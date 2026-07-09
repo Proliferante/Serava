@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --serava-cream: #e2cdae;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #e2cdae;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The Figma design is a fixed 1920px-wide canvas.
+   ScaledCanvas scales it proportionally to the viewport width so the
+   reproduction stays pixel-exact at any screen size. */
+
+/* ── Micro-interactions ─────────────────────────────────────────────
+   Reusable hover/press animations so every interactive element feels
+   alive without converting each section to a client component. */
+.ix-press {
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease, filter 0.2s ease;
+  cursor: pointer;
+}
+.ix-press:hover {
+  transform: scale(1.03);
+  filter: brightness(1.04);
+}
+.ix-press:active {
+  transform: scale(0.97);
+}
+
+.ix-nav {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+.ix-nav:hover {
+  opacity: 0.7;
+}
+
+.ix-lift {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+  cursor: pointer;
+}
+.ix-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px -24px rgba(42, 30, 20, 0.55);
+}
+
+.ix-chip {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+.ix-chip:hover {
+  transform: translateY(-2px);
+}
+
+/* ── Figma button hover variants ────────────────────────────────────
+   Color changes taken from each button component's Variant2/activo state. */
+
+/* Nav text link: sand → olive green */
+.ix-navlink { cursor: pointer; }
+.ix-navlink > * { transition: color 0.2s ease; }
+.ix-navlink:hover > * { color: #7d864e; }
+
+/* Solid cream button → inverts to brown fill + cream text */
+.ix-invert { transition: background-color 0.25s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); cursor: pointer; }
+.ix-invert * { transition: color 0.25s ease; }
+.ix-invert:hover { background-color: #492100; }
+.ix-invert:hover * { color: #e2cdae; }
+.ix-invert:active { transform: scale(0.97); }
+
+/* Solid white button → inverts to brown fill + white text */
+.ix-invert-w { transition: background-color 0.25s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); cursor: pointer; }
+.ix-invert-w * { transition: color 0.25s ease; }
+.ix-invert-w:hover { background-color: #492100; }
+.ix-invert-w:hover * { color: #ffffff; }
+.ix-invert-w:active { transform: scale(0.97); }
+
+/* Outline button → fills cream + brown text */
+.ix-fill { transition: background-color 0.25s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); cursor: pointer; }
+.ix-fill * { transition: color 0.25s ease; }
+.ix-fill:hover { background-color: #e2cdae; }
+.ix-fill:hover * { color: #492100; }
+.ix-fill:active { transform: scale(0.97); }
+
+/* "Reservar ahora" button: yellow → olive green on hover (keeps white text) */
+.ix-reserve { transition: background-color 0.25s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); cursor: pointer; }
+.ix-reserve:hover { background-color: #7d864e; }
+.ix-reserve:active { transform: scale(0.97); }
+
+/* Gentle attention pulse for primary CTAs ("parpadeo" suave) */
+@keyframes ixPulse {
+  0%, 100% { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(247, 241, 229, 0); }
+  50% { box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3), 0 0 0 9px rgba(247, 241, 229, 0.1); }
+}
+.ix-pulse {
+  animation: ixPulse 3s ease-in-out infinite;
+}
+@keyframes ixPulseGreen {
+  0%, 100% { box-shadow: 0 16px 32px -16px rgba(47, 55, 30, 0.6), 0 0 0 0 rgba(104, 117, 64, 0); }
+  50% { box-shadow: 0 16px 32px -16px rgba(47, 55, 30, 0.6), 0 0 0 10px rgba(104, 117, 64, 0.18); }
+}
+.ix-pulse-green {
+  animation: ixPulseGreen 3s ease-in-out infinite;
+}
+
+/* Live status dot: bright blink + expanding halo ring ("botoncito brillante parpadeando") */
+@keyframes ixLiveRing {
+  0%   { box-shadow: 0 0 0 0 rgba(127, 139, 87, 0.55), 0 0 7px 1px rgba(127, 139, 87, 0.55); }
+  70%  { box-shadow: 0 0 0 8px rgba(127, 139, 87, 0), 0 0 12px 3px rgba(127, 139, 87, 0.9); }
+  100% { box-shadow: 0 0 0 0 rgba(127, 139, 87, 0), 0 0 7px 1px rgba(127, 139, 87, 0.55); }
+}
+@keyframes ixLiveBlink {
+  0%, 100% { opacity: 0.7; transform: scale(0.9); }
+  50%      { opacity: 1;   transform: scale(1.1); }
+}
+.ix-live {
+  animation: ixLiveRing 1.7s ease-out infinite, ixLiveBlink 1.7s ease-in-out infinite;
+}
+
+/* Attention pulse for the tuscany (orange) primary CTA */
+@keyframes ixPulseTuscany {
+  0%, 100% { box-shadow: 0 16px 32px -16px rgba(181, 84, 47, 0.7), 0 0 0 0 rgba(181, 84, 47, 0); }
+  50%      { box-shadow: 0 18px 36px -14px rgba(181, 84, 47, 0.75), 0 0 0 10px rgba(181, 84, 47, 0.14); }
+}
+.ix-pulse-tuscany {
+  animation: ixPulseTuscany 3s ease-in-out infinite;
+}
+
+/* Shine sweep on hover for image cards */
+.ix-zoom { transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.group:hover .ix-zoom { transform: scale(1.08); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ix-press, .ix-nav, .ix-lift, .ix-chip, .ix-zoom, .ix-navlink > *, .ix-invert, .ix-invert *, .ix-invert-w, .ix-invert-w *, .ix-fill, .ix-fill * { transition: none; }
+  .ix-press:hover, .ix-nav:hover, .ix-lift:hover, .ix-chip:hover, .ix-invert:active, .ix-invert-w:active, .ix-fill:active { transform: none; filter: none; }
+  .ix-pulse, .ix-pulse-green, .ix-live, .ix-pulse-tuscany { animation: none; }
+  .group:hover .ix-zoom { transform: none; }
+}
