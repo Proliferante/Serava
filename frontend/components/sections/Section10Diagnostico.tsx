@@ -34,7 +34,7 @@ export default function Section10Diagnostico() {
 
       {/* Right masked card: photo */}
       <div className="absolute h-[623px] left-[981px] top-[55px] w-[831px]" style={mask("80px 86px")}>
-        <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={`${A}/1d104ea194ca7ae5b0f84b1328433a3a584b589f.png`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={`${A}/1d104ea194ca7ae5b0f84b1328433a3a584b589f.webp`} />
       </div>
       {/* Dark gradient overlay */}
       <div

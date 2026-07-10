@@ -26,14 +26,14 @@ export default function HubSection1Hero() {
     <div className="relative size-full" data-name="Seccion 1">
       {/* Background image */}
       <div className="absolute h-[1262px] left-[-93px] top-[-155px] w-[2241px]">
-        <img alt="" className="absolute block inset-0 max-w-none size-full object-cover" src={`${A}/0399392c61096f2f9a6febf99f556a00af4eb6ac.png`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full object-cover" src={`${A}/0399392c61096f2f9a6febf99f556a00af4eb6ac.webp`} />
       </div>
       {/* Overlay */}
       <div className="absolute bg-[rgba(73,33,0,0.6)] h-[934px] left-0 top-0 w-[1920px]" />
 
       {/* Logo → inicio */}
       <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute h-[34.12px] left-[222px] top-[115px] w-[175.28px]">
-        <img alt="Serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/6a5469af8a03030efc2535c53f980eb3ea6d7f27.svg`} />
+        <img loading="lazy" decoding="async" alt="Serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/6a5469af8a03030efc2535c53f980eb3ea6d7f27.svg`} />
       </a>
 
       {/* Nav */}
@@ -66,7 +66,7 @@ export default function HubSection1Hero() {
 
       {/* Search bar (functional) */}
       <div className="absolute bg-[rgba(73,33,0,0.2)] backdrop-blur-[10px] h-[71px] left-[453px] rounded-[50px] top-[662px] w-[597px] flex items-center pl-[33px] pr-[24px] transition-shadow focus-within:shadow-[0_0_0_2px_rgba(201,168,119,0.55)]">
-        <img alt="" className="h-[26px] w-[26px] shrink-0" src={`${A}/baf296062379ade92e3d68c04f542725059e8e22.svg`} />
+        <img loading="lazy" decoding="async" alt="" className="h-[26px] w-[26px] shrink-0" src={`${A}/baf296062379ade92e3d68c04f542725059e8e22.svg`} />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}

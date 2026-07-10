@@ -12,7 +12,7 @@ export default function Section5Crowdfunding() {
       </p>
       {/* .serava. logo overlaying the leading space */}
       <div className="absolute h-[57.46px] left-[492px] top-[38px] w-[326px]">
-        <img alt="serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/2e39f364b769701627707fff24c20391c60f5845.svg`} />
+        <img loading="lazy" decoding="async" alt="serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/2e39f364b769701627707fff24c20391c60f5845.svg`} />
       </div>
 
       {/* Body paragraph */}

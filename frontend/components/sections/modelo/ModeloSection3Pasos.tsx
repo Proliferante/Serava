@@ -47,7 +47,7 @@ export default function ModeloSection3Pasos() {
       {/* Left image */}
       <div className="absolute h-[911px] left-[-139px] rounded-[150px] top-0 w-[823px]">
         <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[150px]">
-          <img alt="" className="absolute h-[160.52%] left-0 max-w-none top-[-19.01%] w-full" src={`${A}/7df05c23db70daa92a691c6244ff571c65b0f7b1.png`} />
+          <img loading="lazy" decoding="async" alt="" className="absolute h-[160.52%] left-0 max-w-none top-[-19.01%] w-full" src={`${A}/7df05c23db70daa92a691c6244ff571c65b0f7b1.webp`} />
         </div>
       </div>
 

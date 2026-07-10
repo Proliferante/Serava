@@ -8,14 +8,14 @@ export default function Section7Remodelamos() {
     <div className="relative size-full" data-name="Seccion 7">
       {/* Background image */}
       <div className="absolute h-[1639px] left-[-162px] top-[-117px] w-[2912px]">
-        <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={`${A}/7941b044560d1095b5aec747e08e5f1281f727b4.png`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={`${A}/7941b044560d1095b5aec747e08e5f1281f727b4.webp`} />
       </div>
       {/* Gradient overlay */}
       <div className="absolute bg-gradient-to-b from-[31.239%] from-[rgba(175,79,0,0)] h-[1695px] left-0 to-[79.582%] to-[rgba(73,33,0,0.73)] top-0 via-[64.478%] via-[rgba(61,26,0,0.73)] w-[1922px]" />
 
       {/* .serava. logo */}
       <div className="absolute h-[185.94px] left-[536px] top-[308px] w-[939.36px]">
-        <img alt=".serava." className="absolute block inset-0 max-w-none size-full" src={`${A}/b222563045c17eb7e6b761865e89c31fa20bb084.svg`} />
+        <img loading="lazy" decoding="async" alt=".serava." className="absolute block inset-0 max-w-none size-full" src={`${A}/b222563045c17eb7e6b761865e89c31fa20bb084.svg`} />
       </div>
 
       {/* Heading */}

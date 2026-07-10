@@ -21,7 +21,7 @@ export default function Section8Control() {
         <div className="-rotate-90 flex-none">
           <div className="h-0 relative w-[156.003px]">
             <div className="absolute inset-[-4px_0_0_0]">
-              <img alt="" className="block max-w-none size-full" src={`${A}/edbc63e282e73ce64eabf2c42701f7ba60028c2d.svg`} />
+              <img loading="lazy" decoding="async" alt="" className="block max-w-none size-full" src={`${A}/edbc63e282e73ce64eabf2c42701f7ba60028c2d.svg`} />
             </div>
           </div>
         </div>
@@ -30,7 +30,7 @@ export default function Section8Control() {
         <div className="-rotate-90 flex-none">
           <div className="h-0 relative w-[156.003px]">
             <div className="absolute inset-[-4px_0_0_0]">
-              <img alt="" className="block max-w-none size-full" src={`${A}/2d593e4aee8eab6346a45d50b3c2eebf0abb06f5.svg`} />
+              <img loading="lazy" decoding="async" alt="" className="block max-w-none size-full" src={`${A}/2d593e4aee8eab6346a45d50b3c2eebf0abb06f5.svg`} />
             </div>
           </div>
         </div>
@@ -48,7 +48,7 @@ export default function Section8Control() {
 
       {/* Dashboard image */}
       <div className="absolute h-[572px] left-[478px] rounded-[50px] top-[566px] w-[1003px]">
-        <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[50px] size-full" src={`${A}/4055e80987b7d215e0e7f999065b3a68fa45677b.png`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[50px] size-full" src={`${A}/4055e80987b7d215e0e7f999065b3a68fa45677b.webp`} />
       </div>
 
       {/* Badge under image */}

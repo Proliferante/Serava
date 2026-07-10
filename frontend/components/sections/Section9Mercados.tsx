@@ -10,7 +10,7 @@ export default function Section9Mercados() {
       {/* Background image */}
       <div className="absolute h-[1249px] left-[-164px] top-[100px] w-[2237px]">
         <div className="absolute inset-0 opacity-20 overflow-hidden pointer-events-none">
-          <img alt="" className="absolute h-[119.49%] left-0 max-w-none top-[-19.49%] w-full" src={`${A}/63f0d4b26acea5bd4269d62fe7c1683462dc68c9.png`} />
+          <img loading="lazy" decoding="async" alt="" className="absolute h-[119.49%] left-0 max-w-none top-[-19.49%] w-full" src={`${A}/63f0d4b26acea5bd4269d62fe7c1683462dc68c9.webp`} />
         </div>
       </div>
 
@@ -26,10 +26,10 @@ export default function Section9Mercados() {
       <div className="absolute bg-gradient-to-r from-[rgba(165,122,78,0.28)] h-[3px] left-[701px] to-[rgba(165,122,78,0)] top-[350px] w-[974px]" />
 
       {/* City cards (staggered scroll-in + hover) */}
-      <CityCard left="399px" imgSrc={`${A}/5ff4aca097d9134d9e43d10cf9529ab553333003.png`} shadow label="bOGOTÁ" delay={0} />
-      <CityCard left="701.03px" imgSrc={`${A}/9ce42d8da5619ae5f7fc7aa4f180a3a3e5fbd140.png`} crop label="MEDELLÍN" delay={0.12} />
-      <CityCard left="1003.05px" imgSrc={`${A}/59fc56f5d5802c6aeac8c0975f569485d84c9956.png`} crop label="BARRANQUILLA" delay={0.24} />
-      <CityCard left="1307px" imgSrc={`${A}/06d0daed474f187ce01ccba75bba182d031da45c.png`} label="PANAMÁ" delay={0.36} />
+      <CityCard left="399px" imgSrc={`${A}/5ff4aca097d9134d9e43d10cf9529ab553333003.webp`} shadow label="bOGOTÁ" delay={0} />
+      <CityCard left="701.03px" imgSrc={`${A}/9ce42d8da5619ae5f7fc7aa4f180a3a3e5fbd140.webp`} crop label="MEDELLÍN" delay={0.12} />
+      <CityCard left="1003.05px" imgSrc={`${A}/59fc56f5d5802c6aeac8c0975f569485d84c9956.webp`} crop label="BARRANQUILLA" delay={0.24} />
+      <CityCard left="1307px" imgSrc={`${A}/06d0daed474f187ce01ccba75bba182d031da45c.webp`} label="PANAMÁ" delay={0.36} />
 
       {/* Interest panel */}
       <div className="absolute bg-[rgba(73,33,0,0.2)] backdrop-blur-[10px] border border-solid border-[rgba(247,241,229,0.12)] h-[357px] left-[399px] rounded-[50px] top-[832px] w-[1186px]" />

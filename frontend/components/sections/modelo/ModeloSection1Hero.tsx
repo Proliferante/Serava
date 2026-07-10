@@ -15,7 +15,7 @@ export default function ModeloSection1Hero() {
           loop
           playsInline
           preload="auto"
-          poster={`${A}/0709_2-poster.jpg`}
+          poster={`${A}/0709_2-poster.webp`}
         >
           <source src={`${A}/0709_2.webm`} type="video/webm" />
           <source src={`${A}/0709_2.mp4`} type="video/mp4" />
@@ -26,7 +26,7 @@ export default function ModeloSection1Hero() {
 
       {/* Small logo → inicio */}
       <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute h-[34.12px] left-[222px] top-[115px] w-[175.28px]">
-        <img alt="Serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
+        <img loading="lazy" decoding="async" alt="Serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
       </a>
 
       {/* Nav */}

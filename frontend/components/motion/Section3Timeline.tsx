@@ -51,13 +51,13 @@ export default function Section3Timeline() {
 
       {/* Timeline dots */}
       <motion.div className="absolute h-[41px] left-[1183px] top-[294px] w-[40px]" style={{ opacity: d1o, scale: d1s }}>
-        <img alt="" className="absolute block inset-0 max-w-none size-full" src={E1} />
+        <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={E1} />
       </motion.div>
       <motion.div className="absolute h-[41px] left-[1183px] top-[570px] w-[40px]" style={{ opacity: d2o, scale: d2s }}>
-        <img alt="" className="absolute block inset-0 max-w-none size-full" src={E2} />
+        <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={E2} />
       </motion.div>
       <motion.div className="absolute h-[41px] left-[1183px] top-[845px] w-[40px]" style={{ opacity: d3o, scale: d3s }}>
-        <img alt="" className="absolute block inset-0 max-w-none size-full" src={E3} />
+        <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={E3} />
       </motion.div>
     </>
   );

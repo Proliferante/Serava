@@ -177,7 +177,7 @@ export default function DiagnosticoModal({ open, onClose, initialStep = "intro",
           >
             {/* Top bar */}
             <div className="flex shrink-0 items-center justify-between border-b border-solid border-[rgba(247,241,229,0.07)] px-[28px] py-[16px]">
-              <img src={LOGO} alt="Serava" className="h-[21px] w-[108px]" />
+              <img loading="lazy" decoding="async" src={LOGO} alt="Serava" className="h-[21px] w-[108px]" />
               <button type="button" onClick={onClose} className="ix-nav flex items-center gap-[6px] text-[13px]" style={{ color: "rgba(247,241,229,0.6)" }}>
                 Salir <XIcon />
               </button>

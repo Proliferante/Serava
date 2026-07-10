@@ -25,7 +25,7 @@ export default function HubPage() {
         {/* Grid section (clipped frame): faint site-map texture + explora + newsletter + cards */}
         <div className="bg-cream" style={{ position: "absolute", left: 0, top: 1066, width: 1920, height: 2619, overflow: "hidden" }}>
           <div className="absolute left-0 top-[-332px] w-[1948px] h-[2923px] opacity-15 overflow-hidden pointer-events-none">
-            <img alt="" className="absolute inset-0 size-full max-w-none object-cover" src={`${A}/d97817dcb8ef87e0a52ccef1d65f05587ff8c8dd.png`} />
+            <img loading="lazy" decoding="async" alt="" className="absolute inset-0 size-full max-w-none object-cover" src={`${A}/d97817dcb8ef87e0a52ccef1d65f05587ff8c8dd.webp`} />
           </div>
 
           {/* Explora header */}

@@ -6,13 +6,13 @@ export default function ModeloSection5Acceso() {
     <div className="relative size-full" data-name="Seccion 5">
       {/* Background image */}
       <div className="absolute h-[1117px] left-0 top-[-23px] w-[1920px]">
-        <img alt="" className="absolute inset-0 size-full max-w-none object-cover pointer-events-none" src={`${A}/00138f95093b0a47991feb180cf7939379993bde.png`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 size-full max-w-none object-cover pointer-events-none" src={`${A}/00138f95093b0a47991feb180cf7939379993bde.webp`} />
       </div>
       {/* Overlay */}
       <div className="absolute bg-[rgba(73,33,0,0.4)] h-[1324px] left-0 top-[-23px] w-[1920px]" />
       {/* Glow ellipse */}
       <div className="absolute h-[809px] left-[516px] top-[143px] w-[888px]">
-        <img alt="" className="absolute block inset-0 max-w-none size-full" src={`${A}/f2ff362124986a869e4b8107e69abc9bdac912e6.svg`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={`${A}/f2ff362124986a869e4b8107e69abc9bdac912e6.svg`} />
       </div>
 
       {/* Centered content container */}

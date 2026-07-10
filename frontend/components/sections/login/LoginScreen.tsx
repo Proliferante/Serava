@@ -54,13 +54,13 @@ export default function LoginScreen() {
         {/* Image (50% opacity, blends into gradient) */}
         <div className="absolute inset-0 opacity-50">
           <div className="absolute h-[1082px] left-[-108px] top-[-19px] w-[1442px]">
-            <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={`${A}/1d104ea194ca7ae5b0f84b1328433a3a584b589f.png`} />
+            <img loading="lazy" decoding="async" alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={`${A}/1d104ea194ca7ae5b0f84b1328433a3a584b589f.webp`} />
           </div>
         </div>
 
         {/* Logo → inicio */}
         <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute h-[29.8px] left-[32px] top-[38.43px] w-[175.28px]">
-          <img alt="Serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
+          <img loading="lazy" decoding="async" alt="Serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
         </a>
 
         {/* Bottom text */}

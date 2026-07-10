@@ -8,7 +8,7 @@ export default function Footer() {
     <div className="bg-brown-dark overflow-clip relative rounded-tr-[150px] size-full" data-name="Footer">
       {/* .serava. logo → inicio */}
       <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute h-[86px] left-[416px] top-[57px] w-[493.5px]">
-        <img alt=".serava." className="absolute block inset-0 max-w-none size-full" src={`${A}/c9b9033affcd9b5dd0842d0881ff26a7b0031971.svg`} />
+        <img loading="lazy" decoding="async" alt=".serava." className="absolute block inset-0 max-w-none size-full" src={`${A}/c9b9033affcd9b5dd0842d0881ff26a7b0031971.svg`} />
       </a>
 
       {/* Tagline */}

@@ -100,7 +100,7 @@ export default function AddValue() {
     <div className="relative size-full" style={{ backgroundColor: "#efe6d5" }}>
       {/* ── Faint building illustration ── */}
       <div className="pointer-events-none absolute left-0 top-[-11px] h-[2880px] w-full">
-        <img alt="" className="absolute inset-0 size-full max-w-none object-cover opacity-10" src={`${A}/3f6a1939e05d36a16bf711be1b59ff07950dc9bf.png`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 size-full max-w-none object-cover opacity-10" src={`${A}/3f6a1939e05d36a16bf711be1b59ff07950dc9bf.webp`} />
       </div>
       {/* ── Difuminado (Rectangle 30) — valor exacto del Figma: dark → cream al 65% ── */}
       <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(73,33,0,0.65) 10.29%, rgba(226,205,174,0.65) 100%)" }} />
@@ -111,7 +111,7 @@ export default function AddValue() {
           <ChevL /> Volver a la ficha
         </a>
         <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute left-[1331px] top-[18px] h-[29.8px] w-[175.28px]">
-          <img alt="Serava" className="block size-full max-w-none" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
+          <img loading="lazy" decoding="async" alt="Serava" className="block size-full max-w-none" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
         </a>
       </div>
 

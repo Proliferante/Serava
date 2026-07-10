@@ -17,7 +17,7 @@ function StarLine({ top, width, text, color }: { top: string; width: string; tex
   return (
     <div className="absolute h-[22.328px] left-[22px] w-[449px]" style={{ top }}>
       <div className="absolute left-0 size-[15px] top-[3px]">
-        <img alt="" className="absolute block inset-0 max-w-none size-full" src={STAR} />
+        <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={STAR} />
       </div>
       <p className="[word-break:break-word] absolute font-semibold leading-[22px] left-[24px] not-italic text-[14px] top-0" style={{ width, color }}>{text}</p>
     </div>
@@ -57,7 +57,7 @@ function ModalContent() {
               </div>
               <div className="absolute bg-[#7f8b57] h-[49.359px] left-[685px] top-0 w-[493px]">
                 <div className="absolute h-[27px] left-[51px] top-[10.88px] w-[134px]">
-                  <img alt="serava" className="absolute block inset-0 max-w-none size-full" src={LOGO} />
+                  <img loading="lazy" decoding="async" alt="serava" className="absolute block inset-0 max-w-none size-full" src={LOGO} />
                 </div>
               </div>
             </div>
@@ -196,7 +196,7 @@ function ModalContent() {
             >
               <p className="[word-break:break-word] absolute font-semibold h-[24px] leading-[24px] left-[32px] not-italic text-cream-93 text-[16px] top-[16.5px] w-[246px] text-left">Conoce el proceso de acceso</p>
               <div className="absolute left-[289px] size-[18px] top-[20.39px]">
-                <img alt="" className="absolute block inset-0 max-w-none size-full" src={ARROW} />
+                <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={ARROW} />
               </div>
             </a>
           </div>

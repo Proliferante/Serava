@@ -8,7 +8,7 @@ export default function Section2Criterio() {
     <div className="bg-cream relative size-full" data-name="Seccion 2">
       {/* Bogotá map background */}
       <div className="absolute h-[3415px] left-[-709px] top-[-916px] w-[2629px]">
-        <img alt="" className="absolute inset-0 max-w-none object-cover opacity-20 pointer-events-none size-full" src={`${A}/2cddbd3323c70d04c23ee3ff2c94699c7988af39.png`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 max-w-none object-cover opacity-20 pointer-events-none size-full" src={`${A}/2cddbd3323c70d04c23ee3ff2c94699c7988af39.webp`} />
       </div>
 
       {/* Heading (right aligned) */}
@@ -21,7 +21,7 @@ export default function Section2Criterio() {
       {/* .serava. logo (dark) next to subtitle */}
       <div className="absolute h-[184px] left-[1446px] overflow-clip top-[114px] w-[244px]">
         <div className="absolute inset-[40.84%_14.84%_40.84%_14.77%]">
-          <img alt="serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/b3c936d0ee3f55dc8ac3ee141faf4956708f4fbe.svg`} />
+          <img loading="lazy" decoding="async" alt="serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/b3c936d0ee3f55dc8ac3ee141faf4956708f4fbe.svg`} />
         </div>
       </div>
 

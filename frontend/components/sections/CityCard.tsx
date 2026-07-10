@@ -35,16 +35,16 @@ export default function CityCard({ left, imgSrc, label, crop, shadow, delay = 0 
       {/* Photo (zooms on hover) */}
       <div className={`absolute left-0 top-0 h-[310.111px] w-full overflow-hidden rounded-[50px] ${shadow ? "shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]" : ""}`}>
         {crop ? (
-          <img alt={label} className="ix-zoom absolute h-full left-[-103.75%] max-w-none top-0 w-[207.5%] pointer-events-none" src={imgSrc} />
+          <img loading="lazy" decoding="async" alt={label} className="ix-zoom absolute h-full left-[-103.75%] max-w-none top-0 w-[207.5%] pointer-events-none" src={imgSrc} />
         ) : (
-          <img alt={label} className="ix-zoom absolute inset-0 max-w-none object-cover size-full pointer-events-none" src={imgSrc} />
+          <img loading="lazy" decoding="async" alt={label} className="ix-zoom absolute inset-0 max-w-none object-cover size-full pointer-events-none" src={imgSrc} />
         )}
       </div>
 
       {/* Pin + label */}
       <div className="absolute left-[24px] top-[333px] h-[9.22px] w-[9.714px]">
         <div className="absolute inset-[-43.39%_-41.18%]">
-          <img alt="" className="block max-w-none size-full" src={PIN} />
+          <img loading="lazy" decoding="async" alt="" className="block max-w-none size-full" src={PIN} />
         </div>
       </div>
       <p className="[word-break:break-word] absolute left-[42px] top-[329px] font-semibold leading-[17.86px] not-italic text-cream text-[18px] tracking-[2.995px] uppercase whitespace-nowrap">{label}</p>

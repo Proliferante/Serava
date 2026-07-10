@@ -113,7 +113,7 @@ export default function Section4Caso() {
     <div className="overflow-clip relative rounded-tl-[150px] size-full" data-name="Seccion 4">
       {/* Background image */}
       <div className="absolute h-[1249px] left-[-624px] top-[-123px] w-[2238px]">
-        <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={`${A}/166ec568ae1676f084cc41728776b7aedc389e86.png`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={`${A}/166ec568ae1676f084cc41728776b7aedc389e86.webp`} />
       </div>
 
       {/* Panel */}
@@ -145,7 +145,7 @@ export default function Section4Caso() {
           </div>
           {/* handle */}
           <motion.div className="absolute top-[17px] size-[18px]" initial={{ left: 94, scale: 0 }} animate={sliderInView ? { left: 403, scale: 1 } : { left: 94, scale: 0 }} transition={{ duration: 1, ease: EASE }}>
-            <img alt="" className="absolute block inset-0 max-w-none size-full" src={`${A}/6424a9316b574386588cbe3469edd4b83c7f57c0.svg`} />
+            <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={`${A}/6424a9316b574386588cbe3469edd4b83c7f57c0.svg`} />
           </motion.div>
         </div>
 
@@ -163,10 +163,10 @@ export default function Section4Caso() {
           </div>
           <div className="absolute left-[972px] top-[3px] flex w-[88px] gap-[8px]">
             <button type="button" className="ix-press flex size-[40px] items-center justify-center rounded-[20px] border border-solid border-[rgba(73,33,0,0.12)] bg-white opacity-30">
-              <img alt="" className="size-[18px]" src={`${A}/85a59880c3aaef0d26f3e0ba73e5bde80f43e02c.svg`} />
+              <img loading="lazy" decoding="async" alt="" className="size-[18px]" src={`${A}/85a59880c3aaef0d26f3e0ba73e5bde80f43e02c.svg`} />
             </button>
             <button type="button" className="ix-press flex size-[40px] items-center justify-center rounded-[20px] border border-solid border-[rgba(73,33,0,0.12)] bg-white">
-              <img alt="" className="size-[18px]" src={`${A}/1c7a3cf5f5c4660d1f1f1bedbff0248036ba58af.svg`} />
+              <img loading="lazy" decoding="async" alt="" className="size-[18px]" src={`${A}/1c7a3cf5f5c4660d1f1f1bedbff0248036ba58af.svg`} />
             </button>
           </div>
         </div>

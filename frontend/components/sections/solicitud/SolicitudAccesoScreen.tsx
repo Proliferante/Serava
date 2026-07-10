@@ -116,7 +116,7 @@ export default function SolicitudAccesoScreen() {
       {/* Header */}
       <div className="absolute left-0 top-0 h-[79px] w-full" style={{ background: "#2a1e14" }}>
         <a href="/" className="ix-nav absolute h-[29.8px] left-[50px] top-[25px] w-[175.28px]">
-          <img alt="Serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
+          <img loading="lazy" decoding="async" alt="Serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
         </a>
       </div>
 

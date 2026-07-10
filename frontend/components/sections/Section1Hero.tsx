@@ -15,7 +15,7 @@ export default function Section1Hero() {
           loop
           playsInline
           preload="auto"
-          poster={`${A}/0709-poster.jpg`}
+          poster={`${A}/0709-poster.webp`}
         >
           <source src={`${A}/0709.webm`} type="video/webm" />
           <source src={`${A}/0709.mp4`} type="video/mp4" />
@@ -27,20 +27,20 @@ export default function Section1Hero() {
 
       {/* Glow ellipses behind wordmark */}
       <div className="absolute h-[827px] left-[1026px] top-[104px] w-[597px]">
-        <img alt="" className="absolute block inset-0 max-w-none size-full" src={`${A}/1dfbb9b347803e8d29183672cfb540bcde4bf7f2.svg`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={`${A}/1dfbb9b347803e8d29183672cfb540bcde4bf7f2.svg`} />
       </div>
       <div className="absolute h-[827px] left-[389px] top-[114px] w-[597px]">
-        <img alt="" className="absolute block inset-0 max-w-none size-full" src={`${A}/1dfbb9b347803e8d29183672cfb540bcde4bf7f2.svg`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={`${A}/1dfbb9b347803e8d29183672cfb540bcde4bf7f2.svg`} />
       </div>
 
       {/* Small logo top-left → inicio */}
       <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute h-[34.12px] left-[214px] top-[99px] w-[175.28px]">
-        <img alt="Serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
+        <img loading="lazy" decoding="async" alt="Serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
       </a>
 
       {/* Big .serava. wordmark */}
       <div className="absolute h-[139.94px] left-[406px] top-[262px] w-[713.07px]">
-        <img alt=".serava." className="absolute block inset-0 max-w-none size-full" src={`${A}/d9b1e9d601a843e82663d6c4512aa26ff643e90e.svg`} />
+        <img loading="lazy" decoding="async" alt=".serava." className="absolute block inset-0 max-w-none size-full" src={`${A}/d9b1e9d601a843e82663d6c4512aa26ff643e90e.svg`} />
       </div>
 
       {/* Left headline block */}
@@ -74,7 +74,7 @@ export default function Section1Hero() {
         <div className="flex-none rotate-90">
           <div className="h-0 relative w-[560px]">
             <div className="absolute inset-[-2px_0_0_0]">
-              <img alt="" className="block max-w-none size-full" src={`${A}/8c07a4ebf48c45c15932e14ac70c3ec7615aa25e.svg`} />
+              <img loading="lazy" decoding="async" alt="" className="block max-w-none size-full" src={`${A}/8c07a4ebf48c45c15932e14ac70c3ec7615aa25e.svg`} />
             </div>
           </div>
         </div>
@@ -84,7 +84,7 @@ export default function Section1Hero() {
         <div className="flex-none rotate-[-0.33deg]">
           <div className="h-0 relative w-[180.003px]">
             <div className="absolute inset-[-2px_0_0_0]">
-              <img alt="" className="block max-w-none size-full" src={`${A}/b23a0fa6bdbbeca7b97667f44c377bfe6b7d95c4.svg`} />
+              <img loading="lazy" decoding="async" alt="" className="block max-w-none size-full" src={`${A}/b23a0fa6bdbbeca7b97667f44c377bfe6b7d95c4.svg`} />
             </div>
           </div>
         </div>
@@ -93,7 +93,7 @@ export default function Section1Hero() {
         <div className="flex-none rotate-[-0.33deg]">
           <div className="h-0 relative w-[180.003px]">
             <div className="absolute inset-[-2px_0_0_0]">
-              <img alt="" className="block max-w-none size-full" src={`${A}/b23a0fa6bdbbeca7b97667f44c377bfe6b7d95c4.svg`} />
+              <img loading="lazy" decoding="async" alt="" className="block max-w-none size-full" src={`${A}/b23a0fa6bdbbeca7b97667f44c377bfe6b7d95c4.svg`} />
             </div>
           </div>
         </div>

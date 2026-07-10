@@ -9,7 +9,7 @@ export default function Section3Proceso() {
     <div className="bg-brown-dark overflow-clip relative rounded-tr-[150px] size-full" data-name="Seccion 3">
       {/* Background image */}
       <div className="absolute h-[1320px] left-[-258px] top-[35px] w-[1552px]">
-        <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={`${A}/c711c71d04448a3a0e845fd9b958b2015dfbf6aa.png`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={`${A}/c711c71d04448a3a0e845fd9b958b2015dfbf6aa.webp`} />
       </div>
 
       {/* Headings */}

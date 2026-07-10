@@ -103,7 +103,7 @@ export default function FichaPredio() {
           <ChevL /> Volver a predios
         </a>
         <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute left-[1321px] top-[18px] h-[29.8px] w-[175.28px]">
-          <img alt="Serava" className="block size-full max-w-none" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
+          <img loading="lazy" decoding="async" alt="Serava" className="block size-full max-w-none" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
         </a>
       </div>
 

@@ -8,10 +8,10 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 const IMG = "/antes-despues";
 const PROPS = [
-  { city: "Bogotá", name: "Cabrera 1502", full: "Cabrera 1502 · Bogotá", title: "Remodelación integral ultra lujo", area: 320, interv: "Integral", renta: 54, antes: `${IMG}/1502-sala-antes.png`, despues: `${IMG}/1502-sala-despues.png` },
-  { city: "Bogotá", name: "Cabrera 1601", full: "Cabrera 1601 · Bogotá", title: "Cocina integral en madera", area: 280, interv: "Integral", renta: 48, antes: `${IMG}/1601-cocina-antes.png`, despues: `${IMG}/1601-cocina-despues.png` },
-  { city: "Bogotá", name: "Cabrera 1502", full: "Cabrera 1502 · Bogotá", title: "Baño principal en mármol", area: 350, interv: "Integral", renta: 51, antes: `${IMG}/1502-bano-antes.png`, despues: `${IMG}/1502-bano-despues.png` },
-  { city: "Bogotá", name: "Cabrera 1602", full: "Cabrera 1602 · Bogotá", title: "Sala social renovada", area: 300, interv: "Integral", renta: 60, antes: `${IMG}/1602-sala-antes.png`, despues: `${IMG}/1602-sala-despues.png` },
+  { city: "Bogotá", name: "Cabrera 1502", full: "Cabrera 1502 · Bogotá", title: "Remodelación integral ultra lujo", area: 320, interv: "Integral", renta: 54, antes: `${IMG}/1502-sala-antes.webp`, despues: `${IMG}/1502-sala-despues.webp` },
+  { city: "Bogotá", name: "Cabrera 1601", full: "Cabrera 1601 · Bogotá", title: "Cocina integral en madera", area: 280, interv: "Integral", renta: 48, antes: `${IMG}/1601-cocina-antes.webp`, despues: `${IMG}/1601-cocina-despues.webp` },
+  { city: "Bogotá", name: "Cabrera 1502", full: "Cabrera 1502 · Bogotá", title: "Baño principal en mármol", area: 350, interv: "Integral", renta: 51, antes: `${IMG}/1502-bano-antes.webp`, despues: `${IMG}/1502-bano-despues.webp` },
+  { city: "Bogotá", name: "Cabrera 1602", full: "Cabrera 1602 · Bogotá", title: "Sala social renovada", area: 300, interv: "Integral", renta: 60, antes: `${IMG}/1602-sala-antes.webp`, despues: `${IMG}/1602-sala-despues.webp` },
 ];
 
 const sIco = { fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
@@ -78,6 +78,8 @@ export default function AntesDespuesSection() {
         >
           {/* After (base) */}
           <img
+            loading="lazy"
+            decoding="async"
             key={`despues-${active}`}
             src={p.despues}
             alt={`Después — ${p.full}, ${p.title}`}
@@ -87,6 +89,8 @@ export default function AntesDespuesSection() {
           {/* Before (clipped to left) */}
           <motion.div className="absolute inset-0" style={{ clipPath: beforeClip }}>
             <img
+              loading="lazy"
+              decoding="async"
               key={`antes-${active}`}
               src={p.antes}
               alt={`Antes — ${p.full}, estado original`}
@@ -151,7 +155,7 @@ export default function AntesDespuesSection() {
               className="relative h-[163px] w-[261px] overflow-hidden rounded-[12px] border-2 border-solid"
               style={{ borderColor: active === i ? "#7f8b57" : "transparent" }}
             >
-              <img src={t.despues} alt={t.full} draggable={false} className="absolute inset-0 size-full max-w-none object-cover pointer-events-none" />
+              <img loading="lazy" decoding="async" src={t.despues} alt={t.full} draggable={false} className="absolute inset-0 size-full max-w-none object-cover pointer-events-none" />
               <div className="absolute bottom-0 left-0 h-[60px] w-full" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(42,30,20,0.85) 100%)" }} />
               <div className="absolute bottom-[12px] left-[12px] text-left">
                 <p className="font-medium leading-[14px] text-[9px] text-tan-63">{t.city}</p>

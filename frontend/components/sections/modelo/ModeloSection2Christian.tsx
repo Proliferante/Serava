@@ -39,13 +39,13 @@ export default function ModeloSection2Christian() {
 
       {/* Right image cards */}
       <div className="absolute h-[648px] left-[899px] rounded-[50px] overflow-clip shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-[147px] w-[367px]">
-        <img alt="Christian Mejía" className="absolute inset-0 size-full max-w-none object-cover pointer-events-none" src={`${A}/b198b86126bf89fe31acbd329c43b0c3be2ad9d8.png`} />
+        <img loading="lazy" decoding="async" alt="Christian Mejía" className="absolute inset-0 size-full max-w-none object-cover pointer-events-none" src={`${A}/b198b86126bf89fe31acbd329c43b0c3be2ad9d8.webp`} />
       </div>
       <div className="absolute h-[342px] left-[1295px] rounded-[50px] overflow-clip shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-[147px] w-[298px]">
-        <img alt="" className="absolute inset-0 size-full max-w-none object-cover pointer-events-none" src={`${A}/ae09f9b0135a2fc49c8959c70cc2f2943a689759.png`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 size-full max-w-none object-cover pointer-events-none" src={`${A}/ae09f9b0135a2fc49c8959c70cc2f2943a689759.webp`} />
       </div>
       <div className="absolute h-[294px] left-[1295px] rounded-[50px] overflow-clip shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-[501px] w-[298px]">
-        <img alt="" className="absolute inset-0 size-full max-w-none object-cover pointer-events-none" src={`${A}/241d626f43991fe806f109bff5e5c9db45c204a8.png`} />
+        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 size-full max-w-none object-cover pointer-events-none" src={`${A}/241d626f43991fe806f109bff5e5c9db45c204a8.webp`} />
       </div>
     </div>
   );

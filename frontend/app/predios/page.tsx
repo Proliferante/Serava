@@ -37,7 +37,7 @@ export default function PrediosPage() {
             {/* Nav */}
             <div className="absolute left-0 top-0 h-[82px] w-full">
               <a href="/" className="ix-nav absolute h-[29.8px] left-[101px] top-[21px] w-[175.28px]">
-                <img alt="Serava" className="absolute inset-0 block size-full max-w-none" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
+                <img loading="lazy" decoding="async" alt="Serava" className="absolute inset-0 block size-full max-w-none" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
               </a>
               <div className="absolute left-1/2 top-[16px] flex -translate-x-1/2 items-center gap-[6px] rounded-[999px] p-[5px]" style={{ background: "rgba(247,241,229,0.06)" }}>
                 {NAV.map((n, i) => (
@@ -65,11 +65,11 @@ export default function PrediosPage() {
 
           {/* Decorative building backdrop (faint towers) — image 9 (left) + image 10 (right) */}
           <div className="pointer-events-none absolute left-[-484px] top-[294px] h-[2806px] w-[1871px]">
-            <img alt="" className="absolute inset-0 size-full max-w-none object-cover opacity-10" src={`${A}/1603eea0cdf422fdf4ee349b5d252c4253213488.png`} />
+            <img loading="lazy" decoding="async" alt="" className="absolute inset-0 size-full max-w-none object-cover opacity-10" src={`${A}/1603eea0cdf422fdf4ee349b5d252c4253213488.webp`} />
           </div>
           <div className="pointer-events-none absolute left-[1043px] top-[1021px] h-[2089px] w-[877px]">
             <div className="absolute inset-0 overflow-hidden opacity-10">
-              <img alt="" className="absolute left-0 top-0 h-full max-w-none" style={{ width: "158.84%" }} src={`${A}/1603eea0cdf422fdf4ee349b5d252c4253213488.png`} />
+              <img loading="lazy" decoding="async" alt="" className="absolute left-0 top-0 h-full max-w-none" style={{ width: "158.84%" }} src={`${A}/1603eea0cdf422fdf4ee349b5d252c4253213488.webp`} />
             </div>
           </div>
 
