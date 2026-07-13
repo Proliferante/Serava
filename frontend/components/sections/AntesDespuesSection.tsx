@@ -2,7 +2,6 @@
 
 import { motion, useInView, useMotionTemplate, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import CountUp from "@/components/motion/CountUp";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -58,7 +57,17 @@ export default function AntesDespuesSection() {
   }, []);
 
   return (
-    <div className="relative size-full" style={{ background: "radial-gradient(60% 55% at 50% 46%, rgba(201,168,119,0.16) 0%, rgba(101,84,60,0.08) 27%, rgba(0,0,0,0) 55%), #e2cdae" }} data-name="Antes / Despues">
+    <div className="relative size-full overflow-hidden" style={{ background: "radial-gradient(60% 55% at 50% 46%, rgba(201,168,119,0.16) 0%, rgba(101,84,60,0.08) 27%, rgba(0,0,0,0) 55%), #e2cdae" }} data-name="Antes / Despues">
+      {/* Fondo topográfico — node 217:1227 */}
+      <img
+        aria-hidden
+        loading="lazy"
+        decoding="async"
+        alt=""
+        src="/figma/Fondo_Modelo_Antes_des.png"
+        className="absolute inset-0 size-full max-w-none object-cover opacity-[0.08] pointer-events-none"
+      />
+
       <div className="absolute left-1/2 -translate-x-1/2 top-[249px] w-[1080px]">
         {/* Header */}
         <p className="font-semibold leading-[17px] not-italic text-[#a57a4e] text-[11px]">Antes / Después</p>
@@ -119,27 +128,13 @@ export default function AntesDespuesSection() {
         </div>
 
         {/* Info bar */}
-        <div className="mt-[22px] flex h-[94.34px] items-center justify-between rounded-[16px] border border-solid border-[rgba(165,122,78,0.28)] bg-cream-93 px-[24px]">
+        <div className="mt-[22px] flex h-[94.34px] items-center rounded-[16px] border border-solid border-[rgba(165,122,78,0.28)] bg-cream-93 px-[24px]">
           <div>
             <div className="flex items-center gap-[8px] text-[#a57a4e]">
               <Pin />
               <span className="font-semibold text-[12px] text-[#a57a4e]">{p.full}</span>
             </div>
             <p className="mt-[4px] font-semibold text-[18px] text-[#2a1e14]">{p.title}</p>
-          </div>
-          <div key={active} className="flex gap-[22px]">
-            <div>
-              <p className="font-normal text-[10px] text-[#5b4332]">Área</p>
-              <p className="mt-[1px] font-semibold text-[16px] text-[#3d2c1e]"><CountUp value={p.area} suffix=" m²" duration={1} /></p>
-            </div>
-            <div>
-              <p className="font-normal text-[10px] text-[#5b4332]">Intervención</p>
-              <p className="mt-[1px] font-semibold text-[16px] text-[#3d2c1e]">{p.interv}</p>
-            </div>
-            <div>
-              <p className="font-normal text-[10px] text-[#5b4332]">Renta tras obra</p>
-              <p className="mt-[1px] font-semibold text-[16px] text-[#3d2c1e]"><CountUp value={p.renta} prefix="+" suffix="%" duration={1} /></p>
-            </div>
           </div>
         </div>
 

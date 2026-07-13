@@ -44,12 +44,15 @@ function PasoCard({ cardLeft, cardBg, label, title, titleTop, body, bodyTop, bod
 export default function ModeloSection3Pasos() {
   return (
     <div className="bg-brown-dark overflow-clip relative rounded-br-[150px] rounded-tl-[150px] size-full" data-name="Seccion 3">
-      {/* Left image */}
-      <div className="absolute h-[911px] left-[-139px] rounded-[150px] top-0 w-[823px]">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[150px]">
-          <img loading="lazy" decoding="async" alt="" className="absolute h-[160.52%] left-0 max-w-none top-[-19.01%] w-full" src={`${A}/7df05c23db70daa92a691c6244ff571c65b0f7b1.webp`} />
-        </div>
-      </div>
+      {/* Left image — node 279:1162, imagen ya recortada 713×911 */}
+      <img
+        loading="lazy"
+        decoding="async"
+        alt=""
+        className="absolute object-cover pointer-events-none"
+        style={{ left: 0, top: 0, width: 713, height: 911 }}
+        src={`${A}/Pagina_Modelo_Seccion3.png`}
+      />
 
       {/* Eyebrow + divider */}
       <div className="absolute bg-[#a57a4e] h-px left-[1636px] opacity-80 top-[132px] w-[36px]" />

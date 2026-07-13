@@ -15,10 +15,9 @@ export default function Section1Hero() {
           loop
           playsInline
           preload="auto"
-          poster={`${A}/0709-poster.webp`}
+          poster={`${A}/0709_2-poster.webp`}
         >
-          <source src={`${A}/0709.webm`} type="video/webm" />
-          <source src={`${A}/0709.mp4`} type="video/mp4" />
+          <source src={`${A}/0709_2_.mp4`} type="video/mp4" />
         </video>
       </div>
 

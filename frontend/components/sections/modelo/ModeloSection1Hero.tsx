@@ -7,7 +7,7 @@ export default function ModeloSection1Hero() {
   return (
     <div className="relative size-full" data-name="Seccion 1">
       {/* Background video — falls back to the poster until it loads (or if it can't play) */}
-      <div className="absolute left-0 top-0 h-[1080px] w-[1920px]">
+      <div className="absolute h-[1425px] left-[-34px] top-[-199px] w-[2137px]">
         <video
           className="absolute inset-0 max-w-none object-cover pointer-events-none size-full"
           autoPlay
@@ -22,7 +22,7 @@ export default function ModeloSection1Hero() {
         </video>
       </div>
       {/* Brown overlay */}
-      <div className="absolute bg-[rgba(73,33,0,0.6)] h-[1079px] left-0 top-0 w-[1920px]" />
+      <div className="absolute bg-[rgba(73,33,0,0.6)] h-[1205px] left-0 top-0 w-[1920px]" />
 
       {/* Small logo → inicio */}
       <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute h-[34.12px] left-[222px] top-[115px] w-[175.28px]">
@@ -64,7 +64,7 @@ export default function ModeloSection1Hero() {
       </div>
 
       {/* CTA → solicitud de acceso */}
-      <a href="/solicitud-acceso" className="ix-invert ix-pulse absolute bg-cream h-[104px] left-[758px] overflow-clip rounded-[98px] top-[682px] w-[404px] block">
+      <a href="/solicitud-acceso" className="ix-invert ix-pulse absolute bg-cream h-[104px] left-[758px] overflow-clip rounded-[98px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.25)] top-[682px] w-[404px] block">
         <div className="-translate-x-1/2 [word-break:break-word] absolute font-semibold h-[68px] leading-[0] left-[202px] not-italic text-brown-dark text-[24px] text-center top-[18px] w-[295px] whitespace-pre-wrap">
           <p className="leading-[90.645%] mb-0">Conoce el proceso </p>
           <p className="leading-[90.645%]">de acceso</p>

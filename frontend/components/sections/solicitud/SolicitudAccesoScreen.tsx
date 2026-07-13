@@ -112,7 +112,22 @@ export default function SolicitudAccesoScreen() {
   };
 
   return (
-    <div className="relative size-full" style={{ background: "#e2cdae" }} data-name="SOLICITUD ACCESO">
+    <div
+      className="relative size-full overflow-hidden"
+      style={{ backgroundImage: "linear-gradient(0deg, #e2cdae 10.878%, #492100 61.951%)" }}
+      data-name="SOLICITUD ACCESO"
+    >
+      {/* Fondo topográfico (ChatGPT Image / Fondo_Solicitud_Acceso) — node 208:1213 */}
+      <img
+        aria-hidden
+        loading="lazy"
+        decoding="async"
+        alt=""
+        src={`${A}/Fondo_Solicitud_Acceso.png`}
+        className="pointer-events-none absolute object-cover"
+        style={{ left: "-18.31px", top: "165.54px", width: "1957.834px", height: "1307.345px", opacity: 0.15 }}
+      />
+
       {/* Header */}
       <div className="absolute left-0 top-0 h-[79px] w-full" style={{ background: "#2a1e14" }}>
         <a href="/" className="ix-nav absolute h-[29.8px] left-[50px] top-[25px] w-[175.28px]">

@@ -26,8 +26,8 @@ export default function ModeloPage() {
         <Layer left={0} top={0} width={1920} height={1263}><ModeloSection1Hero /></Layer>
         <RevealLayer left={0} top={1079} width={1920} height={1135}><ModeloSection2Christian /></RevealLayer>
         <RevealLayer left={0} top={4900} width={1920} height={1260}><ModeloSection5Acceso /></RevealLayer>
-        <RevealLayer left={0} top={4168} width={1920} height={966}><ModeloSection4Control /></RevealLayer>
-        <RevealLayer left={0} top={2742} width={1920} height={1499}><AntesDespuesSection /></RevealLayer>
+        <RevealLayer left={0} top={4087} width={1920} height={1047}><ModeloSection4Control /></RevealLayer>
+        <RevealLayer left={-19} top={2742} width={1939} height={1499}><AntesDespuesSection /></RevealLayer>
         <RevealLayer left={0} top={2022} width={1928} height={911}><ModeloSection3Pasos /></RevealLayer>
         <Layer left={0} top={5852} width={1922} height={364}><Footer /></Layer>
       </ScaledCanvas>

@@ -5,7 +5,7 @@ export default function ModeloSection5Acceso() {
   return (
     <div className="relative size-full" data-name="Seccion 5">
       {/* Background image */}
-      <div className="absolute h-[1117px] left-0 top-[-23px] w-[1920px]">
+      <div className="absolute h-[1222px] left-[-104px] top-[-67px] w-[2170px]">
         <img loading="lazy" decoding="async" alt="" className="absolute inset-0 size-full max-w-none object-cover pointer-events-none" src={`${A}/00138f95093b0a47991feb180cf7939379993bde.webp`} />
       </div>
       {/* Overlay */}

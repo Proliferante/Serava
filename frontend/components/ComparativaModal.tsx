@@ -1,233 +1,278 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
-const A = "/figma";
-const STAR = `${A}/7e5131393b4625a802d0322737dbeed0316933de.svg`;
-const LOGO = `${A}/66b685e62ddc97e18461c8492896704f8b4eff9c.svg`;
-const ARROW = `${A}/ae9998c9498fd99f82f96dbf74c3317cbd516587.svg`;
+const EASE = [0.22, 1, 0.36, 1] as const;
 
-const SECTION_GRADIENT =
-  "url(\"data:image/svg+xml;utf8,<svg viewBox='0 0 1920 1717.7' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'><rect x='0' y='0' height='100%' width='100%' fill='url(%23grad)' opacity='1'/><defs><radialGradient id='grad' gradientUnits='userSpaceOnUse' cx='0' cy='0' r='10' gradientTransform='matrix(96 0 0 85.884 960 858.84)'><stop stop-color='rgba(201,168,119,0.16)' offset='0'/><stop stop-color='rgba(101,84,60,0.08)' offset='0.275'/><stop stop-color='rgba(0,0,0,0)' offset='0.55'/></radialGradient></defs></svg>\")";
+/* ── Icons ─────────────────────────────────────────────────────────── */
+const st = { fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+const Pin = () => (<svg viewBox="0 0 24 24" className="size-full" {...st} aria-hidden><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z" /><circle cx="12" cy="10" r="2.5" /></svg>);
+const Search = () => (<svg viewBox="0 0 24 24" className="size-full" {...st} aria-hidden><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>);
+const Wrench = () => (<svg viewBox="0 0 24 24" className="size-full" {...st} aria-hidden><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></svg>);
+const Key = () => (<svg viewBox="0 0 24 24" className="size-full" {...st} aria-hidden><circle cx="7.5" cy="15.5" r="5.5" /><path d="M21 2l-9.6 9.6M15.5 7.5l3 3" /></svg>);
+const Gear = () => (<svg viewBox="0 0 24 24" className="size-full" {...st} aria-hidden><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>);
+const Activity = () => (<svg viewBox="0 0 24 24" className="size-full" {...st} aria-hidden><path d="M3 3v18h18" /><path d="M7 14l3-3 3 3 5-6" /></svg>);
+const Clock = () => (<svg viewBox="0 0 24 24" className="size-full" {...st} aria-hidden><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>);
+const Check = () => (<svg viewBox="0 0 24 24" className="size-full" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6L9 17l-5-5" /></svg>);
+const Star = () => (<svg viewBox="0 0 24 24" className="size-full" fill="currentColor" stroke="none" aria-hidden><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.5l7.1-.6z" /></svg>);
+const Chevron = ({ dir }: { dir: "l" | "r" }) => (<svg viewBox="0 0 24 24" className="size-full" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={dir === "l" ? "M15 6l-6 6 6 6" : "M9 6l6 6-6 6"} /></svg>);
+const ArrowR = () => (<svg viewBox="0 0 24 24" className="size-full" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M5 12h14M13 6l6 6-6 6" /></svg>);
 
-/** Star bullet + text (right "Con Serava" column). */
-function StarLine({ top, width, text, color }: { top: string; width: string; text: string; color: string }) {
+/* ── Data ──────────────────────────────────────────────────────────── */
+type Step = {
+  num: string;
+  title: string;
+  Icon: () => ReactNode;
+  badge?: string;
+  cuenta: string;
+  serava: ReactNode[];
+  chip?: string;
+  takeaway: string;
+  foot?: string;
+};
+
+const STEPS: Step[] = [
+  {
+    num: "01", title: "Elegir la zona", Icon: Pin,
+    cuenta: "Semanas investigando mercados para, aun así, decidir sin certeza.",
+    serava: [
+      <>Zonas validadas por nuestros <b className="font-semibold">datos y el Serava Score</b>.</>,
+      "Demanda alta, oferta limitada.",
+    ],
+    takeaway: "Meses de investigación que te ahorras.",
+  },
+  {
+    num: "02", title: "Encontrar el predio", Icon: Search,
+    cuenta: "Meses de búsqueda, con riesgo de pagar de más o comprar el activo equivocado.",
+    serava: [
+      <>Predios ya <b className="font-semibold">curados por arquitectos expertos</b>.</>,
+      "Sustentados uno a uno, no solo por precio.",
+    ],
+    takeaway: "La selección, hecha y sustentada.",
+  },
+  {
+    num: "03", title: "Remodelar", Icon: Wrench, badge: "El núcleo del modelo",
+    cuenta: "Meses coordinando obra, con sobrecostos y retrasos que salen de tu bolsillo.",
+    serava: [
+      <>Sistema de gestión de obra con <b className="font-semibold">diseño e interventoría independientes</b>.</>,
+      "Control real, no juez y parte.",
+      "Materiales de alta calidad.",
+      <b className="font-semibold">Sin sobrecostos.</b>,
+    ],
+    chip: "95% cumplimiento de tiempos",
+    takeaway: "Cada mes de obra que no se pierde es renta que empieza antes.",
+    foot: "Salvo imprevistos ajenos a Serava.",
+  },
+  {
+    num: "04", title: "Arrendar", Icon: Key,
+    cuenta: "Buscas inquilino y gestionas el contrato. Cada mes vacío es renta que no entra.",
+    serava: [
+      <><b className="font-semibold">Colocamos al arrendatario</b>.</>,
+      "Administramos el arriendo de principio a fin.",
+    ],
+    takeaway: "El activo empieza a rentar, sin demora.",
+  },
+  {
+    num: "05", title: "Administrar", Icon: Gear,
+    cuenta: "Tu tiempo se va en mantenimiento, reparaciones y propiedad horizontal. Sin fecha de fin.",
+    serava: [
+      <>Sostenemos <b className="font-semibold">mantenimiento y reparaciones</b>.</>,
+      "Propiedad horizontal incluida.",
+    ],
+    takeaway: "Tu atención queda libre. Indefinidamente.",
+  },
+  {
+    num: "06", title: "Seguir la inversión", Icon: Activity,
+    cuenta: "Armas tu propio control para no perder de vista el activo, la renta y el valor.",
+    serava: [
+      <><b className="font-semibold">Apruebas y sigues cada etapa</b>.</>,
+      "Datos, obra y zona — sin ejecutar nada.",
+    ],
+    takeaway: "Control total, en minutos.",
+  },
+];
+
+/* ── Step card ─────────────────────────────────────────────────────── */
+function StepCard({ step }: { step: Step }) {
   return (
-    <div className="absolute h-[22.328px] left-[22px] w-[449px]" style={{ top }}>
-      <div className="absolute left-0 size-[15px] top-[3px]">
-        <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={STAR} />
-      </div>
-      <p className="[word-break:break-word] absolute font-semibold leading-[22px] left-[24px] not-italic text-[14px] top-0" style={{ width, color }}>{text}</p>
-    </div>
-  );
-}
-
-/** Exact reproduction of the Figma frame "CON SERAVA/SIN SERAVA" (1920 × 1717.672). */
-function ModalContent() {
-  return (
-    <div className="bg-cream overflow-clip relative rounded-[40px] size-full" data-name="CON SERAVA/SIN SERAVA">
-      <div className="absolute h-[1717.672px] left-0 top-0 w-[1920px]" style={{ backgroundImage: SECTION_GRADIENT }}>
-        <div className="absolute h-[1457.672px] left-[370px] top-[130px] w-[1180px]">
-          {/* Header */}
-          <div className="[word-break:break-word] absolute h-[319.125px] left-0 not-italic top-[13px] w-[820px]">
-            <p className="absolute font-semibold h-[17px] leading-[17px] left-0 text-[#a57a4e] text-[11px] top-[7.58px] w-[285.953px]">El ciclo de tu inversión</p>
-            <p className="absolute font-semibold leading-[0] left-0 text-[48px] text-black top-[40.42px] w-[809.406px]">
-              <span className="font-light leading-[54px] text-[#3d2c1e]">En una inversión, cada etapa cuesta tiempo. Y el tiempo es </span>
-              <span className="leading-[54px] text-[#2a1e14]">renta y es riesgo. </span>
-              <span className="leading-[54px] text-[#5f6b3e]">Nosotros lo asumimos. </span>
-            </p>
-            <p className="absolute font-medium leading-[0] left-0 text-[18px] text-black top-[263px] w-[659px]">
-              <span className="font-light leading-[28px] text-[#5b4332]">Invertir directo es posible. Pero cada mes que tardas en encontrar, remodelar o arrendar es </span>
-              <span className="leading-[28px] text-[#3d2c1e]">renta que no entra y capital detenido. </span>
-              <span className="leading-[28px] text-[#5b4332]">Serava elimina ese tiempo — y lo que ese tiempo te cuesta. </span>
-            </p>
-          </div>
-
-          {/* Table */}
-          <div className="absolute bg-[rgba(255,255,255,0)] border border-[rgba(165,122,78,0.28)] border-solid h-[918.391px] left-0 overflow-clip rounded-[20px] shadow-[36px_38px_60.3px_-40px_#130d05] top-[383.13px] w-[1180px]">
-            {/* Header row */}
-            <div className="absolute bg-[rgba(165,122,78,0.28)] h-[49.359px] left-0 top-0 w-[1178px]">
-              <div className="absolute bg-[#3d2c1e] h-[49.359px] left-0 top-0 w-[190px]">
-                <p className="[word-break:break-word] absolute font-bold h-[17px] leading-[17px] left-[22px] not-italic text-[#c9a877] text-[11px] top-[15.5px] w-[46.969px]">Etapa</p>
-              </div>
-              <div className="absolute bg-[#f7f1e5] h-[49.359px] left-[191px] top-0 w-[493px]">
-                <p className="[word-break:break-word] absolute font-bold h-[17px] leading-[17px] left-[22px] not-italic text-[#b5542f] text-[11px] top-[15.5px] w-[119.297px]">Por tu cuenta</p>
-              </div>
-              <div className="absolute bg-[#7f8b57] h-[49.359px] left-[685px] top-0 w-[493px]">
-                <div className="absolute h-[27px] left-[51px] top-[10.88px] w-[134px]">
-                  <img loading="lazy" decoding="async" alt="serava" className="absolute block inset-0 max-w-none size-full" src={LOGO} />
-                </div>
-              </div>
-            </div>
-
-            {/* Row 01 */}
-            <div className="absolute bg-[#7f8b57] h-[125.953px] left-0 top-[49.36px] w-[1178px]">
-              <div className="[word-break:break-word] absolute bg-[#efe6d5] h-[125.953px] left-0 not-italic top-0 w-[190px]">
-                <p className="absolute font-bold h-[19px] leading-[19px] left-[22px] text-[#a57a4e] text-[12px] top-[22px] w-[146px]">01</p>
-                <p className="absolute font-semibold h-[20px] leading-[20px] left-[22px] text-[#2a1e14] text-[16px] top-[44.34px] w-[146px]">Elegir la zona</p>
-              </div>
-              <div className="absolute bg-[#f7f1e5] h-[125.953px] left-[191px] top-0 w-[493px]">
-                <p className="[word-break:break-word] absolute font-light leading-[22px] left-[22px] not-italic text-[#5b4332] text-[14px] top-[23px] w-[433px]">Semanas investigando mercados para, aun así, decidir sin certeza.</p>
-              </div>
-              <div className="absolute bg-[rgba(127,139,87,0.07)] h-[125.953px] left-[685px] top-0 w-[493px]">
-                <p className="[word-break:break-word] absolute font-light h-[44px] leading-[0] left-[22px] not-italic text-[14px] text-white top-[21.52px] w-[362px] whitespace-pre-wrap">
-                  <span className="leading-[22px]">Entras a zonas validadas por nuestros datos y el :  </span>
-                  <span className="font-bold leading-[22px]">Serava Score </span>
-                  <span className="leading-[22px]">demanda alta, oferta limitada.</span>
-                </p>
-                <StarLine top="81.63px" width="300px" text="Meses de investigación que te ahorras." color="#e2cdae" />
-              </div>
-            </div>
-
-            {/* Row 02 */}
-            <div className="absolute bg-[#7f8b57] h-[125.953px] left-0 top-[175.31px] w-[1178px]">
-              <div className="[word-break:break-word] absolute bg-[#efe6d5] h-[125.953px] left-0 not-italic top-0 w-[190px]">
-                <p className="absolute font-bold h-[19px] leading-[19px] left-[22px] text-[#a57a4e] text-[12px] top-[22px] w-[146px]">02</p>
-                <p className="absolute font-semibold leading-[20px] left-[22px] text-[#2a1e14] text-[16px] top-[44.34px] w-[146px]">Encontrar el predio</p>
-              </div>
-              <div className="absolute bg-[#f7f1e5] h-[125.953px] left-[191px] top-0 w-[493px]">
-                <p className="[word-break:break-word] absolute font-light leading-[22px] left-[22px] not-italic text-[#5b4332] text-[14px] top-[23px] w-[385px]">Meses de búsqueda, con riesgo de pagar de más o comprar el activo equivocado.</p>
-              </div>
-              <div className="absolute bg-[rgba(127,139,87,0.07)] h-[125.953px] left-[685px] top-0 w-[493px]">
-                <p className="[word-break:break-word] absolute font-light h-[22px] leading-[0] left-[22px] not-italic text-[14px] text-white top-[21.56px] w-[440px]">
-                  <span className="leading-[22px]">Accedes a predios ya </span>
-                  <span className="font-bold leading-[22px]">curados por arquitectos expertos </span>
-                  <span className="leading-[22px]">, sustentados uno a uno.</span>
-                </p>
-                <StarLine top="81.63px" width="259px" text="La selección, hecha y sustentada." color="#e2cdae" />
-              </div>
-            </div>
-
-            {/* Row 03 — highlighted */}
-            <div className="absolute bg-[#7f8b57] h-[237.266px] left-0 top-[301.27px] w-[1178px]">
-              <div className="absolute bg-[#7f8b57] h-[237.266px] left-0 top-0 w-[190px]">
-                <p className="[word-break:break-word] absolute font-bold h-[19px] leading-[19px] left-[22px] not-italic text-[#f7f1e5] text-[12px] top-[22px] w-[146px]">03</p>
-                <p className="[word-break:break-word] absolute font-semibold h-[20px] leading-[20px] left-[22px] not-italic text-[#f7f1e5] text-[16px] top-[44.34px] w-[146px]">Remodelar</p>
-                <div className="absolute bg-[rgba(247,241,229,0.22)] h-[82px] left-[22px] rounded-[6px] top-[78.61px] w-[146px]">
-                  <p className="[word-break:break-word] absolute font-bold leading-[24px] left-[9px] not-italic text-[#f7f1e5] text-[20px] top-[5px] w-[92.484px]">El núcleo del modelo</p>
-                </div>
-              </div>
-              <div className="absolute bg-[#f7f1e5] h-[237.266px] left-[191px] top-0 w-[493px]">
-                <p className="[word-break:break-word] absolute font-light leading-[22px] left-[22px] not-italic text-[#5b4332] text-[14px] top-[23px] w-[430px]">Meses coordinando obra, con sobrecostos y retrasos que salen de tu bolsillo.</p>
-              </div>
-              <div className="absolute bg-[rgba(127,139,87,0.14)] h-[237.266px] left-[685px] top-0 w-[493px]">
-                <p className="[word-break:break-word] absolute font-light h-[72px] leading-[0] left-[22px] not-italic text-[14px] text-white top-[16.61px] w-[395px] whitespace-pre-wrap">
-                  <span className="leading-[22px]">Sistema de gestión de obra con  </span>
-                  <span className="font-bold leading-[22px]">diseño e interventoría independientes </span>
-                  <span className="leading-[22px]">de quien ejecuta —control real, no juez y parte— y materiales de alta calidad. </span>
-                  <span className="font-bold leading-[22px]">Sin sobrecostos.</span>
-                </p>
-                <div className="absolute bg-[#3d2c1e] h-[27.344px] left-[22px] rounded-[7px] top-[102.44px] w-[235px]">
-                  <p className="[word-break:break-word] absolute font-bold h-[19px] leading-[19px] left-[11px] not-italic text-[#c9a877] text-[12px] top-[4px] w-[213px]">95% cumplimiento de tiempos</p>
-                </div>
-                <StarLine top="143.78px" width="371px" text="Cada mes de obra que no se pierde es renta que empieza antes." color="#e2cdae" />
-                <p className="[word-break:break-word] absolute font-light h-[18px] leading-[18px] left-[22px] not-italic text-[#5b4332] text-[12px] top-[196.44px] w-[449px]">Salvo imprevistos ajenos a Serava.</p>
-              </div>
-            </div>
-
-            {/* Row 04 */}
-            <div className="absolute bg-[#7f8b57] h-[125.953px] left-0 top-[538.53px] w-[1178px]">
-              <div className="[word-break:break-word] absolute bg-[#efe6d5] h-[125.953px] left-0 not-italic top-0 w-[190px]">
-                <p className="absolute font-bold h-[19px] leading-[19px] left-[22px] text-[#a57a4e] text-[12px] top-[22px] w-[146px]">04</p>
-                <p className="absolute font-semibold h-[20px] leading-[20px] left-[22px] text-[#2a1e14] text-[16px] top-[44.34px] w-[146px]">Arrendar</p>
-              </div>
-              <div className="absolute bg-[#f7f1e5] h-[125.953px] left-[191px] top-0 w-[493px]">
-                <p className="[word-break:break-word] absolute font-light leading-[22px] left-[22px] not-italic text-[#5b4332] text-[14px] top-[23px] w-[445px]">Buscas inquilino y gestionas el contrato. Cada mes vacío es renta que no entra.</p>
-              </div>
-              <div className="absolute bg-[rgba(127,139,87,0.07)] h-[125.953px] left-[685px] top-0 w-[493px]">
-                <p className="[word-break:break-word] absolute font-bold h-[22px] leading-[0] left-[22px] not-italic text-[14px] text-white top-[22px] w-[435px]">
-                  <span className="leading-[22px]">Colocamos al arrendatario y administramos el arriendo </span>
-                  <span className="font-normal leading-[22px]">de principio a fin.</span>
-                </p>
-                <StarLine top="81.63px" width="298px" text="El activo empieza a rentar, sin demora." color="#5f6b3e" />
-              </div>
-            </div>
-
-            {/* Row 05 */}
-            <div className="absolute bg-[#7f8b57] h-[125.953px] left-0 top-[664.48px] w-[1178px]">
-              <div className="[word-break:break-word] absolute bg-[#efe6d5] h-[125.953px] left-0 not-italic top-0 w-[190px]">
-                <p className="absolute font-bold h-[19px] leading-[19px] left-[22px] text-[#a57a4e] text-[12px] top-[22px] w-[146px]">05</p>
-                <p className="absolute font-semibold h-[20px] leading-[20px] left-[22px] text-[#2a1e14] text-[16px] top-[44.34px] w-[146px]">Administrar</p>
-              </div>
-              <div className="absolute bg-[#f7f1e5] h-[125.953px] left-[191px] top-0 w-[493px]">
-                <p className="[word-break:break-word] absolute font-light leading-[22px] left-[22px] not-italic text-[#5b4332] text-[14px] top-[23px] w-[378px]">Tu tiempo se va en mantenimiento, reparaciones y propiedad horizontal. Sin fecha de fin.</p>
-              </div>
-              <div className="absolute bg-[rgba(127,139,87,0.07)] h-[125.953px] left-[685px] top-0 w-[493px]">
-                <p className="[word-break:break-word] absolute font-bold leading-[0] left-[22px] not-italic text-[14px] text-white top-[-0.61px] w-[417px]">
-                  <span className="font-normal leading-[22px]">Sostenemos el activo: </span>
-                  <span className="leading-[22px]">mantenimiento, reparaciones y propiedad horizontal</span>
-                </p>
-                <p className="[word-break:break-word] absolute font-light h-[22px] leading-[22px] left-[186px] not-italic text-[#3d2c1e] text-[14px] top-[44.81px] w-[3px]">.</p>
-                <StarLine top="81.63px" width="324px" text="Tu atención queda libre. Indefinidamente." color="#5f6b3e" />
-              </div>
-            </div>
-
-            {/* Row 06 */}
-            <div className="absolute bg-[#7f8b57] h-[125.953px] left-0 top-[790.44px] w-[1178px]">
-              <div className="[word-break:break-word] absolute bg-[#efe6d5] h-[125.953px] left-0 not-italic top-0 w-[190px]">
-                <p className="absolute font-bold h-[19px] leading-[19px] left-[22px] text-[#a57a4e] text-[12px] top-[22px] w-[146px]">06</p>
-                <p className="absolute font-semibold leading-[20px] left-[22px] text-[#2a1e14] text-[16px] top-[44.34px] w-[146px]">Seguir la inversión</p>
-              </div>
-              <div className="absolute bg-[#f7f1e5] h-[125.953px] left-[191px] top-0 w-[493px]">
-                <p className="[word-break:break-word] absolute font-light leading-[22px] left-[22px] not-italic text-[#5b4332] text-[14px] top-[23px] w-[441px]">Armas tu propio control para no perder de vista el activo, la renta y el valor.</p>
-              </div>
-              <div className="absolute bg-[rgba(127,139,87,0.07)] h-[125.953px] left-[685px] top-0 w-[493px]">
-                <p className="[word-break:break-word] absolute font-bold h-[16px] leading-[0] left-[22px] not-italic text-[14px] text-white top-[22.44px] w-[401px]">
-                  <span className="leading-[22px]">Apruebas y sigues cada etapa </span>
-                  <span className="font-normal leading-[22px]">—datos, obra y zona— sin ejecutar nada.</span>
-                </p>
-                <StarLine top="81.63px" width="199px" text="Control total, en minutos." color="#5f6b3e" />
-              </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="absolute h-[104.156px] left-0 top-[1353.52px] w-[1180px]">
-            <p className="[word-break:break-word] absolute font-normal leading-[0] left-0 not-italic text-[22px] text-black top-px w-[300px]">
-              <span className="font-light leading-[34px] text-[#3d2c1e]">Tú sumas un inmueble a tu patrimonio. </span>
-              <span className="leading-[34px] text-[#5f6b3e]">Nosotros hacemos el resto. </span>
-            </p>
-            <a
-              href="/solicitud-acceso"
-              className="absolute bg-[#7f8b57] h-[58.797px] left-[841px] rounded-[999px] top-[22.67px] w-[339px] cursor-pointer transition-transform duration-200 hover:scale-[1.03] active:scale-95 block"
-              style={{ filter: "drop-shadow(0px 16px 16px rgba(47,55,30,0.6))" }}
-            >
-              <p className="[word-break:break-word] absolute font-semibold h-[24px] leading-[24px] left-[32px] not-italic text-cream-93 text-[16px] top-[16.5px] w-[246px] text-left">Conoce el proceso de acceso</p>
-              <div className="absolute left-[289px] size-[18px] top-[20.39px]">
-                <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={ARROW} />
-              </div>
-            </a>
-          </div>
+    <div className="w-[620px] max-w-full rounded-[40px] bg-[#f7f1e5] px-[42px] pt-[34px] pb-[36px]">
+      {/* Header */}
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="font-bold not-italic text-[#a57a4e] text-[14px] leading-[22px]">{step.num}</p>
+          <p className="font-light not-italic text-[#2a1e14] text-[28px] leading-[35px]">{step.title}</p>
+          {step.badge && (
+            <span className="mt-[8px] inline-block rounded-[7px] bg-[#7f8b57] px-[11px] py-[4px] font-bold text-[10px] leading-[15px] text-[#f7f1e5]">{step.badge}</span>
+          )}
+        </div>
+        <div className="flex size-[54px] shrink-0 items-center justify-center rounded-full border border-solid border-[rgba(165,122,78,0.28)] bg-[rgba(165,122,78,0.12)] text-[#3d2c1e]">
+          <span className="size-[25px]"><step.Icon /></span>
         </div>
       </div>
+
+      {/* Comparison */}
+      <div className="mt-[26px] flex items-stretch gap-[12.6px]">
+        {/* Por tu cuenta */}
+        <div className="flex-1 rounded-[15px] border border-solid border-[rgba(181,84,47,0.18)] bg-[rgba(181,84,47,0.06)] p-[16px]">
+          <p className="font-bold text-[10px] leading-[16px] text-[#b5542f]">Por tu cuenta</p>
+          <p className="mt-[11px] font-light text-[14px] leading-[21px] text-[#5b4332]">{step.cuenta}</p>
+        </div>
+        {/* Con Serava */}
+        <div className="flex-1 rounded-[15px] border border-solid border-[rgba(127,139,87,0.28)] bg-[rgba(127,139,87,0.09)] p-[16px]">
+          <div className="flex items-center justify-between">
+            <p className="font-bold text-[10px] leading-[16px] text-[#5f6b3e]">Con Serava</p>
+            <span className="flex size-[19.8px] items-center justify-center rounded-full bg-[#7f8b57] p-[4.5px] text-[#f7f1e5]"><Check /></span>
+          </div>
+          <ul className="mt-[12px] flex flex-col gap-[8px]">
+            {step.serava.map((b, i) => (
+              <li key={i} className="flex items-start gap-[8px]">
+                <span className="mt-[3px] size-[13.5px] shrink-0 text-[#7f8b57]"><Check /></span>
+                <p className="font-light text-[14px] leading-[21px] text-[#3d2c1e]">{b}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Metric chip */}
+      {step.chip && (
+        <div className="mt-[16px] flex h-[41px] items-center gap-[10px] rounded-[11px] bg-[#3d2c1e] px-[14px]">
+          <span className="size-[15.3px] shrink-0 text-[#c9a877]"><Clock /></span>
+          <p className="font-semibold text-[12.5px] leading-[21px] text-[#c9a877]">{step.chip}</p>
+        </div>
+      )}
+
+      {/* Takeaway */}
+      <div className="mt-[16px] flex items-start gap-[8px]">
+        <span className="mt-[3px] size-[13.5px] shrink-0 text-[#5f6b3e]"><Star /></span>
+        <p className="font-semibold text-[14px] leading-[22px] text-[#5f6b3e]">{step.takeaway}</p>
+      </div>
+      {step.foot && <p className="mt-[6px] font-light text-[11px] leading-[17px] text-[#5b4332]">{step.foot}</p>}
     </div>
   );
 }
 
-/** Popup overlay: scales the 1920-wide design to the viewport WIDTH (never
- *  upscaling past native) so the content stays large and readable, and lets
- *  the dialog scroll vertically when it's taller than the viewport. */
-export default function ComparativaModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const W = 1920;
-  const H = 1717.672;
-  const [scale, setScale] = useState(0.5);
-  const [mounted, setMounted] = useState(false);
+/* ── Modal content (header + carousel + nav + footer) ──────────────── */
+function ModalContent() {
+  const [[idx, dir], setIdx] = useState<[number, number]>([0, 0]);
 
+  const go = (next: number) => {
+    if (next < 0 || next > STEPS.length - 1) return;
+    setIdx([next, next > idx ? 1 : -1]);
+  };
+
+  const variants = {
+    enter: (d: number) => ({ x: d > 0 ? 64 : -64, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (d: number) => ({ x: d > 0 ? -64 : 64, opacity: 0 }),
+  };
+
+  return (
+    <div className="relative w-[min(1040px,92vw)] rounded-[40px] bg-[#eadec9] px-[56px] pt-[52px] pb-[40px]">
+      {/* Header */}
+      <p className="font-semibold text-[#a57a4e] text-[20px] leading-[24px]">El ciclo de tu inversión</p>
+      <p className="mt-[20px] max-w-[900px] font-semibold text-[46px] leading-[52px]">
+        <span className="font-light text-[#3d2c1e]">En una inversión, cada etapa cuesta tiempo. Y el tiempo es </span>
+        <span className="text-[#2a1e14]">renta y es riesgo. </span>
+        <span className="text-[#5f6b3e]">Nosotros lo asumimos.</span>
+      </p>
+      <p className="mt-[22px] max-w-[640px] text-[20px] leading-[27px]">
+        <span className="font-light text-[#5b4332]">Invertir directo es posible. Pero cada mes que tardas en encontrar, remodelar o arrendar es </span>
+        <span className="font-medium text-[#3d2c1e]">renta que no entra y capital detenido. </span>
+        <span className="font-light text-[#5b4332]">Serava elimina ese tiempo — y lo que ese tiempo te cuesta.</span>
+      </p>
+
+      {/* Carousel */}
+      <div className="mt-[40px] flex min-h-[500px] items-start justify-center">
+        <AnimatePresence initial={false} custom={dir} mode="wait">
+          <motion.div
+            key={idx}
+            custom={dir}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.32, ease: EASE }}
+          >
+            <StepCard step={STEPS[idx]} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Nav */}
+      <div className="mt-[8px] flex flex-col items-center gap-[16px]">
+        <div className="flex items-center gap-[22px]">
+          <button
+            type="button"
+            onClick={() => go(idx - 1)}
+            disabled={idx === 0}
+            aria-label="Anterior"
+            className="ix-press flex size-[46px] items-center justify-center rounded-full border border-solid border-[rgba(165,122,78,0.35)] bg-[rgba(165,122,78,0.12)] p-[13px] text-[#3d2c1e] transition-opacity disabled:opacity-30"
+          >
+            <Chevron dir="l" />
+          </button>
+          <p className="font-medium text-[16px] tabular-nums">
+            <span className="text-[#3d2c1e]">{STEPS[idx].num}</span>
+            <span className="text-[#a57a4e]"> / 06</span>
+          </p>
+          <button
+            type="button"
+            onClick={() => go(idx + 1)}
+            disabled={idx === STEPS.length - 1}
+            aria-label="Siguiente"
+            className="ix-press flex size-[46px] items-center justify-center rounded-full bg-[#7f8b57] p-[13px] text-cream-93 transition-[opacity,transform] hover:scale-[1.05] disabled:opacity-30 disabled:hover:scale-100"
+          >
+            <Chevron dir="r" />
+          </button>
+        </div>
+        {/* Dots */}
+        <div className="flex items-center gap-[8px]">
+          {STEPS.map((s, i) => (
+            <button
+              key={s.num}
+              type="button"
+              aria-label={`Paso ${s.num}`}
+              onClick={() => go(i)}
+              className="h-[6px] rounded-full transition-all duration-300"
+              style={{ width: i === idx ? 24 : 6, backgroundColor: i === idx ? "#7f8b57" : "rgba(165,122,78,0.35)" }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-[36px] flex items-center justify-between gap-[24px]">
+        <p className="max-w-[320px] text-[22px] leading-[34px]">
+          <span className="font-light text-[#3d2c1e]">Tú sumas un inmueble a tu patrimonio. </span>
+          <span className="text-[#5f6b3e]">Nosotros hacemos el resto.</span>
+        </p>
+        <a
+          href="/solicitud-acceso"
+          className="flex h-[58px] shrink-0 items-center gap-[10px] rounded-[999px] bg-[#7f8b57] px-[32px] text-cream-93 transition-transform duration-200 hover:scale-[1.03] active:scale-95"
+          style={{ filter: "drop-shadow(0px 16px 16px rgba(47,55,30,0.6))" }}
+        >
+          <span className="font-semibold text-[16px]">Conoce el proceso de acceso</span>
+          <span className="size-[18px]"><ArrowR /></span>
+        </a>
+      </div>
+    </div>
+  );
+}
+
+/** Popup: "El ciclo de tu inversión" — Por tu cuenta vs. Con Serava, en 6 pasos. */
+export default function ComparativaModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!open) return;
-    const update = () => setScale(Math.min((window.innerWidth - 48) / W, 1));
-    update();
-    window.addEventListener("resize", update);
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      window.removeEventListener("resize", update);
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
     };
@@ -242,40 +287,32 @@ export default function ComparativaModal({ open, onClose }: { open: boolean; onC
           className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain"
           role="dialog"
           aria-modal="true"
-          aria-label="Comparativa: por tu cuenta vs. con Serava"
+          aria-label="El ciclo de tu inversión: por tu cuenta vs. con Serava"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
         >
-          {/* Backdrop — fixed to the viewport so it always covers while scrolling */}
           <div className="fixed inset-0 bg-black/60" aria-hidden />
 
-          {/* Scroll layout: horizontally centered, top-aligned so a tall modal scrolls */}
-          <div className="relative flex min-h-full justify-center items-start p-6" onClick={onClose}>
+          <div className="relative flex min-h-full items-start justify-center p-6" onClick={onClose}>
             <motion.div
-              className="relative shrink-0 overflow-hidden rounded-[40px] shadow-[0_40px_120px_rgba(0,0,0,0.5)]"
-              style={{ width: W * scale, height: H * scale }}
+              className="relative shrink-0 rounded-[40px] shadow-[0_40px_120px_rgba(0,0,0,0.5)]"
               onClick={(e) => e.stopPropagation()}
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 24 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 24, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.98 }}
+              transition={{ duration: 0.35, ease: EASE }}
             >
-              {/* Native-size design scaled from the top-left; the wrapper above is
-                  sized to the scaled dimensions so the scroll area is correct. */}
-              <div style={{ width: W, height: H, transform: `scale(${scale})`, transformOrigin: "top left" }}>
-                {/* Close button (scales with the design) */}
-                <button
-                  type="button"
-                  onClick={onClose}
-                  aria-label="Cerrar"
-                  className="ix-press absolute right-[40px] top-[40px] z-10 flex size-[52px] items-center justify-center rounded-full bg-[#3d2c1e] text-cream-93 text-[28px] leading-none hover:bg-black transition-colors"
-                >
-                  ×
-                </button>
-                <ModalContent />
-              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Cerrar"
+                className="ix-press absolute right-[28px] top-[28px] z-10 flex size-[48px] items-center justify-center rounded-full bg-[#3d2c1e] text-cream-93 text-[26px] leading-none transition-colors hover:bg-black"
+              >
+                ×
+              </button>
+              <ModalContent />
             </motion.div>
           </div>
         </motion.div>
