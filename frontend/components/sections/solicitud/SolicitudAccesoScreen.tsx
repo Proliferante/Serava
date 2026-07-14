@@ -123,7 +123,7 @@ export default function SolicitudAccesoScreen() {
         loading="lazy"
         decoding="async"
         alt=""
-        src={`${A}/Fondo_Solicitud_Acceso.png`}
+        src={`${A}/Fondo_Solicitud_Acceso.webp`}
         className="pointer-events-none absolute object-cover"
         style={{ left: "-18.31px", top: "165.54px", width: "1957.834px", height: "1307.345px", opacity: 0.15 }}
       />

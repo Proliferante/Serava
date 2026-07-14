@@ -51,7 +51,7 @@ export default function ModeloSection3Pasos() {
         alt=""
         className="absolute object-cover pointer-events-none"
         style={{ left: 0, top: 0, width: 713, height: 911 }}
-        src={`${A}/Pagina_Modelo_Seccion3.png`}
+        src={`${A}/Pagina_Modelo_Seccion3.webp`}
       />
 
       {/* Eyebrow + divider */}

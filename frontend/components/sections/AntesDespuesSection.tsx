@@ -64,7 +64,7 @@ export default function AntesDespuesSection() {
         loading="lazy"
         decoding="async"
         alt=""
-        src="/figma/Fondo_Modelo_Antes_des.png"
+        src="/figma/Fondo_Modelo_Antes_des.webp"
         className="absolute inset-0 size-full max-w-none object-cover opacity-[0.08] pointer-events-none"
       />
 

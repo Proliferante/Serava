@@ -14,9 +14,10 @@ export default function Section1Hero() {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           poster={`${A}/0709_2-poster.webp`}
         >
+          <source src={`${A}/0709_2_.webm`} type="video/webm" />
           <source src={`${A}/0709_2_.mp4`} type="video/mp4" />
         </video>
       </div>
