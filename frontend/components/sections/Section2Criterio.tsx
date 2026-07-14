@@ -55,10 +55,10 @@ export default function Section2Criterio() {
       </p>
 
       {/* CTA → solicitud de acceso */}
-      <a href="/solicitud-acceso" className="ix-invert absolute bg-cream h-[104px] left-[1234px] overflow-clip rounded-[98px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.25)] top-[787px] w-[404px] block">
-        <div className="-translate-x-1/2 [word-break:break-word] absolute font-semibold h-[68px] leading-[0] left-[202px] not-italic text-brown-dark text-[24px] text-center top-[18px] w-[295px] whitespace-pre-wrap">
-          <p className="leading-[90.645%] mb-0">Conoce el proceso </p>
-          <p className="leading-[90.645%]">de acceso</p>
+      <a href="/solicitud-acceso" className="ix-invert absolute bg-cream h-[104px] left-[1234px] overflow-clip rounded-[98px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.25)] top-[787px] w-[404px] flex items-center justify-center">
+        <div className="[word-break:break-word] font-semibold not-italic text-brown-dark text-[24px] text-center leading-[1.15]">
+          <p className="mb-0">Conoce el proceso</p>
+          <p>de acceso</p>
         </div>
       </a>
     </div>

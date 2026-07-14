@@ -120,10 +120,10 @@ export default function Section1Hero() {
       </a>
 
       {/* CTA button → solicitud de acceso */}
-      <a href="/solicitud-acceso" className="ix-invert ix-pulse absolute bg-cream h-[104px] left-[412px] overflow-clip rounded-[98px] top-[713px] w-[404px] block">
-        <div className="-translate-x-1/2 [word-break:break-word] absolute font-semibold h-[68px] leading-[0] left-[202px] not-italic text-brown-dark text-[24px] text-center top-[18px] w-[295px] whitespace-pre-wrap">
-          <p className="leading-[90.645%] mb-0">Conoce el proceso </p>
-          <p className="leading-[90.645%]">de acceso</p>
+      <a href="/solicitud-acceso" className="ix-invert ix-pulse absolute bg-cream h-[104px] left-[412px] overflow-clip rounded-[98px] top-[713px] w-[404px] flex items-center justify-center">
+        <div className="[word-break:break-word] font-semibold not-italic text-brown-dark text-[24px] text-center leading-[1.15]">
+          <p className="mb-0">Conoce el proceso</p>
+          <p>de acceso</p>
         </div>
       </a>
     </div>
