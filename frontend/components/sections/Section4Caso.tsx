@@ -112,7 +112,7 @@ export default function Section4Caso() {
   return (
     <div className="overflow-clip relative rounded-tl-[150px] size-full" data-name="Seccion 4">
       {/* Background image */}
-      <div className="absolute h-[1249px] left-[-624px] top-[-123px] w-[2238px]">
+      <div className="pointer-events-none absolute h-[1249px] left-[-624px] top-[-123px] w-[2238px]">
         <img loading="lazy" decoding="async" alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={`${A}/166ec568ae1676f084cc41728776b7aedc389e86.webp`} />
       </div>
 
