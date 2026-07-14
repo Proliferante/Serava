@@ -97,39 +97,39 @@ const STEPS: Step[] = [
 /* ── Step card ─────────────────────────────────────────────────────── */
 function StepCard({ step }: { step: Step }) {
   return (
-    <div className="w-[620px] max-w-full rounded-[40px] bg-[#f7f1e5] px-[42px] pt-[34px] pb-[36px]">
+    <div className="w-[520px] max-w-full rounded-[24px] bg-[#f7f1e5] px-[28px] pt-[24px] pb-[24px]">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <p className="font-bold not-italic text-[#a57a4e] text-[14px] leading-[22px]">{step.num}</p>
-          <p className="font-light not-italic text-[#2a1e14] text-[28px] leading-[35px]">{step.title}</p>
+          <p className="font-bold not-italic text-[#a57a4e] text-[12px] leading-[18px]">{step.num}</p>
+          <p className="font-light not-italic text-[#2a1e14] text-[21px] leading-[27px]">{step.title}</p>
           {step.badge && (
-            <span className="mt-[8px] inline-block rounded-[7px] bg-[#7f8b57] px-[11px] py-[4px] font-bold text-[10px] leading-[15px] text-[#f7f1e5]">{step.badge}</span>
+            <span className="mt-[6px] inline-block rounded-[6px] bg-[#7f8b57] px-[9px] py-[3px] font-bold text-[9px] leading-[13px] text-[#f7f1e5]">{step.badge}</span>
           )}
         </div>
-        <div className="flex size-[54px] shrink-0 items-center justify-center rounded-full border border-solid border-[rgba(165,122,78,0.28)] bg-[rgba(165,122,78,0.12)] text-[#3d2c1e]">
-          <span className="size-[25px]"><step.Icon /></span>
+        <div className="flex size-[42px] shrink-0 items-center justify-center rounded-full border border-solid border-[rgba(165,122,78,0.28)] bg-[rgba(165,122,78,0.12)] text-[#3d2c1e]">
+          <span className="size-[19px]"><step.Icon /></span>
         </div>
       </div>
 
       {/* Comparison */}
-      <div className="mt-[26px] flex items-stretch gap-[12.6px]">
+      <div className="mt-[18px] flex items-stretch gap-[10px]">
         {/* Por tu cuenta */}
-        <div className="flex-1 rounded-[15px] border border-solid border-[rgba(181,84,47,0.18)] bg-[rgba(181,84,47,0.06)] p-[16px]">
-          <p className="font-bold text-[10px] leading-[16px] text-[#b5542f]">Por tu cuenta</p>
-          <p className="mt-[11px] font-light text-[14px] leading-[21px] text-[#5b4332]">{step.cuenta}</p>
+        <div className="flex-1 rounded-[12px] border border-solid border-[rgba(181,84,47,0.18)] bg-[rgba(181,84,47,0.06)] p-[13px]">
+          <p className="font-bold text-[9px] leading-[13px] text-[#b5542f]">Por tu cuenta</p>
+          <p className="mt-[8px] font-light text-[12.5px] leading-[18px] text-[#5b4332]">{step.cuenta}</p>
         </div>
         {/* Con Serava */}
-        <div className="flex-1 rounded-[15px] border border-solid border-[rgba(127,139,87,0.28)] bg-[rgba(127,139,87,0.09)] p-[16px]">
+        <div className="flex-1 rounded-[12px] border border-solid border-[rgba(127,139,87,0.28)] bg-[rgba(127,139,87,0.09)] p-[13px]">
           <div className="flex items-center justify-between">
-            <p className="font-bold text-[10px] leading-[16px] text-[#5f6b3e]">Con Serava</p>
-            <span className="flex size-[19.8px] items-center justify-center rounded-full bg-[#7f8b57] p-[4.5px] text-[#f7f1e5]"><Check /></span>
+            <p className="font-bold text-[9px] leading-[13px] text-[#5f6b3e]">Con Serava</p>
+            <span className="flex size-[17px] items-center justify-center rounded-full bg-[#7f8b57] p-[3.5px] text-[#f7f1e5]"><Check /></span>
           </div>
-          <ul className="mt-[12px] flex flex-col gap-[8px]">
+          <ul className="mt-[9px] flex flex-col gap-[7px]">
             {step.serava.map((b, i) => (
-              <li key={i} className="flex items-start gap-[8px]">
-                <span className="mt-[3px] size-[13.5px] shrink-0 text-[#7f8b57]"><Check /></span>
-                <p className="font-light text-[14px] leading-[21px] text-[#3d2c1e]">{b}</p>
+              <li key={i} className="flex items-start gap-[7px]">
+                <span className="mt-[2.5px] size-[12px] shrink-0 text-[#7f8b57]"><Check /></span>
+                <p className="font-light text-[12.5px] leading-[18px] text-[#3d2c1e]">{b}</p>
               </li>
             ))}
           </ul>
@@ -138,18 +138,18 @@ function StepCard({ step }: { step: Step }) {
 
       {/* Metric chip */}
       {step.chip && (
-        <div className="mt-[16px] flex h-[41px] items-center gap-[10px] rounded-[11px] bg-[#3d2c1e] px-[14px]">
-          <span className="size-[15.3px] shrink-0 text-[#c9a877]"><Clock /></span>
-          <p className="font-semibold text-[12.5px] leading-[21px] text-[#c9a877]">{step.chip}</p>
+        <div className="mt-[13px] flex h-[34px] items-center gap-[8px] rounded-[10px] bg-[#3d2c1e] px-[12px]">
+          <span className="size-[14px] shrink-0 text-[#c9a877]"><Clock /></span>
+          <p className="font-semibold text-[11px] leading-[16px] text-[#c9a877]">{step.chip}</p>
         </div>
       )}
 
       {/* Takeaway */}
-      <div className="mt-[16px] flex items-start gap-[8px]">
-        <span className="mt-[3px] size-[13.5px] shrink-0 text-[#5f6b3e]"><Star /></span>
-        <p className="font-semibold text-[14px] leading-[22px] text-[#5f6b3e]">{step.takeaway}</p>
+      <div className="mt-[13px] flex items-start gap-[7px]">
+        <span className="mt-[2px] size-[12px] shrink-0 text-[#5f6b3e]"><Star /></span>
+        <p className="font-semibold text-[12.5px] leading-[18px] text-[#5f6b3e]">{step.takeaway}</p>
       </div>
-      {step.foot && <p className="mt-[6px] font-light text-[11px] leading-[17px] text-[#5b4332]">{step.foot}</p>}
+      {step.foot && <p className="mt-[5px] font-light text-[10px] leading-[15px] text-[#5b4332]">{step.foot}</p>}
     </div>
   );
 }
@@ -170,22 +170,22 @@ function ModalContent() {
   };
 
   return (
-    <div className="relative w-[min(1040px,92vw)] rounded-[40px] bg-[#eadec9] px-[56px] pt-[52px] pb-[40px]">
+    <div className="flex-1 overflow-y-auto w-full bg-[#eadec9] px-[40px] pt-[38px] pb-[30px]">
       {/* Header */}
-      <p className="font-semibold text-[#a57a4e] text-[20px] leading-[24px]">El ciclo de tu inversión</p>
-      <p className="mt-[20px] max-w-[900px] font-semibold text-[46px] leading-[52px]">
+      <p className="font-semibold text-[#a57a4e] text-[14px] leading-[18px]">El ciclo de tu inversión</p>
+      <p className="mt-[14px] max-w-[620px] font-semibold text-[30px] leading-[36px]">
         <span className="font-light text-[#3d2c1e]">En una inversión, cada etapa cuesta tiempo. Y el tiempo es </span>
         <span className="text-[#2a1e14]">renta y es riesgo. </span>
         <span className="text-[#5f6b3e]">Nosotros lo asumimos.</span>
       </p>
-      <p className="mt-[22px] max-w-[640px] text-[20px] leading-[27px]">
+      <p className="mt-[14px] max-w-[560px] text-[14px] leading-[20px]">
         <span className="font-light text-[#5b4332]">Invertir directo es posible. Pero cada mes que tardas en encontrar, remodelar o arrendar es </span>
         <span className="font-medium text-[#3d2c1e]">renta que no entra y capital detenido. </span>
         <span className="font-light text-[#5b4332]">Serava elimina ese tiempo — y lo que ese tiempo te cuesta.</span>
       </p>
 
       {/* Carousel */}
-      <div className="mt-[40px] flex min-h-[500px] items-start justify-center">
+      <div className="mt-[26px] flex min-h-[360px] items-start justify-center">
         <AnimatePresence initial={false} custom={dir} mode="wait">
           <motion.div
             key={idx}
@@ -202,18 +202,18 @@ function ModalContent() {
       </div>
 
       {/* Nav */}
-      <div className="mt-[8px] flex flex-col items-center gap-[16px]">
-        <div className="flex items-center gap-[22px]">
+      <div className="mt-[4px] flex flex-col items-center gap-[12px]">
+        <div className="flex items-center gap-[18px]">
           <button
             type="button"
             onClick={() => go(idx - 1)}
             disabled={idx === 0}
             aria-label="Anterior"
-            className="ix-press flex size-[46px] items-center justify-center rounded-full border border-solid border-[rgba(165,122,78,0.35)] bg-[rgba(165,122,78,0.12)] p-[13px] text-[#3d2c1e] transition-opacity disabled:opacity-30"
+            className="ix-press flex size-[40px] items-center justify-center rounded-full border border-solid border-[rgba(165,122,78,0.35)] bg-[rgba(165,122,78,0.12)] p-[11px] text-[#3d2c1e] transition-opacity disabled:opacity-30"
           >
             <Chevron dir="l" />
           </button>
-          <p className="font-medium text-[16px] tabular-nums">
+          <p className="font-medium text-[14px] tabular-nums">
             <span className="text-[#3d2c1e]">{STEPS[idx].num}</span>
             <span className="text-[#a57a4e]"> / 06</span>
           </p>
@@ -222,39 +222,39 @@ function ModalContent() {
             onClick={() => go(idx + 1)}
             disabled={idx === STEPS.length - 1}
             aria-label="Siguiente"
-            className="ix-press flex size-[46px] items-center justify-center rounded-full bg-[#7f8b57] p-[13px] text-cream-93 transition-[opacity,transform] hover:scale-[1.05] disabled:opacity-30 disabled:hover:scale-100"
+            className="ix-press flex size-[40px] items-center justify-center rounded-full bg-[#7f8b57] p-[11px] text-cream-93 transition-[opacity,transform] hover:scale-[1.05] disabled:opacity-30 disabled:hover:scale-100"
           >
             <Chevron dir="r" />
           </button>
         </div>
         {/* Dots */}
-        <div className="flex items-center gap-[8px]">
+        <div className="flex items-center gap-[7px]">
           {STEPS.map((s, i) => (
             <button
               key={s.num}
               type="button"
               aria-label={`Paso ${s.num}`}
               onClick={() => go(i)}
-              className="h-[6px] rounded-full transition-all duration-300"
-              style={{ width: i === idx ? 24 : 6, backgroundColor: i === idx ? "#7f8b57" : "rgba(165,122,78,0.35)" }}
+              className="h-[5px] rounded-full transition-all duration-300"
+              style={{ width: i === idx ? 20 : 5, backgroundColor: i === idx ? "#7f8b57" : "rgba(165,122,78,0.35)" }}
             />
           ))}
         </div>
       </div>
 
       {/* Footer */}
-      <div className="mt-[36px] flex items-center justify-between gap-[24px]">
-        <p className="max-w-[320px] text-[22px] leading-[34px]">
+      <div className="mt-[26px] flex items-center justify-between gap-[20px]">
+        <p className="max-w-[260px] text-[15px] leading-[23px]">
           <span className="font-light text-[#3d2c1e]">Tú sumas un inmueble a tu patrimonio. </span>
           <span className="text-[#5f6b3e]">Nosotros hacemos el resto.</span>
         </p>
         <a
           href="/solicitud-acceso"
-          className="flex h-[58px] shrink-0 items-center gap-[10px] rounded-[999px] bg-[#7f8b57] px-[32px] text-cream-93 transition-transform duration-200 hover:scale-[1.03] active:scale-95"
-          style={{ filter: "drop-shadow(0px 16px 16px rgba(47,55,30,0.6))" }}
+          className="flex h-[48px] shrink-0 items-center gap-[9px] rounded-[999px] bg-[#7f8b57] px-[24px] text-cream-93 transition-transform duration-200 hover:scale-[1.03] active:scale-95"
+          style={{ filter: "drop-shadow(0px 12px 14px rgba(47,55,30,0.55))" }}
         >
-          <span className="font-semibold text-[16px]">Conoce el proceso de acceso</span>
-          <span className="size-[18px]"><ArrowR /></span>
+          <span className="font-semibold text-[14px]">Conoce el proceso de acceso</span>
+          <span className="size-[16px]"><ArrowR /></span>
         </a>
       </div>
     </div>
@@ -295,9 +295,9 @@ export default function ComparativaModal({ open, onClose }: { open: boolean; onC
         >
           <div className="fixed inset-0 bg-black/60" aria-hidden />
 
-          <div className="relative flex min-h-full items-start justify-center p-6" onClick={onClose}>
+          <div className="relative flex min-h-full items-center justify-center p-4 sm:p-6" onClick={onClose}>
             <motion.div
-              className="relative shrink-0 rounded-[40px] shadow-[0_40px_120px_rgba(0,0,0,0.5)]"
+              className="relative flex max-h-[90vh] w-[min(880px,94vw)] flex-col overflow-hidden rounded-[28px] shadow-[0_40px_120px_rgba(0,0,0,0.5)]"
               onClick={(e) => e.stopPropagation()}
               initial={{ opacity: 0, y: 24, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -308,7 +308,7 @@ export default function ComparativaModal({ open, onClose }: { open: boolean; onC
                 type="button"
                 onClick={onClose}
                 aria-label="Cerrar"
-                className="ix-press absolute right-[28px] top-[28px] z-10 flex size-[48px] items-center justify-center rounded-full bg-[#3d2c1e] text-cream-93 text-[26px] leading-none transition-colors hover:bg-black"
+                className="ix-press absolute right-[20px] top-[20px] z-10 flex size-[40px] items-center justify-center rounded-full bg-[#3d2c1e] text-cream-93 text-[22px] leading-none transition-colors hover:bg-black"
               >
                 ×
               </button>
