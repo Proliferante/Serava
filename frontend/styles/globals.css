@@ -139,9 +139,102 @@ body {
 .ix-zoom { transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
 .group:hover .ix-zoom { transform: scale(1.08); }
 
+/* ── "Compara tu inversión" CTA — lively, eye-catching ──────────────
+   Idle: attention pulse ring + arrow nudging + periodic shine sweep.
+   Hover: pill lifts, arrow circle grows, arrow shoots forward.        */
+.ix-cta {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, filter 0.3s ease;
+  animation: ixPulse 3s ease-in-out infinite;
+  cursor: pointer;
+}
+.ix-cta:hover { transform: translateY(-4px) scale(1.02); filter: brightness(1.03); }
+.ix-cta:active { transform: translateY(-1px) scale(0.98); }
+
+.ix-cta-circle { transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.ix-cta:hover .ix-cta-circle { transform: scale(1.1); }
+
+.ix-cta-arrow { animation: ixArrowNudge 1.6s ease-in-out infinite; }
+.ix-cta:hover .ix-cta-arrow { animation: ixArrowShoot 0.7s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+
+@keyframes ixArrowNudge {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(5px); }
+}
+@keyframes ixArrowShoot {
+  0%   { transform: translateX(0);     opacity: 1; }
+  45%  { transform: translateX(16px);  opacity: 0; }
+  46%  { transform: translateX(-16px); opacity: 0; }
+  100% { transform: translateX(0);     opacity: 1; }
+}
+
+.ix-cta-shine {
+  position: absolute; top: 0; left: 0; height: 100%; width: 55%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.6) 50%, transparent 100%);
+  transform: translateX(-170%) skewX(-18deg);
+  animation: ixShine 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes ixShine {
+  0%   { transform: translateX(-170%) skewX(-18deg); }
+  22%  { transform: translateX(320%)  skewX(-18deg); }
+  100% { transform: translateX(320%)  skewX(-18deg); }
+}
+
+/* ── Cómo operamos / Oportunidades ─────────────────────────────────────────
+   Piezas que no cubrían las utilidades anteriores.                          */
+
+/* Handle del comparador antes/después: halo que respira para que se note
+   que es arrastrable. */
+@keyframes ixBreathe {
+  0%, 100% { box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5), 0 0 0 0 rgba(247, 241, 229, 0); }
+  50%      { box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5), 0 0 0 12px rgba(247, 241, 229, 0.16); }
+}
+.ix-breathe { animation: ixBreathe 2.6s ease-in-out infinite; }
+.ix-grab:active .ix-breathe { animation: none; }
+
+/* Icono "arrastra el círculo": vaivén horizontal como pista de interacción. */
+@keyframes ixSway {
+  0%, 100% { transform: translateX(-2px); }
+  50%      { transform: translateX(2px); }
+}
+.ix-sway { animation: ixSway 1.8s ease-in-out infinite; }
+
+/* Tarjetas de contenido: elevación + barrido de luz diagonal al pasar el ratón. */
+.ix-card {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+  cursor: default;
+}
+.ix-card::after {
+  content: "";
+  position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(247, 241, 229, 0.13) 50%, transparent 65%);
+  transform: translateX(-120%);
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ix-card:hover::after { transform: translateX(120%); }
+
+/* Caja de icono dentro de una tarjeta: gira/escala levemente con el hover. */
+.ix-card-ico { transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.ix-card:hover .ix-card-ico { transform: scale(1.12) rotate(-6deg); }
+
+/* Fila de checklist: se desplaza y se tiñe al pasar el ratón. */
+.ix-row { transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease; }
+.ix-row:hover { transform: translateX(6px); }
+
+/* Miniatura de proyecto activa en el comparador. */
+.ix-thumb { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.35s ease; }
+
 @media (prefers-reduced-motion: reduce) {
+  .ix-breathe, .ix-sway { animation: none; }
+  .ix-card, .ix-card::after, .ix-card-ico, .ix-row, .ix-thumb { transition: none; }
+  .ix-card:hover::after { transform: translateX(-120%); }
+  .ix-card:hover .ix-card-ico, .ix-row:hover { transform: none; }
   .ix-press, .ix-nav, .ix-lift, .ix-chip, .ix-zoom, .ix-navlink > *, .ix-invert, .ix-invert *, .ix-invert-w, .ix-invert-w *, .ix-fill, .ix-fill * { transition: none; }
   .ix-press:hover, .ix-nav:hover, .ix-lift:hover, .ix-chip:hover, .ix-invert:active, .ix-invert-w:active, .ix-fill:active { transform: none; filter: none; }
   .ix-pulse, .ix-pulse-green, .ix-live, .ix-pulse-tuscany { animation: none; }
   .group:hover .ix-zoom { transform: none; }
+  .ix-cta, .ix-cta-arrow, .ix-cta-shine { animation: none; }
+  .ix-cta:hover { transform: none; filter: none; }
+  .ix-cta:hover .ix-cta-circle, .ix-cta:hover .ix-cta-arrow { transform: none; }
+  .ix-cta-shine { display: none; }
 }

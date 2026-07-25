@@ -2,6 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // framer-motion se importa como barrel; esto lo resuelve a imports directos
+  // para que el tree-shaking descarte lo que no usamos.
+  experimental: {
+    optimizePackageImports: ["framer-motion"],
+  },
   async headers() {
     return [
       {

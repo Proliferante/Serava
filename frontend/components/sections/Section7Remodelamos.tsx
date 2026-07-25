@@ -1,6 +1,30 @@
 import ValueCard from "@/components/sections/ValueCard";
+import { cardX } from "@/components/sections/valueCardMetrics";
 
 const A = "/figma";
+
+const CARDS = [
+  {
+    title: "Diseño atemporal",
+    body: "Materiales naturales, lineas limpias. No seguimos tendencias porque lo que está de moda hoy desvaloriza en cinco años.",
+    bodyColor: "rgba(247,241,229,0.9)",
+  },
+  {
+    title: "Materiales de calidad",
+    body: "Mejores materiales: menos mantenimiento y un activo que conserva su valor en el tiempo.",
+    bodyColor: "rgba(247,241,229,0.78)",
+  },
+  {
+    title: "Obra trazable",
+    body: "Seguimiento en cada etapa. Si la obra se pasa del presupuesto, lo asumimos nosotros.",
+    bodyColor: "rgba(247,241,229,0.78)",
+  },
+  {
+    title: "Todo formalizado",
+    body: "Cada etapa se respalda con contratos claros, desde el ingreso hasta cada servicio.",
+    bodyColor: "rgba(247,241,229,0.78)",
+  },
+];
 
 /** Seccion 7 — Remodelamos para que el activo valga más (1922 × 1688) */
 export default function Section7Remodelamos() {
@@ -26,30 +50,9 @@ export default function Section7Remodelamos() {
       </p>
 
       {/* Cards */}
-      <ValueCard
-        cardLeft="430px"
-        title="Diseño atemporal" titleTop={72}
-        body="Materiales naturales, lineas limpias. No seguimos tendencias porque lo que está de moda hoy desvaloriza en cinco años."
-        bodyTop={147} bodyColor="rgba(247,241,229,0.9)" delay={0}
-      />
-      <ValueCard
-        cardLeft="702px"
-        title="Materiales de calidad" titleTop={72}
-        body="Mejores materiales: menos mantenimiento y un activo que conserva su valor en el tiempo."
-        bodyTop={208} bodyColor="rgba(247,241,229,0.78)" delay={0.1}
-      />
-      <ValueCard
-        cardLeft="973.92px"
-        title="Obra trazable" titleTop={83}
-        body="Seguimiento en cada etapa. Si la obra se pasa del presupuesto, lo asumimos nosotros."
-        bodyTop={198} bodyColor="rgba(247,241,229,0.78)" delay={0.2}
-      />
-      <ValueCard
-        cardLeft="1246px"
-        title="Todo formalizado" titleTop={72}
-        body="Cada etapa se respalda con contratos claros, desde el ingreso hasta cada servicio."
-        bodyTop={198} bodyColor="rgba(247,241,229,0.78)" delay={0.3}
-      />
+      {CARDS.map((c, i) => (
+        <ValueCard key={c.title} left={cardX(i)} delay={i * 0.1} {...c} />
+      ))}
     </div>
   );
 }
