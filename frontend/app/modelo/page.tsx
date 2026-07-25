@@ -8,8 +8,8 @@ const CANVAS_H = 9717; // altura exacta del frame de Figma (incluye footer)
 
 /**
  * PAGINA MODELO — "Cómo operamos" (Figma 1920 × 9717): 12 secciones + footer.
- * La sección Antes/Después se conserva en AntesDespuesSection.tsx (fuera de esta
- * página) — pendiente de reubicar según indique el usuario.
+ * Sustituye a las secciones ModeloSection1..5 y a Antes/Después, que se
+ * eliminaron al quedar sin usar.
  */
 export default function ModeloPage() {
   return (
