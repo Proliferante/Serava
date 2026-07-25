@@ -1,6 +1,7 @@
 "use client";
 
 import { MotionConfig, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { EASE, MLine, POP, Pop, Rise, Rule } from "@/components/motion/Kinetics";
 
@@ -199,8 +200,18 @@ function Select({ label, placeholder, options, w }: { label: string; placeholder
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export default function SolicitudAccesoScreen() {
+  const router = useRouter();
   const [mercados, setMercados] = useState<string[]>([]);
   const toggle = (m: string) => setMercados((s) => (s.includes(m) ? s.filter((x) => x !== m) : [...s, m]));
+
+  /**
+   * Todavía no hay endpoint al que enviar: por ahora sólo lleva a la pantalla
+   * de confirmación. Cuando exista el backend, el POST va aquí antes del push.
+   */
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.push("/solicitud-acceso/confirmacion");
+  };
 
   return (
     <MotionConfig reducedMotion="user">
@@ -384,7 +395,7 @@ export default function SolicitudAccesoScreen() {
             viewport={{ once: true, amount: 0.15 }}
             transition={{ duration: 0.9, ease: EASE }}
           >
-            <form className="flex flex-col" style={{ padding: 45, gap: 15.2 }} onSubmit={(e) => e.preventDefault()}>
+            <form className="flex flex-col" style={{ padding: 45, gap: 15.2 }} onSubmit={onSubmit}>
               <div className="flex items-center gap-[13px]">
                 <p className="whitespace-nowrap font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "2.074px", color: DRIFT }}>Tus datos</p>
                 <span className="h-px flex-1" style={{ background: DRIFT28 }} />
