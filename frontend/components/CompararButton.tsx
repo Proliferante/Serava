@@ -18,18 +18,18 @@ export default function CompararButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Compara: por tu cuenta vs. con Serava"
-        className="ix-cta absolute bg-cream h-[104px] left-[1324px] overflow-hidden rounded-[98px] shadow-[0px_16px_32px_-16px_rgba(0,0,0,0.45)] top-[1000px] w-[404px] flex items-center justify-between pl-[38px] pr-[23px]"
+        aria-label="Compara tu inversión: por tu cuenta vs. con Serava"
+        className="ix-cta absolute bg-cream h-[104px] left-[1324px] overflow-hidden rounded-[98px] shadow-[0px_16px_32px_-16px_rgba(0,0,0,0.45)] top-[988px] w-[454px] flex items-center justify-between pl-[54.5px] pr-[16px]"
       >
-        <span className="[word-break:break-word] not-italic text-brown-dark text-left">
-          <span className="block font-semibold text-[25px] leading-[1.2]">Compara:</span>
-          <span className="block font-light text-[19px] leading-[1.25]">por tu cuenta vs. con Serava</span>
+        <span className="[word-break:break-word] w-[295px] not-italic text-brown-dark text-left">
+          <span className="block font-semibold text-[25px] leading-[34px]">Compara tu inversión:</span>
+          <span className="block font-light text-[19px] leading-[34px]">por tu cuenta vs. con Serava</span>
         </span>
 
         {/* Círculo con flecha — crece al hover, la flecha dispara dentro del círculo */}
-        <span className="ix-cta-circle flex h-[58px] w-[58px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-brown-dark">
-          <svg className="ix-cta-arrow" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden>
-            <path d="M4 11h13M11.5 5.5 17 11l-5.5 5.5" stroke="#e2cdae" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        <span className="ix-cta-circle flex h-[72px] w-[72px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-brown-dark">
+          <svg className="ix-cta-arrow" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden>
+            <path d="M5 14h17M14.5 6.5 22 14l-7.5 7.5" stroke="#ffffff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </span>
 
