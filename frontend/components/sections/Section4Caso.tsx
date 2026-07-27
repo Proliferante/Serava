@@ -7,11 +7,11 @@ import CountUp from "@/components/motion/CountUp";
 const COLS = "grid grid-cols-[153px_258px_321px_322px]";
 
 const TABLE_ROWS = [
-  { year: "Año 1", renta: 143, valor: 4.08, mult: null as number | null },
-  { year: "Año 2", renta: 152, valor: 4.4, mult: 1.41 },
-  { year: "Año 3", renta: 161, valor: 4.76, mult: 1.56 },
-  { year: "Año 4", renta: 170, valor: 5.14, mult: 1.71 },
-  { year: "Año 5", renta: 180, valor: 5.55, mult: 1.88, highlight: true },
+  { year: "Año 1", renta: 143, valor: 4.08, mult: 1.32 },
+  { year: "Año 2", renta: 152, valor: 4.4, mult: 1.42 },
+  { year: "Año 3", renta: 161, valor: 4.76, mult: 1.54 },
+  { year: "Año 4", renta: 170, valor: 5.14, mult: 1.66 },
+  { year: "Año 5", renta: 180, valor: 5.55, mult: 1.79 },
 ];
 
 /* ── Año a año table ── */
@@ -20,14 +20,15 @@ function ScenarioTable() {
   const border = "rgba(247,241,229,0.12)";
   return (
     <div className="w-[1054px] overflow-clip rounded-[14px] border border-solid bg-brown-dark" style={{ borderColor: border }}>
-      <div className="border-b border-solid px-[18px] py-[14px]" style={{ borderColor: border }}>
+      <div className="border-b border-solid px-[18px] py-[10px]" style={{ borderColor: border }}>
         <p className="font-semibold text-[10px] text-tan-63">Año a año · escenario base</p>
+        <p className="mt-[3px] font-light text-[9px]" style={{ color: muted }}>Escenario base a 5 años · TIR neta estimada: 16,5% anual</p>
       </div>
       <div className={`${COLS} border-b border-solid`} style={{ borderColor: border }}>
         <div className="px-[14px] py-[11px] font-semibold text-[9px]" style={{ color: muted }}>Año</div>
-        <div className="px-[14px] py-[11px] text-right font-semibold text-[9px]" style={{ color: muted }}>Renta del año</div>
-        <div className="px-[14px] py-[11px] text-right font-semibold text-[9px]" style={{ color: muted }}>Valor de mercado</div>
-        <div className="px-[14px] py-[11px] text-right font-semibold text-[9px]" style={{ color: muted }}>Múltiplo si vendes</div>
+        <div className="px-[14px] py-[11px] text-right font-semibold text-[9px]" style={{ color: muted }}>Renta neta del año</div>
+        <div className="px-[14px] py-[11px] text-right font-semibold text-[9px]" style={{ color: muted }}>Valor estimado de mercado</div>
+        <div className="px-[14px] py-[11px] text-right font-semibold text-[9px]" style={{ color: muted }}>Múltiplo sobre la inversión</div>
       </div>
       {TABLE_ROWS.map((r, i) => (
         <motion.div
@@ -35,15 +36,19 @@ function ScenarioTable() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.06 * i, duration: 0.35, ease: EASE }}
-          className={`${COLS} ${i < TABLE_ROWS.length - 1 ? "border-b border-solid" : ""}`}
-          style={{ borderColor: border, background: r.highlight ? "rgba(127,139,87,0.1)" : undefined }}
+          className={`${COLS} border-b border-solid`}
+          style={{ borderColor: border }}
         >
           <div className="px-[14px] py-[11px] font-medium text-[13px]" style={{ color: muted }}>{r.year}</div>
           <div className="px-[14px] py-[11px] text-right font-normal text-[13px] text-cream-93"><CountUp value={r.renta} prefix="$" suffix="M" /></div>
           <div className="px-[14px] py-[11px] text-right font-normal text-[13px] text-cream-93"><CountUp value={r.valor} prefix="$" suffix="MM" decimals={2} comma /></div>
-          <div className="px-[14px] py-[11px] text-right font-normal text-[13px] text-cream-93">{r.mult === null ? "—" : <CountUp value={r.mult} suffix="×" decimals={2} comma />}</div>
+          <div className="px-[14px] py-[11px] text-right font-normal text-[13px] text-cream-93"><CountUp value={r.mult} suffix="×" decimals={2} comma /></div>
         </motion.div>
       ))}
+      {/* Nota al pie (Figma 179:1250) */}
+      <p className="px-[18px] py-[10px] font-light leading-[1.5] text-[8px]" style={{ color: muted }}>
+        · La TIR estimada incluye la inversión inicial, las rentas de las ventas anuales y la venta estimada de la propiedad al final del año cinco. Todas las estimaciones consideran gastos proyectados.
+      </p>
     </div>
   );
 }
@@ -51,13 +56,49 @@ function ScenarioTable() {
 const A = "/figma";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/* ── Iconos de la barra de estadísticas (Figma: material-symbols / fluent) ── */
+const ICO = "#f7f1e5";
+function IcoHome() {
+  return (
+    <svg width="30" height="30" viewBox="0 0 24 24" fill={ICO} aria-hidden>
+      <path d="M4 21V9.5L12 3l8 6.5V21h-6v-6h-4v6H4z" />
+    </svg>
+  );
+}
+function IcoGrowth() {
+  return (
+    <svg width="30" height="30" viewBox="0 0 24 24" fill={ICO} aria-hidden>
+      <path d="M3 20h3v-6H3v6zm5 0h3V9H8v11zm5 0h3v-8h-3v8zM21 3h-6v2h2.6l-4.6 4.6-3-3L3.7 14 5 15.3l5.3-5.3 3 3L19 7.4V10h2V3z" />
+    </svg>
+  );
+}
+function IcoPercent() {
+  return (
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke={ICO} strokeWidth="2.4" aria-hidden>
+      <circle cx="7" cy="7" r="2.6" />
+      <circle cx="17" cy="17" r="2.6" />
+      <path d="M19 5 5 19" strokeLinecap="round" />
+    </svg>
+  );
+}
+/** Flecha verde ascendente junto a las métricas que crecen (Figma "Arrow 1"/"Arrow 2"). */
+function IcoUp() {
+  return (
+    <svg width="12" height="30" viewBox="0 0 12 30" fill="none" stroke="#9aa66f" strokeWidth="1.6" aria-hidden>
+      <path d="M6 29V3M1.5 7.5 6 2l4.5 5.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 /* ── Metric cell (top stats bar) ── */
-function Metric({ label, sub, children }: { label: string; sub: string; children: React.ReactNode }) {
+function Metric({ label, sub, icon, up, children }: { label: string; sub: string; icon: React.ReactNode; up?: boolean; children: React.ReactNode }) {
   return (
     <div className="relative h-[94.42px] w-[263.75px] bg-[rgba(247,241,229,0.04)]">
-      <p className="absolute left-[16px] top-[15px] w-[231.75px] font-normal leading-[15px] text-[10px]" style={{ color: "rgba(247,241,229,0.6)" }}>{label}</p>
-      <p className="absolute left-[16px] top-[31.34px] w-[231.75px] font-light leading-[23px] text-cream-93 text-[23px]">{children}</p>
-      <p className="absolute left-[16px] top-[64.55px] w-[231.75px] font-light leading-[14px] text-[9px]" style={{ color: "rgba(247,241,229,0.6)" }}>{sub}</p>
+      <span className="absolute left-[14px] top-[32px] opacity-90">{icon}</span>
+      {up && <span className="absolute left-[48px] top-[30px]"><IcoUp /></span>}
+      <p className="absolute left-[64px] top-[15px] w-[196px] font-normal leading-[15px] text-[10px]" style={{ color: "rgba(247,241,229,0.6)" }}>{label}</p>
+      <p className="absolute left-[64px] top-[31.34px] w-[196px] font-light leading-[23px] text-cream-93 text-[23px] whitespace-nowrap">{children}</p>
+      <p className="absolute left-[64px] top-[64.55px] w-[196px] font-light leading-[14px] text-[9px]" style={{ color: "rgba(247,241,229,0.6)" }}>{sub}</p>
     </div>
   );
 }
@@ -126,13 +167,13 @@ export default function Section4Caso() {
 
         {/* Stats bar */}
         <div className="absolute bg-brown-dark flex h-[96.42px] left-[56px] overflow-clip rounded-[12px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-[274px] w-[1060px]">
-          <Metric label="Inversión total" sub="compra + remodelación"><CountUp value={3100} prefix="$" suffix="M" grouping /></Metric>
+          <Metric label="Inversión total" sub="compra + remodelación" icon={<IcoHome />}><CountUp value={3100} prefix="$" suffix="M COP" grouping /></Metric>
           <div className="w-px shrink-0" />
-          <Metric label="Valor de mercado hoy" sub="~22% sobre lo invertido"><CountUp value={3776} prefix="$" suffix="M" grouping /></Metric>
+          <Metric label="Valor de mercado 9 meses después" sub="~22% sobre lo invertido" icon={<IcoGrowth />} up><CountUp value={3776} prefix="$" suffix="M COP" grouping /></Metric>
           <div className="w-px shrink-0" />
-          <Metric label="Canon mensual" sub="+54% tras la obra"><CountUp value={17} prefix="$" suffix="M" /></Metric>
+          <Metric label="Canon mensual" sub="+54% tras la obra" icon={<IcoGrowth />} up><CountUp value={17} prefix="$" suffix="M COP" /></Metric>
           <div className="w-px shrink-0" />
-          <Metric label="Yield bruto" sub="renta anual / inversión"><CountUp value={6.6} suffix="%" decimals={1} comma /></Metric>
+          <Metric label="Yield bruto" sub="renta anual / inversión" icon={<IcoPercent />}><CountUp value={6.6} suffix="%" decimals={1} comma /></Metric>
         </div>
 
         {/* Horizonte slider */}
