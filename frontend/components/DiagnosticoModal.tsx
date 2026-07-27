@@ -154,7 +154,7 @@ export default function DiagnosticoModal({ open, onClose, initialStep = "intro",
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[120] flex items-center justify-center p-[16px] sm:p-[28px]"
+          className="fixed inset-0 z-[120]"
           role="dialog"
           aria-modal="true"
           aria-label="Diagnóstico patrimonial"
@@ -163,20 +163,18 @@ export default function DiagnosticoModal({ open, onClose, initialStep = "intro",
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
         >
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-[3px]" onClick={onClose} />
-
-          {/* Modal panel */}
+          {/* Pantalla completa: ocupa todo el viewport, sin backdrop ni panel
+              flotante. Se sale con el botón "Salir" o con Escape. */}
           <motion.div
-            className="relative z-10 flex max-h-[88vh] w-full max-w-[760px] flex-col overflow-hidden rounded-[24px] border border-solid border-[rgba(247,241,229,0.1)] shadow-[0_40px_120px_rgba(0,0,0,0.6)]"
+            className="relative flex size-full flex-col overflow-hidden"
             style={{ background: BG }}
-            initial={{ opacity: 0, scale: 0.96, y: 18 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 18 }}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 24 }}
             transition={{ duration: 0.35, ease: EASE }}
           >
             {/* Top bar */}
-            <div className="flex shrink-0 items-center justify-between border-b border-solid border-[rgba(247,241,229,0.07)] px-[28px] py-[16px]">
+            <div className="flex shrink-0 items-center justify-between border-b border-solid border-[rgba(247,241,229,0.07)] px-[28px] py-[16px] sm:px-[48px] sm:py-[22px]">
               <img loading="lazy" decoding="async" src={LOGO} alt="Serava" className="h-[21px] w-[108px]" />
               <button type="button" onClick={onClose} className="ix-nav flex items-center gap-[6px] text-[13px]" style={{ color: "rgba(247,241,229,0.6)" }}>
                 Salir <XIcon />
@@ -184,7 +182,7 @@ export default function DiagnosticoModal({ open, onClose, initialStep = "intro",
             </div>
 
             {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto px-[24px] pt-[48px] pb-[48px] sm:px-[40px]">
+            <div className="flex-1 overflow-y-auto px-[24px] pt-[48px] pb-[64px] sm:px-[40px] sm:pt-[72px]">
               <div className="mx-auto w-full max-w-[680px]">
                 <AnimatePresence mode="wait" custom={dir}>
               {/* ── INTRO ── */}

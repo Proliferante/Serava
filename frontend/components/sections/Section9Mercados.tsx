@@ -28,7 +28,7 @@ export default function Section9Mercados() {
       {/* City cards (staggered scroll-in + hover) */}
       <CityCard left="399px" imgSrc={`${A}/5ff4aca097d9134d9e43d10cf9529ab553333003.webp`} shadow label="bOGOTÁ" delay={0} />
       <CityCard left="701.03px" imgSrc={`${A}/9ce42d8da5619ae5f7fc7aa4f180a3a3e5fbd140.webp`} crop label="MEDELLÍN" delay={0.12} />
-      <CityCard left="1003.05px" imgSrc={`${A}/59fc56f5d5802c6aeac8c0975f569485d84c9956.webp`} crop label="BARRANQUILLA" delay={0.24} />
+      <CityCard left="1003.05px" imgSrc={`${A}/bb6bb0436c009c10db21f42f9aeb588af022a9d0.webp`} label="CARTAGENA" delay={0.24} />
       <CityCard left="1307px" imgSrc={`${A}/06d0daed474f187ce01ccba75bba182d031da45c.webp`} label="PANAMÁ" delay={0.36} />
 
       {/* Interest panel */}
