@@ -32,13 +32,13 @@ export default function Navbar() {
         <img loading="lazy" decoding="async" alt="Serava" className="absolute inset-0 block size-full max-w-none" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
       </a>
 
+      {/* Los nombres de capa en Figma ("HUB", "MODELO BTN") están obsoletos:
+          son instancias con override de texto. Las etiquetas reales salen del
+          render del header de Cómo operamos (426:1129/1130/1131). */}
       <NavLink href="/" left={532} top={64}>Inicio</NavLink>
-      <NavLink href="/hub" left={697} top={63}>Hub</NavLink>
-      <NavLink href="/modelo" left={1039} top={64}>Modelo</NavLink>
-      {/* En Figma este slot dice "HUB" y mide 61px (x=1343). Como duplica el
-          enlace de Hub y dejaría Oportunidades sin acceso, va la etiqueta
-          correcta, recentrada en el hueco para no chocar con el botón. */}
-      <NavLink href="/oportunidades" left={1270} top={64}>Oportunidades</NavLink>
+      <NavLink href="/modelo" left={697} top={63}>Cómo operamos</NavLink>
+      <NavLink href="/oportunidades" left={1039} top={64}>Oportunidades</NavLink>
+      <NavLink href="/hub" left={1353} top={64}>HUB</NavLink>
 
       {/* Registro btn (426:1127) */}
       <a
