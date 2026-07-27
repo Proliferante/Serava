@@ -1,4 +1,5 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
+import Navbar from "@/components/Navbar";
 import { RevealLayer, Reveal } from "@/components/motion/Reveal";
 import HubSection1Hero from "@/components/sections/hub/HubSection1Hero";
 import HubFeaturedArticle from "@/components/sections/hub/HubFeaturedArticle";
@@ -44,6 +45,7 @@ export default function HubPage() {
 
         {/* Footer */}
         <Layer left={-2} top={3463} width={1922} height={364}><Footer /></Layer>
+        <Navbar />
       </ScaledCanvas>
     </main>
   );

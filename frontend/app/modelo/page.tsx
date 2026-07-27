@@ -1,4 +1,5 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
+import Navbar from "@/components/Navbar";
 import ComoOperamosScreen from "@/components/sections/modelo/ComoOperamosScreen";
 import Footer from "@/components/sections/Footer";
 
@@ -21,6 +22,7 @@ export default function ModeloPage() {
         <div style={{ position: "absolute", left: 0, top: 9353, width: 1922, height: 364 }}>
           <Footer />
         </div>
+        <Navbar />
       </ScaledCanvas>
     </main>
   );

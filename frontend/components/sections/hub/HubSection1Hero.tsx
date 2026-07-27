@@ -31,24 +31,6 @@ export default function HubSection1Hero() {
       {/* Overlay */}
       <div className="absolute bg-[rgba(73,33,0,0.6)] h-[934px] left-0 top-0 w-[1920px]" />
 
-      {/* Logo → inicio */}
-      <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute h-[34.12px] left-[222px] top-[115px] w-[175.28px]">
-        <img loading="lazy" decoding="async" alt="Serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/6a5469af8a03030efc2535c53f980eb3ea6d7f27.svg`} />
-      </a>
-
-      {/* Nav */}
-      <a href="/" className="ix-navlink absolute flex items-center justify-center left-[1104px] p-[10px] top-[97px]">
-        <p className="font-medium leading-[normal] not-italic text-sand text-[30px] whitespace-nowrap">Inicio</p>
-      </a>
-      <a href="/hub" className="ix-navlink absolute flex items-center justify-center left-[1279px] p-[10px] top-[96px]">
-        <p className="font-medium leading-[normal] not-italic text-sand text-[30px] whitespace-nowrap">Hub</p>
-      </a>
-      <a href="/modelo" className="ix-navlink absolute flex items-center justify-center left-[1428px] p-[10px] top-[97px]">
-        <p className="font-medium leading-[normal] not-italic text-sand text-[30px] whitespace-nowrap">Modelo</p>
-      </a>
-      <a href="/login" className="ix-fill absolute border-4 border-sand border-solid flex items-center justify-center left-[1610px] px-[25px] py-[24px] rounded-[98px] top-[87px]">
-        <p className="font-medium leading-[normal] not-italic text-sand text-[24px] whitespace-nowrap">Iniciar sesión</p>
-      </a>
 
       {/* Eyebrow */}
       <div className="absolute bg-tan-63 h-px left-[450px] opacity-80 top-[279.42px] w-[36px]" />

@@ -1,4 +1,5 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
+import Navbar from "@/components/Navbar";
 import { RevealLayer } from "@/components/motion/Reveal";
 import Section1Hero from "@/components/sections/Section1Hero";
 import Section2Criterio from "@/components/sections/Section2Criterio";
@@ -48,6 +49,7 @@ export default function Home() {
         <RevealLayer left={-2} top={7177} width={2010} height={1420}><Section9Mercados /></RevealLayer>
         <RevealLayer left={0} top={8442} width={1920} height={869}><Section10Diagnostico /></RevealLayer>
         <Layer left={-2} top={9175} width={1922} height={364}><Footer /></Layer>
+        <Navbar />
       </ScaledCanvas>
     </main>
   );

@@ -33,10 +33,6 @@ export default function Section1Hero() {
         <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={`${A}/1dfbb9b347803e8d29183672cfb540bcde4bf7f2.svg`} />
       </div>
 
-      {/* Small logo top-left → inicio */}
-      <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute h-[34.12px] left-[214px] top-[99px] w-[175.28px]">
-        <img loading="lazy" decoding="async" alt="Serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
-      </a>
 
       {/* Big .serava. wordmark */}
       <div className="absolute h-[139.94px] left-[406px] top-[262px] w-[713.07px]">
@@ -102,22 +98,6 @@ export default function Section1Hero() {
       {/* Bottom gradient fade into next section */}
       <div className="absolute bg-gradient-to-b from-[14.361%] from-[rgba(205,154,100,0)] h-[237px] left-0 to-[#e2cdae] to-[99.98%] top-[936px] via-[#e2cdae] via-[62.407%] w-[1920px]" />
 
-      {/* Nav: Iniciar sesión (outline button) */}
-      <a href="/login" className="ix-fill absolute border-4 border-sand border-solid flex items-center justify-center left-[1556px] px-[25px] py-[24px] rounded-[98px] top-[72px]">
-        <p className="[word-break:break-word] font-medium leading-[normal] not-italic text-sand text-[24px] whitespace-nowrap">Iniciar sesión</p>
-      </a>
-      {/* Nav: Inicio */}
-      <a href="/" className="ix-navlink absolute flex items-center justify-center left-[990px] p-[10px] top-[82px]">
-        <p className="[word-break:break-word] font-medium leading-[normal] not-italic text-sand text-[30px] whitespace-nowrap">Inicio</p>
-      </a>
-      {/* Nav: Hub */}
-      <a href="/hub" className="ix-navlink absolute flex items-center justify-center left-[1155px] p-[10px] top-[82px]">
-        <p className="[word-break:break-word] font-medium leading-[normal] not-italic text-sand text-[30px] whitespace-nowrap">Hub</p>
-      </a>
-      {/* Nav: Modelo */}
-      <a href="/modelo" className="ix-navlink absolute flex items-center justify-center left-[1304px] p-[10px] top-[82px]">
-        <p className="[word-break:break-word] font-medium leading-[normal] not-italic text-sand text-[30px] whitespace-nowrap">Modelo</p>
-      </a>
 
       {/* CTA button → solicitud de acceso */}
       <a href="/solicitud-acceso" className="ix-invert ix-pulse absolute bg-cream h-[104px] left-[412px] overflow-clip rounded-[98px] top-[713px] w-[404px] flex items-center justify-center">

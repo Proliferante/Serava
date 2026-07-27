@@ -1,4 +1,5 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
+import Navbar from "@/components/Navbar";
 import OportunidadesScreen from "@/components/sections/oportunidades/OportunidadesScreen";
 import Footer from "@/components/sections/Footer";
 
@@ -20,6 +21,7 @@ export default function OportunidadesPage() {
         <div style={{ position: "absolute", left: -2, top: 5337, width: 1922, height: 364 }}>
           <Footer />
         </div>
+        <Navbar />
       </ScaledCanvas>
     </main>
   );

@@ -945,15 +945,6 @@ export default function ComoOperamosScreen() {
           </T>
         </Sec>
 
-        {/* ══════════ NAV ══════════ */}
-        <div className="absolute left-0 top-0 h-[91px] w-full">
-          <motion.a
-            href="/" className="ix-nav absolute block" style={{ left: 80, top: 28, width: 175.276, height: 34.119 }}
-            initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.05, ease: EASE }}
-          >
-            <img alt="Serava" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} className="absolute inset-0 block size-full max-w-none" />
-          </motion.a>
-        </div>
       </div>
     </MotionConfig>
   );
