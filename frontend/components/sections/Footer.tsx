@@ -1,5 +1,3 @@
-import DiagnosticoTrigger from "@/components/DiagnosticoTrigger";
-
 const A = "/figma";
 
 /** Footer (1922 × 364) */
@@ -20,16 +18,17 @@ export default function Footer() {
       {/* Navega column */}
       <p className="[word-break:break-word] absolute font-extralight leading-[1.137] left-[1125px] not-italic text-[#cd9a64] text-[26px] top-[78px] tracking-[9.36px] whitespace-nowrap">NAVEGA</p>
       <div className="[word-break:break-word] absolute font-light leading-[0] left-[1125px] not-italic text-[20px] text-white top-[147px] w-[312px]">
-        <p className="leading-[2.27] mb-0"><a href="/modelo" className="hover:underline">Modelo</a></p>
-        <p className="leading-[2.27] mb-0"><a href="/hub" className="hover:underline">Hub</a></p>
-        <p className="leading-[2.27]"><DiagnosticoTrigger className="hover:underline">Diagnostico patrimonial</DiagnosticoTrigger></p>
+        <p className="leading-[2.27] mb-0"><a href="/" className="hover:underline">Inicio</a></p>
+        <p className="leading-[2.27] mb-0"><a href="/modelo" className="hover:underline">¿Cómo operamos?</a></p>
+        <p className="leading-[2.27] mb-0"><a href="/oportunidades" className="hover:underline">Oportunidades</a></p>
+        <p className="leading-[2.27]"><a href="/hub" className="hover:underline">HUB</a></p>
       </div>
 
       {/* Cuenta column */}
       <p className="[word-break:break-word] absolute font-extralight leading-[1.137] left-[1460px] not-italic text-[#cd9a64] text-[26px] top-[78px] tracking-[9.36px] whitespace-nowrap">CUENTA</p>
       <div className="[word-break:break-word] absolute font-light leading-[0] left-[1459px] not-italic text-[20px] text-white top-[147px] whitespace-nowrap">
         <p className="leading-[2.27] mb-0"><a href="/login" className="hover:underline">Iniciar sesión</a></p>
-        <p className="leading-[2.27]"><a href="/solicitud-acceso" className="hover:underline">Registrarme</a></p>
+        <p className="leading-[2.27]"><a href="/solicitud-acceso" className="hover:underline">Solicita acceso</a></p>
       </div>
     </div>
   );
