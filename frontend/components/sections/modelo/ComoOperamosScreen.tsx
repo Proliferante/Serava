@@ -166,7 +166,7 @@ function Eyebrow({ x, cy, label, color, w, labelColor, center, d = 0 }: { x: num
       <Rule x={x} y={cy - 0.5} w={34} color={color} delay={d} />
       <T
         x={x + 46} cy={cy - 0.92} w={w} d={d + 0.14} ry={14}
-        className={`font-semibold uppercase ${center ? "text-center" : ""}`}
+        className={`whitespace-nowrap font-semibold uppercase ${center ? "text-center" : ""}`}
         style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.226px", color: labelColor ?? color }}
       >
         <p>{label}</p>
@@ -370,22 +370,17 @@ export default function ComoOperamosScreen() {
           <Pic x={0} y={0} w={1920} h={1082} src="como-hero.webp" alt="" par={46} over={1.12} eager />
         </Sec>
         <Sec top={0} h={1079}>
+          {/* Rectangle 45 (414:1107): degradado horizontal, 1713 de ancho — deja
+              respirar la foto por la derecha. Antes era vertical a 1920. */}
           <div
-            className="absolute inset-0"
+            className="absolute left-0 top-0 h-full w-[1713px]"
             style={{
               backgroundImage:
-                "linear-gradient(180deg, rgba(73,33,0,0.85) 8.144%, rgba(87,48,16,0.85) 18.25%, rgba(226,205,174,0.85) 97.633%)",
+                "linear-gradient(90.1086deg, rgb(73,33,0) 0%, rgba(73,33,0,0.886) 39.484%, rgba(73,33,0,0.714) 51.442%, rgba(73,33,0,0.53) 81.877%, rgba(73,33,0,0) 99.94%)",
             }}
           />
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage:
-                "linear-gradient(134.383deg, rgba(201,168,119,0.12) 0%, rgba(201,168,119,0) 100%), linear-gradient(45.617deg, rgba(247,241,229,0.05) 0%, rgba(247,241,229,0.05) 0.47521%, rgba(247,241,229,0) 0.47521%, rgba(247,241,229,0) 0.95041%)",
-            }}
-          />
-          <Eyebrow x={601} cy={305.5} label="Cómo operamos" color={CREAM} w={143.13} d={0.15} />
-          <T x={601} cy={491.2} className="whitespace-nowrap" style={{ fontSize: 70.4, letterSpacing: "-1.76px", lineHeight: "78.85px", color: CREAM }}>
+          <Eyebrow x={251} cy={247.5} label="Cómo operamos" color={CREAM} w={143.13} d={0.15} />
+          <T x={251} cy={433.2} className="whitespace-nowrap" style={{ fontSize: 70.4, letterSpacing: "-1.76px", lineHeight: "78.85px", color: CREAM }}>
             <MLine delay={0.3}><span className="font-light">Una inversión bien</span></MLine>
             <MLine delay={0.4}><span className="font-light">operada empieza</span></MLine>
             <MLine delay={0.5}>
@@ -394,20 +389,19 @@ export default function ComoOperamosScreen() {
             </MLine>
             <MLine delay={0.6}><span className="font-semibold">decisiones.</span></MLine>
           </T>
-          <T x={601} cy={716.49} d={0.85} className="whitespace-nowrap font-normal" style={{ fontSize: 20.8, lineHeight: "32.24px", color: BROWN }}>
+          <T x={251} cy={658.49} d={0.85} className="whitespace-nowrap font-normal" style={{ fontSize: 20.8, lineHeight: "32.24px", color: CREAM }}>
             <p>Serava integra selección, remodelación y operación en un sistema</p>
             <p>diseñado para aumentar el valor del activo y simplificar la</p>
             <p>experiencia del inversionista.</p>
           </T>
         </Sec>
 
+        {/* Fondo de la sección 2 (426:1108) — capa propia: arranca en 893, por
+            encima del hero, y desborda la sección por arriba y por abajo. */}
+        <Pic x={0} y={893} w={1920} h={1280} radius="150px 0 0 0" src="como-metodo-bg.webp" alt="" par={30} over={1.1} />
+
         {/* ══════════ 2 · NUESTRO MÉTODO ══════════ */}
-        <Sec
-          top={932}
-          h={906}
-          radius="150px 0 0 0"
-          bg="linear-gradient(180deg, rgba(226,205,174,0.85) 0%, #e2cdae 10.388%, #e2cdae 100%)"
-        >
+        <Sec top={932} h={906} radius="150px 0 0 0">
           <Eyebrow x={440} cy={146.5} label="Nuestro método" color={DRIFT} w={147.13} />
           <T x={440} cy={224.7} w={820} style={{ fontSize: 44.8, lineHeight: "50.18px", letterSpacing: "-1.12px", color: BISTRE }}>
             <MLine delay={0.16} dur={1}>
