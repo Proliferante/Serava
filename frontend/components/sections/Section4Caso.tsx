@@ -60,21 +60,21 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const ICO = "#f7f1e5";
 function IcoHome() {
   return (
-    <svg width="30" height="30" viewBox="0 0 24 24" fill={ICO} aria-hidden>
+    <svg width="46" height="46" viewBox="0 0 24 24" fill={ICO} aria-hidden>
       <path d="M4 21V9.5L12 3l8 6.5V21h-6v-6h-4v6H4z" />
     </svg>
   );
 }
 function IcoGrowth() {
   return (
-    <svg width="30" height="30" viewBox="0 0 24 24" fill={ICO} aria-hidden>
+    <svg width="46" height="46" viewBox="0 0 24 24" fill={ICO} aria-hidden>
       <path d="M3 20h3v-6H3v6zm5 0h3V9H8v11zm5 0h3v-8h-3v8zM21 3h-6v2h2.6l-4.6 4.6-3-3L3.7 14 5 15.3l5.3-5.3 3 3L19 7.4V10h2V3z" />
     </svg>
   );
 }
 function IcoPercent() {
   return (
-    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke={ICO} strokeWidth="2.4" aria-hidden>
+    <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke={ICO} strokeWidth="2.4" aria-hidden>
       <circle cx="7" cy="7" r="2.6" />
       <circle cx="17" cy="17" r="2.6" />
       <path d="M19 5 5 19" strokeLinecap="round" />
@@ -84,21 +84,32 @@ function IcoPercent() {
 /** Flecha verde ascendente junto a las métricas que crecen (Figma "Arrow 1"/"Arrow 2"). */
 function IcoUp() {
   return (
-    <svg width="12" height="30" viewBox="0 0 12 30" fill="none" stroke="#9aa66f" strokeWidth="1.6" aria-hidden>
-      <path d="M6 29V3M1.5 7.5 6 2l4.5 5.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="14" height="57" viewBox="0 0 14 57" fill="none" stroke="#9aa66f" strokeWidth="1.6" aria-hidden>
+      <path d="M7 56V4M2 9l5-5 5 5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-/* ── Metric cell (top stats bar) ── */
-function Metric({ label, sub, icon, up, children }: { label: string; sub: string; icon: React.ReactNode; up?: boolean; children: React.ReactNode }) {
+/* ── Metric cell (top stats bar) ──
+   Cada celda del Figma (180:1313/1317/1321/1325) tiene sus propios offsets:
+   el icono y el bloque de texto no están alineados igual entre celdas, así que
+   se pasan explícitos en vez de asumir un padding común. */
+type MetricProps = {
+  left: number; width: number;
+  iconX: number; iconY: number;
+  textX: number; labelY: number; valueY: number; subY: number;
+  arrowX?: number;
+  label: string; sub: string; icon: React.ReactNode; children: React.ReactNode;
+};
+function Metric({ left, width, iconX, iconY, textX, labelY, valueY, subY, arrowX, label, sub, icon, children }: MetricProps) {
+  const muted = "rgba(247,241,229,0.6)";
   return (
-    <div className="relative h-[94.42px] w-[263.75px] bg-[rgba(247,241,229,0.04)]">
-      <span className="absolute left-[14px] top-[32px] opacity-90">{icon}</span>
-      {up && <span className="absolute left-[48px] top-[30px]"><IcoUp /></span>}
-      <p className="absolute left-[64px] top-[15px] w-[196px] font-normal leading-[15px] text-[10px]" style={{ color: "rgba(247,241,229,0.6)" }}>{label}</p>
-      <p className="absolute left-[64px] top-[31.34px] w-[196px] font-light leading-[23px] text-cream-93 text-[23px] whitespace-nowrap">{children}</p>
-      <p className="absolute left-[64px] top-[64.55px] w-[196px] font-light leading-[14px] text-[9px]" style={{ color: "rgba(247,241,229,0.6)" }}>{sub}</p>
+    <div className="absolute top-[1px] h-[94.42px] bg-[rgba(247,241,229,0.04)]" style={{ left, width }}>
+      <span className="absolute" style={{ left: iconX, top: iconY }}>{icon}</span>
+      {arrowX !== undefined && <span className="absolute top-[19px]" style={{ left: arrowX }}><IcoUp /></span>}
+      <p className="absolute whitespace-nowrap font-normal leading-[15px] text-[10px]" style={{ left: textX, top: labelY, color: muted }}>{label}</p>
+      <p className="absolute whitespace-nowrap font-light leading-[23px] text-cream-93 text-[23px]" style={{ left: textX, top: valueY }}>{children}</p>
+      <p className="absolute whitespace-nowrap font-light leading-[14px] text-[9px]" style={{ left: textX, top: subY, color: muted }}>{sub}</p>
     </div>
   );
 }
@@ -166,26 +177,27 @@ export default function Section4Caso() {
         </p>
 
         {/* Stats bar */}
-        <div className="absolute bg-brown-dark flex h-[96.42px] left-[56px] overflow-clip rounded-[12px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-[274px] w-[1060px]">
-          <Metric label="Inversión total" sub="compra + remodelación" icon={<IcoHome />}><CountUp value={3100} prefix="$" suffix="M COP" grouping /></Metric>
-          <div className="w-px shrink-0" />
-          <Metric label="Valor de mercado 9 meses después" sub="~22% sobre lo invertido" icon={<IcoGrowth />} up><CountUp value={3776} prefix="$" suffix="M COP" grouping /></Metric>
-          <div className="w-px shrink-0" />
-          <Metric label="Canon mensual" sub="+54% tras la obra" icon={<IcoGrowth />} up><CountUp value={17} prefix="$" suffix="M COP" /></Metric>
-          <div className="w-px shrink-0" />
-          <Metric label="Yield bruto" sub="renta anual / inversión" icon={<IcoPercent />}><CountUp value={6.6} suffix="%" decimals={1} comma /></Metric>
+        <div className="absolute bg-brown-dark h-[96.42px] left-[56px] overflow-clip rounded-[12px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-[274px] w-[1060px]">
+          <Metric left={1} width={263.75} iconX={16} iconY={24} textX={70} labelY={11} valueY={27.34} subY={60.55}
+            label="Inversión total" sub="compra + remodelación" icon={<IcoHome />}><CountUp value={3100} prefix="$" suffix="M COP" grouping /></Metric>
+          <Metric left={265} width={265} iconX={6} iconY={26} arrowX={68} textX={83.75} labelY={15} valueY={35} subY={64.55}
+            label="Valor de mercado 9 meses después" sub="~22% sobre lo invertido" icon={<IcoGrowth />}><CountUp value={3776} prefix="$" suffix="M COP" grouping /></Metric>
+          <Metric left={530.5} width={263.75} iconX={20.5} iconY={26} arrowX={81.5} textX={97} labelY={15} valueY={31.34} subY={64.55}
+            label="Canon mensual" sub="+54% tras la obra" icon={<IcoGrowth />}><CountUp value={17} prefix="$" suffix="M COP" /></Metric>
+          <Metric left={795.25} width={263.75} iconX={12.75} iconY={23} textX={58.75} labelY={15} valueY={31.34} subY={64.55}
+            label="Yield bruto" sub="renta anual / inversión" icon={<IcoPercent />}><CountUp value={6.6} suffix="%" decimals={1} comma /></Metric>
         </div>
 
         {/* Horizonte slider */}
         <div ref={sliderRef} className="absolute bg-brown-dark border border-solid border-[rgba(247,241,229,0.12)] h-[55.19px] left-[57px] rounded-[12px] top-[388px] w-[1060px]">
-          <p className="[word-break:break-word] absolute font-semibold leading-[17px] left-[18px] not-italic text-cream-93 text-[11px] top-[17.7px]">Horizonte</p>
-          <p className="[word-break:break-word] absolute font-semibold leading-[25px] left-[448px] not-italic text-tan-63 text-[16px] top-[13.5px]">5 años</p>
-          {/* track */}
-          <div className="absolute left-[93px] top-[23px] h-[7px] w-[319px] overflow-hidden rounded-[40px]" style={{ background: "rgba(201,168,119,0.25)" }}>
+          <p className="[word-break:break-word] absolute font-semibold leading-[17px] left-[19px] not-italic text-cream-93 text-[11px] top-[18.7px]">Horizonte</p>
+          <p className="[word-break:break-word] absolute font-semibold leading-[25px] left-[986px] not-italic text-tan-63 text-[16px] top-[15px]">5 años</p>
+          {/* track — 875 × 7 en x=94, y=24 (Figma 180:1334) */}
+          <div className="absolute left-[94px] top-[24px] h-[7px] w-[875px] overflow-hidden rounded-[40px]" style={{ background: "rgba(201,168,119,0.25)" }}>
             <motion.div className="h-full rounded-[40px] bg-tan-63" initial={{ width: 0 }} animate={sliderInView ? { width: "100%" } : { width: 0 }} transition={{ duration: 1, ease: EASE }} />
           </div>
-          {/* handle */}
-          <motion.div className="absolute top-[17px] size-[18px]" initial={{ left: 94, scale: 0 }} animate={sliderInView ? { left: 403, scale: 1 } : { left: 94, scale: 0 }} transition={{ duration: 1, ease: EASE }}>
+          {/* handle — 18 × 18 (Figma 180:1335), recorre el track hasta el tope de 5 años */}
+          <motion.div className="absolute top-[18px] size-[18px]" initial={{ left: 95, scale: 0 }} animate={sliderInView ? { left: 951, scale: 1 } : { left: 95, scale: 0 }} transition={{ duration: 1, ease: EASE }}>
             <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={`${A}/6424a9316b574386588cbe3469edd4b83c7f57c0.svg`} />
           </motion.div>
         </div>
