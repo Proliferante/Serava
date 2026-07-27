@@ -24,14 +24,9 @@ function NavLink({ href, left, top, children }: LinkProps) {
   );
 }
 
-/**
- * `top` existe porque en Home el frame va en y=-4 (426:1113) y en Cómo
- * operamos, Oportunidades y Hub en y=0 (426:1114 / 1137 / 1160). El interior
- * es idéntico en las cuatro.
- */
-export default function Navbar({ top = 0 }: { top?: number }) {
+export default function Navbar() {
   return (
-    <nav className="absolute left-0 h-[173px] w-[1920px] rounded-bl-[80px] rounded-br-[80px] bg-brown-dark" style={{ top }} aria-label="Principal">
+    <nav className="absolute left-0 top-0 h-[173px] w-[1920px] rounded-bl-[80px] rounded-br-[80px] bg-brown-dark" aria-label="Principal">
       {/* Wordmark (426:1116) */}
       <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute left-[121px] top-[67px] h-[34.119px] w-[175.276px]">
         <img loading="lazy" decoding="async" alt="Serava" className="absolute inset-0 block size-full max-w-none" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
