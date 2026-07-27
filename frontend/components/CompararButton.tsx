@@ -12,7 +12,7 @@ export default function CompararButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="ix-press absolute bg-cream h-[104px] left-[1324px] overflow-clip rounded-[98px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.25)] top-[988px] w-[404px] flex items-center justify-center"
+        className="ix-press absolute bg-cream h-[104px] left-[1324px] overflow-clip rounded-[98px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.25)] top-[1000px] w-[404px] flex items-center justify-center"
       >
         <p className="[word-break:break-word] font-semibold not-italic text-brown-dark text-center leading-[1.25] px-[26px]">
           <span className="text-[25px]">Compara:</span>{" "}

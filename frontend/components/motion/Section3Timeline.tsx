@@ -23,14 +23,14 @@ export default function Section3Timeline() {
     offset: ["start 0.9", "end 0.6"],
   });
 
-  // Line fill height (0 → 652px) tied to scroll progress.
-  const fillHeight = useTransform(scrollYProgress, [0, 1], [0, 652]);
+  // Line fill height (0 → 612px) tied to scroll progress.
+  const fillHeight = useTransform(scrollYProgress, [0, 1], [0, 612]);
 
   // Dots activate as the fill reaches their position along the line.
   const d1o = useTransform(scrollYProgress, [0.0, 0.06], [0.3, 1]);
   const d1s = useTransform(scrollYProgress, [0.0, 0.06], [0.55, 1]);
-  const d2o = useTransform(scrollYProgress, [0.38, 0.46], [0.3, 1]);
-  const d2s = useTransform(scrollYProgress, [0.38, 0.46], [0.55, 1]);
+  const d2o = useTransform(scrollYProgress, [0.41, 0.49], [0.3, 1]);
+  const d2s = useTransform(scrollYProgress, [0.41, 0.49], [0.55, 1]);
   const d3o = useTransform(scrollYProgress, [0.8, 0.88], [0.3, 1]);
   const d3s = useTransform(scrollYProgress, [0.8, 0.88], [0.55, 1]);
 
@@ -39,7 +39,7 @@ export default function Section3Timeline() {
       {/* Track (faint) — also the scroll measurement target */}
       <div
         ref={ref}
-        className="absolute left-[1201px] top-[309px] w-[4px] h-[652px] rounded-full"
+        className="absolute left-[1201px] top-[346px] w-[4px] h-[612px] rounded-full"
         style={{ background: "rgba(104,117,64,0.22)" }}
       >
         {/* Fill grows downward with scroll */}
@@ -50,13 +50,13 @@ export default function Section3Timeline() {
       </div>
 
       {/* Timeline dots */}
-      <motion.div className="absolute h-[41px] left-[1183px] top-[294px] w-[40px]" style={{ opacity: d1o, scale: d1s }}>
+      <motion.div className="absolute h-[41px] left-[1183px] top-[331px] w-[40px]" style={{ opacity: d1o, scale: d1s }}>
         <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={E1} />
       </motion.div>
-      <motion.div className="absolute h-[41px] left-[1183px] top-[570px] w-[40px]" style={{ opacity: d2o, scale: d2s }}>
+      <motion.div className="absolute h-[41px] left-[1183px] top-[601px] w-[40px]" style={{ opacity: d2o, scale: d2s }}>
         <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={E2} />
       </motion.div>
-      <motion.div className="absolute h-[41px] left-[1183px] top-[845px] w-[40px]" style={{ opacity: d3o, scale: d3s }}>
+      <motion.div className="absolute h-[41px] left-[1183px] top-[842px] w-[40px]" style={{ opacity: d3o, scale: d3s }}>
         <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={E3} />
       </motion.div>
     </>
