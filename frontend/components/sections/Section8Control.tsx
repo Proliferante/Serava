@@ -46,9 +46,15 @@ export default function Section8Control() {
       <p className="[word-break:break-word] absolute font-black leading-[normal] left-[1245px] not-italic text-brown-dark text-[25px] top-[322px] w-[434px]">Cómo va tu zona</p>
       <p className="[word-break:break-word] absolute font-normal leading-[normal] left-[1238px] not-italic text-brown-dark text-[20px] top-[367px] w-[282px]">Si la demanda sigue firme y cómo se mueve el valor de tu predio, mes a mes.</p>
 
-      {/* Dashboard image */}
-      <div className="absolute h-[572px] left-[478px] rounded-[50px] top-[566px] w-[1003px]">
-        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[50px] size-full" src={`${A}/4055e80987b7d215e0e7f999065b3a68fa45677b.webp`} />
+      {/* Dashboard image (351:1107) — 810 × 612 en 555,520, con el halo crema */}
+      <div className="absolute h-[612px] left-[555px] top-[520px] w-[810px] overflow-clip rounded-[40px] shadow-[18px_22px_18.4px_-5px_rgba(226,205,174,0.73)]">
+        <img
+          loading="lazy"
+          decoding="async"
+          alt="Panel de seguimiento de la inversión"
+          className="absolute h-[107.52%] left-[-4.59%] max-w-none top-[-2.61%] w-[108.31%] pointer-events-none"
+          src={`${A}/69716bbab7c45079d8a35d0ff6cf3961b2185be5.webp`}
+        />
       </div>
 
       {/* Badge under image */}
