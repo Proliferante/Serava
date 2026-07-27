@@ -12,13 +12,13 @@ type FiltroCardProps = {
 };
 
 /**
- * Dark filter card (Home · Seccion 2 "El criterio de entrada", 378px tall).
+ * Dark filter card (Home · Seccion 2 "Pocas oportunidades. Para pocos.", 400px tall).
  * Self-contained container with a staggered scroll-in entrance and hover lift.
  */
 export default function FiltroCard({ cardLeft, label, title, body, bodyColor, delay = 0 }: FiltroCardProps) {
   return (
     <motion.div
-      className="group absolute top-[264px] h-[378px] w-[245.46px]"
+      className="group absolute top-[320px] h-[400px] w-[245.46px]"
       style={{ left: cardLeft }}
       initial={{ opacity: 0, y: 42 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -27,9 +27,9 @@ export default function FiltroCard({ cardLeft, label, title, body, bodyColor, de
       whileHover={{ y: -8 }}
     >
       <div className="absolute inset-0 rounded-[50px] bg-brown-dark border border-solid border-transparent transition-[border-color,box-shadow] duration-300 group-hover:border-[rgba(247,241,229,0.25)] group-hover:shadow-[0px_24px_48px_-20px_rgba(0,0,0,0.55)]" />
-      <p className="[word-break:break-word] absolute left-[33px] top-[41px] w-[171.62px] font-semibold leading-[18.35px] not-italic text-tan-63 text-[11.8px] tracking-[2.368px]">{label}</p>
-      <p className="[word-break:break-word] absolute left-[32px] top-[94px] w-[171.62px] font-semibold leading-[26.4px] not-italic text-cream-93 text-[24px] tracking-[-0.6px]">{title}</p>
-      <p className="[word-break:break-word] absolute left-[32px] top-[154px] w-[171.62px] font-light leading-[22.82px] not-italic text-[15px]" style={{ color: bodyColor }}>{body}</p>
+      <p className="[word-break:break-word] absolute left-[33px] top-[41px] w-[181px] font-semibold leading-[18.35px] not-italic text-tan-63 text-[11.8px] tracking-[2.368px]">{label}</p>
+      <p className="[word-break:break-word] absolute left-[32px] top-[94px] w-[181px] font-semibold leading-[26.4px] not-italic text-cream-93 text-[24px] tracking-[-0.6px]">{title}</p>
+      <p className="[word-break:break-word] absolute left-[32px] top-[154px] w-[181px] font-light leading-[22.82px] not-italic text-[15px]" style={{ color: bodyColor }}>{body}</p>
     </motion.div>
   );
 }

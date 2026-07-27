@@ -43,15 +43,15 @@ export default function Section1Hero() {
         <img loading="lazy" decoding="async" alt=".serava." className="absolute block inset-0 max-w-none size-full" src={`${A}/d9b1e9d601a843e82663d6c4512aa26ff643e90e.svg`} />
       </div>
 
-      {/* Left headline block */}
-      <div className="[word-break:break-word] absolute font-medium leading-[0] left-[412px] not-italic text-cream text-[0px] top-[452px] whitespace-nowrap">
-        <p className="leading-[normal] mb-0 text-[30px]">Invierte tu capital,</p>
-        <p className="leading-[67.09%] text-tan text-[55px]">no tu tiempo.</p>
-      </div>
-      <div className="[word-break:break-word] absolute font-medium leading-[0] left-[416px] not-italic text-cream text-[0px] top-[587px] whitespace-nowrap">
-        <p className="leading-[normal] mb-0 text-[30px]">Inversión inmobiliaria gestionada,</p>
-        <p className="leading-[67.09%] text-tan text-[55px]">de principio a fin.</p>
-      </div>
+      {/* H1 dominante */}
+      <h1 className="[word-break:break-word] absolute font-semibold leading-[1.05] left-[412px] not-italic text-cream text-[55px] top-[452px] whitespace-nowrap">
+        <span className="block">Invierte tu capital,</span>
+        <span className="block text-tan">no tu tiempo.</span>
+      </h1>
+      {/* Subhead — peso medio, tamaño menor */}
+      <p className="[word-break:break-word] absolute font-medium leading-[1.25] left-[412px] not-italic text-cream text-[30px] top-[601px] whitespace-nowrap">
+        Inversión inmobiliaria gestionada<br />de principio a fin.
+      </p>
 
       {/* Right stats */}
       <p className="[word-break:break-word] absolute font-medium leading-[normal] left-[1212px] not-italic text-cream text-[30px] top-[342px] whitespace-nowrap">Proyectos estructurados</p>
@@ -121,10 +121,9 @@ export default function Section1Hero() {
 
       {/* CTA button → solicitud de acceso */}
       <a href="/solicitud-acceso" className="ix-invert ix-pulse absolute bg-cream h-[104px] left-[412px] overflow-clip rounded-[98px] top-[713px] w-[404px] flex items-center justify-center">
-        <div className="[word-break:break-word] font-semibold not-italic text-brown-dark text-[24px] text-center leading-[1.15]">
-          <p className="mb-0">Conoce el proceso</p>
-          <p>de acceso</p>
-        </div>
+        <p className="[word-break:break-word] font-semibold not-italic text-brown-dark text-[24px] text-center leading-[1.15]">
+          Solicitar Entrevista
+        </p>
       </a>
     </div>
   );
