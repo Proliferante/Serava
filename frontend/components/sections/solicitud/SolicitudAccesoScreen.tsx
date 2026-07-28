@@ -229,7 +229,7 @@ export default function SolicitudAccesoScreen() {
             }}
           />
           <Rule x={620} y={279.99} w={34} color={LASER} delay={0.15} />
-          <T x={666} cy={279.07} w={251.104} d={0.29} ry={14} className="font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.226px", color: LASER }}>
+          <T x={666} cy={279.07} w={251.104} d={0.29} ry={14} className="whitespace-nowrap font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.226px", color: LASER }}>
             <p>Portafolio privado Serava</p>
           </T>
           <T x={620} cy={422.11} w={591.34} className="whitespace-nowrap" style={{ fontSize: 64, lineHeight: "71.68px", letterSpacing: "-1.6px", color: LINEN }}>
@@ -483,7 +483,7 @@ export default function SolicitudAccesoScreen() {
           </L>
 
           <Rule x={846.79} y={127.5} w={34} color={LASER} delay={0.12} />
-          <T x={892.79} cy={126.58} w={178.15} d={0.26} ry={14} className="text-center font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.226px", color: LASER }}>
+          <T x={892.79} cy={126.58} w={178.15} d={0.26} ry={14} className="whitespace-nowrap text-center font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.226px", color: LASER }}>
             <p>Alineación primero</p>
           </T>
           <T x={660} cy={244.3} w={600} className="whitespace-nowrap text-center" style={{ fontSize: 48, lineHeight: "53.76px", letterSpacing: "-1.2px", color: LINEN }}>
