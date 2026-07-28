@@ -357,8 +357,8 @@ export default function SolicitudAccesoScreen() {
         <L x={0} y={1667} w={1920} h={1202.17} className="overflow-hidden" style={{ background: BROWN, borderRadius: "150px 0 0 0" }}>
           <img
             alt="" loading="lazy" src={`${A}/acc-cuadro.webp`}
-            className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
-            style={{ opacity: 0.1 }}
+            className="pointer-events-none absolute left-0 max-w-none object-cover"
+            style={{ top: -465, width: 1920, height: 1688, opacity: 0.1 }}
           />
           <span id="formulario" className="absolute left-0 top-0" />
 
@@ -479,7 +479,7 @@ export default function SolicitudAccesoScreen() {
         {/* ══════════ 5 · CIERRE (311:4752) ══════════ */}
         <L x={0} y={3647} w={1920} h={823} className="overflow-hidden" style={{ background: BROWN, borderRadius: "150px 0 0 0" }}>
           <L x={-580} y={-116} w={1913} h={1109} className="overflow-hidden">
-            <img alt="" loading="lazy" src={`${A}/acc-lineas.webp`} className="absolute inset-0 size-full max-w-none object-cover" style={{ opacity: 0.1 }} />
+            <img alt="" loading="lazy" src={`${A}/acc-lineas.webp`} className="absolute max-w-none" style={{ left: "-0.58%", top: "-120.02%", width: "102.04%", height: "220.02%", opacity: 0.1 }} />
           </L>
 
           <Rule x={846.79} y={127.5} w={34} color={LASER} delay={0.12} />
