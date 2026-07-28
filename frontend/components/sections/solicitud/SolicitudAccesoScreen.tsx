@@ -256,7 +256,7 @@ export default function SolicitudAccesoScreen() {
           <T x={460} cy={198.16} w={760} d={0} ry={16} className="font-normal" style={{ fontSize: 14.4, lineHeight: "22.32px", color: BROWN }}>
             <p>Un proceso de conocimiento mutuo</p>
           </T>
-          <T x={460} cy={244.09} w={563.67} className="whitespace-nowrap" style={{ fontSize: 41.6, lineHeight: "46.59px", letterSpacing: "-1.04px", color: BROWN }}>
+          <T x={460} cy={267.79} w={563.67} className="whitespace-nowrap" style={{ fontSize: 41.6, lineHeight: "46.59px", letterSpacing: "-1.04px", color: BROWN }}>
             <MLine delay={0.12}><span className="font-light">Tres pasos para entrar al</span></MLine>
             <MLine delay={0.24}><span className="font-semibold">portafolio privado.</span></MLine>
           </T>
@@ -271,7 +271,7 @@ export default function SolicitudAccesoScreen() {
               whileHover={{ y: -7 }}
               className="ix-card absolute overflow-hidden"
               style={{
-                left: 460 + i * 339.33, top: 364.79, width: 321.33,
+                left: 460 + i * 339.33, top: 364.79, width: 321.33, height: 272,
                 background: "rgba(73,33,0,0.8)", border: `1px solid ${LINEN18}`,
                 borderRadius: 18, padding: "31px 27px", boxShadow: "0px 4px 4px 0px rgba(0,0,0,0.25)",
               }}
@@ -326,7 +326,7 @@ export default function SolicitudAccesoScreen() {
               whileHover={{ y: -7 }}
               className="ix-card absolute overflow-hidden"
               style={{
-                left: 460 + i * 338.67, top: 605.89, width: 322.66,
+                left: 460 + i * 338.67, top: 605.89, width: 322.66, height: 200,
                 background: AVOCADO, border: `1px solid ${LINEN18}`,
                 borderRadius: 16, padding: "29px 25px",
               }}
@@ -478,7 +478,7 @@ export default function SolicitudAccesoScreen() {
 
         {/* ══════════ 5 · CIERRE (311:4752) ══════════ */}
         <L x={0} y={3647} w={1920} h={823} className="overflow-hidden" style={{ background: BROWN, borderRadius: "150px 0 0 0" }}>
-          <L x={0} y={4} w={1913} h={1109} className="overflow-hidden">
+          <L x={-580} y={-116} w={1913} h={1109} className="overflow-hidden">
             <img alt="" loading="lazy" src={`${A}/acc-lineas.webp`} className="absolute inset-0 size-full max-w-none object-cover" style={{ opacity: 0.1 }} />
           </L>
 
