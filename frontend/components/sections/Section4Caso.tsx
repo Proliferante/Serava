@@ -214,11 +214,26 @@ export default function Section4Caso() {
               <span className={`relative z-10 font-medium text-[12px] transition-colors ${tab === "tabla" ? "text-cream-93" : "text-[#8a6a3f]"}`}>Año a año · base</span>
             </button>
           </div>
+          {/* Flechas (180:1342 / 180:1345) — pasan entre las dos vistas del bloque.
+              El opacity-30 del diseño es el estado "no hay nada antes": ahora se
+              apaga la que corresponde en vez de estar fija en la primera. */}
           <div className="absolute left-[972px] top-[3px] flex w-[88px] gap-[8px]">
-            <button type="button" className="ix-press flex size-[40px] items-center justify-center rounded-[20px] border border-solid border-[rgba(73,33,0,0.12)] bg-white opacity-30">
+            <button
+              type="button"
+              onClick={() => setTab("escenarios")}
+              disabled={tab === "escenarios"}
+              aria-label="Ver escenarios"
+              className="ix-press flex size-[40px] items-center justify-center rounded-[20px] border border-solid border-[rgba(73,33,0,0.12)] bg-white transition-opacity disabled:pointer-events-none disabled:opacity-30"
+            >
               <img loading="lazy" decoding="async" alt="" className="size-[18px]" src={`${A}/85a59880c3aaef0d26f3e0ba73e5bde80f43e02c.svg`} />
             </button>
-            <button type="button" className="ix-press flex size-[40px] items-center justify-center rounded-[20px] border border-solid border-[rgba(73,33,0,0.12)] bg-white">
+            <button
+              type="button"
+              onClick={() => setTab("tabla")}
+              disabled={tab === "tabla"}
+              aria-label="Ver año a año"
+              className="ix-press flex size-[40px] items-center justify-center rounded-[20px] border border-solid border-[rgba(73,33,0,0.12)] bg-white transition-opacity disabled:pointer-events-none disabled:opacity-30"
+            >
               <img loading="lazy" decoding="async" alt="" className="size-[18px]" src={`${A}/1c7a3cf5f5c4660d1f1f1bedbff0248036ba58af.svg`} />
             </button>
           </div>
