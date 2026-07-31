@@ -5,7 +5,12 @@ const A = "/figma";
 /** Seccion 2 — Criterio de entrada · "Pocas oportunidades. Para pocos." (1920 × 1337) */
 export default function Section2Criterio() {
   return (
-    <div className="bg-cream relative size-full" data-name="Seccion 2">
+    /* overflow-clip = "Clip content" del frame en Figma. Sin él, el mapa de
+       abajo (2629 × 3415 desde -709,-916) se sale 916px por arriba y se pinta
+       encima del hero, que va antes en el orden del documento: sobre el video
+       oscuro no se nota, pero sobre el wordmark y el botón crema se ve el
+       trazado de las calles. */
+    <div className="bg-cream relative size-full overflow-clip" data-name="Seccion 2">
       {/* Bogotá map background */}
       <div className="pointer-events-none absolute h-[3415px] left-[-709px] top-[-916px] w-[2629px]">
         <img loading="lazy" decoding="async" alt="" className="absolute inset-0 max-w-none object-cover opacity-20 pointer-events-none size-full" src={`${A}/2cddbd3323c70d04c23ee3ff2c94699c7988af39.webp`} />
