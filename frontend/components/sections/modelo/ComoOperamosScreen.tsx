@@ -115,8 +115,14 @@ function Svg({ src, x, y, w, h, inset, d }: { src: string; x: number; y: number;
   );
 }
 
-/** `<img>` con el encuadre exacto de Figma + parallax vertical opcional. */
-function ParImg({ src, style, par = 0, over, alt = "", eager }: { src: string; style: CSSProperties; par?: number; over?: number; alt?: string; eager?: boolean }) {
+/**
+ * `<img>` con el encuadre exacto de Figma + parallax vertical opcional.
+ *
+ * `fit="fill"` para los nodos que ya traen su encuadre en % desde Figma: ahí
+ * `object-cover` recorta *encima* del recorte y la imagen sale ampliada — el
+ * mismo caso que los dos fondos de /solicitud-acceso (147d475).
+ */
+function ParImg({ src, style, par = 0, over, alt = "", eager, fit = "cover" }: { src: string; style: CSSProperties; par?: number; over?: number; alt?: string; eager?: boolean; fit?: "cover" | "fill" }) {
   const ref = useRef<HTMLImageElement>(null);
   const py = useParallaxY(ref, par);
   return (
@@ -127,7 +133,7 @@ function ParImg({ src, style, par = 0, over, alt = "", eager }: { src: string; s
       loading={eager ? "eager" : "lazy"}
       fetchPriority={eager ? "high" : undefined}
       decoding="async"
-      className="absolute max-w-none object-cover"
+      className={`absolute max-w-none ${fit === "fill" ? "object-fill" : "object-cover"}`}
       style={{ ...style, scale: over, y: par ? py ?? 0 : 0 }}
     />
   );
@@ -763,8 +769,11 @@ export default function ComoOperamosScreen() {
 
         {/* ══════════ 10 · CAPACIDAD OPERATIVA ══════════ */}
         <Sec top={6971} h={1002} bg={CREAM}>
+          {/* ciudad 1 (326:1139) — el encuadre en % ya es el de Figma, así que va
+              con object-fill; la caja crece ±80px en vertical (la amplitud del
+              parallax) para que al hacer scroll no se descubra el borde. */}
           <L x={-0.477} y={-1} w={1918.694} h={1080.929} className="overflow-hidden">
-            <ParImg src="como-ciudad.webp" par={80} style={{ height: "127.34%", left: "-40.46%", top: "-27.34%", width: "180.93%", opacity: 0.25 }} />
+            <ParImg src="como-ciudad.webp" par={80} fit="fill" style={{ height: "142.14%", left: "-40.46%", top: "-34.74%", width: "180.93%", opacity: 0.25 }} />
           </L>
           <L
             x={0} y={1} w={1157} h={790}
