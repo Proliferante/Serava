@@ -60,7 +60,7 @@ export default function Section2Criterio() {
       </p>
 
       {/* CTA → solicitud de acceso */}
-      <a href="/solicitud-acceso" className="ix-invert absolute bg-cream h-[104px] left-[1234px] overflow-clip rounded-[98px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.25)] top-[865px] w-[404px] flex items-center justify-center">
+      <a href="/solicitud-acceso" className="ix-invert ix-pulse-brown absolute bg-cream h-[104px] left-[1234px] overflow-clip rounded-[98px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.25)] top-[865px] w-[404px] flex items-center justify-center">
         <p className="[word-break:break-word] font-semibold not-italic text-brown-dark text-[24px] text-center leading-[1.15]">
           Solicitar Entrevista
         </p>

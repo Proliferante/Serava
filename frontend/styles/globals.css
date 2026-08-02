@@ -135,6 +135,19 @@ body {
   animation: ixPulseTuscany 3s ease-in-out infinite;
 }
 
+/* Attention pulse for a cream CTA sitting on a cream background (Sección 2 de
+   la home): el botón y el fondo son del mismo color hasta el hover, así que el
+   anillo va en marrón —el tono al que invierte al pasar el mouse— porque uno
+   crema como el de .ix-pulse no se vería. El 0%/100% repite la sombra base del
+   botón para que en reposo se vea igual que antes. */
+@keyframes ixPulseBrown {
+  0%, 100% { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(73, 33, 0, 0); }
+  50%      { box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), 0 0 0 9px rgba(73, 33, 0, 0.1); }
+}
+.ix-pulse-brown {
+  animation: ixPulseBrown 3s ease-in-out infinite;
+}
+
 /* Shine sweep on hover for image cards */
 .ix-zoom { transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
 .group:hover .ix-zoom { transform: scale(1.08); }
@@ -231,7 +244,7 @@ body {
   .ix-card:hover .ix-card-ico, .ix-row:hover { transform: none; }
   .ix-press, .ix-nav, .ix-lift, .ix-chip, .ix-zoom, .ix-navlink > *, .ix-invert, .ix-invert *, .ix-invert-w, .ix-invert-w *, .ix-fill, .ix-fill * { transition: none; }
   .ix-press:hover, .ix-nav:hover, .ix-lift:hover, .ix-chip:hover, .ix-invert:active, .ix-invert-w:active, .ix-fill:active { transform: none; filter: none; }
-  .ix-pulse, .ix-pulse-green, .ix-live, .ix-pulse-tuscany { animation: none; }
+  .ix-pulse, .ix-pulse-green, .ix-live, .ix-pulse-tuscany, .ix-pulse-brown { animation: none; }
   .group:hover .ix-zoom { transform: none; }
   .ix-cta, .ix-cta-arrow, .ix-cta-shine { animation: none; }
   .ix-cta:hover { transform: none; filter: none; }
