@@ -198,10 +198,10 @@ function CTA({ x, y, tone, d = 0 }: { x: number; y: number; tone: "olive" | "cre
    cada proyecto reemplazan los marcadores "Foto ANTES / Foto DESPUÉS".      */
 
 const PROY = [
-  { city: "Bogotá", zone: "La Cabrera", full: "La Cabrera · Bogotá", title: "Remodelación integral ultra lujo", interv: "Integral", antes: `${ADP}/1502-sala-antes.webp`, despues: `${ADP}/1502-sala-despues.webp` },
-  { city: "Medellín", zone: "El Poblado", full: "El Poblado · Medellín", title: "Cocina integral en madera", interv: "Integral", antes: `${ADP}/1601-cocina-antes.webp`, despues: `${ADP}/1601-cocina-despues.webp` },
-  { city: "Bogotá", zone: "Chicó", full: "Chicó · Bogotá", title: "Baño principal en mármol", interv: "Integral", antes: `${ADP}/1502-bano-antes.webp`, despues: `${ADP}/1502-bano-despues.webp` },
-  { city: "Panamá", zone: "Costa del Este", full: "Costa del Este · Panamá", title: "Sala social renovada", interv: "Integral", antes: `${ADP}/1602-sala-antes.webp`, despues: `${ADP}/1602-sala-despues.webp` },
+  { city: "Bogotá", zone: "Cabrera 1502", full: "Cabrera 1502 · Bogotá", title: "Remodelación integral ultra lujo", interv: "Integral", antes: `${ADP}/1502-sala-antes.webp`, despues: `${ADP}/1502-sala-despues.webp` },
+  { city: "Bogotá", zone: "Cabrera 1601", full: "Cabrera 1601 · Bogotá", title: "Cocina integral en madera", interv: "Integral", antes: `${ADP}/1601-cocina-antes.webp`, despues: `${ADP}/1601-cocina-despues.webp` },
+  { city: "Bogotá", zone: "Cabrera 1502", full: "Cabrera 1502 · Bogotá", title: "Baño principal en mármol", interv: "Integral", antes: `${ADP}/1502-bano-antes.webp`, despues: `${ADP}/1502-bano-despues.webp` },
+  { city: "Bogotá", zone: "Cabrera 1602", full: "Cabrera 1602 · Bogotá", title: "Sala social renovada", interv: "Integral", antes: `${ADP}/1602-sala-antes.webp`, despues: `${ADP}/1602-sala-despues.webp` },
 ];
 
 /** Degradados placeholder de Figma detrás de cada foto. */
@@ -345,7 +345,7 @@ function Comparador({ active, setActive }: { active: number; setActive: (i: numb
       {/* Selectores de proyecto (311:2118) */}
       {PROY.map((t, i) => (
         <motion.button
-          key={t.full}
+          key={t.antes}
           type="button"
           onClick={() => setActive(i)}
           initial={{ opacity: 0, y: 26 }}
