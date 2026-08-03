@@ -416,6 +416,36 @@ export function Big({
   );
 }
 
+/**
+ * Tarjeta de indicador de cabecera: etiqueta, cifra grande y pie. Es la fila
+ * de tres que abre Presupuesto, Interventoría y Proyección de valor.
+ *
+ * `green` la vuelve verde sólida (el sobrecosto a cargo del inversionista) y
+ * `weight` distingue las cifras de dinero (700) de los conteos (300).
+ */
+export function StatCard({
+  x, y = 95.61, w, h = 141, label, value, note, green, weight = 700, delay = 0,
+}: {
+  x: number; y?: number; w: number; h?: number; label: string; value: ReactNode;
+  note: string; green?: boolean; weight?: number; delay?: number;
+}) {
+  return (
+    <Card x={x} y={y} w={w} h={h} delay={delay} green={green}>
+      <Eyebrow x={23} y={22} color={green ? LINEN72 : undefined}>{label}</Eyebrow>
+      <p
+        className="absolute m-0"
+        style={{
+          left: 23, top: 46.01, fontSize: 34, lineHeight: "51px", fontWeight: weight,
+          color: green ? LINEN : INK, letterSpacing: weight >= 600 ? "-0.5px" : "-1px",
+        }}
+      >
+        {value}
+      </p>
+      <Note x={23} y={100.01} color={green ? LINEN80 : MUTED}>{note}</Note>
+    </Card>
+  );
+}
+
 /** Línea de texto secundario dentro de una tarjeta. */
 export function Note({
   x, y, w, size = 13, color = MUTED, weight = 300, className, children,

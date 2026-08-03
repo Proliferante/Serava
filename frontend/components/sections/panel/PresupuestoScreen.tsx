@@ -1,11 +1,10 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 import CountUp from "@/components/motion/CountUp";
 import { Ico } from "@/components/panel/icons";
 import {
-  Bar, Card, Eyebrow, In, INK, LINE, LINEN, LINEN72, LINEN80, MUTED, Note,
-  OLIVE, Tag, VERD, ViewTitle,
+  Bar, Card, Eyebrow, In, INK, LINE, MUTED, OLIVE, StatCard, Tag, VERD, ViewTitle,
 } from "@/components/panel/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -44,21 +43,6 @@ const TH: CSSProperties = {
 };
 const TD: CSSProperties = { padding: "0 10px", fontSize: 14, borderBottom: `1px solid ${LINE}` };
 
-/** Total de cabecera. En verde el sobrecosto, que es la promesa de la marca. */
-function Total({
-  x, w, label, value, note, green, delay,
-}: { x: number; w: number; label: string; value: ReactNode; note: string; green?: boolean; delay: number }) {
-  return (
-    <Card x={x} y={95.61} w={w} h={141} delay={delay} green={green}>
-      <Eyebrow x={23} y={22} color={green ? LINEN72 : undefined}>{label}</Eyebrow>
-      <p className="absolute m-0" style={{ left: 23, top: 46.01, fontSize: 34, lineHeight: "51px", fontWeight: 700, color: green ? LINEN : INK, letterSpacing: "-0.5px" }}>
-        {value}
-      </p>
-      <Note x={23} y={100.01} color={green ? LINEN80 : MUTED}>{note}</Note>
-    </Card>
-  );
-}
-
 /** Fila de partida: etiqueta, porcentaje y barra de 11 px. */
 function Partida({ y, pad, label, pct, i }: (typeof PARTIDAS)[number] & { i: number }) {
   return (
@@ -80,11 +64,11 @@ export default function PresupuestoScreen() {
       />
 
       {/* ── Totales (472:2643) ── */}
-      <Total x={0} w={522.66} label="Presupuesto cerrado" note="Compra + remodelación" delay={0.06}
+      <StatCard x={0} w={522.66} label="Presupuesto cerrado" note="Compra + remodelación" delay={0.06}
         value={<CountUp value={1.35} prefix="$" decimals={3} suffix="M" />} />
-      <Total x={540.66} w={522.67} label="Ejecutado" note="92% del total" delay={0.12}
+      <StatCard x={540.66} w={522.67} label="Ejecutado" note="92% del total" delay={0.12}
         value={<CountUp value={1.24} prefix="$" decimals={3} suffix="M" />} />
-      <Total x={1081.33} w={522.67} label="Sobrecosto a tu cargo" note="El sobrecosto no estructural lo asume Serava" delay={0.18} green
+      <StatCard x={1081.33} w={522.67} label="Sobrecosto a tu cargo" note="El sobrecosto no estructural lo asume Serava" delay={0.18} green
         value="$0" />
 
       {/* ── Ejecución por partida (472:2671) ── */}
