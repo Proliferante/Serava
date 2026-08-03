@@ -237,6 +237,52 @@ body {
 /* Miniatura de proyecto activa en el comparador. */
 .ix-thumb { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.35s ease; }
 
+/* ── Panel (área privada) ───────────────────────────────────────────
+   Interacciones del post-login. Se separan de las `ix-*` porque el panel
+   vive sobre fondo claro y usa el verde aguacate como color de acción,
+   no el tabaco de la web pública. */
+
+/* Tarjeta interactiva: se eleva y marca el borde en dorado. */
+.pnl-card {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.pnl-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(201, 168, 119, 0.65);
+  box-shadow: 0 16px 34px -22px rgba(61, 44, 30, 0.45);
+}
+
+/* Enlace "Ver todas →": la flecha empuja hacia la derecha. */
+.pnl-link { cursor: pointer; background: none; border: 0; padding: 0; }
+.pnl-link-arrow { transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
+.pnl-link:hover .pnl-link-arrow { transform: translateX(4px); }
+
+/* Botones del panel. */
+.pnl-btn { transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
+.pnl-btn:active:not(:disabled) { transform: scale(0.97); }
+.pnl-btn-solid:hover:not(:disabled) { filter: brightness(1.07); box-shadow: 0 12px 24px -16px rgba(61, 44, 30, 0.7); }
+.pnl-btn-outline:hover:not(:disabled) { background-color: rgba(91, 67, 50, 0.05); border-color: rgba(201, 168, 119, 0.75); }
+
+/* Item de navegación del sidebar. */
+.pnl-nav { transition: background-color 0.25s ease, color 0.25s ease; cursor: pointer; }
+.pnl-nav:hover { background-color: rgba(247, 241, 229, 0.06); }
+
+/* Fila de lista (documento, actividad, aprobación). */
+.pnl-row { transition: background-color 0.25s ease; }
+.pnl-row:hover { background-color: rgba(91, 67, 50, 0.04); }
+
+/* Foto de la galería: la imagen se acerca dentro del marco. */
+.pnl-photo { overflow: hidden; }
+.pnl-photo-img { transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
+.pnl-photo:hover .pnl-photo-img { transform: scale(1.06); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pnl-card, .pnl-btn, .pnl-nav, .pnl-row, .pnl-link-arrow, .pnl-photo-img { transition: none; }
+  .pnl-card:hover, .pnl-btn:active:not(:disabled) { transform: none; }
+  .pnl-link:hover .pnl-link-arrow, .pnl-photo:hover .pnl-photo-img { transform: none; }
+  .pnl-btn-solid:hover:not(:disabled) { filter: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ix-breathe, .ix-sway { animation: none; }
   .ix-card, .ix-card::after, .ix-card-ico, .ix-row, .ix-thumb { transition: none; }

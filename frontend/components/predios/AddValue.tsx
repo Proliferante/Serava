@@ -269,7 +269,7 @@ export default function AddValue() {
             <p className="text-[28.8px] leading-[32.83px] tracking-[-0.576px]"><span className="font-light text-[#3d2c1e]">Los números cuadran.</span><span className="font-light text-[#2a1e14]"> La oportunidad no espera.</span></p>
             <p className="mt-[6px] font-light text-[16px] leading-[24px] text-[#5b4332]">Reserva este predio antes de que otro inversionista lo haga.</p>
           </div>
-          <a href="/predios/ficha" className="ix-press ix-pulse-tuscany absolute right-[41px] top-[43.41px] flex h-[59px] w-[220px] items-center justify-center gap-[10px] rounded-[999px] font-bold text-[16px] text-white" style={{ backgroundColor: "#b5542f" }}>
+          <a href="/panel" className="ix-press ix-pulse-tuscany absolute right-[41px] top-[43.41px] flex h-[59px] w-[220px] items-center justify-center gap-[10px] rounded-[999px] font-bold text-[16px] text-white" style={{ backgroundColor: "#b5542f" }}>
             Reservar ahora <Bolt />
           </a>
         </div>
