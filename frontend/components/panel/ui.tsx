@@ -247,13 +247,8 @@ export function SeeLink({
 /** Píldora de estado (Pagado, Pendiente, Observación…). */
 export function Pill({
   x, y, label, tone = "green", size = 10.5,
-}: { x: number; y: number; label: string; tone?: "green" | "gold" | "tuscany" | "plain"; size?: number }) {
-  const tones = {
-    green: { bg: "rgba(95,107,62,0.12)", fg: VERD },
-    gold: { bg: "rgba(201,168,119,0.2)", fg: "#8a6a3c" },
-    tuscany: { bg: "rgba(181,84,47,0.12)", fg: TUSCANY },
-    plain: { bg: "rgba(91,67,50,0.1)", fg: MUTED },
-  }[tone];
+}: { x: number; y: number; label: string; tone?: Tone; size?: number }) {
+  const tones = TONES[tone];
   return (
     <span
       className="absolute inline-flex items-center uppercase"
@@ -261,6 +256,34 @@ export function Pill({
         left: x, top: y, padding: "3.5px 9px", borderRadius: 999,
         background: tones.bg, color: tones.fg,
         fontSize: size, lineHeight: `${Math.round(size * 1.45)}px`, fontWeight: 600, letterSpacing: "0.8px",
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+
+/** Tonos compartidos por `Pill` y `Tag`. */
+const TONES = {
+  green: { bg: "rgba(95,107,62,0.12)", fg: VERD },
+  gold: { bg: "rgba(201,168,119,0.2)", fg: "#8a6a3c" },
+  tuscany: { bg: "rgba(181,84,47,0.12)", fg: TUSCANY },
+  plain: { bg: "rgba(91,67,50,0.1)", fg: MUTED },
+};
+
+export type Tone = keyof typeof TONES;
+
+/** Píldora en línea, para celdas de tabla y filas de lista. */
+export function Tag({
+  label, tone = "green", size = 11,
+}: { label: string; tone?: Tone; size?: number }) {
+  const t = TONES[tone];
+  return (
+    <span
+      className="inline-flex items-center"
+      style={{
+        padding: "3.5px 10px", borderRadius: 999, background: t.bg, color: t.fg,
+        fontSize: size, lineHeight: `${Math.round(size * 1.45)}px`, fontWeight: 600, whiteSpace: "nowrap",
       }}
     >
       {label}

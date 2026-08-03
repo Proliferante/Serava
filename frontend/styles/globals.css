@@ -271,13 +271,24 @@ body {
 .pnl-row { transition: background-color 0.25s ease; }
 .pnl-row:hover { background-color: rgba(91, 67, 50, 0.04); }
 
+/* Caja de texto del panel (notas de obra). */
+.pnl-input {
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.pnl-input::placeholder { color: rgba(91, 67, 50, 0.45); font-weight: 300; }
+.pnl-input:focus {
+  border-color: rgba(201, 168, 119, 0.85);
+  box-shadow: 0 0 0 3px rgba(201, 168, 119, 0.18);
+}
+
 /* Foto de la galería: la imagen se acerca dentro del marco. */
 .pnl-photo { overflow: hidden; }
 .pnl-photo-img { transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
 .pnl-photo:hover .pnl-photo-img { transform: scale(1.06); }
 
 @media (prefers-reduced-motion: reduce) {
-  .pnl-card, .pnl-btn, .pnl-nav, .pnl-row, .pnl-link-arrow, .pnl-photo-img { transition: none; }
+  .pnl-card, .pnl-btn, .pnl-nav, .pnl-row, .pnl-link-arrow, .pnl-photo-img, .pnl-input { transition: none; }
   .pnl-card:hover, .pnl-btn:active:not(:disabled) { transform: none; }
   .pnl-link:hover .pnl-link-arrow, .pnl-photo:hover .pnl-photo-img { transform: none; }
   .pnl-btn-solid:hover:not(:disabled) { filter: none; }
