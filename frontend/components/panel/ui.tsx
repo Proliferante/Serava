@@ -147,11 +147,11 @@ export function Eyebrow({
  * Título de vista: primera parte en peso ligero y segunda en semibold, como
  * los `h1` del resto del sitio.
  */
-export function ViewTitle({ light, strong, sub }: { light: string; strong: string; sub: string }) {
+export function ViewTitle({ light, strong, sub }: { light?: string; strong: string; sub: string }) {
   const reduce = useReducedMotion();
   const head = (
     <h1 className="m-0" style={{ fontSize: 36, lineHeight: "48px", color: INK, fontWeight: 300, letterSpacing: "-0.4px" }}>
-      {light}{" "}<span style={{ fontWeight: 600 }}>{strong}</span>
+      {light ? `${light} ` : null}<span style={{ fontWeight: 600 }}>{strong}</span>
     </h1>
   );
   return (
@@ -460,6 +460,65 @@ export function Note({
     >
       {children}
     </p>
+  );
+}
+
+/**
+ * Fila de documento: icono, nombre, pie y botón de descarga a la derecha. La
+ * usan el Resumen (ancho 747) y la vista de Documentos (ancho 1558).
+ */
+export function DocRow({
+  y, w, name, sub, first, delay = 0,
+}: { y: number; w: number; name: string; sub: string; first?: boolean; delay?: number }) {
+  return (
+    <>
+      {!first && <Sep x={23} y={y} w={w} />}
+      <In x={23} y={y} w={w} h={65.38} delay={delay} dy={10} className="pnl-row" style={{ borderRadius: 10 }}>
+        <IconBox x={0} y={15.19} icon="docs" tone="tan" />
+        <p className="absolute m-0" style={{ left: 46, top: 12, fontSize: 15, lineHeight: "22px", fontWeight: 500, color: INK }}>{name}</p>
+        <p className="absolute m-0" style={{ left: 46, top: 33.11, fontSize: 12, lineHeight: "18px", fontWeight: 300, color: MUTED }}>{sub}</p>
+        <button
+          type="button"
+          aria-label={`Descargar ${name}`}
+          className="pnl-link absolute"
+          style={{ right: 0, top: 23, color: MUTED }}
+        >
+          <span className="pnl-link-arrow block"><Ico name="download" size={18} /></span>
+        </button>
+      </In>
+    </>
+  );
+}
+
+/**
+ * Fila de lista con marca de estado a la izquierda (registro de inspecciones,
+ * alternativas a futuro). El veredicto de la derecha es opcional.
+ */
+export function CheckRow({
+  y, w, h = 71, title, sub, badge, badgeColor, tone = "ok", first, delay = 0,
+}: {
+  y: number; w: number; h?: number; title: string; sub: string; badge?: string;
+  badgeColor?: string; tone?: "ok" | "warn"; first?: boolean; delay?: number;
+}) {
+  const t = tone === "warn"
+    ? { bg: "rgba(201,168,119,0.22)", fg: "#8a6a3c", icon: "alert" as IconName }
+    : { bg: "rgba(95,107,62,0.12)", fg: VERD, icon: "check" as IconName };
+  return (
+    <>
+      {!first && <Sep x={23} y={y} w={w} />}
+      <In x={23} y={y} w={w} h={h} delay={delay} dy={10} className="pnl-row" style={{ borderRadius: 8 }}>
+        <span className="absolute flex items-center justify-center" style={{ left: 0, top: 20, width: 30, height: 30, borderRadius: 999, background: t.bg, color: t.fg }}>
+          <Ico name={t.icon} size={16} />
+        </span>
+        <p className="absolute m-0" style={{ left: 44, top: 15, fontSize: 15, lineHeight: "22px", fontWeight: 600, color: INK }}>{title}</p>
+        <p className="absolute m-0" style={{ left: 44, top: 36, fontSize: 12.5, lineHeight: "19px", fontWeight: 300, color: MUTED }}>{sub}</p>
+        {badge && (
+          <p className="absolute m-0 text-right" style={{ right: 0, top: 25.85, fontSize: 12, lineHeight: "17px", fontWeight: 600, color: badgeColor ?? VERD }}>
+            {badge}
+          </p>
+        )}
+      </In>
+    </>
   );
 }
 

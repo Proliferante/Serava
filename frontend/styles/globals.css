@@ -271,6 +271,11 @@ body {
 .pnl-row { transition: background-color 0.25s ease; }
 .pnl-row:hover { background-color: rgba(91, 67, 50, 0.04); }
 
+/* Tirador del comparador antes/después. */
+.pnl-ba-handle { transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease; }
+.pnl-ba-handle:hover { transform: translate(0, 0) scale(1.08); }
+.pnl-ba-handle:focus-visible { outline: 2px solid rgba(201, 168, 119, 0.9); outline-offset: 3px; }
+
 /* Caja de texto del panel (notas de obra). */
 .pnl-input {
   outline: none;
@@ -288,7 +293,8 @@ body {
 .pnl-photo:hover .pnl-photo-img { transform: scale(1.06); }
 
 @media (prefers-reduced-motion: reduce) {
-  .pnl-card, .pnl-btn, .pnl-nav, .pnl-row, .pnl-link-arrow, .pnl-photo-img, .pnl-input { transition: none; }
+  .pnl-card, .pnl-btn, .pnl-nav, .pnl-row, .pnl-link-arrow, .pnl-photo-img, .pnl-input, .pnl-ba-handle { transition: none; }
+  .pnl-ba-handle:hover { transform: none; }
   .pnl-card:hover, .pnl-btn:active:not(:disabled) { transform: none; }
   .pnl-link:hover .pnl-link-arrow, .pnl-photo:hover .pnl-photo-img { transform: none; }
   .pnl-btn-solid:hover:not(:disabled) { filter: none; }

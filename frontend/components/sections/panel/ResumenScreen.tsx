@@ -3,8 +3,8 @@
 import CountUp from "@/components/motion/CountUp";
 import { Ico } from "@/components/panel/icons";
 import {
-  Bar, Big, Card, Eyebrow, IconBox, In, INK, MUTED, Note, PHOTO_BG,
-  Photo, SecLink, SeeLink, Sep, Stat, ViewTitle, VERD,
+  Bar, Big, Card, DocRow, Eyebrow, IconBox, In, INK, MUTED, Note, PHOTO_BG,
+  Photo, SecLink, SeeLink, Stat, ViewTitle, VERD,
 } from "@/components/panel/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -59,28 +59,6 @@ function ActRow({ y, tone, title, sub, time }: (typeof ACTIVIDAD)[number]) {
       <p className="absolute m-0" style={{ left: 37, top: 31, fontSize: 12.5, lineHeight: "19px", fontWeight: 300, color: MUTED }}>{sub}</p>
       <p className="absolute m-0 text-right" style={{ right: 0, top: 9, fontSize: 11.5, lineHeight: "18px", fontWeight: 400, color: MUTED }}>{time}</p>
     </In>
-  );
-}
-
-/** Fila de documento con su botón de descarga. */
-function DocRow({ y, name, sub, first }: (typeof DOCS)[number] & { first: boolean }) {
-  return (
-    <>
-      {!first && <Sep x={23} y={y} w={747} />}
-      <In x={23} y={y} w={747} h={65.38} delay={0.05 + y / 900} dy={10} className="pnl-row" style={{ borderRadius: 10 }}>
-        <IconBox x={0} y={15.19} icon="docs" tone="tan" />
-        <p className="absolute m-0" style={{ left: 46, top: 12, fontSize: 15, lineHeight: "22px", fontWeight: 500, color: INK }}>{name}</p>
-        <p className="absolute m-0" style={{ left: 46, top: 33.11, fontSize: 12, lineHeight: "18px", fontWeight: 300, color: MUTED }}>{sub}</p>
-        <button
-          type="button"
-          aria-label={`Descargar ${name}`}
-          className="pnl-link absolute"
-          style={{ left: 730, top: 23, color: MUTED }}
-        >
-          <span className="pnl-link-arrow block"><Ico name="download" size={18} /></span>
-        </button>
-      </In>
-    </>
   );
 }
 
@@ -168,7 +146,7 @@ export default function ResumenScreen() {
       <Card x={811} y={949.73} w={793} h={288.81} delay={0.12}>
         <Eyebrow x={23} y={29}>Documentos recientes</Eyebrow>
         <SecLink right={23} y={29} label="Ver todos" href="/panel/documentos" />
-        {DOCS.map((d, i) => <DocRow key={d.name} {...d} first={i === 0} />)}
+        {DOCS.map((d, i) => <DocRow key={d.name} {...d} w={747} first={i === 0} delay={0.05 + d.y / 900} />)}
       </Card>
     </>
   );
