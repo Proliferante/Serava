@@ -237,6 +237,42 @@ body {
 /* Miniatura de proyecto activa en el comparador. */
 .ix-thumb { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.35s ease; }
 
+/* ── Tooltip de las tarjetas de predio ──────────────────────────────
+   Los componentes 2 y 3 de Figma (Score Serava y tipo de transformación)
+   sólo cambian al pasar el ratón para desplegar su explicación: el pill no
+   se altera, aparece la caja.
+
+   La caja se ancla en línea, no aquí, porque el Score abre hacia la
+   izquierda (`right: 0`) y el chip hacia la derecha (`left: 0`).
+
+   Se queda en el árbol de accesibilidad a propósito —sólo se oculta con
+   `opacity`—: es texto que explica la ficha, no decoración. */
+.ix-tip { position: relative; cursor: help; }
+.ix-tip-box {
+  position: absolute;
+  z-index: 5;
+  width: 210px;
+  padding: 10.2px 13px 10.9px;
+  border-radius: 10px;
+  background: #2a1e14;
+  color: #f7f1e5;
+  font-size: 11.5px;
+  font-weight: 300;
+  line-height: 16.7px;
+  letter-spacing: 0;
+  text-transform: none;
+  box-shadow: 0 16px 32px -14px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ix-tip:hover .ix-tip-box,
+.ix-tip:focus-visible .ix-tip-box {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* ── Panel (área privada) ───────────────────────────────────────────
    Interacciones del post-login. Se separan de las `ix-*` porque el panel
    vive sobre fondo claro y usa el verde aguacate como color de acción,
@@ -308,6 +344,8 @@ body {
   .ix-press, .ix-nav, .ix-lift, .ix-chip, .ix-zoom, .ix-navlink > *, .ix-invert, .ix-invert *, .ix-invert-w, .ix-invert-w *, .ix-fill, .ix-fill * { transition: none; }
   .ix-press:hover, .ix-nav:hover, .ix-lift:hover, .ix-chip:hover, .ix-invert:active, .ix-invert-w:active, .ix-fill:active { transform: none; filter: none; }
   .ix-pulse, .ix-pulse-green, .ix-live, .ix-pulse-tuscany, .ix-pulse-brown { animation: none; }
+  .ix-tip-box { transition: opacity 0.22s ease; transform: none; }
+  .ix-tip:hover .ix-tip-box, .ix-tip:focus-visible .ix-tip-box { transform: none; }
   .group:hover .ix-zoom { transform: none; }
   .ix-cta, .ix-cta-arrow, .ix-cta-shine { animation: none; }
   .ix-cta:hover { transform: none; filter: none; }

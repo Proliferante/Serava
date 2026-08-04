@@ -41,6 +41,21 @@ const BADGE = {
 
 export type BadgeTone = keyof typeof BADGE;
 
+/** Explicación del Score, igual en las ocho variantes de Figma (311:2402). */
+const SCORE_TIP = "Evaluación especializada de la zona y su afinidad con la estrategia Serava.";
+
+/**
+ * Qué significa cada tipo de transformación (Component 3, una por variante).
+ * Se busca por la etiqueta del chip, así que los datos del predio siguen
+ * llevando sólo el nombre del tipo.
+ */
+const CHIP_TIP: Record<string, string> = {
+  "Reposicionamiento premium": "La propiedad se transforma para competir en una categoría superior: mejor diseño, materiales, funcionalidad y percepción de valor.",
+  "División en dos unidades": "Un inmueble se adapta para funcionar como dos unidades independientes, cuando la normativa lo permite.",
+  "Remodelación completa": "Se renueva todo el interior: cocina, baños, pisos, iluminación, carpintería, redes y acabados.",
+  "Cambio de distribución": "Se reorganizan los espacios para aprovechar mejor el área: ampliar la zona social, integrar la cocina o ajustar habitaciones y baños.",
+};
+
 export type Predio = {
   /** Etiqueta de estado, arriba a la izquierda de la foto. */
   badge: { label: string; tone: BadgeTone };
@@ -134,17 +149,18 @@ export default function PredioCard({
           {data.badge.label}
         </span>
 
-        {/* Score Serava */}
+        {/* Score Serava, con su explicación al pasar el ratón (311:2392) */}
         <span
-          className="absolute inline-flex items-center"
+          className="ix-tip absolute inline-flex items-center uppercase"
           style={{
-            right: 14, top: 14, height: 32, padding: "0 13px", gap: 7, borderRadius: 8,
-            background: "rgba(247,241,229,0.95)",
+            right: 14, top: 14, padding: "6px 11px", gap: 4, borderRadius: 8,
+            background: "rgba(247,241,229,0.95)", letterSpacing: "0.448px", fontWeight: 700,
             boxShadow: "0 6px 14px -6px rgba(0,0,0,0.4)",
           }}
         >
-          <span className="uppercase" style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "1px", color: "#3d2c1e" }}>Score Serava</span>
-          <span style={{ fontSize: 13.5, fontWeight: 700, color: VERD }}><CountUp value={data.score} duration={1.1} /></span>
+          <span style={{ fontSize: 11.2, lineHeight: "16.8px", color: "#3d2c1e" }}>Score Serava</span>
+          <span style={{ fontSize: 13.1, lineHeight: "19.68px", color: VERD }}><CountUp value={data.score} duration={1.1} /></span>
+          <span className="ix-tip-box" style={{ right: 0, top: 39.69 }}>{SCORE_TIP}</span>
         </span>
       </div>
 
@@ -163,17 +179,20 @@ export default function PredioCard({
         {data.title}
       </h3>
 
-      {/* Tipo de transformación */}
+      {/* Tipo de transformación, con su explicación al pasar el ratón (311:2483) */}
       <span
-        className="absolute inline-flex items-center"
+        className="ix-tip absolute inline-flex items-center"
         style={{
-          left: 22, top: 359.48, height: 33.27, padding: "0 14px", gap: 8, borderRadius: 999,
-          background: "rgba(95,107,62,0.09)", border: "1px solid rgba(95,107,62,0.22)", color: VERD,
-          fontSize: 12.5, fontWeight: 600,
+          left: 22, top: 359.48, height: 33.27, padding: "0 16px 0 14px", gap: 7, borderRadius: 999,
+          background: "rgba(127,139,87,0.13)", border: "1px solid rgba(127,139,87,0.32)", color: VERD,
+          fontSize: 11.5, lineHeight: "17.28px", fontWeight: 600,
         }}
       >
         <Spark />
         <span className="whitespace-nowrap">{data.chip}</span>
+        {CHIP_TIP[data.chip] && (
+          <span className="ix-tip-box" style={{ left: 0, top: 39.27 }}>{CHIP_TIP[data.chip]}</span>
+        )}
       </span>
 
       <p className="absolute m-0" style={{ left: 22, top: 408.75, fontSize: 13.5, lineHeight: "20px", fontWeight: 300, color: MUTED }}>
