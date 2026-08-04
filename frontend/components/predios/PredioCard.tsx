@@ -201,17 +201,19 @@ export default function PredioCard({
       <span className="absolute" style={{ left: 22, top: 445.75, width: 322, height: 1, background: "rgba(165,122,78,0.22)" }} />
 
       {/* Cifras */}
+      {/* Las etiquetas y el horizonte van en una línea, como en el diseño: si
+          se parten, la columna crece y el pie choca con el estado de abajo. */}
       <div className="absolute" style={{ left: 22, top: 460.94, width: 157 }}>
-        <p className="m-0 uppercase" style={{ fontSize: 10, lineHeight: "16px", fontWeight: 600, letterSpacing: "0.8px", color: MUTED }}>Inversión total estimada</p>
+        <p className="m-0 whitespace-nowrap uppercase" style={{ fontSize: 10, lineHeight: "16px", fontWeight: 600, letterSpacing: "0.8px", color: MUTED }}>Inversión total estimada</p>
         <p className="m-0" style={{ fontSize: 19.5, lineHeight: "28px", fontWeight: 600, letterSpacing: "-0.3px", color: INK }}>{data.price}</p>
         <p className="m-0" style={{ marginTop: 2, fontSize: 11.5, lineHeight: "16px", fontWeight: 300, color: MUTED }}>{data.priceNote}</p>
       </div>
-      <div className="absolute text-right" style={{ left: 251, top: 460.94, width: 93 }}>
-        <p className="m-0 uppercase" style={{ fontSize: 10, lineHeight: "16px", fontWeight: 600, letterSpacing: "0.8px", color: MUTED }}>TIR estimada</p>
-        <p className="m-0" style={{ fontSize: 19.5, lineHeight: "28px", fontWeight: 600, letterSpacing: "-0.3px", color: VERD }}>
+      <div className="absolute text-right" style={{ right: 24, top: 460.94, width: 120 }}>
+        <p className="m-0 whitespace-nowrap uppercase" style={{ fontSize: 10, lineHeight: "16px", fontWeight: 600, letterSpacing: "0.8px", color: MUTED }}>TIR estimada</p>
+        <p className="m-0 whitespace-nowrap" style={{ fontSize: 19.5, lineHeight: "28px", fontWeight: 600, letterSpacing: "-0.3px", color: VERD }}>
           <CountUp value={data.tir} suffix="% anual" duration={1.2} />
         </p>
-        <p className="m-0" style={{ marginTop: 2, fontSize: 11.5, lineHeight: "16px", fontWeight: 300, color: MUTED }}>{data.horizon}</p>
+        <p className="m-0 whitespace-nowrap" style={{ marginTop: 2, fontSize: 11.5, lineHeight: "16px", fontWeight: 300, color: MUTED }}>{data.horizon}</p>
       </div>
 
       {/* Estado de la oportunidad */}

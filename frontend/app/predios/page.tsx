@@ -241,7 +241,7 @@ export default function PrediosPage() {
           <p className="absolute m-0" style={{ left: 380, top: 728, fontSize: 16.5, lineHeight: "26px", fontWeight: 600, color: CREAM }}>
             7 oportunidades disponibles
           </p>
-          <p className="absolute m-0 text-right" style={{ left: 1257.75, top: 732, width: 275, fontSize: 13.5, lineHeight: "20px", fontWeight: 300, color: "rgba(247,241,229,0.6)" }}>
+          <p className="absolute m-0 whitespace-nowrap text-right" style={{ right: 388, top: 732, fontSize: 13.5, lineHeight: "20px", fontWeight: 300, color: "rgba(247,241,229,0.6)" }}>
             Portafolio limitado · actualización mensual
           </p>
           {PREDIOS.map((p, i) => (

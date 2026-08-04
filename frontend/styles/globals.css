@@ -246,8 +246,13 @@ body {
    izquierda (`right: 0`) y el chip hacia la derecha (`left: 0`).
 
    Se queda en el árbol de accesibilidad a propósito —sólo se oculta con
-   `opacity`—: es texto que explica la ficha, no decoración. */
-.ix-tip { position: relative; cursor: help; }
+   `opacity`—: es texto que explica la ficha, no decoración.
+
+   Ojo: aquí no se toca `position`. El disparador ya viene posicionado desde
+   la tarjeta y eso basta para anclar la caja; declarar `relative` pisaría el
+   `absolute` de Tailwind, porque este archivo va después de las utilidades y
+   ambas reglas tienen la misma especificidad. */
+.ix-tip { cursor: help; }
 .ix-tip-box {
   position: absolute;
   z-index: 5;
