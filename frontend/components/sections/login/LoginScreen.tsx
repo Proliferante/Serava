@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { MARK } from "@/components/brand";
 
 const A = "/figma";
 
@@ -59,8 +60,8 @@ export default function LoginScreen() {
         </div>
 
         {/* Logo → inicio */}
-        <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute h-[29.8px] left-[32px] top-[38.43px] w-[175.28px]">
-          <img loading="lazy" decoding="async" alt="Serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
+        <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute h-[29.8px] left-[32px] top-[38.43px] w-[32.66px]">
+          <img loading="lazy" decoding="async" alt="Zequara" className="absolute block inset-0 max-w-none size-full" src={MARK} />
         </a>
 
         {/* Bottom text */}

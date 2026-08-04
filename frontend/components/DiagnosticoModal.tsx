@@ -3,8 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { MARK } from "@/components/brand";
 
-const LOGO = "/figma/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg";
 
 /* ── Icons ─────────────────────────────────────────────── */
 const ic = { fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
@@ -175,7 +175,7 @@ export default function DiagnosticoModal({ open, onClose, initialStep = "intro",
           >
             {/* Top bar */}
             <div className="flex shrink-0 items-center justify-between border-b border-solid border-[rgba(247,241,229,0.07)] px-[28px] py-[16px] sm:px-[48px] sm:py-[22px]">
-              <img loading="lazy" decoding="async" src={LOGO} alt="Serava" className="h-[21px] w-[108px]" />
+              <img loading="lazy" decoding="async" src={MARK} alt="Zequara" className="h-[21px] w-[23.02px]" />
               <button type="button" onClick={onClose} className="ix-nav flex items-center gap-[6px] text-[13px]" style={{ color: "rgba(247,241,229,0.6)" }}>
                 Salir <XIcon />
               </button>

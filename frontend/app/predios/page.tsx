@@ -1,5 +1,6 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
 import PredioCard, { type Predio } from "@/components/predios/PredioCard";
+import { MARK } from "@/components/brand";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PREDIOS — reproducción del frame de Figma 100:2349 (1920 × 2850).
@@ -197,8 +198,8 @@ export default function PrediosPage() {
 
           {/* ── Nav (100:3121) ── */}
           <nav className="absolute left-0 top-0 h-[81.81px] w-full" aria-label="Panel de predios">
-            <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute" style={{ left: 101, top: 21, width: 175.28, height: 29.8 }}>
-              <img loading="lazy" decoding="async" alt="Serava" className="absolute inset-0 block size-full max-w-none" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
+            <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute" style={{ left: 101, top: 21, width: 32.66, height: 29.8 }}>
+              <img loading="lazy" decoding="async" alt="Zequara" className="absolute inset-0 block size-full max-w-none" src={MARK} />
             </a>
             <div className="absolute" style={{ left: 726.7, top: 16, width: 504, height: 49.81, borderRadius: 999, background: "rgba(247,241,229,0.06)" }}>
               {NAV.map((n, i) => (

@@ -1,12 +1,13 @@
+import { WORDMARK } from "@/components/brand";
 const A = "/figma";
 
 /** Footer (1922 × 364) */
 export default function Footer() {
   return (
     <div className="bg-brown-dark overflow-clip relative rounded-tr-[150px] size-full" data-name="Footer">
-      {/* .serava. logo → inicio */}
-      <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute h-[86px] left-[416px] top-[57px] w-[493.5px]">
-        <img loading="lazy" decoding="async" alt=".serava." className="absolute block inset-0 max-w-none size-full" src={`${A}/c9b9033affcd9b5dd0842d0881ff26a7b0031971.svg`} />
+      {/* Wordmark grande → inicio, con el ancho y el centro vertical anteriores. */}
+      <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute h-[80.69px] left-[416px] top-[59.66px] w-[493.5px]">
+        <img loading="lazy" decoding="async" alt="Zequara" className="absolute block inset-0 max-w-none size-full" src={WORDMARK} />
       </a>
 
       {/* Tagline */}

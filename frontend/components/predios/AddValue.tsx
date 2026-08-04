@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 import CountUp from "@/components/motion/CountUp";
+import { MARK } from "@/components/brand";
 
 const A = "/figma";
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -110,8 +111,8 @@ export default function AddValue() {
         <a href="/predios/ficha" className="ix-nav absolute left-[444px] top-[21.56px] flex items-center gap-[9px] text-[14.4px] font-medium" style={{ color: "#f7f1e5" }}>
           <ChevL /> Volver a la ficha
         </a>
-        <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute left-[1331px] top-[18px] h-[29.8px] w-[175.28px]">
-          <img loading="lazy" decoding="async" alt="Serava" className="block size-full max-w-none" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
+        <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute left-[1473.62px] top-[18px] h-[29.8px] w-[32.66px]">
+          <img loading="lazy" decoding="async" alt="Zequara" className="block size-full max-w-none" src={MARK} />
         </a>
       </div>
 

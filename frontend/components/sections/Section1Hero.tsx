@@ -1,4 +1,5 @@
 import CountUp from "@/components/motion/CountUp";
+import { WORDMARK } from "@/components/brand";
 
 const A = "/figma";
 
@@ -34,9 +35,10 @@ export default function Section1Hero() {
       </div>
 
 
-      {/* Big .serava. wordmark */}
-      <div className="absolute h-[139.94px] left-[406px] top-[262px] w-[713.07px]">
-        <img loading="lazy" decoding="async" alt=".serava." className="absolute block inset-0 max-w-none size-full" src={`${A}/d9b1e9d601a843e82663d6c4512aa26ff643e90e.svg`} />
+      {/* Wordmark grande. Conserva el ancho y el centro vertical del bloque
+          anterior: el de Zequara es algo más apaisado (6.12:1 contra 5.10:1). */}
+      <div className="absolute h-[116.59px] left-[406px] top-[273.68px] w-[713.07px]">
+        <img loading="lazy" decoding="async" alt="Zequara" className="absolute block inset-0 max-w-none size-full" src={WORDMARK} />
       </div>
 
       {/* H1 dominante */}

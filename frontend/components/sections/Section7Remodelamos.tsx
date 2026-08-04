@@ -1,5 +1,6 @@
 import ValueCard from "@/components/sections/ValueCard";
 import { cardX } from "@/components/sections/valueCardMetrics";
+import { WORDMARK } from "@/components/brand";
 
 const A = "/figma";
 
@@ -37,9 +38,9 @@ export default function Section7Remodelamos() {
       {/* Gradient overlay */}
       <div className="absolute bg-gradient-to-b from-[31.239%] from-[rgba(175,79,0,0)] h-[1695px] left-0 to-[79.582%] to-[rgba(73,33,0,0.73)] top-0 via-[64.478%] via-[rgba(61,26,0,0.73)] w-[1922px]" />
 
-      {/* .serava. logo */}
-      <div className="absolute h-[185.94px] left-[536px] top-[308px] w-[939.36px]">
-        <img loading="lazy" decoding="async" alt=".serava." className="absolute block inset-0 max-w-none size-full" src={`${A}/b222563045c17eb7e6b761865e89c31fa20bb084.svg`} />
+      {/* Wordmark grande, con el ancho y el centro vertical del bloque anterior. */}
+      <div className="absolute h-[153.59px] left-[536px] top-[324.18px] w-[939.36px]">
+        <img loading="lazy" decoding="async" alt="Zequara" className="absolute block inset-0 max-w-none size-full" src={WORDMARK} />
       </div>
 
       {/* Heading */}

@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import CountUp from "@/components/motion/CountUp";
+import { MARK } from "@/components/brand";
 
 const A = "/figma";
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -104,8 +105,8 @@ export default function FichaPredio() {
         <a href="/predios" className="ix-nav absolute left-[424px] top-1/2 flex -translate-y-1/2 items-center gap-[8px] text-[14px] font-medium" style={{ color: "rgba(247,241,229,0.82)" }}>
           <ChevL /> Volver a predios
         </a>
-        <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute left-[1321px] top-[18px] h-[29.8px] w-[175.28px]">
-          <img loading="lazy" decoding="async" alt="Serava" className="block size-full max-w-none" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
+        <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute left-[1463.62px] top-[18px] h-[29.8px] w-[32.66px]">
+          <img loading="lazy" decoding="async" alt="Zequara" className="block size-full max-w-none" src={MARK} />
         </a>
       </div>
 

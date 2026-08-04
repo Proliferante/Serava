@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 import { EASE } from "@/components/motion/Kinetics";
+import { MARK } from "@/components/brand";
 import { Ico, type IconName } from "@/components/panel/icons";
 import {
   HELPBG, LASER, LINEN, LINEN40, LINEN72, OIL, PAPER, SHELL, TUSCANY,
@@ -121,19 +122,13 @@ function Sidebar({ active, h }: { active: PanelKey; h: number }) {
   let i = 0;
   return (
     <div className="absolute overflow-hidden" style={{ left: 0, top: 0, width: SIDEBAR_W, height: h, background: SHELL }}>
-      {/* Marca (472:1521) */}
-      <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute" style={{ left: 26, top: 28, width: 30, height: 30 }}>
-        <span
-          className="absolute inset-0 flex items-center justify-center"
-          style={{ borderRadius: 8, border: `1px solid rgba(201,168,119,0.55)`, color: LASER }}
-        >
-          <Ico name="home" size={15} />
-        </span>
-      </a>
-      <a href="/" aria-label="Serava" className="ix-nav absolute" style={{ left: 68, top: 34.5, width: 86, height: 16.7 }}>
+      {/* Marca (472:1521). El diseño tenía dos ranuras —un icono y el wordmark—
+          porque el logotipo aún no existía. Con Zequara el monograma cumple las
+          dos: es la marca y ocupa la ranura del icono. */}
+      <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute" style={{ left: 26, top: 28, width: 32.88, height: 30 }}>
         <img
-          src="/figma/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg"
-          alt="Serava"
+          src={MARK}
+          alt="Zequara"
           loading="lazy"
           decoding="async"
           className="absolute inset-0 block size-full max-w-none"

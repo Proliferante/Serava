@@ -3,6 +3,7 @@
 import { MotionConfig, motion } from "framer-motion";
 import type { CSSProperties, ReactNode } from "react";
 import { EASE, MLine, Pop, Rise, Rule } from "@/components/motion/Kinetics";
+import { MARK } from "@/components/brand";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    CONFIRMACIÓN DE ACCESO — reproducción 1:1 del frame de Figma 311:4977
@@ -143,10 +144,10 @@ export default function ConfirmacionAccesoScreen() {
         {/* Nav (311:4979) */}
         <div className="absolute left-0 top-0 h-[83px] w-full">
           <motion.a
-            href="/" className="ix-nav absolute block" style={{ left: 63, top: 26, width: 175.277, height: 32.797 }}
+            href="/" className="ix-nav absolute block" style={{ left: 63, top: 26, width: 35.95, height: 32.797 }}
             initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.05, ease: EASE }}
           >
-            <img alt="Serava" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} className="absolute inset-0 block size-full max-w-none" />
+            <img alt="Zequara" src={MARK} className="absolute inset-0 block size-full max-w-none" />
           </motion.a>
         </div>
       </div>

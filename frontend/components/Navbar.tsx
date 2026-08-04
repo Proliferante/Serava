@@ -1,3 +1,4 @@
+import { MARK } from "@/components/brand";
 const A = "/figma";
 
 /**
@@ -28,8 +29,8 @@ export default function Navbar() {
   return (
     <nav className="absolute left-0 top-0 h-[173px] w-[1920px] rounded-bl-[80px] rounded-br-[80px] bg-brown-dark" aria-label="Principal">
       {/* Wordmark (426:1116) */}
-      <a href="/" aria-label="Serava — Inicio" className="ix-nav absolute left-[121px] top-[67px] h-[34.119px] w-[175.276px]">
-        <img loading="lazy" decoding="async" alt="Serava" className="absolute inset-0 block size-full max-w-none" src={`${A}/1b2273ed06fc7bc3062eb64ec237623cefb6a7f9.svg`} />
+      <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute left-[121px] top-[67px] h-[34.119px] w-[37.4px]">
+        <img loading="lazy" decoding="async" alt="Zequara" className="absolute inset-0 block size-full max-w-none" src={MARK} />
       </a>
 
       {/* Los nombres de capa en Figma ("HUB", "MODELO BTN") están obsoletos:
