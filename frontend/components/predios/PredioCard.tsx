@@ -3,143 +3,227 @@
 import { motion } from "framer-motion";
 import CountUp from "@/components/motion/CountUp";
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   TARJETA DE PREDIO — Component 6 de Figma (368 × 644.03).
+
+   Foto arriba con la etiqueta de estado y el Score Serava, y debajo la ficha:
+   zona, titular, tipo de transformación, metros, cifras y el estado de la
+   oportunidad. Cierra con "Ver oportunidad" y el botón de guardar.
+
+   La geometría va en absoluto porque la página es un lienzo fijo de 1920 px
+   que ScaledCanvas escala, igual que el resto del sitio.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 const EASE = [0.22, 1, 0.36, 1] as const;
-const s = { fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
-const Photo = () => (<svg width={26} height={26} viewBox="0 0 24 24" {...s} aria-hidden><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9.5" r="1.6" /><path d="M4 17l5-4 4 3 3-2 4 3" /></svg>);
-const Pin = () => (<svg width={13} height={13} viewBox="0 0 24 24" {...s} aria-hidden><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z" /><circle cx="12" cy="10" r="2.3" /></svg>);
-const Ruler = () => (<svg width={15} height={15} viewBox="0 0 24 24" {...s} aria-hidden><rect x="3" y="8" width="18" height="8" rx="1" /><path d="M7 8v3M11 8v4M15 8v3M19 8v4" /></svg>);
-const Bed = () => (<svg width={15} height={15} viewBox="0 0 24 24" {...s} aria-hidden><path d="M3 18V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v9M3 14h18M7 10h4" /></svg>);
-const Bath = () => (<svg width={15} height={15} viewBox="0 0 24 24" {...s} aria-hidden><path d="M4 12V6a2 2 0 0 1 4 0M3 12h18v3a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z" /></svg>);
-const Car = () => (<svg width={15} height={15} viewBox="0 0 24 24" {...s} aria-hidden><path d="M5 13l1.5-4.5A2 2 0 0 1 8.4 7h7.2a2 2 0 0 1 1.9 1.5L19 13M4 13h16v5H4zM7 18v2M17 18v2" /></svg>);
-const Clock = () => (<svg width={13} height={13} viewBox="0 0 24 24" {...s} aria-hidden><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>);
-const Eye = () => (<svg width={14} height={14} viewBox="0 0 24 24" {...s} aria-hidden><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg>);
-const Bolt = () => (<svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden><path d="M13 2L4.5 13H11l-1 9 8.5-11H12l1-9z" /></svg>);
-const Bell = () => (<svg width={16} height={16} viewBox="0 0 24 24" {...s} aria-hidden><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6M10 20a2 2 0 0 0 4 0" /></svg>);
+
+export const CARD_W = 368;
+export const CARD_H = 644.03;
+
+/* ── Paleta ──────────────────────────────────────────────────────────────── */
+const CREAM = "#f7f1e5";
+const INK = "#2a1e14";
+const MUTED = "#5b4332";
+const DRIFT = "#a57a4e";
+const VERD = "#5f6b3e";
+const AVOCADO = "#77854e";
+const LINE = "rgba(165,122,78,0.28)";
+/** Relleno del hueco de foto: madera oscura, de arriba a la izquierda. */
+const PHOTO_BG = "linear-gradient(160deg, #4b3729 0%, #2b1f16 100%)";
+
+/** Tonos de la etiqueta de estado. Cada uno dice algo distinto del predio. */
+const BADGE = {
+  green: { bg: AVOCADO, fg: CREAM },   // disponible / reserva liberada
+  gold: { bg: "#a97c3c", fg: CREAM },  // recién incorporado
+  amber: { bg: "#b3872e", fg: INK },   // alta actividad
+  steel: { bg: "#52697a", fg: CREAM }, // reserva en curso
+  dark: { bg: "#2e2118", fg: CREAM },  // ya reservada
+} as const;
+
+export type BadgeTone = keyof typeof BADGE;
 
 export type Predio = {
+  /** Etiqueta de estado, arriba a la izquierda de la foto. */
+  badge: { label: string; tone: BadgeTone };
+  score: number;
+  /** Pie del hueco de foto, sin el prefijo "Foto —". */
+  photo: string;
   city: string;
-  title: [string, string?];
-  score?: number;
-  pill?: { label: string; tone: "green" | "orange" | "neutral" };
-  urgency?: { label: string; value: string };
-  specs?: [string, string, string, string]; // area, hab, baños, parq
-  price?: string;
-  roi?: number;
-  note?: { text: string; tone: "red" | "green" | "muted" };
-  variant: "available" | "reserved" | "coming";
-  description?: string;
+  title: string;
+  /** Tipo de transformación previsto. */
+  chip: string;
+  specs: string;
+  price: string;
+  priceNote: string;
+  /** TIR estimada en porcentaje. */
+  tir: number;
+  horizon: string;
+  status: string;
 };
 
-const PILL_TONE = {
-  green: { bg: "#7f8b57", color: "#f7f1e5" },
-  orange: { bg: "#b5542f", color: "#f7f1e5" },
-  neutral: { bg: "rgba(42,30,20,0.65)", color: "rgba(247,241,229,0.9)" },
-};
-const NOTE_COLOR = { red: "#b5542f", green: "#5f6b3e", muted: "#5b4332" };
+/* ── Iconos ──────────────────────────────────────────────────────────────── */
+const st = { fill: "none", stroke: "currentColor", strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
 
-export default function PredioCard({ data, delay = 0 }: { data: Predio; delay?: number }) {
-  const { city, title, score, pill, urgency, specs, price, roi, note, variant, description } = data;
+const Home = () => (
+  <svg width={26} height={26} viewBox="0 0 24 24" strokeWidth={1.5} {...st} aria-hidden>
+    <path d="M3.5 10.4 12 3.6l8.5 6.8V20a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1z" />
+  </svg>
+);
+const Pin = () => (
+  <svg width={13} height={13} viewBox="0 0 24 24" strokeWidth={1.8} {...st} aria-hidden>
+    <path d="M19 10.4c0 5.3-7 10.4-7 10.4s-7-5.1-7-10.4a7 7 0 0 1 14 0z" /><circle cx="12" cy="10.2" r="2.4" />
+  </svg>
+);
+const Spark = () => (
+  <svg width={13} height={13} viewBox="0 0 24 24" strokeWidth={1.7} {...st} aria-hidden>
+    <path d="M12 3.5v4M12 16.5v4M3.5 12h4M16.5 12h4M6 6l2.6 2.6M15.4 15.4 18 18M18 6l-2.6 2.6M8.6 15.4 6 18" />
+  </svg>
+);
+const Arrow = () => (
+  <svg width={15} height={15} viewBox="0 0 24 24" strokeWidth={2} {...st} aria-hidden>
+    <path d="M4.5 12h15M13.6 6.2 19.5 12l-5.9 5.8" />
+  </svg>
+);
+const Bookmark = () => (
+  <svg width={17} height={17} viewBox="0 0 24 24" strokeWidth={1.7} {...st} aria-hidden>
+    <path d="M6.5 3.8h11a1 1 0 0 1 1 1v15.4l-6.5-4.4-6.5 4.4V4.8a1 1 0 0 1 1-1z" />
+  </svg>
+);
+
+export default function PredioCard({
+  x, y, data, delay = 0, href = "/predios/ficha",
+}: { x: number; y: number; data: Predio; delay?: number; href?: string }) {
+  const b = BADGE[data.badge.tone];
   return (
-    <motion.div
-      initial={{ y: 26 }}
-      whileInView={{ y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.5, delay, ease: EASE }}
-      whileHover={{ y: -6 }}
-      className="group flex flex-col overflow-clip rounded-[20px] border border-solid border-[rgba(165,122,78,0.28)] bg-cream-93 transition-shadow duration-300 hover:shadow-[0px_24px_48px_-24px_rgba(42,30,20,0.5)]"
+    <motion.article
+      className="group absolute overflow-hidden"
+      style={{
+        left: x, top: y, width: CARD_W, height: CARD_H,
+        borderRadius: 18, border: `1px solid ${LINE}`, background: CREAM,
+      }}
+      initial={{ opacity: 0, y: 26 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.55, delay, ease: EASE }}
+      whileHover={{ y: -6, transition: { duration: 0.25, ease: EASE } }}
     >
-      {/* Image placeholder */}
-      <div className="relative w-full aspect-[360/248] overflow-hidden" style={{ backgroundImage: "linear-gradient(155deg, #5b4332 0%, #3d2c1e 100%)" }}>
-        <div className="ix-zoom absolute inset-0 flex flex-col items-center justify-center gap-[7px]">
-          <span style={{ color: "rgba(247,241,229,0.6)" }}><Photo /></span>
-          <p className="font-semibold text-[9.6px] uppercase tracking-[0.1em] text-center" style={{ color: "rgba(247,241,229,0.6)" }}>Foto — {city}</p>
-        </div>
-        {/* Top badges */}
-        <div className="absolute left-[14px] right-[14px] top-[14px] flex items-start justify-between">
-          {pill ? (
-            <span className="rounded-[8px] px-[10px] py-[5px] font-bold text-[9.5px] uppercase tracking-[0.06em] backdrop-blur-[2px]" style={{ background: PILL_TONE[pill.tone].bg, color: PILL_TONE[pill.tone].color }}>{pill.label}</span>
-          ) : score != null ? (
-            <span className="flex items-end gap-[6px] rounded-[8px] bg-[rgba(247,241,229,0.95)] px-[11px] pt-[5px] pb-[6px] shadow-[0px_6px_14px_-6px_rgba(0,0,0,0.4)]">
-              <span className="font-bold text-[10.6px] uppercase tracking-[0.08em] text-[#3d2c1e]">Score</span>
-              <span className="font-bold text-[10.6px] text-[#5f6b3e]">{score}</span>
-            </span>
-          ) : <span />}
-          {pill && score != null && (
-            <span className="flex items-end gap-[6px] rounded-[8px] bg-[rgba(247,241,229,0.95)] px-[11px] pt-[5px] pb-[6px] shadow-[0px_6px_14px_-6px_rgba(0,0,0,0.4)]">
-              <span className="font-bold text-[10.6px] uppercase tracking-[0.08em] text-[#3d2c1e]">Score</span>
-              <span className="font-bold text-[10.6px] text-[#5f6b3e]">{score}</span>
-            </span>
-          )}
-        </div>
-        {/* Urgency bar */}
-        {urgency && (
-          <div className="absolute bottom-[14px] left-[14px] flex h-[33px] items-center gap-[9px] rounded-[9px] px-[12px] backdrop-blur-[2px]" style={{ background: "rgba(42,30,20,0.82)" }}>
-            <span className="text-tan-63"><Clock /></span>
-            <span className="font-medium text-[12.2px] text-cream-93">{urgency.label}</span>
-            <span className="font-bold text-[12.2px] text-tan-63">{urgency.value}</span>
-          </div>
-        )}
+      {/* ── Foto (520:361) ── */}
+      <div className="absolute overflow-hidden" style={{ left: 0, top: 0, width: 366, height: 251.63 }}>
+        <div className="ix-zoom absolute inset-0" style={{ background: PHOTO_BG }} />
+        <span className="absolute" style={{ left: 170, top: 94.43, color: "rgba(247,241,229,0.42)" }}><Home /></span>
+        <p
+          className="absolute m-0 text-center uppercase"
+          style={{
+            left: 122.08, top: 128.62, width: 123.84,
+            fontSize: 9.5, lineHeight: "14.5px", fontWeight: 600, letterSpacing: "1.1px",
+            color: "rgba(247,241,229,0.5)",
+          }}
+        >
+          Foto — {data.photo}
+        </p>
+
+        {/* Etiqueta de estado */}
+        <span
+          className="absolute inline-flex items-center uppercase"
+          style={{
+            left: 14, top: 14, height: 27.34, padding: "0 11px", borderRadius: 8,
+            background: b.bg, color: b.fg,
+            fontSize: 10, fontWeight: 700, letterSpacing: "0.9px",
+            boxShadow: "0 6px 14px -8px rgba(0,0,0,0.5)",
+          }}
+        >
+          {data.badge.label}
+        </span>
+
+        {/* Score Serava */}
+        <span
+          className="absolute inline-flex items-center"
+          style={{
+            right: 14, top: 14, height: 32, padding: "0 13px", gap: 7, borderRadius: 8,
+            background: "rgba(247,241,229,0.95)",
+            boxShadow: "0 6px 14px -6px rgba(0,0,0,0.4)",
+          }}
+        >
+          <span className="uppercase" style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "1px", color: "#3d2c1e" }}>Score Serava</span>
+          <span style={{ fontSize: 13.5, fontWeight: 700, color: VERD }}><CountUp value={data.score} duration={1.1} /></span>
+        </span>
       </div>
 
-      {/* Content */}
-      <div className="flex grow flex-col px-[22px] pt-[20px] pb-[24px]">
-        <div className="flex items-center gap-[7px] text-[#a57a4e]">
-          <Pin />
-          <span className="font-semibold text-[11.8px] uppercase tracking-[0.1em] text-[#a57a4e]">{city}</span>
-        </div>
-        <div className="mt-[8px] font-semibold text-[18.4px] leading-[20.98px] tracking-[-0.02em] text-[#2a1e14]">
-          <p className="mb-0">{title[0]}</p>
-          {title[1] && <p>{title[1]}</p>}
-        </div>
-
-        {variant === "coming" ? (
-          <>
-            <p className="mt-[12px] font-light text-[13.1px] leading-[20px] text-[#5b4332]">{description}</p>
-            <button type="button" className="ix-press mt-auto flex items-center justify-center gap-[9px] rounded-[999px] border border-solid border-[rgba(165,122,78,0.28)] py-[15px] text-[14.7px] font-semibold text-[#3d2c1e]">
-              Avísame cuando abra <Bell />
-            </button>
-          </>
-        ) : (
-          <>
-            {/* Specs */}
-            <div className="mt-[16px] flex flex-wrap gap-x-[16px] gap-y-[6px] text-[#5b4332]">
-              <span className="flex items-center gap-[7px] font-light text-[13.1px]"><Ruler /> {specs![0]}</span>
-              <span className="flex items-center gap-[7px] font-light text-[13.1px]"><Bed /> {specs![1]}</span>
-              <span className="flex items-center gap-[7px] font-light text-[13.1px]"><Bath /> {specs![2]}</span>
-              <span className="flex items-center gap-[7px] font-light text-[13.1px]"><Car /> {specs![3]}</span>
-            </div>
-            {/* Price / ROI */}
-            <div className="mt-[16px] flex items-end justify-between">
-              <div>
-                <p className="font-light text-[11.2px] uppercase tracking-[0.08em] text-[#5b4332]">Inversión total</p>
-                <p className="mt-[2px] font-semibold text-[24px] leading-none tracking-[-0.02em] text-[#3d2c1e]">{price}</p>
-              </div>
-              <div className="text-right">
-                <p className="font-light text-[11.2px] uppercase tracking-[0.08em] text-[#5b4332]">ROI estimado</p>
-                <p className="mt-[2px] font-bold text-[19.2px] leading-none text-[#5f6b3e]"><CountUp value={roi!} suffix="%" duration={1.2} /></p>
-              </div>
-            </div>
-            {/* Note */}
-            {note && (
-              <div className="mt-[14px] flex items-center gap-[8px]" style={{ color: NOTE_COLOR[note.tone] }}>
-                <Eye />
-                <span className="font-medium text-[12.5px]">{note.text}</span>
-              </div>
-            )}
-            {/* Buttons */}
-            <div className="mt-[16px] flex gap-[10px]">
-              {variant === "reserved" ? (
-                <div className="flex flex-1 items-center justify-center rounded-[999px] py-[15px] text-[14.7px] font-semibold" style={{ background: "rgba(165,122,78,0.18)", color: "#a57a4e" }}>Reservada</div>
-              ) : (
-                <a href="/predios/ficha" className="ix-reserve flex flex-1 items-center justify-center gap-[9px] rounded-[999px] bg-[#f5d741] py-[15px] text-[14.7px] font-semibold text-white shadow-[0px_12px_26px_-14px_rgba(181,84,47,0.7)]">
-                  Reservar ahora <Bolt />
-                </a>
-              )}
-              <a href="/predios/ficha" className="ix-press flex items-center justify-center rounded-[999px] border border-solid border-[rgba(165,122,78,0.28)] px-[19px] py-[13.5px] text-[14.7px] font-semibold text-[#3d2c1e]">Ver ficha</a>
-            </div>
-          </>
-        )}
+      {/* ── Ficha (520:379) ── */}
+      <div className="absolute" style={{ left: 22, top: 272.62, width: 322 }}>
+        <span className="absolute" style={{ left: 0, top: 2.13, color: DRIFT }}><Pin /></span>
+        <p className="absolute m-0 uppercase" style={{ left: 20, top: -1, fontSize: 11.5, lineHeight: "18px", fontWeight: 600, letterSpacing: "1.2px", color: DRIFT }}>
+          {data.city}
+        </p>
       </div>
-    </motion.div>
+
+      <h3
+        className="absolute m-0"
+        style={{ left: 22, top: 298.89, width: 322, fontSize: 19, lineHeight: "23.5px", fontWeight: 600, letterSpacing: "-0.3px", color: INK }}
+      >
+        {data.title}
+      </h3>
+
+      {/* Tipo de transformación */}
+      <span
+        className="absolute inline-flex items-center"
+        style={{
+          left: 22, top: 359.48, height: 33.27, padding: "0 14px", gap: 8, borderRadius: 999,
+          background: "rgba(95,107,62,0.09)", border: "1px solid rgba(95,107,62,0.22)", color: VERD,
+          fontSize: 12.5, fontWeight: 600,
+        }}
+      >
+        <Spark />
+        <span className="whitespace-nowrap">{data.chip}</span>
+      </span>
+
+      <p className="absolute m-0" style={{ left: 22, top: 408.75, fontSize: 13.5, lineHeight: "20px", fontWeight: 300, color: MUTED }}>
+        {data.specs}
+      </p>
+      <span className="absolute" style={{ left: 22, top: 445.75, width: 322, height: 1, background: "rgba(165,122,78,0.22)" }} />
+
+      {/* Cifras */}
+      <div className="absolute" style={{ left: 22, top: 460.94, width: 157 }}>
+        <p className="m-0 uppercase" style={{ fontSize: 10, lineHeight: "16px", fontWeight: 600, letterSpacing: "0.8px", color: MUTED }}>Inversión total estimada</p>
+        <p className="m-0" style={{ fontSize: 19.5, lineHeight: "28px", fontWeight: 600, letterSpacing: "-0.3px", color: INK }}>{data.price}</p>
+        <p className="m-0" style={{ marginTop: 2, fontSize: 11.5, lineHeight: "16px", fontWeight: 300, color: MUTED }}>{data.priceNote}</p>
+      </div>
+      <div className="absolute text-right" style={{ left: 251, top: 460.94, width: 93 }}>
+        <p className="m-0 uppercase" style={{ fontSize: 10, lineHeight: "16px", fontWeight: 600, letterSpacing: "0.8px", color: MUTED }}>TIR estimada</p>
+        <p className="m-0" style={{ fontSize: 19.5, lineHeight: "28px", fontWeight: 600, letterSpacing: "-0.3px", color: VERD }}>
+          <CountUp value={data.tir} suffix="% anual" duration={1.2} />
+        </p>
+        <p className="m-0" style={{ marginTop: 2, fontSize: 11.5, lineHeight: "16px", fontWeight: 300, color: MUTED }}>{data.horizon}</p>
+      </div>
+
+      {/* Estado de la oportunidad */}
+      <span className="absolute" style={{ left: 22, top: 542.09, width: 7, height: 7, borderRadius: 999, background: VERD }} />
+      <p className="absolute m-0" style={{ left: 37, top: 535.23, fontSize: 12.5, lineHeight: "19px", fontWeight: 500, color: MUTED }}>
+        {data.status}
+      </p>
+
+      {/* Acciones */}
+      <a
+        href={href}
+        className="ix-press absolute inline-flex items-center justify-center"
+        style={{
+          left: 22, top: 570.95, width: 264, height: 48.08, gap: 9, borderRadius: 999,
+          background: AVOCADO, color: CREAM, fontSize: 14.5, fontWeight: 600,
+          boxShadow: "0 14px 28px -16px rgba(47,55,30,0.75)",
+        }}
+      >
+        Ver oportunidad <Arrow />
+      </a>
+      <button
+        type="button"
+        aria-label={`Guardar ${data.title}`}
+        className="ix-press absolute inline-flex items-center justify-center"
+        style={{
+          left: 296, top: 570.95, width: 48, height: 48.08, borderRadius: 999,
+          border: `1px solid ${LINE}`, background: "transparent", color: MUTED,
+        }}
+      >
+        <Bookmark />
+      </button>
+    </motion.article>
   );
 }
