@@ -218,12 +218,29 @@ export default function SolicitudAccesoScreen() {
     <MotionConfig reducedMotion="user">
       <div className="relative size-full overflow-hidden" style={{ background: CREAM }} data-name="ACCESO">
         {/* ══════════ 1 · HERO (311:4484) ══════════ */}
-        <L
-          x={0} y={0} w={1920} h={936.42} className="overflow-hidden"
-          style={{ backgroundImage: "linear-gradient(179.978deg, rgba(73,33,0,0.65) 24.665%, rgba(110,75,43,0.65) 48.338%, rgba(168,140,109,0.65) 82.277%, rgba(226,205,174,0.65) 99.915%)" }}
-        >
+        <L x={0} y={0} w={1920} h={936.42} className="overflow-hidden" style={{ background: OIL }}>
+          {/* Foto de fondo. Va debajo de los degradados, que son los que dejan
+              legible el texto sobre la parte clara de la cocina. */}
+          <img
+            alt="" src={`${A}/acceso.webp`} decoding="async"
+            className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
+          />
+          {/* Velo lateral: la columna de texto queda sobre marrón cerrado y la
+              cocina se ve limpia a la derecha. El degradado vertical que había
+              antes iba al 65 % en todo el ancho, así que con la foto puesta la
+              aplanaba entera. */}
           <div
-            className="absolute inset-0"
+            className="pointer-events-none absolute inset-0"
+            style={{ backgroundImage: "linear-gradient(90deg, rgba(45,22,4,0.96) 0%, rgba(45,22,4,0.93) 34%, rgba(45,22,4,0.66) 52%, rgba(45,22,4,0.24) 72%, rgba(45,22,4,0.04) 100%)" }}
+          />
+          {/* Remate vertical: sólo cierra al pie, hacia el crema de la sección
+              siguiente. Un velo a todo lo alto dejaba la foto lechosa. */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ backgroundImage: "linear-gradient(180deg, rgba(73,33,0,0.22) 0%, rgba(73,33,0,0) 30%, rgba(73,33,0,0) 74%, rgba(168,140,109,0.45) 90%, rgba(226,205,174,0.95) 98%, #e2cdae 100%)" }}
+          />
+          <div
+            className="pointer-events-none absolute inset-0"
             style={{
               backgroundImage:
                 "linear-gradient(134.987deg, rgba(201,168,119,0.12) 0%, rgba(201,168,119,0) 100%), linear-gradient(45.013deg, rgba(247,241,229,0.05) 0%, rgba(247,241,229,0.05) 0.49517%, rgba(247,241,229,0) 0.49517%, rgba(247,241,229,0) 0.99035%)",
@@ -356,10 +373,15 @@ export default function SolicitudAccesoScreen() {
 
         {/* ══════════ 3 · FORMULARIO (311:4564) — se pinta sobre la sección 4 ══════════ */}
         <L x={0} y={1667} w={1920} h={1202.17} className="overflow-hidden" style={{ background: BROWN, borderRadius: "150px 0 0 0" }}>
+          {/* Trama de cubos (358:1107). Se estira a la sección en vez de
+              recortarse: la ilustración tiene los cubos arriba a la izquierda y
+              abajo, con el centro vacío, así que sólo mapeándola 1:1 sobre la
+              caja quedan repartidos como en el diseño. Recortada —como estaba—
+              se veía únicamente el hueco vacío del centro. */}
           <img
-            alt="" loading="lazy" src={`${A}/acc-cuadro.webp`}
-            className="pointer-events-none absolute left-0 max-w-none object-cover"
-            style={{ top: -465, width: 1920, height: 1688, opacity: 0.1 }}
+            alt="" loading="lazy" src={`${A}/acceso-cubos.webp`}
+            className="pointer-events-none absolute inset-0 size-full max-w-none"
+            style={{ opacity: 0.1 }}
           />
           <span id="formulario" className="absolute left-0 top-0" />
 
@@ -479,8 +501,14 @@ export default function SolicitudAccesoScreen() {
 
         {/* ══════════ 5 · CIERRE (311:4752) ══════════ */}
         <L x={0} y={3647} w={1920} h={823} className="overflow-hidden" style={{ background: BROWN, borderRadius: "150px 0 0 0" }}>
-          <L x={-580} y={-116} w={1913} h={1109} className="overflow-hidden">
-            <img alt="" loading="lazy" src={`${A}/acc-lineas.webp`} className="absolute max-w-none" style={{ left: "-0.58%", top: "-120.02%", width: "102.04%", height: "220.02%", opacity: 0.1 }} />
+          {/* Dibujo de torres (312:1175). La ventana va en (0, 4) de la sección:
+              antes estaba en (-580, -116), que son las coordenadas del rectángulo
+              relativas a su contenedor en Figma, no a la sección — y por eso el
+              dibujo salía desplazado fuera de cuadro. Los porcentajes internos
+              encuadran la mitad baja de la ilustración, que es donde están las
+              torres. */}
+          <L x={0} y={4} w={1913} h={1109} className="overflow-hidden">
+            <img alt="" loading="lazy" src={`${A}/acceso-torres.webp`} className="absolute max-w-none" style={{ left: "-0.58%", top: "-120.02%", width: "102.04%", height: "220.02%", opacity: 0.1 }} />
           </L>
 
           <Rule x={846.79} y={127.5} w={34} color={LASER} delay={0.12} />
