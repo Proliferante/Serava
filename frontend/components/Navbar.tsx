@@ -29,7 +29,7 @@ export default function Navbar() {
   return (
     <nav className="absolute left-0 top-0 h-[173px] w-[1920px] rounded-bl-[80px] rounded-br-[80px] bg-brown-dark" aria-label="Principal">
       {/* Wordmark (426:1116) */}
-      <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute left-[121px] top-[67px] h-[34.119px] w-[37.4px]">
+      <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute left-[121px] top-[56px] h-[56px] w-[61.38px]">
         <img loading="lazy" decoding="async" alt="Zequara" className="absolute inset-0 block size-full max-w-none" src={MARK} />
       </a>
 

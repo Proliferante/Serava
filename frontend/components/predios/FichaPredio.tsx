@@ -105,7 +105,7 @@ export default function FichaPredio() {
         <a href="/predios" className="ix-nav absolute left-[424px] top-1/2 flex -translate-y-1/2 items-center gap-[8px] text-[14px] font-medium" style={{ color: "rgba(247,241,229,0.82)" }}>
           <ChevL /> Volver a predios
         </a>
-        <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute left-[1463.62px] top-[18px] h-[29.8px] w-[32.66px]">
+        <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute left-[1459.02px] top-[16px] h-[34px] w-[37.26px]">
           <img loading="lazy" decoding="async" alt="Zequara" className="block size-full max-w-none" src={MARK} />
         </a>
       </div>

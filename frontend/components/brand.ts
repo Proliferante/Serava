@@ -22,10 +22,17 @@
    el del color, o las proporciones de abajo dejan de valer y saldrán negros.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/**
+ * Token de caché. Los SVG se editaron conservando el nombre, así que el
+ * navegador seguía sirviendo la copia vieja —negra y con el viewBox flojo—
+ * de la memoria. Subir este número al retocar un logotipo fuerza la recarga.
+ */
+const V = "2";
+
 /** Wordmark completo. Sólo para presentaciones grandes de la marca. */
-export const WORDMARK = "/figma/ZEQUARA-01.svg";
+export const WORDMARK = `/figma/ZEQUARA-01.svg?v=${V}`;
 /** Monograma. Para headers y presentaciones pequeñas. */
-export const MARK = "/figma/ZEQUARA-02.svg";
+export const MARK = `/figma/ZEQUARA-02.svg?v=${V}`;
 
 /** Proporción ancho/alto del wordmark, para dimensionar su caja sin deformarlo. */
 export const WORDMARK_RATIO = 6.116;

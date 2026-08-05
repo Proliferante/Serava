@@ -144,7 +144,7 @@ export default function ConfirmacionAccesoScreen() {
         {/* Nav (311:4979) */}
         <div className="absolute left-0 top-0 h-[83px] w-full">
           <motion.a
-            href="/" className="ix-nav absolute block" style={{ left: 63, top: 26, width: 35.95, height: 32.797 }}
+            href="/" className="ix-nav absolute block" style={{ left: 63, top: 22.4, width: 43.84, height: 40 }}
             initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.05, ease: EASE }}
           >
             <img alt="Zequara" src={MARK} className="absolute inset-0 block size-full max-w-none" />

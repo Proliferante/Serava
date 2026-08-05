@@ -60,7 +60,7 @@ export default function LoginScreen() {
         </div>
 
         {/* Logo → inicio */}
-        <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute h-[29.8px] left-[32px] top-[38.43px] w-[32.66px]">
+        <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute h-[40px] left-[32px] top-[33.33px] w-[43.84px]">
           <img loading="lazy" decoding="async" alt="Zequara" className="absolute block inset-0 max-w-none size-full" src={MARK} />
         </a>
 

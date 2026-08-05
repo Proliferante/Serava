@@ -198,7 +198,7 @@ export default function PrediosPage() {
 
           {/* ── Nav (100:3121) ── */}
           <nav className="absolute left-0 top-0 h-[81.81px] w-full" aria-label="Panel de predios">
-            <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute" style={{ left: 101, top: 21, width: 32.66, height: 29.8 }}>
+            <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute" style={{ left: 101, top: 22.9, width: 39.46, height: 36 }}>
               <img loading="lazy" decoding="async" alt="Zequara" className="absolute inset-0 block size-full max-w-none" src={MARK} />
             </a>
             <div className="absolute" style={{ left: 726.7, top: 16, width: 504, height: 49.81, borderRadius: 999, background: "rgba(247,241,229,0.06)" }}>

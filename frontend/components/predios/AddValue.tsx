@@ -111,7 +111,7 @@ export default function AddValue() {
         <a href="/predios/ficha" className="ix-nav absolute left-[444px] top-[21.56px] flex items-center gap-[9px] text-[14.4px] font-medium" style={{ color: "#f7f1e5" }}>
           <ChevL /> Volver a la ficha
         </a>
-        <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute left-[1473.62px] top-[18px] h-[29.8px] w-[32.66px]">
+        <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute left-[1469.02px] top-[15.9px] h-[34px] w-[37.26px]">
           <img loading="lazy" decoding="async" alt="Zequara" className="block size-full max-w-none" src={MARK} />
         </a>
       </div>

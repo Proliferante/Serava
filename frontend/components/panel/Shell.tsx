@@ -125,7 +125,7 @@ function Sidebar({ active, h }: { active: PanelKey; h: number }) {
       {/* Marca (472:1521). El diseño tenía dos ranuras —un icono y el wordmark—
           porque el logotipo aún no existía. Con Zequara el monograma cumple las
           dos: es la marca y ocupa la ranura del icono. */}
-      <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute" style={{ left: 26, top: 28, width: 32.88, height: 30 }}>
+      <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute" style={{ left: 26, top: 26, width: 37.26, height: 34 }}>
         <img
           src={MARK}
           alt="Zequara"
