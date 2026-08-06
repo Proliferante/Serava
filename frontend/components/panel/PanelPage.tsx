@@ -11,12 +11,12 @@ import { PAPER } from "@/components/panel/ui";
  * la navegación y el área privada no tiene pie.
  */
 export default function PanelPage({
-  active, h, children,
-}: { active: PanelKey; h: number; children: ReactNode }) {
+  active, h, meta, state, children,
+}: { active: PanelKey; h: number; meta?: string; state?: string; children: ReactNode }) {
   return (
     <main style={{ background: PAPER }}>
       <ScaledCanvas width={1920} height={h}>
-        <Shell active={active} h={h}>{children}</Shell>
+        <Shell active={active} h={h} meta={meta} state={state}>{children}</Shell>
       </ScaledCanvas>
     </main>
   );

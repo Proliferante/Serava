@@ -58,7 +58,7 @@ const PROPIEDADES: Propiedad[] = [
     specs: "210 m² · 2 hab · 2 baños · 2 parq",
     metric: { kind: "renta", label: "Canon mensual", value: "$12M", aside: "Ocupado · al día" },
     invest: "COP $2.050M",
-    href: "/panel/valor",
+    href: "/panel/operacion",
   },
 ];
 

@@ -383,6 +383,15 @@ body {
 .pnl-ba-handle:hover { transform: translate(0, 0) scale(1.08); }
 .pnl-ba-handle:focus-visible { outline: 2px solid rgba(201, 168, 119, 0.9); outline-offset: 3px; }
 
+/* Chip de filtro de la bitácora (600:2309). El activo es marrón sólido; los
+   demás, claros con el punto de su categoría. Pintados: todavía no filtran. */
+.pnl-fchip { transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); cursor: pointer; }
+.pnl-fchip[aria-pressed="false"]:hover { background-color: #fffdf8; border-color: rgba(90, 67, 50, 0.34); }
+.pnl-fchip:active { transform: scale(0.97); }
+
+/* Botón de contorno sobre tarjeta oscura ("Ver convocatoria"). */
+.pnl-ghost:hover { background-color: rgba(247, 241, 229, 0.07); border-color: rgba(247, 241, 229, 0.24); }
+
 /* Caja de texto del panel (notas de obra). */
 .pnl-input {
   outline: none;
@@ -400,7 +409,8 @@ body {
 .pnl-photo:hover .pnl-photo-img { transform: scale(1.06); }
 
 @media (prefers-reduced-motion: reduce) {
-  .pnl-card, .pnl-btn, .pnl-nav, .pnl-navitem, .pnl-navitem-ico, .pnl-row, .pnl-link-arrow, .pnl-photo-img, .pnl-input, .pnl-ba-handle { transition: none; }
+  .pnl-card, .pnl-btn, .pnl-nav, .pnl-navitem, .pnl-navitem-ico, .pnl-row, .pnl-link-arrow, .pnl-photo-img, .pnl-input, .pnl-ba-handle, .pnl-fchip { transition: none; }
+  .pnl-fchip:active { transform: none; }
   .pnl-ba-handle:hover { transform: none; }
   .pnl-card:hover, .pnl-btn:active:not(:disabled) { transform: none; }
   .pnl-link:hover .pnl-link-arrow, .pnl-photo:hover .pnl-photo-img { transform: none; }

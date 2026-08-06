@@ -15,7 +15,7 @@ export type IconName =
   | "photos" | "value" | "docs" | "manager"
   | "bell" | "calendar" | "clock" | "pin" | "arrow" | "download"
   | "check" | "alert" | "chevronL" | "chevronR" | "message" | "phone"
-  | "plus" | "help" | "image" | "user" | "dot";
+  | "plus" | "help" | "image" | "user" | "dot" | "key";
 
 /** Trazos por icono, en el viewBox 0 0 24 24. */
 const P: Record<IconName, React.ReactNode> = {
@@ -45,6 +45,7 @@ const P: Record<IconName, React.ReactNode> = {
   help: <><circle cx="12" cy="12" r="8.6" /><path d="M9.7 9.4a2.4 2.4 0 1 1 3.4 2.2c-.7.4-1.1 1-1.1 1.8v.3" /><path d="M12 17.2h.01" /></>,
   image: <><rect x="3.2" y="4.8" width="17.6" height="14.4" rx="2" /><circle cx="8.6" cy="10.1" r="1.7" /><path d="M3.6 17.4l4.6-4.3a1.6 1.6 0 0 1 2.2 0l5.6 5.3" /></>,
   dot: <circle cx="12" cy="12" r="4.6" fill="currentColor" stroke="none" />,
+  key: <><circle cx="8.4" cy="8.4" r="4.4" /><path d="M11.6 11.6 20 20" /><path d="M17 17l-2.2 2.2" /></>,
 };
 
 /**

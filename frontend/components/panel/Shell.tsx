@@ -31,16 +31,21 @@ export const VIEW_W = 1604;
 
 export type PanelKey =
   | "resumen" | "avance" | "presupuesto" | "aprobaciones" | "interventoria"
-  | "fotos" | "valor" | "documentos" | "gestor";
+  | "operacion" | "fotos" | "valor" | "documentos" | "gestor";
 
 type NavItem = { key: PanelKey; label: string; icon: IconName; href: string; badge?: number };
 
-/** Los dos grupos del sidebar, con los `top` literales del frame de Figma. */
+/**
+ * Los dos grupos del sidebar, con los `top` literales de Figma. Se toman del
+ * frame de Operación del activo (600:2073), que es el más reciente y el único
+ * con los diez items: los frames anteriores traían pasos de 47 px y sólo
+ * nueve, sin "Operación del activo".
+ */
 const GROUPS: { label: string; top: number; items: NavItem[]; tops: number[] }[] = [
   {
     label: "Tu obra",
     top: 94,
-    tops: [117, 164, 211, 258, 305],
+    tops: [117, 162.61, 208.22, 253.83, 299.44],
     items: [
       { key: "resumen", label: "Resumen", icon: "home", href: "/panel" },
       { key: "avance", label: "Avance de obra", icon: "progress", href: "/panel/avance" },
@@ -51,9 +56,10 @@ const GROUPS: { label: string; top: number; items: NavItem[]; tops: number[] }[]
   },
   {
     label: "Tu activo",
-    top: 366,
-    tops: [389, 434.61, 481.61, 528.61],
+    top: 359.05,
+    tops: [382.05, 427.66, 473.27, 518.88, 564.49],
     items: [
+      { key: "operacion", label: "Operación del activo", icon: "key", href: "/panel/operacion" },
       { key: "fotos", label: "Fotos y avance visual", icon: "photos", href: "/panel/fotos" },
       { key: "valor", label: "Proyección de valor", icon: "value", href: "/panel/valor" },
       { key: "documentos", label: "Documentos", icon: "docs", href: "/panel/documentos" },
