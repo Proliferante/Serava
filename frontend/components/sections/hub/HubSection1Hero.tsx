@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
+import CanvasImage from "@/components/CanvasImage";
 
 const A = "/figma";
 
@@ -26,7 +27,7 @@ export default function HubSection1Hero() {
     <div className="relative size-full" data-name="Seccion 1">
       {/* Background image */}
       <div className="absolute h-[1262px] left-[-93px] top-[-155px] w-[2241px]">
-        <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full object-cover" src={`${A}/0399392c61096f2f9a6febf99f556a00af4eb6ac.webp`} />
+        <CanvasImage src={`${A}/0399392c61096f2f9a6febf99f556a00af4eb6ac.webp`} w={2241} />
       </div>
       {/* Overlay */}
       <div className="absolute bg-[rgba(73,33,0,0.6)] h-[934px] left-0 top-0 w-[1920px]" />

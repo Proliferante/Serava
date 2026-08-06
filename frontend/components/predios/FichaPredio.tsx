@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import CountUp from "@/components/motion/CountUp";
 import { MARK } from "@/components/brand";
+import CanvasImage from "@/components/CanvasImage";
 
 const A = "/figma";
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -96,7 +97,7 @@ export default function FichaPredio() {
   return (
     <div className="relative size-full" style={{ backgroundColor: "#e2cdae" }}>
       {/* ── Ilustración de fondo (Fondo_Ficha_predio) ── */}
-      <img loading="lazy" decoding="async" alt="" className="pointer-events-none absolute inset-0 size-full max-w-none object-cover" src={`${A}/Fondo_Ficha_predio.webp`} />
+      <CanvasImage src={`${A}/Fondo_Ficha_predio.webp`} w={1920} className="pointer-events-none" />
       {/* ── Background gradient (Rectangle 31): dark #492100 → cream, 70% over cream ── */}
       <div className="pointer-events-none absolute left-0 top-[64px] h-[2588px] w-full" style={{ background: "linear-gradient(180deg, rgba(73,33,0,0.7) 36.285%, rgba(226,205,174,0.7) 99.699%)" }} />
 

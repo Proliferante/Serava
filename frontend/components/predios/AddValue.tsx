@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 import CountUp from "@/components/motion/CountUp";
 import { MARK } from "@/components/brand";
+import CanvasImage from "@/components/CanvasImage";
 
 const A = "/figma";
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -101,7 +102,7 @@ export default function AddValue() {
     <div className="relative size-full" style={{ backgroundColor: "#efe6d5" }}>
       {/* ── Faint building illustration ── */}
       <div className="pointer-events-none absolute left-0 top-[-11px] h-[2880px] w-full">
-        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 size-full max-w-none object-cover opacity-70" src={`${A}/Fondo_Add_Value.webp`} />
+        <CanvasImage src={`${A}/Fondo_Add_Value.webp`} w={1920} className="opacity-70" />
       </div>
       {/* ── Difuminado (Rectangle 30) — valor exacto del Figma: dark → cream al 65% ── */}
       <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(73,33,0,0.65) 10.29%, rgba(226,205,174,0.65) 100%)" }} />

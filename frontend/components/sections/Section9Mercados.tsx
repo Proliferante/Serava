@@ -1,5 +1,6 @@
 import MercadoPill from "@/components/sections/MercadoPill";
 import CityCard from "@/components/sections/CityCard";
+import Image from "next/image";
 
 const A = "/figma";
 
@@ -10,7 +11,16 @@ export default function Section9Mercados() {
       {/* Background image */}
       <div className="absolute h-[1249px] left-[-164px] top-[100px] w-[2237px]">
         <div className="absolute inset-0 opacity-20 overflow-hidden pointer-events-none">
-          <img loading="lazy" decoding="async" alt="" className="absolute h-[119.49%] left-0 max-w-none top-[-19.49%] w-full" src={`${A}/63f0d4b26acea5bd4269d62fe7c1683462dc68c9.webp`} />
+          {/* Se estira al 119,49 % de alto y se sube, así que no admite modo
+              `fill`: ese modo fija el alto en línea y ganaría al de aquí. */}
+          <Image
+            src={`${A}/63f0d4b26acea5bd4269d62fe7c1683462dc68c9.webp`}
+            alt=""
+            width={2237}
+            height={1492}
+            sizes="116.51vw"
+            className="absolute h-[119.49%] left-0 max-w-none top-[-19.49%] w-full"
+          />
         </div>
       </div>
 

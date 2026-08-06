@@ -1,5 +1,6 @@
 import FiltroCard from "@/components/sections/FiltroCard";
 import { tinted, WORDMARK } from "@/components/brand";
+import CanvasImage from "@/components/CanvasImage";
 
 const A = "/figma";
 
@@ -14,7 +15,7 @@ export default function Section2Criterio() {
     <div className="bg-cream relative size-full overflow-clip" data-name="Seccion 2">
       {/* Bogotá map background */}
       <div className="pointer-events-none absolute h-[3415px] left-[-709px] top-[-916px] w-[2629px]">
-        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 max-w-none object-cover opacity-20 pointer-events-none size-full" src={`${A}/2cddbd3323c70d04c23ee3ff2c94699c7988af39.webp`} />
+        <CanvasImage src={`${A}/2cddbd3323c70d04c23ee3ff2c94699c7988af39.webp`} w={2629} className="opacity-20 pointer-events-none" />
       </div>
 
       {/* Heading (right aligned) */}

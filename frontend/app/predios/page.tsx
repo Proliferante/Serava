@@ -1,4 +1,6 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
+import CanvasImage from "@/components/CanvasImage";
+import Image from "next/image";
 import PredioCard, { type Predio } from "@/components/predios/PredioCard";
 import PrediosNav from "@/components/predios/PrediosNav";
 
@@ -171,10 +173,22 @@ export default function PrediosPage() {
 
           {/* Torres decorativas — image 9 e image 10 (207:1208 / 207:1210) */}
           <div className="pointer-events-none absolute overflow-hidden" style={{ left: -624, top: -140, width: 1986, height: 2979 }}>
-            <img loading="lazy" decoding="async" alt="" className="absolute inset-0 size-full max-w-none object-cover opacity-10" src={`${A}/1603eea0cdf422fdf4ee349b5d252c4253213488.webp`} />
+            <CanvasImage src={`${A}/1603eea0cdf422fdf4ee349b5d252c4253213488.webp`} w={1986} className="opacity-10" />
           </div>
           <div className="pointer-events-none absolute overflow-hidden" style={{ left: 996, top: 633, width: 931, height: 2217 }}>
-            <img loading="lazy" decoding="async" alt="" className="absolute left-0 top-0 h-full max-w-none opacity-10" style={{ width: "158.84%" }} src={`${A}/1603eea0cdf422fdf4ee349b5d252c4253213488.webp`} />
+            {/* Esta torre se estira al 158,84 % del ancho de su caja, así que no
+                puede ir en modo `fill`: ese modo fija el ancho en línea y ganaría
+                al de aquí. Con `width`/`height` normales Next los escribe como
+                atributos, que el CSS sí sobreescribe. */}
+            <Image
+              src={`${A}/1603eea0cdf422fdf4ee349b5d252c4253213488.webp`}
+              alt=""
+              width={1479}
+              height={2217}
+              sizes="77.03vw"
+              className="absolute left-0 top-0 h-full max-w-none opacity-10"
+              style={{ width: "158.84%" }}
+            />
           </div>
 
           {/* ── Barra de filtros (100:3062) ── */}

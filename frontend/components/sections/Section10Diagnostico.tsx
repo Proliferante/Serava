@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import DiagnosticoTrigger from "@/components/DiagnosticoTrigger";
+import CanvasImage from "@/components/CanvasImage";
 
 const A = "/figma";
 const MASK = `url("${A}/4697f1e876333b5d184437c4efd2d030a61e1462.svg")`;
@@ -34,7 +35,7 @@ export default function Section10Diagnostico() {
 
       {/* Right masked card: photo */}
       <div className="absolute h-[623px] left-[981px] top-[55px] w-[831px]" style={mask("80px 86px")}>
-        <img loading="lazy" decoding="async" alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={`${A}/1d104ea194ca7ae5b0f84b1328433a3a584b589f.webp`} />
+        <CanvasImage src={`${A}/1d104ea194ca7ae5b0f84b1328433a3a584b589f.webp`} w={831} className="pointer-events-none" />
       </div>
       {/* Dark gradient overlay */}
       <div

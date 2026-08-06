@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MARK } from "@/components/brand";
+import CanvasImage from "@/components/CanvasImage";
 
 const A = "/figma";
 
@@ -55,7 +56,7 @@ export default function LoginScreen() {
         {/* Image (50% opacity, blends into gradient) */}
         <div className="absolute inset-0 opacity-50">
           <div className="absolute h-[1082px] left-[-108px] top-[-19px] w-[1442px]">
-            <img loading="lazy" decoding="async" alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={`${A}/1d104ea194ca7ae5b0f84b1328433a3a584b589f.webp`} />
+            <CanvasImage src={`${A}/1d104ea194ca7ae5b0f84b1328433a3a584b589f.webp`} w={1442} className="pointer-events-none" />
           </div>
         </div>
 
