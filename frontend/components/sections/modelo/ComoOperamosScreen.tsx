@@ -3,7 +3,7 @@
 import { MotionConfig, motion } from "framer-motion";
 import { useRef, type CSSProperties, type ReactNode } from "react";
 import CountUp from "@/components/motion/CountUp";
-import { Bloom, BloomSpin, Draw, EASE, Float, MLine, POP, Pop, Rise, Rule, useParallaxY } from "@/components/motion/Kinetics";
+import { Draw, EASE, Float, MLine, POP, Pop, Rise, Rule, useParallaxY } from "@/components/motion/Kinetics";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    COMO OPERAMOS — reproducción 1:1 del frame de Figma 311:1396 (1920 × 9717).
@@ -159,6 +159,40 @@ function Pic({
       transition={{ duration: 0.95, delay, ease: EASE }}
     >
       <ParImg src={src} alt={alt} par={par} over={over} eager={eager} style={crop ?? { inset: 0, width: "100%", height: "100%" }} />
+    </motion.div>
+  );
+}
+
+/**
+ * Composición "Imagen Christian" (312:1258) — una sola imagen con transparencia.
+ *
+ * No usa `Pic` porque `Pic` recorta con `overflow-hidden`, y entonces el
+ * parallax obliga a ampliar la imagen (`over`) para tener margen: eso le
+ * comería los aros exteriores. Aquí no hay recorte y la caja lleva la
+ * proporción exacta del archivo, así que la composición se ve entera.
+ *
+ * El movimiento va en tres capas anidadas para que no se peleen por la misma
+ * propiedad —las tres animan `y`—: la de fuera hace la entrada, la de en medio
+ * el flotado continuo y `ParImg` el parallax de scroll.
+ */
+function ChristianImg() {
+  return (
+    <motion.div
+      className="pointer-events-none absolute"
+      style={{ left: 623, top: -29.25, width: 1561, height: 1041 }}
+      initial={{ opacity: 0, y: 46, scale: 0.975 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 1.15, ease: EASE }}
+    >
+      <Float style={{ inset: 0 }} amp={9} dur={7.5}>
+        <ParImg
+          src="como-christian-full.webp"
+          alt="Christian Mejía, director de diseño y operación técnica"
+          par={24}
+          style={{ inset: 0, width: "100%", height: "100%" }}
+        />
+      </Float>
     </motion.div>
   );
 }
@@ -355,9 +389,19 @@ const ANTES_ITEMS: AntesItem[] = [
 ];
 
 /** Sección: caja absoluta a ancho completo con fondo, radio y recorte. */
+/**
+ * Franja de sección: ancho completo, recorta lo que se sale.
+ *
+ * `overflow-clip` y no `overflow-hidden`: varias secciones tienen composiciones
+ * que se salen por la derecha —la de Christian llega a 2184 sobre un lienzo de
+ * 1920—, y `hidden` crea un contenedor desplazable. Basta con que algo lleve el
+ * foco o haga `scrollIntoView` sobre esa parte oculta para que la franja se
+ * desplace en horizontal y todo el contenido aparezca corrido. `clip` recorta
+ * igual pero no admite scroll, así que no puede pasar.
+ */
 function Sec({ top, h, bg, radius, children }: { top: number; h: number; bg?: string; radius?: string; children: ReactNode }) {
   return (
-    <div className="absolute left-0 w-full overflow-hidden" style={{ top, height: h, background: bg, borderRadius: radius }}>
+    <div className="absolute left-0 w-full overflow-clip" style={{ top, height: h, background: bg, borderRadius: radius }}>
       {children}
     </div>
   );
@@ -841,55 +885,20 @@ export default function ComoOperamosScreen() {
 
         {/* ══════════ 11 · RESPALDO HUMANO ══════════ */}
         <Sec top={7762.25} h={854.835} bg={BROWN} radius="0 150px 0 0">
-          {/* Composición "Imagen Christian" (orden de pintado de Figma) */}
-          <Pic x={623} y={-29.25} w={1561} h={1041} src="como-christian-bg.webp" alt="" par={34} over={1.08} />
-          <Bloom style={{ left: 1039, top: 88.75, width: 754, height: 746 }} delay={0.1} dur={1.5} from={0.9}>
-            <img alt="" src={`${I}/ch-e12.svg`} className="absolute inset-0 block size-full max-w-none" />
-          </Bloom>
-          <BloomSpin style={{ left: 985, top: 41.75, width: 971, height: 858 }} delay={0.2} dur={1.8} spin={150}>
-            <img alt="" src={`${I}/ch-e10.svg`} className="absolute inset-0 block size-full max-w-none" />
-          </BloomSpin>
-          <Bloom style={{ left: 1045, top: 404.75, width: 591, height: 516 }} delay={0.15} dur={1.6} from={0.88}>
-            <div className="absolute" style={{ inset: "-13.95% -12.18%" }}>
-              <img alt="" src={`${I}/ch-e13.svg`} className="block size-full max-w-none" />
-            </div>
-          </Bloom>
-          <Pic x={1125} y={3.75} w={566} h={851} src="como-christian.webp" alt="Christian Mejía" delay={0.25} par={22} over={1.06} rise={34} />
-          <Draw style={{ left: 1758, top: 305.75, width: 2, height: 480 }} delay={0.5} dur={1.2}>
-            <div className="flex size-full items-center justify-center">
-              <div style={{ transform: "rotate(89.76deg)", flex: "none" }}>
-                <div className="relative" style={{ width: 480.004, height: 0 }}>
-                  <div className="absolute" style={{ inset: "-1px 0 0 0" }}>
-                    <img alt="" src={`${I}/ch-line11.svg`} className="block size-full max-w-none" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Draw>
-          <motion.div
-            className="pointer-events-none absolute flex items-center justify-center"
-            style={{ left: 698, top: 88.75, width: 1222, height: 766 }}
-            initial={{ opacity: 0, y: 54 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 1.05, delay: 0.35, ease: EASE }}
-          >
-            <div style={{ transform: "rotate(180deg) scaleY(-1)", flex: "none" }}>
-              <div className="relative overflow-hidden" style={{ width: 1222, height: 766 }}>
-                <img alt="" loading="lazy" src={`${A}/como-christian-img1.webp`} className="absolute max-w-none" style={{ height: "172.76%", left: "-61.55%", top: "10.21%", width: "162.44%" }} />
-              </div>
-            </div>
-          </motion.div>
-          <Float style={{ left: 979, top: 374.75, width: 30, height: 30 }} amp={7} dur={5.5}>
-            <Pop delay={0.7}><img alt="" src={`${I}/ch-dot30.svg`} className="block size-full max-w-none" /></Pop>
-          </Float>
-          <Float style={{ left: 1745, top: 389.75, width: 30, height: 30 }} amp={7} dur={6.2} delay={0.4}>
-            <Pop delay={0.8}><img alt="" src={`${I}/ch-dot30.svg`} className="block size-full max-w-none" /></Pop>
-          </Float>
-          <T x={1678} cy={272.75} w={159.138} d={0.9} ry={12} className="text-center font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.226px", color: LASER, whiteSpace: "pre-wrap" }}>
-            <p>Christian </p>
-            <p>mejia</p>
-          </T>
+          {/* Composición "Imagen Christian" (312:1258), 1561 × 1041 en (623, −29.25).
+              Va como una sola imagen con transparencia, que es el export aplanado
+              del frame: el retrato recortado en círculo, los tres aros, la línea,
+              los dos puntos y el rótulo "Christian Mejía" vienen dentro.
+
+              Antes se montaba con nueve piezas —fondo, tres elipses SVG, retrato,
+              línea, una segunda foto rotada y dos puntos—, y el resultado no
+              cuadraba con el diseño: el retrato iba sin el recorte circular y los
+              aros no caían donde debían.
+
+              El contenedor NO recorta y la caja tiene la proporción exacta de la
+              imagen (1561 × 1041), así que se ve completa: nada de `overflow`
+              ni de `over`, que es lo que obliga a `Pic` a ampliar y recortar. */}
+          <ChristianImg />
 
           <Eyebrow x={440} cy={146.5} label="Respaldo humano" color={LASER} w={159.14} />
           <Question x={440} cy={186.58} w={484} color={GREEN_SMOKE} d={0.16}>El criterio detrás de cada inmueble.</Question>
