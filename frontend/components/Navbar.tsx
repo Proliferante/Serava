@@ -37,7 +37,7 @@ export default function Navbar() {
           son instancias con override de texto. Las etiquetas reales salen del
           render del header de Cómo operamos (426:1129/1130/1131). */}
       <NavLink href="/" left={532} top={64}>Inicio</NavLink>
-      <NavLink href="/modelo" left={697} top={63}>Cómo operamos</NavLink>
+      <NavLink href="/modelo" left={697} top={63}>¿Cómo operamos?</NavLink>
       <NavLink href="/oportunidades" left={1039} top={64}>Oportunidades</NavLink>
       <NavLink href="/hub" left={1353} top={64}>HUB</NavLink>
 
