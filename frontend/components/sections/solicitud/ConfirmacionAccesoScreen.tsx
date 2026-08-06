@@ -2,16 +2,19 @@
 
 import { MotionConfig, motion } from "framer-motion";
 import type { CSSProperties, ReactNode } from "react";
-import { EASE, MLine, Pop, Rise, Rule } from "@/components/motion/Kinetics";
+import { EASE, MLine, Pop, Rule } from "@/components/motion/Kinetics";
 import { MARK } from "@/components/brand";
+import CanvasImage from "@/components/CanvasImage";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    CONFIRMACIÓN DE ACCESO — reproducción 1:1 del frame de Figma 311:4977
    (CONFIRMACIÓN ACCESO, 1920 × 1199.7). Pantalla a la que llega el formulario
    de /solicitud-acceso al enviarse.
 
-   El fondo es sólo el degradado del frame: el mapa que se ve en el lienzo de
-   Figma está detrás del frame, no dentro, así que no forma parte del diseño.
+   El fondo son dos capas: la foto a sangre y, encima, el degradado del frame.
+   Las cinco paradas del degradado van con alfa 0,93, así que la foto se
+   transparenta un 7 % por debajo; sin ella el 7 % caía sobre nada y el fondo
+   quedaba plano.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const A = "/figma";
@@ -69,14 +72,19 @@ const IC_ARROW_DARK: [string, string, string][] = [
 export default function ConfirmacionAccesoScreen() {
   return (
     <MotionConfig reducedMotion="user">
-      <div
-        className="relative size-full overflow-hidden"
-        data-name="CONFIRMACIÓN ACCESO"
-        style={{
-          backgroundImage:
-            "linear-gradient(179.882deg, rgba(73,33,0,0.93) 0.164%, rgba(82,43,10,0.93) 35.973%, rgba(97,60,28,0.93) 50.479%, rgba(151,120,88,0.93) 80.07%, rgba(226,205,174,0.93) 99.836%)",
-        }}
-      >
+      <div className="relative size-full overflow-hidden" data-name="CONFIRMACIÓN ACCESO">
+        {/* Foto de fondo, a sangre sobre todo el frame. Va debajo del degradado. */}
+        <CanvasImage src={`${A}/confirmacion-acceso.webp`} w={1920} priority />
+
+        {/* Degradado del frame (311:4977), con sus cinco paradas al 93 %. */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(179.882deg, rgba(73,33,0,0.93) 0.164%, rgba(82,43,10,0.93) 35.973%, rgba(97,60,28,0.93) 50.479%, rgba(151,120,88,0.93) 80.07%, rgba(226,205,174,0.93) 99.836%)",
+          }}
+        />
+
         {/* Tarjeta con el halo crema (358:1108) */}
         <motion.div
           className="absolute"
@@ -92,14 +100,17 @@ export default function ConfirmacionAccesoScreen() {
         </Pop>
 
         {/* Eyebrow con filete a los dos lados (311:4990) */}
-        <Rule x={850.435} y={468.14} w={26} color={LASER} opacity={0.7} delay={0.5} />
-        <T x={888.435} cy={467.72} w={140.124} d={0.6} ry={12} className="text-center font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.456px", color: LASER }}>
+        <Rule x={850.435} y={468.64} w={26} color={LASER} opacity={0.7} delay={0.5} />
+        {/* `whitespace-nowrap`: con el interletraje de 3,456 px el texto mide algo
+            más que los 140,124 px del nodo y se partía en dos líneas. En Figma el
+            nodo es de ancho automático, así que nunca parte. */}
+        <T x={888.435} cy={467.72} w={140.124} d={0.6} ry={12} className="whitespace-nowrap text-center font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.456px", color: LASER }}>
           <p>Perfil recibido</p>
         </T>
-        <Rule x={1043.575} y={468.14} w={26} color={LASER} opacity={0.7} delay={0.5} />
+        <Rule x={1043.575} y={468.64} w={26} color={LASER} opacity={0.7} delay={0.5} />
 
         {/* Heading 1 (311:4995) */}
-        <T x={710.735} cy={526.44} w={498.53} className="whitespace-nowrap text-center" style={{ fontSize: 48, lineHeight: "53.76px", letterSpacing: "-0.96px", color: LINEN }}>
+        <T x={710.735} cy={526.56} w={498.53} className="whitespace-nowrap text-center" style={{ fontSize: 48, lineHeight: "53.76px", letterSpacing: "-0.96px", color: LINEN }}>
           <MLine delay={0.7} amount={0}>
             <span className="font-light">Recibimos tu </span>
             <span className="font-semibold">perfil.</span>
@@ -107,7 +118,10 @@ export default function ConfirmacionAccesoScreen() {
         </T>
 
         {/* Párrafos (311:4999 / 311:5006) */}
-        <T x={710.735} cy={613.48} w={498.53} d={0.9} className="whitespace-nowrap text-center font-light" style={{ fontSize: 17.6, lineHeight: "27.28px", color: "rgba(247,241,229,0.82)" }}>
+        {/* Este párrafo va a 20 px / 28 px en Medium (311:5003), no a 17,6 en
+            Light: llevaba los valores del párrafo de abajo (311:5007), que sí
+            es 17,6 Light. Por eso se veía más pequeño que en el diseño. */}
+        <T x={710.735} cy={614.56} w={498.53} d={0.9} className="whitespace-nowrap text-center font-medium" style={{ fontSize: 20, lineHeight: "28px", color: "rgba(247,241,229,0.82)" }}>
           <p>El equipo Zequara revisará tu información y se</p>
           <p>
             <span>comunicará contigo para coordinar una </span>
@@ -115,13 +129,15 @@ export default function ConfirmacionAccesoScreen() {
           </p>
           <p className="font-medium" style={{ color: LINEN }}>de conocimiento mutuo.</p>
         </T>
-        <T x={710.735} cy={697.34} w={498.53} d={1.02} className="whitespace-nowrap text-center font-light" style={{ fontSize: 17.6, lineHeight: "27.28px", color: "rgba(247,241,229,0.82)" }}>
+        <T x={710.735} cy={697.56} w={498.53} d={1.02} className="whitespace-nowrap text-center font-light" style={{ fontSize: 17.6, lineHeight: "27.28px", color: "rgba(247,241,229,0.82)" }}>
           <p>Después de esa conversación confirmaremos si</p>
           <p>avanzamos con el acceso al portafolio privado.</p>
         </T>
 
         {/* Volver al inicio (311:5008) */}
-        <Pop className="absolute" style={{ left: 854.185, top: 771.06 }} delay={1.14} from={0.88} dur={0.6}>
+        {/* El botón cuelga del contenedor 311:4982 en (143.27, 425.86), y ese
+            contenedor arranca en (710.735, 330.14): sale y = 756, no 771. */}
+        <Pop className="absolute" style={{ left: 854.001, top: 756 }} delay={1.14} from={0.88} dur={0.6}>
           <a
             href="/"
             className="ix-cta ix-pulse relative block overflow-hidden"
@@ -136,7 +152,7 @@ export default function ConfirmacionAccesoScreen() {
         </Pop>
 
         {/* Nota legal (311:5015) */}
-        <T x={774.265} cy={875.37} w={371.47} d={1.26} className="whitespace-nowrap text-center font-medium" style={{ fontSize: 13.1, lineHeight: "20.34px", color: CREAM }}>
+        <T x={774.001} cy={860.41} w={371.474} d={1.26} className="whitespace-nowrap text-center font-medium" style={{ fontSize: 13.1, lineHeight: "20.34px", color: CREAM }}>
           <p>Portafolio privado. Acceso sujeto a evaluación, sesión</p>
           <p>virtual y disponibilidad.</p>
         </T>
