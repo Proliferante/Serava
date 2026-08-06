@@ -7,6 +7,16 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ["framer-motion"],
   },
+  images: {
+    // AVIF primero, WebP para quien no lo soporte. Las fotos ya eran WebP, así
+    // que el formato aporta poco por sí solo: lo que de verdad baja el peso es
+    // que `next/image` sirva la variante del tamaño al que se pinta (ver
+    // `components/CanvasImage.tsx`).
+    formats: ["image/avif", "image/webp"],
+    // La caché de las variantes hereda el `max-age` del archivo de origen, y
+    // los de `/figma` van con `immutable` un año (ver `headers()` abajo), así
+    // que las versiones optimizadas se cachean igual de bien.
+  },
   async headers() {
     return [
       {
