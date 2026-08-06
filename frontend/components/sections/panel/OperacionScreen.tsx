@@ -46,11 +46,13 @@ const FILTROS: { label: string; x: number; w: number }[] = [
 type LogItem = {
   y: number; icon: IconName; title: string; desc: string; cat: string; date: string;
   estado?: { label: string; tone: "green" | "gold" };
+  /** La descripcion ocupa dos lineas: la fila crece y la etiqueta baja. */
+  tall?: boolean;
 };
 
 const LOG: LogItem[] = [
   { y: 4, icon: "manager", title: "Asamblea ordinaria de copropiedad", desc: "Zequara asistió en tu representación. Se aprobó el presupuesto anual. Acta cargada en documentos.", cat: "Asamblea", date: "03 jul" },
-  { y: 110.13, icon: "alert", title: "Fuga menor en grifería de cocina", desc: "Reportada por el arrendatario. Atendida por nuestro equipo en menos de 24 h. Costo $180.000, cubierto por póliza de mantenimiento.", cat: "Mantenimiento", date: "28 jun", estado: { label: "Resuelto", tone: "green" } },
+  { y: 110.13, icon: "alert", title: "Fuga menor en grifería de cocina", desc: "Reportada por el arrendatario. Atendida por nuestro equipo en menos de 24 h. Costo $180.000, cubierto por póliza de mantenimiento.", cat: "Mantenimiento", date: "28 jun", estado: { label: "Resuelto", tone: "green" }, tall: true },
   { y: 235.94, icon: "budget", title: "Canon de junio recaudado", desc: "Recaudo al día. Consignación neta a tu cuenta programada para el 30 de junio.", cat: "Pago", date: "25 jun", estado: { label: "Resuelto", tone: "green" } },
   { y: 342.07, icon: "alert", title: "Ruido en ducto de ventilación", desc: "Reportado por el arrendatario. En revisión con la administración del edificio; no afecta habitabilidad.", cat: "Mantenimiento", date: "20 jun", estado: { label: "En proceso", tone: "gold" } },
   { y: 448.2, icon: "approvals", title: "Inspección semestral del inmueble", desc: "Estado óptimo, sin novedades estructurales ni de acabados. Registro fotográfico disponible.", cat: "Inspección", date: "15 jun" },
@@ -87,7 +89,7 @@ function Dato({ x, y, label, value, aside, green }: { x: number; y: number; labe
 function Log({ item, i }: { item: LogItem; i: number }) {
   const color = CAT[item.cat] ?? MUTED;
   return (
-    <In x={23} y={112.27 + item.y} w={930} h={90} delay={0.05 + i * 0.05} dy={10} className="pnl-row" style={{ borderRadius: 10 }}>
+    <In x={23} y={112.27 + item.y} w={930} h={item.tall ? 110 : 90} delay={0.05 + i * 0.05} dy={10} className="pnl-row" style={{ borderRadius: 10 }}>
       <span
         className="absolute flex items-center justify-center"
         style={{ left: 0, top: 16, width: 38, height: 38, borderRadius: 10, background: `${color}22`, border: `1px solid ${color}44`, color }}
@@ -98,7 +100,7 @@ function Log({ item, i }: { item: LogItem; i: number }) {
       <p className="absolute m-0" style={{ left: 53, top: 40.56, width: 800, fontSize: 13, lineHeight: "20px", fontWeight: 300, color: MUTED }}>{item.desc}</p>
       <span
         className="absolute inline-flex items-center uppercase"
-        style={{ left: 53, top: 68.55, height: 21, padding: "0 9px", borderRadius: 999, background: `${color}1f`, color, fontSize: 9.6, fontWeight: 700, letterSpacing: "0.7px" }}
+        style={{ left: 53, top: item.tall ? 87.86 : 68.55, height: 21, padding: "0 9px", borderRadius: 999, background: `${color}1f`, color, fontSize: 9.6, fontWeight: 700, letterSpacing: "0.7px" }}
       >
         {item.cat}
       </span>
