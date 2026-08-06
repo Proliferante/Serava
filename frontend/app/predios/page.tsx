@@ -48,7 +48,7 @@ const FILTERS = [
   { label: "Zona", value: "Todas", x: 800, w: 157 },
   { label: "Capital requerido", value: "Cualquiera", x: 984, w: 170 },
   { label: "Tipo de transformación", value: "Todas", x: 1181, w: 264 },
-  { label: "Ordenar por", value: "Mayor Score Serava", x: 1472, w: 198 },
+  { label: "Ordenar por", value: "Mayor Score Zequara", x: 1472, w: 198 },
 ];
 
 const PREDIOS: Predio[] = [
@@ -170,7 +170,7 @@ export default function PrediosPage() {
             className="absolute m-0"
             style={{ left: 392, top: 366.25, width: 580, fontSize: 16, lineHeight: "26.5px", fontWeight: 300, color: "rgba(247,241,229,0.78)" }}
           >
-            Predios curados por Serava en zonas consolidadas, con demanda activa, oferta limitada y potencial de transformación.
+            Predios curados por Zequara en zonas consolidadas, con demanda activa, oferta limitada y potencial de transformación.
           </p>
           <span className="absolute" style={{ left: 392, top: 474.79, width: 1136, height: 1, background: "rgba(247,241,229,0.14)" }} />
 

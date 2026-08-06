@@ -43,12 +43,12 @@ const DATOS: [string, string][] = [
   ["Piso", "4 de 6"],
   ["Administración", "Incluida en análisis"],
   ["Ubicación exacta", "Visible al reservar"],
-  ["Score Serava", "96 / 100"],
+  ["Score Zequara", "96 / 100"],
 ];
 const RIESGOS = [
-  { tone: "green" as const, title: "Costo de obra cerrado", desc: "El sobrecosto no estructural lo asume Serava. Sin sorpresas de presupuesto." },
+  { tone: "green" as const, title: "Costo de obra cerrado", desc: "El sobrecosto no estructural lo asume Zequara. Sin sorpresas de presupuesto." },
   { tone: "green" as const, title: "Estudio jurídico completo", desc: "Títulos y validaciones legales realizados antes de habilitar el predio." },
-  { tone: "orange" as const, title: "Liquidez de venta", desc: "La salida depende del mercado. Serava acompaña pero el activo es tuyo: vendes cuando decidas." },
+  { tone: "orange" as const, title: "Liquidez de venta", desc: "La salida depende del mercado. Zequara acompaña pero el activo es tuyo: vendes cuando decidas." },
 ];
 const DOCS = [
   { t: "Ficha técnica del predio", status: "Disponible", tone: "green" as const },
@@ -254,7 +254,7 @@ export default function FichaPredio() {
                 </div>
               </div>
               <div>
-                <p className="font-light text-[12.5px] leading-[19.34px] text-[#5b4332]">Score Serava</p>
+                <p className="font-light text-[12.5px] leading-[19.34px] text-[#5b4332]">Score Zequara</p>
                 <p className="font-semibold text-[16px] leading-[24.8px] text-[#3d2c1e]">Prioridad alta</p>
               </div>
             </div>

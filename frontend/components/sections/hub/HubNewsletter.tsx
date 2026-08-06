@@ -25,7 +25,7 @@ export default function HubNewsletter() {
         </div>
         <div className="[word-break:break-word] font-light leading-[0] not-italic text-[16px] whitespace-nowrap" style={{ color: "rgba(247,241,229,0.85)" }}>
           <p className="leading-[24.8px] mb-0">Análisis de mercado, casos reales y aprendizajes del</p>
-          <p className="leading-[24.8px]">método Serava. Sin ruido.</p>
+          <p className="leading-[24.8px]">método Zequara. Sin ruido.</p>
         </div>
       </div>
 

@@ -108,7 +108,7 @@ export default function ConfirmacionAccesoScreen() {
 
         {/* Párrafos (311:4999 / 311:5006) */}
         <T x={710.735} cy={613.48} w={498.53} d={0.9} className="whitespace-nowrap text-center font-light" style={{ fontSize: 17.6, lineHeight: "27.28px", color: "rgba(247,241,229,0.82)" }}>
-          <p>El equipo Serava revisará tu información y se</p>
+          <p>El equipo Zequara revisará tu información y se</p>
           <p>
             <span>comunicará contigo para coordinar una </span>
             <span className="font-medium" style={{ color: LINEN }}>sesión virtual</span>

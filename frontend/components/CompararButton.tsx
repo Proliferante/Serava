@@ -4,7 +4,7 @@ import { useState } from "react";
 import ComparativaModal from "@/components/ComparativaModal";
 
 /**
- * Section 3 CTA — opens the "por tu cuenta vs. con Serava" popup.
+ * Section 3 CTA — opens the "por tu cuenta vs. con Zequara" popup.
  *
  * Usa el sistema `ix-cta` de globals.css (mismo que Oportunidades, Cómo
  * operamos y Solicitud): pulso de atención + barrido de luz en reposo, y al
@@ -18,12 +18,12 @@ export default function CompararButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Compara tu inversión: por tu cuenta vs. con Serava"
+        aria-label="Compara tu inversión: por tu cuenta vs. con Zequara"
         className="ix-cta absolute bg-cream h-[104px] left-[1324px] overflow-hidden rounded-[98px] shadow-[0px_16px_32px_-16px_rgba(0,0,0,0.45)] top-[988px] w-[454px] flex items-center justify-between pl-[54.5px] pr-[16px]"
       >
         <span className="[word-break:break-word] w-[295px] not-italic text-brown-dark text-left">
           <span className="block font-semibold text-[25px] leading-[34px]">Compara tu inversión:</span>
-          <span className="block font-light text-[19px] leading-[34px]">por tu cuenta vs. con Serava</span>
+          <span className="block font-light text-[19px] leading-[34px]">por tu cuenta vs. con Zequara</span>
         </span>
 
         {/* Círculo con flecha — crece al hover, la flecha dispara dentro del círculo */}

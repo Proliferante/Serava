@@ -20,7 +20,7 @@ import {
 export const VALOR_H = 1200;
 
 const ALTERNATIVAS = [
-  { y: 60.27, h: 71, title: "Rentar", sub: "Canon proyectado $17M/mes; Serava administra" },
+  { y: 60.27, h: 71, title: "Rentar", sub: "Canon proyectado $17M/mes; Zequara administra" },
   { y: 131.27, h: 71, title: "Vender", sub: "Te acompañamos cuando decidas la salida" },
   { y: 202.27, h: 70, title: "Conservar", sub: "El activo es tuyo; tú decides el horizonte" },
 ];
@@ -44,9 +44,9 @@ export default function ValorScreen() {
       <StatCard x={1218} w={386} h={139} label="TIR estimada" note="Horizonte 5 años" weight={300} green delay={0.24}
         value="~16%" />
 
-      {/* ── Score Serava (472:3997) ── */}
+      {/* ── Score Zequara (472:3997) ── */}
       <Card x={0} y={254.61} w={793} h={296.2} delay={0.06}>
-        <Eyebrow x={23} y={28}>Score Serava de tu activo</Eyebrow>
+        <Eyebrow x={23} y={28}>Score Zequara de tu activo</Eyebrow>
         <div className="absolute text-center" style={{ left: 23, top: 71.27, width: 66 }}>
           <p className="m-0" style={{ fontSize: 22, lineHeight: "32px", fontWeight: 700, color: VERD }}>
             <CountUp value={96} />
@@ -56,7 +56,7 @@ export default function ValorScreen() {
           </p>
         </div>
         <p className="absolute m-0" style={{ left: 109, top: 81.47, width: 661, fontSize: 14, lineHeight: "21.6px", fontWeight: 300, color: MUTED }}>
-          Evaluación especializada de la zona y su afinidad con la estrategia Serava. La Cabrera: alta demanda, oferta limitada, valorización sostenida.
+          Evaluación especializada de la zona y su afinidad con la estrategia Zequara. La Cabrera: alta demanda, oferta limitada, valorización sostenida.
         </p>
       </Card>
 

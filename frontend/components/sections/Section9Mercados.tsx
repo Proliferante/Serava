@@ -17,7 +17,7 @@ export default function Section9Mercados() {
       {/* Heading (right aligned) */}
       <p className="[word-break:break-word] absolute font-black leading-[normal] left-[797px] not-italic text-cream text-[60px] text-right top-[97px] w-[753px]">El criterio de entrada</p>
       <div className="[word-break:break-word] absolute font-normal leading-[0] left-[711px] not-italic text-[25px] text-right top-[178px] w-[839px]" style={{ color: "rgba(247,241,229,0.78)" }}>
-        <p className="leading-[29.26px] mb-0">Los datos, el diseño, la curaduría y el seguimiento son Serava,</p>
+        <p className="leading-[29.26px] mb-0">Los datos, el diseño, la curaduría y el seguimiento son Zequara,</p>
         <p className="leading-[29.26px]">estés donde estés.</p>
       </div>
 

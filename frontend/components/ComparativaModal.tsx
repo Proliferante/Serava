@@ -38,7 +38,7 @@ const STEPS: Step[] = [
     num: "01", title: "Elegir la zona", Icon: Pin,
     cuenta: "Semanas investigando mercados para, aun así, decidir sin certeza.",
     serava: [
-      <>Zonas validadas por nuestros <b className="font-semibold">datos y el Serava Score</b>.</>,
+      <>Zonas validadas por nuestros <b className="font-semibold">datos y el Zequara Score</b>.</>,
       "Demanda alta, oferta limitada.",
     ],
     takeaway: "Meses de investigación que te ahorras.",
@@ -63,7 +63,7 @@ const STEPS: Step[] = [
     ],
     chip: "95% cumplimiento de tiempos",
     takeaway: "Cada mes de obra que no se pierde es renta que empieza antes.",
-    foot: "Salvo imprevistos ajenos a Serava.",
+    foot: "Salvo imprevistos ajenos a Zequara.",
   },
   {
     num: "04", title: "Arrendar", Icon: Key,
@@ -119,10 +119,10 @@ function StepCard({ step }: { step: Step }) {
           <p className="font-bold text-[9px] leading-[13px] text-[#b5542f]">Por tu cuenta</p>
           <p className="mt-[8px] font-light text-[12.5px] leading-[18px] text-[#5b4332]">{step.cuenta}</p>
         </div>
-        {/* Con Serava */}
+        {/* Con Zequara */}
         <div className="flex-1 rounded-[12px] border border-solid border-[rgba(127,139,87,0.28)] bg-[rgba(127,139,87,0.09)] p-[13px]">
           <div className="flex items-center justify-between">
-            <p className="font-bold text-[9px] leading-[13px] text-[#5f6b3e]">Con Serava</p>
+            <p className="font-bold text-[9px] leading-[13px] text-[#5f6b3e]">Con Zequara</p>
             <span className="flex size-[17px] items-center justify-center rounded-full bg-[#7f8b57] p-[3.5px] text-[#f7f1e5]"><Check /></span>
           </div>
           <ul className="mt-[9px] flex flex-col gap-[7px]">
@@ -181,7 +181,7 @@ function ModalContent() {
       <p className="mt-[14px] max-w-[560px] text-[14px] leading-[20px]">
         <span className="font-light text-[#5b4332]">Invertir directo es posible. Pero cada mes que tardas en encontrar, remodelar o arrendar es </span>
         <span className="font-medium text-[#3d2c1e]">renta que no entra y capital detenido. </span>
-        <span className="font-light text-[#5b4332]">Serava elimina ese tiempo — y lo que ese tiempo te cuesta.</span>
+        <span className="font-light text-[#5b4332]">Zequara elimina ese tiempo — y lo que ese tiempo te cuesta.</span>
       </p>
 
       {/* Carousel */}
@@ -261,7 +261,7 @@ function ModalContent() {
   );
 }
 
-/** Popup: "El ciclo de tu inversión" — Por tu cuenta vs. Con Serava, en 6 pasos. */
+/** Popup: "El ciclo de tu inversión" — Por tu cuenta vs. Con Zequara, en 6 pasos. */
 export default function ComparativaModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -287,7 +287,7 @@ export default function ComparativaModal({ open, onClose }: { open: boolean; onC
           className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain"
           role="dialog"
           aria-modal="true"
-          aria-label="El ciclo de tu inversión: por tu cuenta vs. con Serava"
+          aria-label="El ciclo de tu inversión: por tu cuenta vs. con Zequara"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

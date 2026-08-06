@@ -67,7 +67,7 @@ export default function LoginScreen() {
         {/* Bottom text */}
         <div className="absolute left-[44px] top-[724px] w-[920px]">
           <div className="[word-break:break-word] font-light leading-[0] not-italic text-cream-93 text-[38.4px] tracking-[-0.768px]">
-            <p className="leading-[43px] mb-0">El acceso a Serava</p>
+            <p className="leading-[43px] mb-0">El acceso a Zequara</p>
             <p className="leading-[43px]">es selectivo.</p>
           </div>
           <div className="[word-break:break-word] font-light leading-[0] not-italic text-[15.7px] mt-[15px] whitespace-nowrap" style={{ color: "rgba(247,241,229,0.75)" }}>
@@ -133,7 +133,7 @@ export default function LoginScreen() {
 
           {/* Solicitar acceso (outline) */}
           <a href="/solicitud-acceso" className="ix-press absolute left-0 top-[489.26px] w-[430px] border border-solid flex items-center justify-center p-[16px] rounded-[999px]" style={{ borderColor: "rgba(247,241,229,0.18)" }}>
-            <span className="font-medium leading-[23.56px] not-italic text-cream-93 text-[15.2px] text-center whitespace-nowrap">Solicitar acceso a Serava</span>
+            <span className="font-medium leading-[23.56px] not-italic text-cream-93 text-[15.2px] text-center whitespace-nowrap">Solicitar acceso a Zequara</span>
           </a>
 
           {/* Bottom note */}

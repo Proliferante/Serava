@@ -30,7 +30,7 @@ function Layer({ left, top, width, height, children }: Placed) {
 }
 
 /**
- * HOME SERAVA — reproducción exacta del frame de Figma (1920 × 9539).
+ * HOME ZEQUARA — reproducción exacta del frame de Figma (1920 × 9539).
  * Las secciones se apilan por coordenadas absolutas respetando el orden de
  * pintado del diseño (Sección 7 se pinta antes que la 5, etc.).
  */

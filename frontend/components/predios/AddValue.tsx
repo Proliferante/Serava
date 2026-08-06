@@ -25,12 +25,12 @@ const STATS = [
 ];
 const WATERFALL = [
   { n: "01", title: "Precio de compra", sub: "Entramos por debajo del mercado de la zona", num: 7.2, kind: "light" as const },
-  { n: "02", title: "Remodelación (costo cerrado)", sub: "Sobrecosto no estructural lo asume Serava", num: 2.5, kind: "light" as const },
+  { n: "02", title: "Remodelación (costo cerrado)", sub: "Sobrecosto no estructural lo asume Zequara", num: 2.5, kind: "light" as const },
   { n: "=", title: "Inversión total", sub: "Compra + obra", num: 9.7, kind: "dark" as const },
   { n: "▲", title: "Valor esperado (mediana de venta)", sub: "70% de la oferta pide más por m² que nuestro costo", num: 11.8, kind: "green" as const },
 ];
 const COMPARABLES = [
-  { label: "Costo total Serava (ya remodelado)", num: 9.7, pct: 78, grad: GRAD_GREEN, caption: "Entramos por debajo del mercado" },
+  { label: "Costo total Zequara (ya remodelado)", num: 9.7, pct: 78, grad: GRAD_GREEN, caption: "Entramos por debajo del mercado" },
   { label: "Mediana de venta en La Cabrera", num: 11.8, pct: 95, grad: GRAD_TAN, caption: "" },
   { label: "Oferta premium comparable", num: 12.4, pct: 100, grad: GRAD_TAN, caption: "" },
 ];
@@ -44,8 +44,8 @@ const SUPUESTOS: [string, string][] = [
 ];
 const RIESGOS: [string, string][] = [
   ["Liquidez de venta", "La salida depende del mercado. El activo es tuyo: decides cuándo vender."],
-  ["Sobrecosto de obra", "Mitigado: el sobrecosto no estructural lo asume Serava (costo cerrado)."],
-  ["Vacancia de arriendo", "Zona de alta demanda; administración y colocación coordinadas por Serava."],
+  ["Sobrecosto de obra", "Mitigado: el sobrecosto no estructural lo asume Zequara (costo cerrado)."],
+  ["Vacancia de arriendo", "Zona de alta demanda; administración y colocación coordinadas por Zequara."],
   ["Variación del mercado", "Cifras de referencia 2025; el retorno real puede variar según condiciones."],
 ];
 const STEPS: [string, string][] = [
@@ -243,7 +243,7 @@ export default function AddValue() {
       <Reveal left={444} top={2026.53} width={1032} delay={0.04}>
         <div className="relative h-[365px] rounded-[20px]" style={{ backgroundImage: "linear-gradient(172.67deg,#3d2c1e 0%,#2a1e14 100%)" }}>
           <p className="absolute left-[44px] top-[44px] font-medium text-[20.8px] leading-[23.7px] tracking-[-0.416px] text-[#f7f1e5]">Metodología, a la vista</p>
-          <p className="absolute left-[44px] top-[79.7px] w-[600px] font-light text-[16px] leading-[24px]" style={{ color: "rgba(247,241,229,0.8)" }}>El análisis Add Value se construye con el mismo criterio que gobierna cada remodelación Serava: datos de zona, costos cerrados y comparables reales. Estas son cifras de referencia; los rangos finales se confirman en el proceso.</p>
+          <p className="absolute left-[44px] top-[79.7px] w-[600px] font-light text-[16px] leading-[24px]" style={{ color: "rgba(247,241,229,0.8)" }}>El análisis Add Value se construye con el mismo criterio que gobierna cada remodelación Zequara: datos de zona, costos cerrados y comparables reales. Estas son cifras de referencia; los rangos finales se confirman en el proceso.</p>
           <div className="absolute left-[44px] top-[198.89px] flex gap-[13.5px]">
             {STEPS.map(([e, t], i) => (
               <motion.div

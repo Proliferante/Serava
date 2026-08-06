@@ -451,7 +451,7 @@ export default function OportunidadesScreen() {
             <MLine delay={0.54}><span className="font-semibold">transformación.</span></MLine>
           </T>
           <T x={601} cy={602} d={0.78} className="whitespace-nowrap font-light" style={{ fontSize: 20.8, lineHeight: "32.24px", color: "rgba(247,241,229,0.86)" }}>
-            <p>Serava selecciona activos en zonas consolidadas, con condiciones</p>
+            <p>Zequara selecciona activos en zonas consolidadas, con condiciones</p>
             <p>para aumentar su valor mediante diseño, remodelación y mejor</p>
             <p>operación.</p>
           </T>
@@ -488,7 +488,7 @@ export default function OportunidadesScreen() {
           </T>
           <T x={440} cy={406.71} w={639.75} d={0.4} className="whitespace-nowrap font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: MILLBROOK }}>
             <p>Conoce transformaciones realizadas por nuestro equipo y el tipo de</p>
-            <p>propiedades que orientan la selección Serava. Buscamos inmuebles</p>
+            <p>propiedades que orientan la selección Zequara. Buscamos inmuebles</p>
             <p>bien ubicados, con atributos difíciles de replicar y capacidad de</p>
             <p>mejorar su posicionamiento a través de una intervención estratégica.</p>
           </T>
@@ -521,7 +521,7 @@ export default function OportunidadesScreen() {
           </T>
           <T x={238} cy={434.15} w={639.75} d={0.56} className="whitespace-nowrap font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: LINEN80 }}>
             <p>Los inversionistas aprobados reciben una ficha que conecta los datos</p>
-            <p>del activo con la propuesta de transformación desarrollada por Serava.</p>
+            <p>del activo con la propuesta de transformación desarrollada por Zequara.</p>
             <p>La información permite entender el valor de entrada, la inversión</p>
             <p>requerida, el potencial de renta y la proyección de valorización.</p>
           </T>
@@ -625,7 +625,7 @@ export default function OportunidadesScreen() {
           </T>
 
           <T x={417} cy={387.16} w={488} d={0.4} className="font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: MILLBROOK }}>
-            <p>Serava acompaña cada operación desde la selección del activo hasta su remodelación y gestión posterior.</p>
+            <p>Zequara acompaña cada operación desde la selección del activo hasta su remodelación y gestión posterior.</p>
           </T>
           <T x={417} cy={470.35} w={488} d={0.52} className="font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: MILLBROOK }}>
             <p>
@@ -687,7 +687,7 @@ export default function OportunidadesScreen() {
           </T>
           <T x={650} cy={229.95} w={620} className="whitespace-nowrap text-center" style={{ fontSize: 51.2, lineHeight: "57.34px", letterSpacing: "-1.28px", color: LINEN }}>
             <MLine delay={0.26}><span className="font-light">Accede al portafolio</span></MLine>
-            <MLine delay={0.38}><span className="font-semibold">privado de Serava.</span></MLine>
+            <MLine delay={0.38}><span className="font-semibold">privado de Zequara.</span></MLine>
           </T>
           <T x={650} cy={335.29} w={620} d={0.56} className="whitespace-nowrap text-center font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: "rgba(247,241,229,0.84)" }}>
             <p>Solicita tu evaluación para conocer oportunidades seleccionadas</p>

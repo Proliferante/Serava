@@ -68,7 +68,7 @@ export default function PresupuestoScreen() {
         value={<CountUp value={1.35} prefix="$" decimals={3} suffix="M" />} />
       <StatCard x={540.66} w={522.67} label="Ejecutado" note="92% del total" delay={0.12}
         value={<CountUp value={1.24} prefix="$" decimals={3} suffix="M" />} />
-      <StatCard x={1081.33} w={522.67} label="Sobrecosto a tu cargo" note="El sobrecosto no estructural lo asume Serava" delay={0.18} green
+      <StatCard x={1081.33} w={522.67} label="Sobrecosto a tu cargo" note="El sobrecosto no estructural lo asume Zequara" delay={0.18} green
         value="$0" />
 
       {/* ── Ejecución por partida (472:2671) ── */}

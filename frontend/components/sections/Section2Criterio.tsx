@@ -1,4 +1,5 @@
 import FiltroCard from "@/components/sections/FiltroCard";
+import { tinted, WORDMARK } from "@/components/brand";
 
 const A = "/figma";
 
@@ -23,19 +24,26 @@ export default function Section2Criterio() {
       <p className="-translate-x-full [word-break:break-word] absolute font-medium leading-[normal] left-[1468px] not-italic text-brown-dark text-[25px] text-right top-[250px] w-[573px]">
         No todo inmueble entra a
       </p>
-      {/* .serava. logo (dark) next to subtitle */}
-      <div className="absolute h-[184px] left-[1446px] overflow-clip top-[176px] w-[244px]">
-        <div className="absolute inset-[40.84%_14.84%_40.84%_14.77%]">
-          <img loading="lazy" decoding="async" alt="serava" className="absolute block inset-0 max-w-none size-full" src={`${A}/b3c936d0ee3f55dc8ac3ee141faf4956708f4fbe.svg`} />
-        </div>
-      </div>
+      {/* Wordmark que cierra la frase "No todo inmueble entra a [.zequara.]"
+          (LOGO ZEQUARA 3, 50:63). Conserva el ancho y el centro vertical del
+          logotipo anterior: el de Zequara es más apaisado, así que baja de alto
+          en vez de crecer a la derecha y chocar con el borde de la frase.
+          Va en marrón (#492100, el mismo del logotipo que sustituye) porque
+          esta sección es crema: se pinta con máscara, no con el crema que el
+          SVG lleva dentro. */}
+      <span
+        role="img"
+        aria-label="Zequara"
+        className="absolute block h-[28.1px] left-[1482px] top-[253.9px] w-[171.8px]"
+        style={tinted(WORDMARK, "#492100")}
+      />
 
       {/* Three filter cards */}
       <FiltroCard
         cardLeft="883px"
         label="Filtro 01"
         title="La zona"
-        body="Zonas consolidadas, con alta demanda, baja oferta y bajo riesgo de pérdida de valor, seleccionadas por el Score Serava."
+        body="Zonas consolidadas, con alta demanda, baja oferta y bajo riesgo de pérdida de valor, seleccionadas por el Score Zequara."
         bodyColor="rgba(247,241,229,0.9)" delay={0}
       />
       <FiltroCard

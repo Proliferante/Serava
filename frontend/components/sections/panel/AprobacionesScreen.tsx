@@ -46,7 +46,7 @@ const PENDIENTES: {
     meta: "Enviado por Interventoría · 11 jun · hallazgo técnico",
     body: "Durante la evaluación se identificó humedad en un muro. Se propone impermeabilización adicional y cambio de enchape. El costo se cubre dentro del presupuesto cerrado.",
     impacto: [
-      { label: "Impacto en costo", value: "$0 (a cargo Serava)", x: 0 },
+      { label: "Impacto en costo", value: "$0 (a cargo Zequara)", x: 0 },
       { label: "Impacto en cronograma", value: "+2 días", x: 181 },
       { label: "Interventoría", value: "Recomendado", x: 357 },
     ],

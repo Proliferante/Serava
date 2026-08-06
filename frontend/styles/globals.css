@@ -238,7 +238,7 @@ body {
 .ix-thumb { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.35s ease; }
 
 /* ── Tooltip de las tarjetas de predio ──────────────────────────────
-   Los componentes 2 y 3 de Figma (Score Serava y tipo de transformación)
+   Los componentes 2 y 3 de Figma (Score Zequara y tipo de transformación)
    sólo cambian al pasar el ratón para desplegar su explicación: el pill no
    se altera, aparece la caja.
 

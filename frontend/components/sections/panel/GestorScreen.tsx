@@ -42,7 +42,7 @@ export default function GestorScreen() {
         <p className="absolute m-0" style={{ left: 113, top: 22, fontSize: 20, lineHeight: "29.8px", fontWeight: 600, color: INK, letterSpacing: "-0.2px" }}>
           Juan P. Restrepo
         </p>
-        <Note x={113} y={50.8} size={14}>Gestor de proyecto · Serava</Note>
+        <Note x={113} y={50.8} size={14}>Gestor de proyecto · Zequara</Note>
         <Pill x={113} y={79.96} label="Tu único interlocutor" tone="green" size={11} />
 
         <Btn x={23} y={123.8} w={179} label="Escribir mensaje" icon="message" tone="primary" />

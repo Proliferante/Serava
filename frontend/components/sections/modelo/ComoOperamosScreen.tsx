@@ -20,7 +20,7 @@ const A = "/figma";
 const I = "/figma/como";
 
 /* ── Tokens (variables de Figma) ─────────────────────────────────────────── */
-const CREAM = "#e2cdae"; // Serava cream
+const CREAM = "#e2cdae"; // Zequara cream
 const LINEN = "#f7f1e5"; // White Linen
 const LINEN80 = "rgba(247,241,229,0.8)";
 const BROWN = "#492100"; // color/orange/48 base oscuro
@@ -396,7 +396,7 @@ export default function ComoOperamosScreen() {
             <MLine delay={0.6}><span className="font-semibold">decisiones.</span></MLine>
           </T>
           <T x={251} cy={658.49} d={0.85} className="whitespace-nowrap font-normal" style={{ fontSize: 20.8, lineHeight: "32.24px", color: CREAM }}>
-            <p>Serava integra selección, remodelación y operación en un sistema</p>
+            <p>Zequara integra selección, remodelación y operación en un sistema</p>
             <p>diseñado para aumentar el valor del activo y simplificar la</p>
             <p>experiencia del inversionista.</p>
           </T>
@@ -416,7 +416,7 @@ export default function ComoOperamosScreen() {
             </MLine>
           </T>
           <P x={440} cy={309.42} w={617.69} color={MILLBROOK} className="whitespace-nowrap" d={0.34}>
-            <p>Cada decisión de Serava combina tres capacidades:</p>
+            <p>Cada decisión de Zequara combina tres capacidades:</p>
           </P>
           <T x={440} cy={358.02} d={0.46} ry={14} className="whitespace-nowrap font-semibold" style={{ fontSize: 16.8, lineHeight: "26px", color: BISTRE }}>
             <p>Datos verificables</p>
@@ -473,7 +473,7 @@ export default function ComoOperamosScreen() {
           <P x={440} cy={376.48} w={484} color={LINEN80} d={0.34}>
             <p>
               <span>El </span>
-              <span className="font-semibold" style={{ color: LINEN }}>Score Serava</span>
+              <span className="font-semibold" style={{ color: LINEN }}>Score Zequara</span>
               <span> es un modelo especializado que identifica zonas consolidadas de alta demanda, oferta limitada y activos con potencial de transformación.</span>
             </p>
           </P>
@@ -515,7 +515,7 @@ export default function ComoOperamosScreen() {
             <p>Después, nuestro equipo inspecciona el inmueble y evalúa su arquitectura, distribución, luz natural, estado del edificio, entorno y posibilidades reales de remodelación.</p>
           </P>
           <P x={1129} cy={454} w={484} color={MILLBROOK} size={15} lh={22} d={0.7}>
-            <p>Cada activo debe cumplir los criterios comerciales y técnicos de Serava para avanzar.</p>
+            <p>Cada activo debe cumplir los criterios comerciales y técnicos de Zequara para avanzar.</p>
           </P>
           <Callout x={1076} y={540.25} w={484} h={79.63} icon={CK_LIGHT_TICK} textX={52} textCy={38.41} textW={410} iconX={20} iconY={18} d={0.82}>
             <p>De cada 100 oportunidades evaluadas, menos de 3</p>
@@ -538,7 +538,7 @@ export default function ComoOperamosScreen() {
           <Svg src="paper.svg" x={418} y={214} w={70} inset="12.5% 12.5% 0.78% 8.33%" d={0.34} />
           <P x={509} cy={249.39} color={LINEN80} className="whitespace-nowrap" d={0.4}>
             <p>El preacuerdo protege la confidencialidad de las oportunidades y</p>
-            <p>define cómo se ejecuta el modelo Serava.</p>
+            <p>define cómo se ejecuta el modelo Zequara.</p>
           </P>
 
           <Svg src="people70.svg" x={419} y={335} w={70} d={0.5} />
@@ -573,7 +573,7 @@ export default function ComoOperamosScreen() {
             x={0} y={-1} w={1708} h={888} style={{ borderRadius: "150px 0 0 0", backgroundImage: "linear-gradient(89.515deg, rgb(232,217,193) 0.218%, rgba(229,210,184,0) 99.782%)" }}
           />
           <Paso x={440} cy={137.93} w={760} label="Paso 04 · Modelo de cobro" color={DRIFT} />
-          <Question x={440} cy={173} w={760} color={VERDIGRIS}>¿Cómo cobra Serava?</Question>
+          <Question x={440} cy={173} w={760} color={VERDIGRIS}>¿Cómo cobra Zequara?</Question>
           <H3 x={440} cy={230.84} w={760} color={BROWN}>
             <p>Honorarios vinculados a la ejecución sobre el activo.</p>
           </H3>
@@ -581,7 +581,7 @@ export default function ComoOperamosScreen() {
             <p>El acceso aprobado a la plataforma y la curaduría de oportunidades</p>
             <p>
               <span>hacen parte del proceso de vinculación. </span>
-              <span className="font-semibold" style={{ color: BISTRE }}>Serava cobra cuando</span>
+              <span className="font-semibold" style={{ color: BISTRE }}>Zequara cobra cuando</span>
             </p>
             <p>
               <span className="font-semibold" style={{ color: BISTRE }}>ejecuta servicios sobre la propiedad.</span>
@@ -698,7 +698,7 @@ export default function ComoOperamosScreen() {
           </P>
           <P x={1162} cy={476.385} w={484} color={MILLBROOK} d={0.84}>
             <p className="font-bold" style={{ color: BROWN }}>Finalmente</p>
-            <p>Una vez disponible, Serava gestiona la comercialización, las visitas, la selección del arrendatario y la operación del activo.</p>
+            <p>Una vez disponible, Zequara gestiona la comercialización, las visitas, la selección del arrendatario y la operación del activo.</p>
           </P>
 
           <Callout x={1162} y={576} w={484} h={79.63} icon={CK_R} textCy={39.4} textW={410} d={1}>
@@ -722,7 +722,7 @@ export default function ComoOperamosScreen() {
             <p>Los datos orientan. Tú decides.</p>
           </H3>
           <P x={440} cy={279.05} color={LINEN80} className="whitespace-nowrap" d={0.3}>
-            <p>Serava monitorea el comportamiento de la microzona, la oferta</p>
+            <p>Zequara monitorea el comportamiento de la microzona, la oferta</p>
             <p>disponible, la velocidad de venta y los nuevos proyectos en</p>
             <p>construcción.</p>
           </P>
@@ -787,7 +787,7 @@ export default function ComoOperamosScreen() {
             <p>Veinte años de ejecución verificable.</p>
           </H3>
           <P x={440} cy={306.5} w={617.69} color={MILLBROOK} className="whitespace-nowrap" d={0.34}>
-            <p>El equipo Serava reúne experiencia en diseño, estructuración y</p>
+            <p>El equipo Zequara reúne experiencia en diseño, estructuración y</p>
             <p>ejecución de proyectos residenciales, comerciales, institucionales e</p>
             <p>industriales. Ese recorrido se traduce en procesos, presupuestos y</p>
             <p>controles aplicados a cada nueva operación.</p>
@@ -898,7 +898,7 @@ export default function ComoOperamosScreen() {
             </T>
           </L>
           <P x={440} cy={713} w={484} color="rgba(247,241,229,0.6)" size={14.1} lh={21.82} d={0.92}>
-            <p>Christian revisa cada operación que ingresa al portafolio Serava.</p>
+            <p>Christian revisa cada operación que ingresa al portafolio Zequara.</p>
           </P>
         </Sec>
 
@@ -916,12 +916,12 @@ export default function ComoOperamosScreen() {
 
           <T x={630} cy={266.22} w={660} className="whitespace-nowrap text-center" style={{ fontSize: 54.4, lineHeight: "60.93px", letterSpacing: "-1.36px", color: BROWN }}>
             <MLine delay={0.24}><span className="font-light">Tu capital trabaja.</span></MLine>
-            <MLine delay={0.36}><span className="font-semibold">Serava se ocupa de la</span></MLine>
+            <MLine delay={0.36}><span className="font-semibold">Zequara se ocupa de la</span></MLine>
             <MLine delay={0.48}><span className="font-semibold">operación.</span></MLine>
           </T>
 
           <T x={651.155} cy={420.76} w={617.69} d={0.68} className="whitespace-nowrap text-center font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: BROWN }}>
-            <p>Tú mantienes la propiedad y apruebas las decisiones clave. Serava</p>
+            <p>Tú mantienes la propiedad y apruebas las decisiones clave. Zequara</p>
             <p>conecta selección, remodelación y operación mediante un solo</p>
             <p>equipo, un proceso trazable y un único interlocutor.</p>
           </T>

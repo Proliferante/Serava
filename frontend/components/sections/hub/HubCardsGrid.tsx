@@ -6,7 +6,7 @@ import HubCard, { type CardData } from "./HubCard";
 const CARDS: CardData[] = [
   { type: "article", imageLabel: "mercado", category: "Mercado", title: ["Zonas donde la demanda", "defiende el valor por sí sola"], desc: ["Qué hace que un terreno sostenga su", "precio sin depender de la moda."], meta: "6 min de lectura" },
   { type: "video", imageLabel: "remodelación", category: "Remodelación", title: ["Recorrido: una remodelación", "integral de principio a fin"], desc: ["Cómo intervenimos un activo para que", "valga más, sin sobrecostos."], meta: "Video · 4:20" },
-  { type: "noticia", imageLabel: "Panamá", category: "Zonas", title: ["Serava amplía operación a", "Ciudad de Panamá"], desc: ["El método completo llega a un nuevo", "mercado para nuestros inversionistas."], meta: "Noticia · Jun 2026" },
+  { type: "noticia", imageLabel: "Panamá", category: "Zonas", title: ["Zequara amplía operación a", "Ciudad de Panamá"], desc: ["El método completo llega a un nuevo", "mercado para nuestros inversionistas."], meta: "Noticia · Jun 2026" },
   { type: "article", imageLabel: "legal", category: "Legal", title: ["Todo formalizado: por qué", "cada etapa lleva contrato"], desc: ["Transparencia jurídica como parte del", "retorno, no como trámite."], meta: "5 min de lectura" },
   { type: "video", imageLabel: "patrimonio", category: "Patrimonio", title: ["Esto no es crowdfunding: tu", "salida no depende de otros"], desc: ["El inmueble es tuyo. Lo vendes, lo", "hipotecas o lo heredas cuando", "decidas."], meta: "Video · 3:10" },
   { type: "article", imageLabel: "caso La Cabrera", category: "Mercado", title: ["Entrar por debajo del mercado,", "ya remodelado a ultra lujo"], desc: ["Cómo leemos un caso real: La Cabrera,", "Bogotá."], meta: "7 min de lectura" },

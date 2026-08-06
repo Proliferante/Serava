@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 /* ═══════════════════════════════════════════════════════════════════════════
    MARCA ZEQUARA — los dos logotipos y cuándo va cada uno.
 
@@ -38,6 +40,29 @@ export const MARK = `/figma/ZEQUARA-02.svg?v=${V}`;
 export const WORDMARK_RATIO = 6.116;
 /** Proporción ancho/alto del monograma: es casi cuadrado. */
 export const MARK_RATIO = 1.096;
+
+/**
+ * Pinta un logotipo del color que haga falta. Se usa `mask-image`, así que el
+ * crema que llevan dentro los SVG se ignora y el color sale de
+ * `backgroundColor`: un solo archivo sirve para la marca clara sobre fondo
+ * oscuro y para la oscura sobre fondo claro.
+ *
+ * Va en un elemento vacío con `role="img"` y `aria-label`, porque una máscara
+ * no tiene `alt`.
+ */
+export function tinted(src: string, color: string): CSSProperties {
+  return {
+    backgroundColor: color,
+    maskImage: `url("${src}")`,
+    WebkitMaskImage: `url("${src}")`,
+    maskSize: "contain",
+    WebkitMaskSize: "contain",
+    maskRepeat: "no-repeat",
+    WebkitMaskRepeat: "no-repeat",
+    maskPosition: "center",
+    WebkitMaskPosition: "center",
+  };
+}
 
 /** Ancho que le corresponde al wordmark para un alto dado. */
 export const wordmarkW = (h: number) => +(h * WORDMARK_RATIO).toFixed(2);

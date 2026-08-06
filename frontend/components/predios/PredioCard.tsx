@@ -6,7 +6,7 @@ import CountUp from "@/components/motion/CountUp";
 /* ═══════════════════════════════════════════════════════════════════════════
    TARJETA DE PREDIO — Component 6 de Figma (368 × 644.03).
 
-   Foto arriba con la etiqueta de estado y el Score Serava, y debajo la ficha:
+   Foto arriba con la etiqueta de estado y el Score Zequara, y debajo la ficha:
    zona, titular, tipo de transformación, metros, cifras y el estado de la
    oportunidad. Cierra con "Ver oportunidad" y el botón de guardar.
 
@@ -42,7 +42,7 @@ const BADGE = {
 export type BadgeTone = keyof typeof BADGE;
 
 /** Explicación del Score, igual en las ocho variantes de Figma (311:2402). */
-const SCORE_TIP = "Evaluación especializada de la zona y su afinidad con la estrategia Serava.";
+const SCORE_TIP = "Evaluación especializada de la zona y su afinidad con la estrategia Zequara.";
 
 /**
  * Qué significa cada tipo de transformación (Component 3, una por variante).
@@ -149,7 +149,7 @@ export default function PredioCard({
           {data.badge.label}
         </span>
 
-        {/* Score Serava, con su explicación al pasar el ratón (311:2392) */}
+        {/* Score Zequara, con su explicación al pasar el ratón (311:2392) */}
         <span
           className="ix-tip absolute inline-flex items-center uppercase"
           style={{
@@ -158,7 +158,7 @@ export default function PredioCard({
             boxShadow: "0 6px 14px -6px rgba(0,0,0,0.4)",
           }}
         >
-          <span style={{ fontSize: 11.2, lineHeight: "16.8px", color: "#3d2c1e" }}>Score Serava</span>
+          <span style={{ fontSize: 11.2, lineHeight: "16.8px", color: "#3d2c1e" }}>Score Zequara</span>
           <span style={{ fontSize: 13.1, lineHeight: "19.68px", color: VERD }}><CountUp value={data.score} duration={1.1} /></span>
           <span className="ix-tip-box" style={{ right: 0, top: 39.69 }}>{SCORE_TIP}</span>
         </span>

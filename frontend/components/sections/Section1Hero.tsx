@@ -61,7 +61,7 @@ export default function Section1Hero() {
 
       {/* Bottom claim */}
       <p className="-translate-x-1/2 [word-break:break-word] absolute font-medium leading-[normal] left-[973px] not-italic text-cream text-[32px] text-center top-[893px] w-[1188px]">
-        Serava encuentra el activo lo remodela sin sobrecostos y lo administra.
+        Zequara encuentra el activo lo remodela sin sobrecostos y lo administra.
       </p>
       <p className="-translate-x-1/2 [word-break:break-word] absolute font-black leading-[normal] left-[980.5px] not-italic text-cream text-[32px] text-center top-[931px] w-[1109px]">
         Tu sumas un inmueble a tu patrimonio, rentando y valorizándose.

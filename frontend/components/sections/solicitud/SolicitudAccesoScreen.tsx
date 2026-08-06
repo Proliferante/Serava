@@ -248,7 +248,7 @@ export default function SolicitudAccesoScreen() {
           />
           <Rule x={620} y={279.99} w={34} color={LASER} delay={0.15} />
           <T x={666} cy={279.07} w={251.104} d={0.29} ry={14} className="whitespace-nowrap font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.226px", color: LASER }}>
-            <p>Portafolio privado Serava</p>
+            <p>Portafolio privado Zequara</p>
           </T>
           <T x={620} cy={422.11} w={591.34} className="whitespace-nowrap" style={{ fontSize: 64, lineHeight: "71.68px", letterSpacing: "-1.6px", color: LINEN }}>
             <MLine delay={0.3}><span className="font-light">Conozcamos tu</span></MLine>
@@ -312,7 +312,7 @@ export default function SolicitudAccesoScreen() {
           ))}
 
           <T x={460} cy={655.8} w={1000} d={0.1} className="font-light" style={{ fontSize: 13.4, lineHeight: "20.83px", color: BROWN }}>
-            <p>El acceso se confirma después de la sesión virtual con el equipo Serava.</p>
+            <p>El acceso se confirma después de la sesión virtual con el equipo Zequara.</p>
           </T>
         </L>
 
@@ -367,7 +367,7 @@ export default function SolicitudAccesoScreen() {
           ))}
 
           <T x={460} cy={836.8} w={1000} d={0.1} className="font-light" style={{ fontSize: 13.4, lineHeight: "20.83px", color: BROWN }}>
-            <p>La información detallada del portafolio permanece dentro del entorno privado Serava.</p>
+            <p>La información detallada del portafolio permanece dentro del entorno privado Zequara.</p>
           </T>
         </L>
 
@@ -478,7 +478,7 @@ export default function SolicitudAccesoScreen() {
                   style={{ width: 19, height: 19, marginTop: 2.79, borderRadius: 2.5, border: "1px solid #767676", background: "#ffffff", accentColor: AVOCADO }}
                 />
                 <span className="font-light" style={{ fontSize: 13.4, lineHeight: "20.83px", color: MILLBROOK }}>
-                  Autorizo el tratamiento de mis datos personales y el contacto por parte de Serava para continuar el proceso de evaluación.
+                  Autorizo el tratamiento de mis datos personales y el contacto por parte de Zequara para continuar el proceso de evaluación.
                 </span>
               </label>
 
@@ -524,7 +524,7 @@ export default function SolicitudAccesoScreen() {
             <MLine delay={0.48}><span className="font-semibold">alineación.</span></MLine>
           </T>
           <T x={660} cy={371.46} w={600} d={0.66} className="whitespace-nowrap text-center font-light" style={{ fontSize: 17.6, lineHeight: "27.28px", color: "rgba(247,241,229,0.84)" }}>
-            <p>Comparte tu perfil para iniciar el proceso y conocer si Serava se</p>
+            <p>Comparte tu perfil para iniciar el proceso y conocer si Zequara se</p>
             <p>ajusta a la forma en que quieres invertir.</p>
           </T>
           <CTA x={834.31} y={431.18} tone="cream" label="Completar mi perfil" d={0.82} centered />

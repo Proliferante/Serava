@@ -11,9 +11,9 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Serava — Inversión inmobiliaria gestionada de principio a fin",
+  title: "Zequara — Inversión inmobiliaria gestionada de principio a fin",
   description:
-    "Serava encuentra el activo, lo remodela sin sobrecostos y lo administra. Tú sumas un inmueble a tu patrimonio, rentando y valorizándose.",
+    "Zequara encuentra el activo, lo remodela sin sobrecostos y lo administra. Tú sumas un inmueble a tu patrimonio, rentando y valorizándose.",
 };
 
 export default function RootLayout({

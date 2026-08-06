@@ -201,7 +201,7 @@ export default function DiagnosticoModal({ open, onClose, initialStep = "intro",
                     ))}
                   </div>
                   <OliveBtn onClick={goStart} className="mt-[30px]">Empezar <ArrowR /></OliveBtn>
-                  <p className="mt-[26px] text-[13px]" style={{ color: "rgba(247,241,229,0.45)" }}>Completarlo no garantiza acceso a oportunidades Serava.</p>
+                  <p className="mt-[26px] text-[13px]" style={{ color: "rgba(247,241,229,0.45)" }}>Completarlo no garantiza acceso a oportunidades Zequara.</p>
                 </motion.div>
               )}
 
@@ -279,7 +279,7 @@ export default function DiagnosticoModal({ open, onClose, initialStep = "intro",
                   <Progress pct={100} label="Último paso" />
                   <div className="mt-[26px] rounded-[18px] border border-solid p-[clamp(20px,4vw,40px)]" style={{ background: "rgba(247,241,229,0.03)", borderColor: "rgba(247,241,229,0.14)" }}>
                     <h3 className="font-light text-[clamp(24px,3.5vw,30px)] text-[#f7f1e5] tracking-[-0.02em]">Ya casi. Un último paso.</h3>
-                    <p className="mt-[10px] font-light text-[14px] leading-[1.5]" style={{ color: "rgba(247,241,229,0.7)" }}>Déjanos tus datos para ver tu diagnóstico completo y solicitar, si quieres, una evaluación de acceso a Serava.</p>
+                    <p className="mt-[10px] font-light text-[14px] leading-[1.5]" style={{ color: "rgba(247,241,229,0.7)" }}>Déjanos tus datos para ver tu diagnóstico completo y solicitar, si quieres, una evaluación de acceso a Zequara.</p>
                     <div className="mt-[22px] grid grid-cols-1 gap-[16px] sm:grid-cols-2">
                       <Field label="Nombre" placeholder="Tu nombre" value={form.nombre} onChange={(v) => setForm({ ...form, nombre: v })} />
                       <Field label="Apellido" placeholder="Tu apellido" value={form.apellido} onChange={(v) => setForm({ ...form, apellido: v })} />
@@ -288,7 +288,7 @@ export default function DiagnosticoModal({ open, onClose, initialStep = "intro",
                       <Field label="Ciudad" placeholder="Ciudad de residencia" value={form.ciudad} onChange={(v) => setForm({ ...form, ciudad: v })} />
                       <Field label="País" placeholder="" value={form.pais} onChange={(v) => setForm({ ...form, pais: v })} />
                     </div>
-                    <p className="mt-[16px] text-[12px] leading-[1.5]" style={{ color: "rgba(247,241,229,0.5)" }}>Acepto el tratamiento de mis datos personales conforme a la política de privacidad de Serava.</p>
+                    <p className="mt-[16px] text-[12px] leading-[1.5]" style={{ color: "rgba(247,241,229,0.5)" }}>Acepto el tratamiento de mis datos personales conforme a la política de privacidad de Zequara.</p>
                     <OliveBtn onClick={() => { setDir(1); setStep("result"); }} className="mt-[22px] w-full">Ver mi diagnóstico <ArrowR /></OliveBtn>
                   </div>
                 </motion.div>
@@ -339,8 +339,8 @@ export default function DiagnosticoModal({ open, onClose, initialStep = "intro",
 
                   {/* CTA card */}
                   <div className="mt-[16px] w-full overflow-hidden rounded-[20px] p-[36px]" style={{ background: "linear-gradient(160deg, #7f8b57 0%, #5f6b3e 100%)" }}>
-                    <h3 className="font-light text-[clamp(24px,4vw,30px)] text-[#f7f1e5]">Tu perfil se alinea con el modelo Serava.</h3>
-                    <p className="mx-auto mt-[10px] max-w-[420px] font-light text-[14px] leading-[1.5]" style={{ color: "rgba(247,241,229,0.85)" }}>Solicita una evaluación de acceso. El acceso a Serava es selectivo: cada solicitud se evalúa.</p>
+                    <h3 className="font-light text-[clamp(24px,4vw,30px)] text-[#f7f1e5]">Tu perfil se alinea con el modelo Zequara.</h3>
+                    <p className="mx-auto mt-[10px] max-w-[420px] font-light text-[14px] leading-[1.5]" style={{ color: "rgba(247,241,229,0.85)" }}>Solicita una evaluación de acceso. El acceso a Zequara es selectivo: cada solicitud se evalúa.</p>
                     <motion.a
                       href="/solicitud-acceso"
                       whileHover={{ scale: 1.03 }}
@@ -351,7 +351,7 @@ export default function DiagnosticoModal({ open, onClose, initialStep = "intro",
                     </motion.a>
                   </div>
 
-                  <p className="mt-[24px] max-w-[520px] text-[11.5px] leading-[1.5]" style={{ color: "rgba(247,241,229,0.4)" }}>Esta lectura es orientativa y no constituye asesoría financiera ni una promesa de acceso a oportunidades. Serava opera bajo un modelo de acceso cerrado.</p>
+                  <p className="mt-[24px] max-w-[520px] text-[11.5px] leading-[1.5]" style={{ color: "rgba(247,241,229,0.4)" }}>Esta lectura es orientativa y no constituye asesoría financiera ni una promesa de acceso a oportunidades. Zequara opera bajo un modelo de acceso cerrado.</p>
                 </motion.div>
               )}
                 </AnimatePresence>

@@ -34,7 +34,7 @@ export default function HubSection1Hero() {
 
       {/* Eyebrow */}
       <div className="absolute bg-tan-63 h-px left-[450px] opacity-80 top-[279.42px] w-[36px]" />
-      <p className="[word-break:break-word] absolute font-semibold leading-[17.86px] left-[498px] not-italic text-tan-63 text-[11.5px] top-[270px] tracking-[3.456px] uppercase w-[202.17px]">Conocimiento Serava</p>
+      <p className="[word-break:break-word] absolute font-semibold leading-[17.86px] left-[498px] not-italic text-tan-63 text-[11.5px] top-[270px] tracking-[3.456px] uppercase w-[202.17px]">Conocimiento Zequara</p>
 
       {/* Heading */}
       <p className="[word-break:break-word] absolute font-medium leading-[88px] left-[450px] not-italic text-cream-93 text-[80px] top-[305px] tracking-[-2px] w-[1123px]">Criterio para invertir mejor en finca raíz</p>
@@ -42,7 +42,7 @@ export default function HubSection1Hero() {
       {/* Subtitle */}
       <div className="[word-break:break-word] absolute font-light leading-[0] left-[450px] not-italic text-[18.9px] top-[504px] whitespace-nowrap" style={{ color: "rgba(247,241,229,0.8)" }}>
         <p className="leading-[29.26px] mb-0">Artículos, análisis y videos sobre patrimonio, mercado inmobiliario</p>
-        <p className="leading-[29.26px] mb-0">y el método Serava. Lo que necesitas saber antes de cada</p>
+        <p className="leading-[29.26px] mb-0">y el método Zequara. Lo que necesitas saber antes de cada</p>
         <p className="leading-[29.26px]">decisión.</p>
       </div>
 
