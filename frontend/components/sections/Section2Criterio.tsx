@@ -67,9 +67,11 @@ export default function Section2Criterio() {
         <span className="font-bold leading-[normal] text-[55px]"> patrimonio.</span>
       </p>
 
-      {/* CTA → solicitud de acceso */}
-      <a href="/solicitud-acceso" className="ix-invert ix-pulse-brown absolute bg-cream h-[104px] left-[1234px] overflow-clip rounded-[98px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.25)] top-[865px] w-[404px] flex items-center justify-center">
-        <p className="[word-break:break-word] font-semibold not-italic text-brown-dark text-[24px] text-center leading-[1.15]">
+      {/* CTA → solicitud de acceso. Va en marrón sobre el crema de la sección;
+          por eso el hover es `ix-fill`, que aclara a crema, y no `ix-invert`,
+          que oscurecía —lo correcto cuando el botón era crema. */}
+      <a href="/solicitud-acceso" className="ix-fill ix-pulse-brown absolute bg-brown-dark h-[104px] left-[1234px] overflow-clip rounded-[98px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.25)] top-[865px] w-[404px] flex items-center justify-center">
+        <p className="[word-break:break-word] font-semibold not-italic text-cream text-[24px] text-center leading-[1.15]">
           Solicitar Entrevista
         </p>
       </a>

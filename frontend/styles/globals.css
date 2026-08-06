@@ -135,11 +135,10 @@ body {
   animation: ixPulseTuscany 3s ease-in-out infinite;
 }
 
-/* Attention pulse for a cream CTA sitting on a cream background (Sección 2 de
-   la home): el botón y el fondo son del mismo color hasta el hover, así que el
-   anillo va en marrón —el tono al que invierte al pasar el mouse— porque uno
-   crema como el de .ix-pulse no se vería. El 0%/100% repite la sombra base del
-   botón para que en reposo se vea igual que antes. */
+/* Pulso del CTA de la sección 2 de la home. El anillo va en marrón porque el
+   fondo de la sección es crema y uno crema como el de .ix-pulse no se vería;
+   ahora además coincide con el color del propio botón. El 0%/100% repite su
+   sombra base para que en reposo se vea igual. */
 @keyframes ixPulseBrown {
   0%, 100% { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(73, 33, 0, 0); }
   50%      { box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), 0 0 0 9px rgba(73, 33, 0, 0.1); }
