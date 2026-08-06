@@ -308,6 +308,42 @@ body {
 .pnl-nav { transition: background-color 0.25s ease, color 0.25s ease; cursor: pointer; }
 .pnl-nav:hover { background-color: rgba(247, 241, 229, 0.06); }
 
+/* Item de navegación del sidebar (Component 2 de Figma, 472:1463: default y
+   hover). Al pasar el ratón entra un relleno al 5 % y el rótulo y el icono
+   pasan a linen pleno.
+
+   Todo —fondo, color del rótulo, color del icono y el estado activo— vive
+   aquí y no en el marcado. Es el único sitio donde puede vivir: un estilo en
+   línea gana a cualquier selector de clase, así que mientras los colores se
+   escribían en el `style` del enlace, ninguna regla de hover podía pisarlos
+   (con variables CSS tampoco: la variable en línea también gana).
+
+   El activo no reacciona al ratón, de ahí el `:not()`: en Figma el hover sólo
+   existe para los ocho items inactivos, el activo es otro componente. */
+.pnl-navitem {
+  background-color: transparent;
+  color: rgba(247, 241, 229, 0.72);
+  transition: background-color 0.25s ease, color 0.25s ease;
+  cursor: pointer;
+}
+.pnl-navitem .pnl-navitem-ico {
+  color: rgba(247, 241, 229, 0.4);
+  transition: color 0.25s ease;
+}
+.pnl-navitem .pnl-navitem-label { font-weight: 400; }
+.pnl-navitem:not([aria-current="page"]):hover {
+  background-color: rgba(247, 241, 229, 0.05);
+  color: #f7f1e5;
+}
+.pnl-navitem:not([aria-current="page"]):hover .pnl-navitem-ico { color: #f7f1e5; }
+
+.pnl-navitem[aria-current="page"] {
+  background-color: #3b2c1e;
+  color: #f7f1e5;
+}
+.pnl-navitem[aria-current="page"] .pnl-navitem-ico { color: #c9a877; }
+.pnl-navitem[aria-current="page"] .pnl-navitem-label { font-weight: 600; }
+
 /* Fila de lista (documento, actividad, aprobación). */
 .pnl-row { transition: background-color 0.25s ease; }
 .pnl-row:hover { background-color: rgba(91, 67, 50, 0.04); }
@@ -334,7 +370,7 @@ body {
 .pnl-photo:hover .pnl-photo-img { transform: scale(1.06); }
 
 @media (prefers-reduced-motion: reduce) {
-  .pnl-card, .pnl-btn, .pnl-nav, .pnl-row, .pnl-link-arrow, .pnl-photo-img, .pnl-input, .pnl-ba-handle { transition: none; }
+  .pnl-card, .pnl-btn, .pnl-nav, .pnl-navitem, .pnl-navitem-ico, .pnl-row, .pnl-link-arrow, .pnl-photo-img, .pnl-input, .pnl-ba-handle { transition: none; }
   .pnl-ba-handle:hover { transform: none; }
   .pnl-card:hover, .pnl-btn:active:not(:disabled) { transform: none; }
   .pnl-link:hover .pnl-link-arrow, .pnl-photo:hover .pnl-photo-img { transform: none; }

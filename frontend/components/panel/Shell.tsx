@@ -69,23 +69,15 @@ function NavRow({ item, active, delay }: { item: NavItem; active: boolean; delay
     <a
       href={item.href}
       aria-current={active ? "page" : undefined}
-      className="pnl-nav absolute flex items-center"
-      style={{
-        left: 0, top: 0, width: 216, height: 45,
-        borderRadius: 10,
-        background: active ? "#3b2c1e" : "transparent",
-        color: active ? LINEN : LINEN72,
-      }}
+      className="pnl-navitem absolute flex items-center"
+      style={{ left: 0, top: 0, width: 216, height: 45, borderRadius: 11 }}
     >
-      <span className="absolute" style={{ left: 12, top: 13, color: active ? LASER : LINEN40 }}>
+      <span className="pnl-navitem-ico absolute" style={{ left: 12, top: 13 }}>
         <Ico name={item.icon} size={18} />
       </span>
       <span
-        className="absolute whitespace-nowrap"
-        style={{
-          left: 43, top: 11, fontSize: 14.5, lineHeight: "22px",
-          fontWeight: active ? 600 : 400,
-        }}
+        className="pnl-navitem-label absolute whitespace-nowrap"
+        style={{ left: 43, top: 11, fontSize: 14.4, lineHeight: "22px" }}
       >
         {item.label}
       </span>
