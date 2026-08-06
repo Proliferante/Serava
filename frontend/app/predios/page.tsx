@@ -1,6 +1,6 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
 import PredioCard, { type Predio } from "@/components/predios/PredioCard";
-import { MARK } from "@/components/brand";
+import PrediosNav from "@/components/predios/PrediosNav";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PREDIOS — reproducción del frame de Figma 100:2349 (1920 × 2850).
@@ -35,11 +35,6 @@ const LINE = "rgba(165,122,78,0.28)";
 
 /* ── Datos ───────────────────────────────────────────────────────────────── */
 
-const NAV = [
-  { label: "Predios disponibles", x: 5, w: 174, href: "/predios" },
-  { label: "Análisis de valor", x: 185, w: 153, href: "/predios/add-value" },
-  { label: "Mis propiedades", x: 344, w: 155, href: "/panel" },
-];
 
 /** `x` y `w` salen del frame de la barra (100:3062): canales de 27 px. */
 const FILTERS = [
@@ -196,35 +191,8 @@ export default function PrediosPage() {
             Limpiar filtros
           </button>
 
-          {/* ── Nav (100:3121) ── */}
-          <nav className="absolute left-0 top-0 h-[81.81px] w-full" aria-label="Panel de predios">
-            <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute" style={{ left: 101, top: 22.9, width: 39.46, height: 36 }}>
-              <img loading="lazy" decoding="async" alt="Zequara" className="absolute inset-0 block size-full max-w-none" src={MARK} />
-            </a>
-            <div className="absolute" style={{ left: 726.7, top: 16, width: 504, height: 49.81, borderRadius: 999, background: "rgba(247,241,229,0.06)" }}>
-              {NAV.map((n, i) => (
-                <a
-                  key={n.label}
-                  href={n.href}
-                  className="ix-press absolute inline-flex items-center justify-center"
-                  style={{
-                    left: n.x, top: 5, width: n.w, height: 39.81, borderRadius: 999,
-                    background: i === 0 ? "#7f8b57" : "transparent",
-                    color: i === 0 ? CREAM : "rgba(247,241,229,0.65)",
-                    fontSize: 13, fontWeight: 500,
-                  }}
-                >
-                  {n.label}
-                </a>
-              ))}
-            </div>
-            <div
-              className="absolute flex items-center justify-center rounded-full border border-solid"
-              style={{ left: 1492.4, top: 21.9, width: 38, height: 38, borderColor: "rgba(247,241,229,0.2)", background: "rgba(247,241,229,0.06)", fontSize: 12, fontWeight: 600, color: CREAM }}
-            >
-              NR
-            </div>
-          </nav>
+          {/* ── Nav (100:3121) — compartida con Mis propiedades ── */}
+          <PrediosNav active="predios" geo="predios" />
 
           {/* ── Cifras del portafolio (311:4896 / 4902 / 4906) ── */}
           <span className="absolute" style={{ left: 393, top: 492.81, width: 9, height: 9, borderRadius: 999, background: "#7f8b57" }} />
