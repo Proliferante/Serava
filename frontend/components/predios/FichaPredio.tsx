@@ -96,10 +96,24 @@ export default function FichaPredio() {
 
   return (
     <div className="relative size-full" style={{ backgroundColor: "#e2cdae" }}>
-      {/* ── Ilustración de fondo (Fondo_Ficha_predio) ── */}
-      <CanvasImage src={`${A}/Fondo_Ficha_predio.webp`} w={1920} className="pointer-events-none" />
-      {/* ── Background gradient (Rectangle 31): dark #492100 → cream, 70% over cream ── */}
-      <div className="pointer-events-none absolute left-0 top-[64px] h-[2588px] w-full" style={{ background: "linear-gradient(180deg, rgba(73,33,0,0.7) 36.285%, rgba(226,205,174,0.7) 99.699%)" }} />
+      {/* ── Ilustración de fondo (217:1229) ──
+          La caja va a los valores del diseño —y = 72, alto 3196— y no al alto
+          del lienzo. Importa porque `object-cover` recorta según la caja: con
+          2287 px de alto la ilustración salía en otro encuadre. Lo que sobra
+          por abajo lo recorta `ScaledCanvas`, que lleva `overflow: hidden`. */}
+      <div className="pointer-events-none absolute left-0" style={{ top: 72, width: 1920, height: 3196 }}>
+        {/* Al 15 %, como en el diseño. Iba al 100 %, y aunque el velo la tapa
+            casi toda, la textura de edificios salía más marcada de lo debido. */}
+        <CanvasImage src={`${A}/Fondo_Ficha_predio.webp`} w={1920} className="opacity-[0.15]" />
+      </div>
+      {/* ── Velo de color (Rectangle 31, 217:1230) ──
+          En el diseño es un plano `rgba(73,33,0,0.79)`, no un degradado: la
+          página es marrón uniforme de arriba a abajo. Antes llevaba el
+          degradado que aclara a crema al final —el de ADD VALUE, que sí lo
+          tiene—, y de ahí venía el desvanecido que no cuadraba con Figma.
+          El rectángulo mide 3205 px desde y = 64; dentro del lienzo eso
+          equivale a llegar hasta abajo. */}
+      <div className="pointer-events-none absolute left-0 w-full" style={{ top: 64, height: 2287 - 64, background: "rgba(73,33,0,0.79)" }} />
 
       {/* ── Nav ── */}
       <div className="absolute left-0 top-0 h-[66px] w-full" style={{ backgroundColor: "#2a1e14" }}>

@@ -1,5 +1,4 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
-import CanvasImage from "@/components/CanvasImage";
 import Image from "next/image";
 import PredioCard, { type Predio } from "@/components/predios/PredioCard";
 import PrediosNav from "@/components/predios/PrediosNav";
@@ -18,9 +17,6 @@ const A = "/figma";
 const CANVAS_W = 1920;
 const CANVAS_H = 2850;
 
-/** Alto de la zona oscura: hasta el pie de la barra de filtros (570 + 111). */
-const DARK_H = 681;
-
 /**
  * Rejilla de tarjetas (311:3742). Los valores van literales y no calculados a
  * partir del alto de la tarjeta: `PredioCard` es un componente de cliente, y
@@ -29,7 +25,6 @@ const DARK_H = 681;
  */
 const COLS = [380, 772, 1164];
 const ROWS = [780.19, 1448.22, 2116.25];
-const DARK_BG = "linear-gradient(180deg, #2a1e14 12%, #492202 85%)";
 
 const CREAM = "#f7f1e5";
 const LASER = "#c9a877";
@@ -147,8 +142,16 @@ export default function PrediosPage() {
     <main className="bg-cream">
       <ScaledCanvas width={CANVAS_W} height={CANVAS_H}>
         <div className="relative size-full" style={{ background: "linear-gradient(0deg, #E2CDAE 0.02%, #492100 82.77%), #FFF" }}>
-          {/* Zona oscura de nav + encabezado + filtros */}
-          <div className="absolute left-0 top-0 w-full" style={{ height: DARK_H, backgroundColor: "#2a1e14", backgroundImage: DARK_BG }} />
+          {/* ── Velo del encabezado (Header, 100:2351) ──
+              La clave está en el alfa de la parada final: el degradado muere en
+              `rgba(73,34,2,0.45)`, así que la mitad de abajo deja ver el
+              degradado de la página y funde con él. Antes esto era un bloque
+              opaco de 681 px con una base `#2a1e14` sólida: tapaba el degradado
+              y cortaba en seco justo debajo de la barra de filtros. */}
+          <div
+            className="pointer-events-none absolute left-0 w-full"
+            style={{ top: 81.81, height: 487.975, backgroundImage: "linear-gradient(180.016deg, #2a1e14 0%, rgba(73,34,2,0.45) 99.945%)" }}
+          />
 
           {/* ── Encabezado (100:2351) ── */}
           <div className="absolute flex items-center gap-[12px]" style={{ left: 392, top: 152.39 }}>
@@ -171,9 +174,28 @@ export default function PrediosPage() {
           </p>
           <span className="absolute" style={{ left: 392, top: 474.79, width: 1136, height: 1, background: "rgba(247,241,229,0.14)" }} />
 
-          {/* Torres decorativas — image 9 e image 10 (207:1208 / 207:1210) */}
-          <div className="pointer-events-none absolute overflow-hidden" style={{ left: -624, top: -140, width: 1986, height: 2979 }}>
-            <CanvasImage src={`${A}/1603eea0cdf422fdf4ee349b5d252c4253213488.webp`} w={1986} className="opacity-10" />
+          {/* Torres decorativas — image 9 e image 10 (207:1208 / 207:1210).
+              Las dos tienen la misma estructura: una caja que recorta y, dentro,
+              la imagen estirada muy por encima del ancho de la caja.
+
+              En `image 9` estaba puesto como ancho de la caja el de la imagen
+              interior (1986 px = 450,34 % de 441). Eso la convertía en una torre
+              enorme cruzando el encabezado. No se notaba porque el bloque opaco
+              que había antes la tapaba; al pasar el velo al alfa 0,45 del diseño,
+              salió a la vista.
+              Con la caja en sus 441 px reales la torre cae en x = −624…−183, o sea
+              fuera del lienzo: en Figma tampoco se ve dentro del frame. Queda en
+              el código, y no borrada, porque es una capa del diseño. */}
+          <div className="pointer-events-none absolute overflow-hidden" style={{ left: -624, top: -140, width: 441, height: 2979 }}>
+            <Image
+              src={`${A}/1603eea0cdf422fdf4ee349b5d252c4253213488.webp`}
+              alt=""
+              width={1986}
+              height={2979}
+              sizes="103.44vw"
+              className="absolute left-0 top-0 h-full max-w-none opacity-10"
+              style={{ width: "450.34%" }}
+            />
           </div>
           <div className="pointer-events-none absolute overflow-hidden" style={{ left: 996, top: 633, width: 931, height: 2217 }}>
             {/* Esta torre se estira al 158,84 % del ancho de su caja, así que no
@@ -205,7 +227,13 @@ export default function PrediosPage() {
             Limpiar filtros
           </button>
 
-          {/* ── Nav (100:3121) — compartida con Mis propiedades ── */}
+          {/* ── Nav (100:3121) — compartida con Mis propiedades ──
+              La franja va aquí, y no con el velo del encabezado, porque en el
+              diseño el nav queda por encima de las torres decorativas: la de la
+              izquierda arranca en y = −140 y le pasaría por delante.
+              `PrediosNav` no pinta fondo (lo comparte con Mis propiedades, que
+              lo lleva distinto), así que el plano lo pone la página. */}
+          <div className="absolute left-0 top-0 w-full" style={{ height: 81.81, backgroundColor: "#2a1e14" }} />
           <PrediosNav active="predios" geo="predios" />
 
           {/* ── Cifras del portafolio (311:4896 / 4902 / 4906) ── */}

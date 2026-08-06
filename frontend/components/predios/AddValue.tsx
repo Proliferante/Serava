@@ -99,13 +99,25 @@ const WF_STYLE = {
 
 export default function AddValue() {
   return (
-    <div className="relative size-full" style={{ backgroundColor: "#efe6d5" }}>
+    /* Base (body, 104:1994): un degradado marrón → crema, no el crema plano que
+       había antes. Es la capa de más abajo; encima van la ilustración y el
+       difuminado, así que con la base plana la página entera salía más clara
+       que en el diseño. */
+    <div className="relative size-full" style={{ backgroundImage: "linear-gradient(180deg, #492100 16.827%, #e2cdae 100%)" }}>
       {/* ── Faint building illustration ── */}
       <div className="pointer-events-none absolute left-0 top-[-11px] h-[2880px] w-full">
-        <CanvasImage src={`${A}/Fondo_Add_Value.webp`} w={1920} className="opacity-70" />
+        {/* Al 10 %, como en el diseño; iba al 70 %, siete veces más marcada. */}
+        <CanvasImage src={`${A}/Fondo_Add_Value.webp`} w={1920} className="opacity-10" />
       </div>
-      {/* ── Difuminado (Rectangle 30) — valor exacto del Figma: dark → cream al 65% ── */}
-      <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(73,33,0,0.65) 10.29%, rgba(226,205,174,0.65) 100%)" }} />
+      {/* ── Difuminado (Rectangle 30, 217:1223) ──
+          Los colores ya eran los del diseño; lo que estaba mal era la caja.
+          Iba a `inset-0`, o sea de 0 a 2805, cuando el rectángulo de Figma va
+          de y = 65 con 2759 px de alto. Con la caja corrida, cada parada del
+          degradado caía en una altura distinta a la del diseño. */}
+      <div
+        className="pointer-events-none absolute left-0 w-full"
+        style={{ top: 65, height: 2759, background: "linear-gradient(180deg, rgba(73,33,0,0.65) 10.294%, rgba(226,205,174,0.65) 100%)" }}
+      />
 
       {/* ── Nav ── */}
       <div className="absolute left-0 top-0 h-[65px] w-full">

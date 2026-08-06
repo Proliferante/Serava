@@ -27,9 +27,15 @@ const LASER = "#c9a877";
 const DRIFT = "#a57a4e";
 const HAIRLINE = "rgba(247,241,229,0.12)";
 
-/** Degradado de la página: marrón cerrado arriba, crema al pie. */
-const PAGE_BG =
-  "linear-gradient(180deg, #241710 0%, #2c1d12 26%, #3f2713 50%, #6b4526 72%, #b08f60 88%, #ddc9a6 97%, #e2cdae 100%)";
+/**
+ * Degradado de la página (600:3028): marrón cerrado arriba, crema al pie.
+ *
+ * Son tres paradas y salen del relleno del frame en Figma. Antes había aquí
+ * siete puestas a ojo, y de las tres que importan solo coincidía la última
+ * (`#241710` en vez de `#2a1e14` arriba, `#3f2713` en vez de `#452104` en el
+ * medio); las cuatro intermedias, inventadas, torcían la curva.
+ */
+const PAGE_BG = "linear-gradient(180deg, #2a1e14 0%, #452104 50%, #e2cdae 100%)";
 
 /** Las cuatro cifras del resumen. `$` va en dorado y el número en linen. */
 const SUMMARY: { x: number; label: string; money: boolean; value: number; suffix: string; note: string }[] = [
