@@ -610,10 +610,25 @@ export default function ComoOperamosScreen() {
 
         {/* ══════════ 7 · PASO 05 · CONTROL DE OBRA ══════════ */}
         <Sec top={4733} h={944} bg={BROWN} radius="0 150px 0 0">
+          {/* Igual que en la sección 8 del home: pantallazo del panel real en
+              lugar del mockup con marco de iPad y marca Serava.
+
+              Van fuera el `crop`, el `par` y el `over`. Los tres existían para
+              el mockup anterior, que traía un marco de iPad de sobra por los
+              lados: ahí ampliar un 14 % sólo recortaba bezel. En el pantallazo
+              del panel ese 14 % se come el sidebar y parte las etiquetas por la
+              mitad. Sin ampliación queda el recorte mínimo —un 2,35 % por lado,
+              inevitable porque la imagen es más apaisada que el hueco—, y el
+              parallax se retira porque necesitaba justo ese margen vertical:
+              sin él, al desplazar dejaría ver el fondo del contenedor. Se
+              conserva la entrada (`rise`).
+
+              Y el alto baja de 612 a 583,03 —centrado en el hueco original— para
+              que el panel se vea completo: 810 / (1920/1382) es la proporción
+              exacta de la imagen, así que no queda recorte ni franjas vacías. */}
           <Pic
-            x={1020} y={77} w={810} h={612} radius="40px" src="como-dashboard.webp" alt="Plataforma de control de obra"
-            shadow="18px 22px 18.4px -5px rgba(226,205,174,0.73)" par={30} over={1.14} rise={38} delay={0.1}
-            crop={{ height: "107.52%", top: "-2.61%", left: "-4.59%", width: "108.31%" }}
+            x={1020} y={91.49} w={810} h={583.03} radius="40px" src="panel-zequara.webp" alt="Plataforma de control de obra"
+            shadow="18px 22px 18.4px -5px rgba(226,205,174,0.73)" rise={38} delay={0.1}
           />
           <Paso x={199} cy={54.93} w={484} label="Paso 05 · Control de obra" color={LASER} />
           <Question x={199} cy={90.01} w={484} color={GREEN_SMOKE}>¿Cómo protegemos el presupuesto?</Question>

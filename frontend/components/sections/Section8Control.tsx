@@ -1,3 +1,5 @@
+import CanvasImage from "@/components/CanvasImage";
+
 const A = "/figma";
 
 /** Seccion 8 — Control de obra + indicadores (1922 × 1383) */
@@ -46,15 +48,20 @@ export default function Section8Control() {
       <p className="[word-break:break-word] absolute font-black leading-[normal] left-[1245px] not-italic text-brown-dark text-[25px] top-[322px] w-[434px]">Cómo va tu zona</p>
       <p className="[word-break:break-word] absolute font-normal leading-[normal] left-[1238px] not-italic text-brown-dark text-[20px] top-[367px] w-[282px]">Si la demanda sigue firme y cómo se mueve el valor de tu predio, mes a mes.</p>
 
-      {/* Dashboard image (351:1107) — 810 × 612 en 555,520, con el halo crema */}
-      <div className="absolute h-[612px] left-[555px] top-[520px] w-[810px] overflow-clip rounded-[40px] shadow-[18px_22px_18.4px_-5px_rgba(226,205,174,0.73)]">
-        <img
-          loading="lazy"
-          decoding="async"
-          alt="Panel de seguimiento de la inversión"
-          className="absolute h-[107.52%] left-[-4.59%] max-w-none top-[-2.61%] w-[108.31%] pointer-events-none"
-          src={`${A}/69716bbab7c45079d8a35d0ff6cf3961b2185be5.webp`}
-        />
+      {/* Dashboard image (351:1107) — el hueco del diseño es 810 × 612 en 555,520.
+          El mockup anterior venía en un marco de iPad y con la marca Serava; se
+          sustituye por el pantallazo del panel real, y con él se va el recorte
+          que había (108,31 % de ancho, desplazado), que sólo servía para tapar
+          los bordes del marco.
+
+          El alto baja a 583,03 para que el panel se vea completo. La imagen es
+          más apaisada que el hueco (1,389 frente a 1,333), así que a 612 px
+          `object-cover` recortaría un 2,35 % por lado y se comería el borde del
+          sidebar. 810 / (1920/1382) = 583,03 da la proporción exacta: ni recorte
+          ni franjas vacías. Se centra en el espacio original —520 + 14,49— para
+          no descolocar la composición ni el badge de abajo. */}
+      <div className="absolute h-[583.03px] left-[555px] top-[534.49px] w-[810px] overflow-clip rounded-[40px] shadow-[18px_22px_18.4px_-5px_rgba(226,205,174,0.73)]">
+        <CanvasImage src={`${A}/panel-zequara.webp`} w={810} alt="Panel de seguimiento de la inversión" className="pointer-events-none" />
       </div>
 
       {/* Badge under image */}
