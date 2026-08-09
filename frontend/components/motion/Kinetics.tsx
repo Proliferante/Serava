@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
-import { useRef, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { type CSSProperties, type ReactNode, type RefObject } from "react";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Kinetics — vocabulario de movimiento compartido por las páginas de canvas
@@ -13,7 +13,8 @@ import { useRef, type CSSProperties, type ReactNode, type RefObject } from "reac
 
    Las animaciones respetan `prefers-reduced-motion` — la raíz de cada página
    va envuelta en <MotionConfig reducedMotion="user">, y los helpers con bucle
-   infinito comprueban `useReducedMotion()` directamente.
+   infinito comprueban `useReducedMotion()` directamente. El de <Orbit> es la
+   excepción: como el bucle es CSS, se apaga en globals.css con el resto.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const EASE = [0.22, 1, 0.36, 1] as const;
@@ -190,32 +191,47 @@ export function Float({
   );
 }
 
-/** Rotación muy lenta — contornos circulares decorativos. */
-export function Spin({
-  children, className, style, dur = 90, reverse = false,
-}: { children?: ReactNode; className?: string; style?: CSSProperties; dur?: number; reverse?: boolean }) {
-  const reduce = useReducedMotion();
+/**
+ * Giro perpetuo sobre un contorno **elíptico**, sin deformarlo: el trazo se
+ * queda clavado donde lo puso el diseño y sólo viajan los adornos que lleva
+ * encima (puntos, marcas).
+ *
+ * Girar una elipse la hace bailar: como sus semiejes no miden lo mismo, el
+ * contorno se sale de su sitio hasta la diferencia entre ambos — en el aro de
+ * Oportunidades son 21 px, muy visibles. El truco es meter la rotación entre
+ * dos escalas inversas: la de dentro estira el eje corto hasta convertir la
+ * elipse en círculo, que sí es invariante al giro, y la de fuera devuelve el
+ * círculo a su óvalo. Lo único que se mueve es lo que rompe la simetría.
+ *
+ * Las tres capas comparten el mismo `transform-origin` — el centro de la
+ * elipse, no el de la caja — porque si no, cada escala desplazaría el aro.
+ *
+ * `cx`/`cy` es ese centro y `rx`/`ry` los semiejes, en píxeles locales a la
+ * caja. Se pasan explícitos porque la caja suele ser mayor que la elipse: los
+ * adornos que sobresalen del trazo la ensanchan.
+ *
+ * El giro va en CSS (`.ix-orbit`, en globals.css) y no en framer-motion, como
+ * el resto de bucles perpetuos del proyecto: es una rotación lineal constante,
+ * así que la compone la GPU sin pasar por JS en cada frame. De ahí también que
+ * `prefers-reduced-motion` se resuelva allí y no con `useReducedMotion()`.
+ */
+export function Orbit({
+  children, className, style, cx, cy, rx, ry, dur = 60, reverse = false,
+}: {
+  children?: ReactNode; className?: string; style?: CSSProperties;
+  cx: number; cy: number; rx: number; ry: number; dur?: number; reverse?: boolean;
+}) {
+  const origin = `${cx}px ${cy}px`;
   return (
-    <motion.div
-      className={`absolute ${className ?? ""}`}
-      style={style}
-      animate={reduce ? undefined : { rotate: reverse ? -360 : 360 }}
-      transition={{ duration: dur, ease: "linear", repeat: Infinity }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-/** Combina entrada (bloom) + giro perpetuo sin que las transformadas choquen. */
-export function BloomSpin({
-  children, className, style, delay = 0, dur = 1.6, spin = 90, reverse = false,
-}: { children?: ReactNode; className?: string; style?: CSSProperties; delay?: number; dur?: number; spin?: number; reverse?: boolean }) {
-  return (
-    <Bloom className={className} style={style} delay={delay} dur={dur}>
-      <Spin className="inset-0" dur={spin} reverse={reverse}>
-        {children}
-      </Spin>
-    </Bloom>
+    <div className={`absolute ${className ?? ""}`} style={{ ...style, transformOrigin: origin, transform: `scaleY(${ry / rx})` }}>
+      <div
+        className="ix-orbit absolute inset-0"
+        style={{ transformOrigin: origin, animationDuration: `${dur}s`, animationDirection: reverse ? "reverse" : undefined }}
+      >
+        <div className="absolute inset-0" style={{ transformOrigin: origin, transform: `scaleY(${rx / ry})` }}>
+          {children}
+        </div>
+      </div>
+    </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { MotionConfig, animate, motion, useInView, useMotionTemplate, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { BloomSpin, EASE, Float, MLine, POP, Pop, Rise, Rule, useParallaxY } from "@/components/motion/Kinetics";
+import { Bloom, EASE, MLine, Orbit, POP, Pop, Rise, Rule, useParallaxY } from "@/components/motion/Kinetics";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    OPORTUNIDADES — reproducción 1:1 del frame de Figma 311:1996 (1920 × 5701).
@@ -698,20 +698,27 @@ export default function OportunidadesScreen() {
             <p>Portafolio confidencial. Acceso sujeto a evaluación y disponibilidad.</p>
           </T>
 
-          {/* Elipse trazada, duplicada tal cual en Figma (326:1194 + 326:1201).
-              Las dos giran muy lento en sentidos opuestos. */}
-          <BloomSpin className="pointer-events-none" style={{ left: 635, top: 18, width: 650, height: 607 }} delay={0.15} dur={1.7} spin={140}>
-            <img alt="" src={`${I}/ell15.svg`} className="absolute inset-0 block size-full max-w-none" />
-          </BloomSpin>
-          <BloomSpin className="pointer-events-none" style={{ left: 635, top: 18, width: 650, height: 607 }} delay={0.3} dur={1.9} spin={200} reverse>
-            <img alt="" src={`${I}/ell15.svg`} className="absolute inset-0 block size-full max-w-none" />
-          </BloomSpin>
-          <Float className="pointer-events-none" style={{ left: 630, top: 248, width: 20, height: 21 }} amp={7} dur={5}>
-            <Pop delay={0.6}><img alt="" src={`${I}/ell16.svg`} className="block size-full max-w-none" /></Pop>
-          </Float>
-          <Float className="pointer-events-none" style={{ left: 1205, top: 500, width: 20, height: 21 }} amp={7} dur={6} delay={0.5}>
-            <Pop delay={0.72}><img alt="" src={`${I}/ell17.svg`} className="block size-full max-w-none" /></Pop>
-          </Float>
+          {/* Aro trazado con sus dos puntos (326:1201) — una sola pieza,
+              `circulos.png`, el export aplanado del frame. Antes iba en cuatro:
+              el trazo duplicado girando en sentidos opuestos y los puntos
+              flotando por su cuenta, y el aro se veía doble porque las dos
+              copias, al no ser un círculo, se desalineaban al girar.
+
+              Ahora entra con un bloom y luego gira perpetuamente dentro de
+              <Orbit>, que compensa la elipse: el trazo no se mueve ni un píxel
+              de donde lo puso Figma y lo único que viaja son los dos puntos,
+              que recorren el aro entero cada 64 s.
+
+              La caja mide 655 px y no 650 porque el punto de la izquierda cae
+              a caballo del trazo y asoma 5 px por fuera; medido sobre el PNG,
+              sus centros quedan en (9.5, 240) y (584.5, 492), que colocan la
+              imagen en (630.5, 18.5). El centro de la elipse, en coordenadas
+              de esa caja, es (329.5, 303) y sus semiejes 325 × 303.5. */}
+          <Bloom className="pointer-events-none" style={{ left: 630.5, top: 18.5, width: 655, height: 607 }} delay={0.15} dur={1.7}>
+            <Orbit className="inset-0" cx={329.5} cy={303} rx={325} ry={303.5} dur={64}>
+              <img alt="" src={`${A}/circulos.png`} className="absolute inset-0 block size-full max-w-none" />
+            </Orbit>
+          </Bloom>
         </L>
 
       </div>

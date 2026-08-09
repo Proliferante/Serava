@@ -211,6 +211,16 @@ body {
 }
 .ix-sway { animation: ixSway 1.8s ease-in-out infinite; }
 
+/* Órbita perpetua del aro de "Accede al portafolio" (capa central de <Orbit>).
+   La duración y el sentido los pone el componente en línea, que gana al
+   atajo de aquí sin tocar el `animation-name`; así el bloque de
+   prefers-reduced-motion del final la sigue pudiendo apagar. */
+@keyframes ixOrbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.ix-orbit { animation: ixOrbit 60s linear infinite; }
+
 /* Tarjetas de contenido: elevación + barrido de luz diagonal al pasar el ratón. */
 .ix-card {
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s ease, box-shadow 0.4s ease;
@@ -417,7 +427,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ix-breathe, .ix-sway { animation: none; }
+  .ix-breathe, .ix-sway, .ix-orbit { animation: none; }
   .ix-card, .ix-card::after, .ix-card-ico, .ix-row, .ix-thumb { transition: none; }
   .ix-card:hover::after { transform: translateX(-120%); }
   .ix-card:hover .ix-card-ico, .ix-row:hover { transform: none; }
