@@ -3,7 +3,7 @@
 import { MotionConfig, motion } from "framer-motion";
 import { useRef, type CSSProperties, type ReactNode } from "react";
 import CountUp from "@/components/motion/CountUp";
-import { Draw, EASE, Float, MLine, POP, Pop, Rise, Rule, useParallaxY } from "@/components/motion/Kinetics";
+import { Draw, EASE, Float, MLine, Orbit, POP, Pop, Rise, Rule, useParallaxY } from "@/components/motion/Kinetics";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    COMO OPERAMOS — reproducción 1:1 del frame de Figma 311:1396 (1920 × 9717).
@@ -163,6 +163,23 @@ function Pic({
   );
 }
 
+/* Geometría de la composición de Christian, en coordenadas del propio frame
+   (1561 × 1041). `Ellipse 10` (312:1252) es el aro grande y `Ellipse 11`
+   (312:1253) el punto que lo recorre. Los semiejes son los del **trazo**, no
+   los de la caja del nodo: Figma dibuja el path 0.5 px hacia dentro para que
+   el borde de 1 px quepa en la caja de 971 × 858. Comprobado contra los
+   píxeles del WebP: en ocho filas el trazo cae a menos de 0.36 px de esta
+   elipse, y el centro del punto a 0.24 px de ella. */
+const CHR_ARO = { cx: 847.5, cy: 500, rx: 485, ry: 428.5 };
+const CHR_PUNTO = { cx: 371, cy: 419, r: 14.5 };
+
+/* Radio del hueco que se abre en el aplanado sobre el punto (su borde exterior
+   mide 15) y con el que se recorta el parche del trazo. Es el mismo círculo a
+   propósito: el parche repone justo lo que el hueco quita, así que el antialias
+   de los dos bordes se compensa y el aro no enseña ni muesca ni doble trazo. */
+const CHR_HUECO_R = CHR_PUNTO.r + 3.5;
+const CHR_HUECO = `radial-gradient(circle ${CHR_HUECO_R}px at ${CHR_PUNTO.cx}px ${CHR_PUNTO.cy}px, transparent 94%, #000 100%)`;
+
 /**
  * Composición "Imagen Christian" (312:1258) — una sola imagen con transparencia.
  *
@@ -171,11 +188,29 @@ function Pic({
  * comería los aros exteriores. Aquí no hay recorte y la caja lleva la
  * proporción exacta del archivo, así que la composición se ve entera.
  *
- * El movimiento va en tres capas anidadas para que no se peleen por la misma
- * propiedad —las tres animan `y`—: la de fuera hace la entrada, la de en medio
- * el flotado continuo y `ParImg` el parallax de scroll.
+ * El punto del aro grande orbita, como el de Oportunidades: <Orbit> compensa
+ * la elipse para que el trazo no se mueva y sólo viaje el punto. Da una vuelta
+ * en 72 s, que sobre estos 2873 px de perímetro es el mismo ritmo aparente que
+ * allí. Los otros dos puntos de la composición no van sobre este aro —el hueco
+ * de la derecha cuelga de la línea vertical— así que se quedan quietos.
+ *
+ * El punto va pintado ENCIMA del trazo dentro del aplanado, así que para que
+ * orbite hay que sacarlo de la imagen. Se hace con `mask-image` en vez de
+ * reexportar el WebP: recomprimirlo con pérdida degradaría el retrato y en
+ * lossless pasaría de 175 kB a 444 kB. Alrededor del punto la imagen es
+ * transparente pura —el alfa máximo es 1/255— así que el hueco no se lleva
+ * nada más que él y el trocito de trazo que le pasaba por debajo, que se
+ * repone recortando la elipse entera a ese mismo círculo.
+ *
+ * El movimiento va en cuatro capas anidadas porque tres de ellas animan `y` y
+ * se pisarían: la de fuera hace la entrada, la siguiente el flotado continuo y
+ * la tercera el parallax de scroll. Esa tercera lleva la imagen y los vectores
+ * juntos —antes el parallax vivía dentro de `ParImg`—, porque si el aro se
+ * desplazase y el punto no, el punto se saldría de la línea hasta 48 px.
  */
 function ChristianImg() {
+  const ref = useRef<HTMLDivElement>(null);
+  const py = useParallaxY(ref, 24);
   return (
     <motion.div
       className="pointer-events-none absolute"
@@ -186,14 +221,38 @@ function ChristianImg() {
       transition={{ duration: 1.15, ease: EASE }}
     >
       <Float style={{ inset: 0 }} amp={9} dur={7.5}>
-        <ParImg
-          src="como-christian-full.webp"
-          alt="Christian Mejía, director de diseño y operación técnica"
-          par={24}
-          style={{ inset: 0, width: "100%", height: "100%" }}
-        />
+        <motion.div ref={ref} className="absolute inset-0" style={{ y: py ?? 0 }}>
+          <img
+            src={`${A}/como-christian-full.webp`}
+            alt="Christian Mejía, director de diseño y operación técnica"
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 block size-full max-w-none object-cover"
+            style={{ maskImage: CHR_HUECO, WebkitMaskImage: CHR_HUECO }}
+          />
+          <ChrSvg>
+            <clipPath id="chr-hueco">
+              <circle cx={CHR_PUNTO.cx} cy={CHR_PUNTO.cy} r={CHR_HUECO_R} />
+            </clipPath>
+            <ellipse {...CHR_ARO} fill="none" stroke={CREAM} clipPath="url(#chr-hueco)" />
+          </ChrSvg>
+          <Orbit className="inset-0" cx={CHR_ARO.cx} cy={CHR_ARO.cy} rx={CHR_ARO.rx} ry={CHR_ARO.ry} dur={72}>
+            <ChrSvg>
+              <circle {...CHR_PUNTO} fill={BROWN} stroke={CREAM} />
+            </ChrSvg>
+          </Orbit>
+        </motion.div>
       </Float>
     </motion.div>
+  );
+}
+
+/** Capa vectorial sobre la imagen de Christian, en sus mismas coordenadas. */
+function ChrSvg({ children }: { children: ReactNode }) {
+  return (
+    <svg viewBox="0 0 1561 1041" aria-hidden className="absolute inset-0 block size-full max-w-none">
+      {children}
+    </svg>
   );
 }
 
@@ -888,7 +947,9 @@ export default function ComoOperamosScreen() {
           {/* Composición "Imagen Christian" (312:1258), 1561 × 1041 en (623, −29.25).
               Va como una sola imagen con transparencia, que es el export aplanado
               del frame: el retrato recortado en círculo, los tres aros, la línea,
-              los dos puntos y el rótulo "Christian Mejía" vienen dentro.
+              los dos puntos y el rótulo "Christian Mejía" vienen dentro. El punto
+              del aro grande se enmascara y se repone en vector para que orbite;
+              lo demás sale tal cual del aplanado.
 
               Antes se montaba con nueve piezas —fondo, tres elipses SVG, retrato,
               línea, una segunda foto rotada y dos puntos—, y el resultado no
