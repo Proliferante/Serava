@@ -1,4 +1,6 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
+import { Compact, Desk } from "@/components/responsive/Adaptive";
+import ModeloCompact from "@/components/responsive/modelo/ModeloCompact";
 import Navbar from "@/components/Navbar";
 import ComoOperamosScreen from "@/components/sections/modelo/ComoOperamosScreen";
 import Footer from "@/components/sections/Footer";
@@ -15,6 +17,8 @@ const CANVAS_H = 9717; // altura exacta del frame de Figma (incluye footer)
 export default function ModeloPage() {
   return (
     <main className="bg-cream">
+      <Compact><ModeloCompact /></Compact>
+      <Desk>
       <ScaledCanvas width={CANVAS_W} height={CANVAS_H}>
         <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: COMO_H }}>
           <ComoOperamosScreen />
@@ -24,6 +28,7 @@ export default function ModeloPage() {
         </div>
         <Navbar />
       </ScaledCanvas>
+      </Desk>
     </main>
   );
 }

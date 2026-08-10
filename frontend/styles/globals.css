@@ -234,6 +234,15 @@ body {
   box-shadow: 0 0 0 3px rgba(127, 139, 87, 0.22);
 }
 
+/* Mando del comparador antes/después táctil. El `<input type="range">` se
+   estira invisible sobre la foto: aporta el arrastre con el dedo, el teclado y
+   la lectura por voz, mientras que lo que se ve —la guía y el tirador— se pinta
+   aparte. De ahí que aquí sólo se apague su propio dibujo. */
+.ba-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 44px; height: 100%; opacity: 0; cursor: ew-resize; }
+.ba-range::-moz-range-thumb { width: 44px; height: 100%; border: 0; opacity: 0; cursor: ew-resize; }
+.ba-range::-moz-range-track { background: transparent; }
+.ba-range:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(201, 168, 119, 0.6); border-radius: 16px; }
+
 /* Tarjetas de contenido: elevación + barrido de luz diagonal al pasar el ratón. */
 .ix-card {
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s ease, box-shadow 0.4s ease;
