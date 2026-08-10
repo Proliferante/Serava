@@ -17,17 +17,29 @@ import { BROWN, Card, CheckList, CTA, Eyebrow, H2, In, LASER, Note, P, WRAP } fr
 
 const A = "/figma";
 
+/** Los mismos cuatro pares del lienzo, con sus rótulos literales. */
 const PROYECTOS = [
-  { slug: "1502-sala", titulo: "Cabrera 1502 · Sala", zona: "La Cabrera · Bogotá" },
-  { slug: "1502-bano", titulo: "Cabrera 1502 · Baño", zona: "La Cabrera · Bogotá" },
-  { slug: "1601-cocina", titulo: "Cabrera 1601 · Cocina", zona: "La Cabrera · Bogotá" },
-  { slug: "1602-sala", titulo: "Cabrera 1602 · Sala", zona: "La Cabrera · Bogotá" },
+  { slug: "1502-sala", ciudad: "Bogotá", predio: "Cabrera 1502" },
+  { slug: "1502-bano", ciudad: "Bogotá", predio: "Cabrera 1601" },
+  { slug: "1601-cocina", ciudad: "Bogotá", predio: "Cabrera 1502" },
+  { slug: "1602-sala", ciudad: "Bogotá", predio: "Cabrera 1602" },
 ];
 
+/** Las cuatro columnas de la ficha, con el texto del lienzo. */
 const FICHA = [
-  { t: "Datos del activo", d: "Ubicación, área, valor de entrada y características principales." },
-  { t: "Propuesta de transformación", d: "Alcance preliminar de diseño, remodelación e inversión." },
-  { t: "Lectura de la oportunidad", d: "Potencial de renta, valorización y alternativas de salida." },
+  { t: "Valor de entrada", d: "Precio, área y lectura del valor por metro cuadrado." },
+  { t: "Transformación propuesta", d: "Alcance de diseño, remodelación e inversión estimada." },
+  { t: "Potencial de renta", d: "Canon proyectado y perfil de demanda de la microzona." },
+  { t: "Proyección de valor", d: "Valorización estimada y alternativas de permanencia o salida." },
+];
+
+/** Las cifras de la ficha de ejemplo, tal cual salen en escritorio. */
+const CIFRAS = [
+  { t: "Valor de entrada", v: "$7,2M / m²" },
+  { t: "Área", v: "320 m²" },
+  { t: "Inversión estimada", v: "$2,5M / m²" },
+  { t: "Canon proyectado", v: "$17M / mes" },
+  { t: "Valorización estimada", v: "~22%" },
 ];
 
 const ACOMPANAMIENTO = [
@@ -73,33 +85,65 @@ export default function OportunidadesCompact() {
           <In><Eyebrow tone="brown">El tipo de activos que buscamos</Eyebrow></In>
           <In delay={0.06}>
             <H2 dark>Espacios donde el valor <span className="font-semibold">puede construirse.</span></H2>
-            <P dark>Conoce transformaciones realizadas por nuestro equipo y el tipo de propiedades que orientan la selección Zequara: inmuebles bien ubicados, con atributos difíciles de replicar y capacidad de mejorar su posicionamiento.</P>
+            <P dark>Conoce transformaciones realizadas por nuestro equipo y el tipo de propiedades que orientan la selección Zequara. Buscamos inmuebles bien ubicados, con atributos difíciles de replicar y capacidad de mejorar su posicionamiento a través de una intervención estratégica.</P>
           </In>
 
-          <div className="mt-[26px] flex flex-col gap-[22px]">
+          {/* La ficha del proyecto destacado, con las mismas dos filas de datos
+              que el lienzo pone al pie del comparador grande. */}
+          <In delay={0.12} className="mt-[24px] rounded-[16px] border border-solid border-[rgba(165,122,78,0.28)] bg-[rgba(255,255,255,0.45)] p-[18px]">
+            <p className="m-0 text-[17px] font-semibold" style={{ color: BROWN }}>Cabrera 1502 · Bogotá</p>
+            <p className="m-0 mt-[3px] text-[13.5px] font-light" style={{ color: "#5b4332" }}>Remodelación integral ultra lujo</p>
+            <div className="mt-[14px] grid grid-cols-2 gap-[12px]">
+              <div>
+                <p className="m-0 text-[11px] font-semibold uppercase tracking-[1px]" style={{ color: "#a57a4e" }}>Ciudad / Zona</p>
+                <p className="m-0 mt-[3px] text-[14px] font-medium" style={{ color: BROWN }}>Bogotá · Cabrera 1502</p>
+              </div>
+              <div>
+                <p className="m-0 text-[11px] font-semibold uppercase tracking-[1px]" style={{ color: "#a57a4e" }}>Intervención</p>
+                <p className="m-0 mt-[3px] text-[14px] font-medium" style={{ color: BROWN }}>Integral</p>
+              </div>
+            </div>
+          </In>
+
+          <div className="mt-[22px] flex flex-col gap-[22px]">
             {PROYECTOS.map((p, i) => (
-              <In key={p.slug} delay={0.06 * i}>
-                <BeforeAfterTouch slug={p.slug} alt={p.titulo} />
+              <In key={`${p.slug}-${i}`} delay={0.06 * i}>
+                <BeforeAfterTouch slug={p.slug} alt={`${p.predio} · ${p.ciudad}`} />
                 <div className="mt-[10px] flex items-baseline justify-between gap-[12px]">
-                  <p className="m-0 text-[15px] font-semibold" style={{ color: BROWN }}>{p.titulo}</p>
-                  <p className="m-0 text-[12px] font-light uppercase tracking-[0.8px]" style={{ color: "rgba(91,67,50,0.75)" }}>{p.zona}</p>
+                  <p className="m-0 text-[12px] font-semibold uppercase tracking-[1.4px]" style={{ color: "#a57a4e" }}>Antes / Después</p>
+                  <p className="m-0 text-[13.5px] font-medium" style={{ color: BROWN }}>{p.ciudad} · {p.predio}</p>
                 </div>
               </In>
             ))}
           </div>
 
+          <In delay={0.24}>
+            <p className="mt-[18px] text-[13.5px] font-light leading-[1.5]" style={{ color: "#5b4332" }}>
+              Arrastra el círculo (o toca la imagen) para ver el antes y el después de cada proyecto.
+            </p>
+          </In>
           <Note dark>Los proyectos mostrados son casos de referencia. El portafolio activo es confidencial.</Note>
         </section>
 
         {/* ══════════ 3 · QUÉ MUESTRA CADA OPORTUNIDAD ══════════ */}
-        <section className="relative overflow-hidden rounded-tr-[64px] bg-brown-dark py-[62px]">
+        <section className="relative overflow-hidden rounded-tl-[64px] bg-brown-dark py-[62px]">
           {/* La trama topográfica del lienzo, al mismo 5 %. */}
           <img src={`${A}/opp-topo.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover" style={{ opacity: 0.05 }} />
           <div className={`${WRAP} relative`}>
             <In><Eyebrow>Información para decidir</Eyebrow></In>
             <In delay={0.06}>
-              <H2>Cada oportunidad muestra <span className="font-semibold">lo mismo.</span></H2>
-              <P>Los inversionistas aprobados reciben una ficha que conecta los datos del activo con la propuesta de transformación desarrollada por Zequara: valor de entrada, inversión requerida, potencial de renta y proyección de valorización.</P>
+              <H2>Cada oportunidad muestra dónde está el potencial y <span className="font-semibold">cómo puede convertirse en valor.</span></H2>
+              <P>Los inversionistas aprobados reciben una ficha que conecta los datos del activo con la propuesta de transformación desarrollada por Zequara. La información permite entender el valor de entrada, la inversión requerida, el potencial de renta y la proyección de valorización.</P>
+            </In>
+
+            {/* Las cifras que en el lienzo van sobre la maqueta de la ficha. */}
+            <In delay={0.12} className="mt-[24px] overflow-hidden rounded-[16px] border border-solid" style={{ borderColor: "rgba(201,168,119,0.28)", background: "rgba(247,241,229,0.05)" }}>
+              {CIFRAS.map((c) => (
+                <div key={c.t} className="flex items-baseline justify-between gap-[12px] border-b border-solid px-[16px] py-[13px] last:border-b-0" style={{ borderColor: "rgba(247,241,229,0.1)" }}>
+                  <span className="text-[13.5px] font-light text-[rgba(247,241,229,0.72)]">{c.t}</span>
+                  <span className="whitespace-nowrap text-[15px] font-semibold text-tan-63">{c.v}</span>
+                </div>
+              ))}
             </In>
 
             <div className="mt-[26px] flex flex-col gap-[2px]">
@@ -121,7 +165,8 @@ export default function OportunidadesCompact() {
         </section>
 
         {/* ══════════ 4 · EXPERIENCIA DEL INVERSIONISTA ══════════ */}
-        <section className={`${WRAP} py-[62px]`}>
+        <section className="rounded-tr-[64px] bg-cream">
+          <div className={`${WRAP} py-[62px]`}>
           <In><Eyebrow tone="brown">Una operación acompañada</Eyebrow></In>
           <In delay={0.06}>
             <H2 dark>Información para decidir. <span className="font-semibold">Un equipo para ejecutar.</span></H2>
@@ -131,10 +176,11 @@ export default function OportunidadesCompact() {
           <In delay={0.2}>
             <p className="mt-[18px] text-[13.5px] font-medium" style={{ color: "#5f6b3e" }}>Un solo equipo conecta análisis, diseño, obra y operación.</p>
           </In>
+          </div>
         </section>
 
         {/* ══════════ 5 · ACCESO ══════════ */}
-        <section className="relative overflow-hidden rounded-tr-[64px] py-[68px]" style={{ background: "rgba(73,33,0,0.96)" }}>
+        <section className="relative overflow-hidden rounded-tl-[64px] py-[68px]" style={{ background: "rgba(73,33,0,0.96)" }}>
           <img
             src={`${A}/opp-dusk.webp`} alt="" loading="lazy" decoding="async"
             className="pointer-events-none absolute inset-0 size-full object-cover opacity-25"

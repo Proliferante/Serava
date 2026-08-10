@@ -23,20 +23,30 @@ const A = "/figma";
 
 const TIPO: Record<string, string> = { article: "Artículo", video: "Video", noticia: "Noticia" };
 
+/** Las mismas pestañas de tipo del lienzo, con el tipo del dato detrás. */
+const TABS: { label: string; type: string | null }[] = [
+  { label: "Todos", type: null },
+  { label: "Artículos", type: "article" },
+  { label: "Videos", type: "video" },
+  { label: "Noticias", type: "noticia" },
+];
+
 export default function HubCompact() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string | null>(null);
+  const [tipo, setTipo] = useState<string | null>(null);
 
   const categorias = useMemo(() => [...new Set(CARDS.map((c) => c.category))], []);
 
   const visibles = useMemo(() => {
     const t = q.trim().toLowerCase();
     return CARDS.filter((c) => {
+      if (tipo && c.type !== tipo) return false;
       if (cat && c.category !== cat) return false;
       if (!t) return true;
       return [c.title.join(" "), c.desc.join(" "), c.category, TIPO[c.type] ?? ""].join(" ").toLowerCase().includes(t);
     });
-  }, [q, cat]);
+  }, [q, cat, tipo]);
 
   return (
     <MotionConfig reducedMotion="user">
@@ -104,9 +114,10 @@ export default function HubCompact() {
 
         {/* ══════════ NEWSLETTER ══════════ */}
         <section className={`${WRAP} pt-[28px]`}>
-          <In className="rounded-[18px] p-[22px]" style={{ backgroundImage: "linear-gradient(118deg, rgba(165,122,78,0.22) 0%, rgba(127,139,87,0.16) 100%)", border: "1px solid rgba(201,168,119,0.3)" }}>
-            <h2 className="m-0 text-[clamp(1.1rem,4.8vw,1.4rem)] font-semibold leading-[1.25]" style={{ color: BROWN }}>Recibe nuestro criterio cada semana</h2>
-            <p className="m-0 mt-[7px] text-[14px] font-light leading-[1.5]" style={{ color: MILLBROOK }}>
+          {/* El mismo verde oliva del lienzo, no un degradado suave. */}
+          <In className="rounded-[24px] p-[24px]" style={{ background: "#687540" }}>
+            <h2 className="m-0 text-[clamp(1.3rem,5.6vw,1.75rem)] font-light leading-[1.15] tracking-[-0.02em] text-cream-93">Recibe nuestro criterio cada mes.</h2>
+            <p className="m-0 mt-[9px] text-[14.5px] font-light leading-[1.55]" style={{ color: "rgba(247,241,229,0.85)" }}>
               Análisis de mercado, casos reales y aprendizajes del método Zequara. Sin ruido.
             </p>
             <form className="mt-[16px] flex flex-col gap-[10px] sm:flex-row" onSubmit={(e) => e.preventDefault()}>
@@ -114,13 +125,14 @@ export default function HubCompact() {
                 type="email" required placeholder="nombre@correo.com" aria-label="Correo electrónico"
                 /* `sm:flex-1` y no `flex-1`: en columna, `flex-basis: 0` cae
                    sobre el alto y aplasta el campo a la altura del texto. */
-                className="ix-field h-[52px] shrink-0 rounded-full border border-solid px-[18px] text-[15px] outline-none sm:flex-1"
-                style={{ background: "rgba(255,255,255,0.6)", borderColor: "rgba(165,122,78,0.35)", color: "#2a1e14" }}
+                className="ix-field h-[52px] shrink-0 rounded-full border border-solid px-[23px] text-[15px] text-cream-93 outline-none sm:flex-1"
+                style={{ background: "rgba(247,241,229,0.1)", borderColor: "rgba(247,241,229,0.4)" }}
               />
-              <button type="submit" className="ix-press h-[52px] shrink-0 rounded-full px-[26px] text-[15px] font-semibold" style={{ background: BROWN, color: CREAM }}>
+              <button type="submit" className="ix-press h-[52px] shrink-0 rounded-full px-[26px] text-[15px] font-semibold" style={{ background: CREAM, color: BROWN }}>
                 Suscribirme
               </button>
             </form>
+            <p className="m-0 mt-[12px] text-[13px] font-light" style={{ color: "rgba(247,241,229,0.7)" }}>Te avisaremos cada mes. Sin ruido.</p>
           </In>
         </section>
 
@@ -136,8 +148,25 @@ export default function HubCompact() {
             </p>
           </div>
 
+          {/* Pestañas de tipo, las mismas del lienzo. Van en su barra crema
+              con la pastilla activa deslizándose, como en escritorio. */}
+          <div className="mt-[14px] flex gap-[2px] rounded-full p-[5px]" style={{ background: "#efe6d5" }} role="tablist" aria-label="Tipo de contenido">
+            {TABS.map((t) => {
+              const on = tipo === t.type;
+              return (
+                <button
+                  key={t.label} type="button" role="tab" aria-selected={on} onClick={() => setTipo(t.type)}
+                  className="relative flex-1 rounded-full px-[10px] py-[9px] text-[13px] font-medium transition-colors"
+                  style={on ? { background: BROWN, color: CREAM } : { background: "transparent", color: MILLBROOK }}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+
           {/* Filtros por categoría. Salen del propio contenido. */}
-          <div className="mt-[14px] flex flex-wrap gap-[8px]">
+          <div className="mt-[12px] flex flex-wrap gap-[8px]">
             {[null, ...categorias].map((c) => {
               const on = cat === c;
               return (
