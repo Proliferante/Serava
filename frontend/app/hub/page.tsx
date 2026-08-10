@@ -1,4 +1,6 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
+import { Compact, Desk } from "@/components/responsive/Adaptive";
+import HubCompact from "@/components/responsive/hub/HubCompact";
 import CanvasImage from "@/components/CanvasImage";
 import Navbar from "@/components/Navbar";
 import { RevealLayer, Reveal } from "@/components/motion/Reveal";
@@ -20,6 +22,8 @@ function Layer({ left, top, width, height, children }: { left: number; top: numb
 export default function HubPage() {
   return (
     <main className="bg-cream">
+      <Compact><HubCompact /></Compact>
+      <Desk>
       <ScaledCanvas width={CANVAS_W} height={CANVAS_H}>
         {/* Hero */}
         <Layer left={0} top={0} width={1920} height={1263}><HubSection1Hero /></Layer>
@@ -48,6 +52,7 @@ export default function HubPage() {
         <Layer left={-2} top={3463} width={1922} height={364}><Footer /></Layer>
         <Navbar />
       </ScaledCanvas>
+      </Desk>
     </main>
   );
 }

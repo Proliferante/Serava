@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import HubCard, { type CardData } from "./HubCard";
 
-const CARDS: CardData[] = [
+/** Se exporta porque la vista fluida de móvil pinta las mismas ocho fichas. */
+export const CARDS: CardData[] = [
   { type: "article", imageLabel: "mercado", category: "Mercado", title: ["Zonas donde la demanda", "defiende el valor por sí sola"], desc: ["Qué hace que un terreno sostenga su", "precio sin depender de la moda."], meta: "6 min de lectura" },
   { type: "video", imageLabel: "remodelación", category: "Remodelación", title: ["Recorrido: una remodelación", "integral de principio a fin"], desc: ["Cómo intervenimos un activo para que", "valga más, sin sobrecostos."], meta: "Video · 4:20" },
   { type: "noticia", imageLabel: "Panamá", category: "Zonas", title: ["Zequara amplía operación a", "Ciudad de Panamá"], desc: ["El método completo llega a un nuevo", "mercado para nuestros inversionistas."], meta: "Noticia · Jun 2026" },
