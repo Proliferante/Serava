@@ -35,7 +35,7 @@ export const COMPARABLES = [
   { label: "Mediana de venta en La Cabrera", num: 11.8, pct: 95, grad: GRAD_TAN, caption: "" },
   { label: "Oferta premium comparable", num: 12.4, pct: 100, grad: GRAD_TAN, caption: "" },
 ];
-const SUPUESTOS: [string, string][] = [
+export const SUPUESTOS: [string, string][] = [
   ["Arriendo antes de intervención", "$11M / mes"],
   ["Arriendo tras intervención", "$17M / mes"],
   ["Incremento de arriendo", "+54%"],
@@ -43,13 +43,13 @@ const SUPUESTOS: [string, string][] = [
   ["Horizonte de referencia", "2025"],
   ["Modalidad de obra", "Costo cerrado"],
 ];
-const RIESGOS: [string, string][] = [
+export const RIESGOS: [string, string][] = [
   ["Liquidez de venta", "La salida depende del mercado. El activo es tuyo: decides cuándo vender."],
   ["Sobrecosto de obra", "Mitigado: el sobrecosto no estructural lo asume Zequara (costo cerrado)."],
   ["Vacancia de arriendo", "Zona de alta demanda; administración y colocación coordinadas por Zequara."],
   ["Variación del mercado", "Cifras de referencia 2025; el retorno real puede variar según condiciones."],
 ];
-const STEPS: [string, string][] = [
+export const STEPS: [string, string][] = [
   ["01 · ENTRAR", "Análisis de demanda y oferta de la zona con tecnología."],
   ["02 · COMPRAR", "Predio curado, por debajo del mercado."],
   ["03 · TRANSFORMAR", "Remodelación a costo cerrado, materiales con criterio."],

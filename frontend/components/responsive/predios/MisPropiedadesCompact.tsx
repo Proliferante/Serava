@@ -59,7 +59,8 @@ export default function MisPropiedadesCompact() {
               <span>
                 <span className="block text-[10.5px] font-semibold uppercase tracking-[2.2px]" style={{ color: BROWN }}>Tu portafolio</span>
                 <span className="block text-[clamp(1.3rem,5.8vw,1.8rem)] font-light leading-[1.15]" style={{ color: BROWN }}>
-                  Hola, Pablo.
+                  <span className="font-light">Hola, Pablo. </span>
+                  <span className="font-extralight">Bienvenido a tus propiedades.</span>
                 </span>
               </span>
             </motion.div>
@@ -84,7 +85,7 @@ export default function MisPropiedadesCompact() {
                     +19%
                   </span>
                 </div>
-                <p className="m-0 mt-[4px] text-[13.5px] font-medium leading-[1.35]" style={{ color: L55 }}>sobre $6.830M invertidos</p>
+                <p className="m-0 mt-[4px] text-[13.5px] font-medium leading-[1.35]" style={{ color: L55 }}>sobre $6.830M invertidos · estimado por comparables de zona</p>
                 <div className="mt-[14px] flex h-[10px] w-full overflow-hidden rounded-full" style={{ background: "rgba(247,241,229,0.08)" }}>
                   {[[33, `linear-gradient(90deg, ${TUSSOCK} 0%, #d9a656 100%)`], [67, `linear-gradient(90deg, ${AVOCADO} 0%, ${GREEN} 100%)`]].map(([pct, grad], i) => (
                     <motion.span
@@ -207,7 +208,7 @@ export default function MisPropiedadesCompact() {
                 <p className="m-0 text-[clamp(1.25rem,5.4vw,1.6rem)] font-light" style={{ color: LINEN }}>
                   Lo último que <span className="font-semibold">revisaste</span>
                 </p>
-                <a href="/predios" className="shrink-0 text-[12.5px] font-semibold" style={{ color: LASER }}>Ver todos →</a>
+                <a href="/predios" className="shrink-0 text-[12.5px] font-semibold" style={{ color: LASER }}>Ver todos los predios →</a>
               </div>
               <p className="m-0 mt-[8px] text-[13.5px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.6)" }}>
                 Retoma donde quedaste. Estas oportunidades siguen disponibles para sumar tu próxima propiedad.
