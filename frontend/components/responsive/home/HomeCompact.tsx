@@ -115,6 +115,13 @@ const CONTROL = [
 
 const DIAGNOSTICO = ["Tu perfil de riesgo", "Mercados compatibles", "Ruta patrimonial sugerida"];
 
+/** Las tres plazas activas, con las mismas fotos que las tarjetas del lienzo. */
+const CIUDADES = [
+  { label: "Bogotá", img: "5ff4aca097d9134d9e43d10cf9529ab553333003.webp" },
+  { label: "Medellín", img: "9ce42d8da5619ae5f7fc7aa4f180a3a3e5fbd140.webp" },
+  { label: "Cartagena", img: "bb6bb0436c009c10db21f42f9aeb588af022a9d0.webp" },
+];
+
 export default function HomeCompact() {
   const wm = 230;
   return (
@@ -195,7 +202,9 @@ export default function HomeCompact() {
       </section>
 
       {/* ══════════ 2 · CRITERIO ══════════ */}
-      <section className={`${WRAP} py-[68px]`}>
+      <section className="relative overflow-hidden">
+        <img src={`${A}/2cddbd3323c70d04c23ee3ff2c94699c7988af39.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover opacity-20" />
+        <div className={`${WRAP} relative py-[68px]`}>
         <In><Eyebrow tone="brown">Pocas oportunidades. Para pocos.</Eyebrow></In>
         <In delay={0.06}>
           <H2 dark>No todo inmueble entra a <span className="font-semibold">.zequara.</span></H2>
@@ -203,11 +212,16 @@ export default function HomeCompact() {
           <P dark>Pocas propiedades superan los filtros. Cuando una aparece, quienes tienen el capital disponible son los primeros en adquirirla.</P>
           <p className="mt-[18px] text-[clamp(1.15rem,5vw,1.6rem)] font-semibold leading-[1.2] text-brown-dark">Así se construye patrimonio.</p>
         </In>
+        </div>
       </section>
 
       {/* ══════════ 3 · PROCESO ══════════ */}
-      <section className="rounded-tr-[64px] bg-brown-dark py-[68px]">
-        <div className={WRAP}>
+      <section className="relative overflow-hidden rounded-tr-[64px] bg-brown-dark py-[68px]">
+        {/* La foto del diseño va a sangre; aquí se vela para que el texto de la
+            línea de tiempo siga legible sobre ella. */}
+        <img src={`${A}/c711c71d04448a3a0e845fd9b958b2015dfbf6aa.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover opacity-30" />
+        <div className="pointer-events-none absolute inset-0" style={{ background: "rgba(73,33,0,0.72)" }} />
+        <div className={`${WRAP} relative`}>
           <In><Eyebrow>Así funciona tu inversión</Eyebrow></In>
           <In delay={0.06}><H2>De principio a fin.</H2></In>
 
@@ -316,22 +330,38 @@ export default function HomeCompact() {
       </section>
 
       {/* ══════════ 9 · MERCADOS ══════════ */}
-      <section className={`${WRAP} py-[68px]`}>
-        <In><Eyebrow tone="brown">El criterio de entrada</Eyebrow></In>
-        <In delay={0.06}>
-          <H2 dark>¿Dónde te gustaría <span className="font-semibold">invertir?</span></H2>
-          <P dark>Los datos, el diseño, la curaduría y el seguimiento son Zequara, estés donde estés.</P>
-        </In>
-        <div className="mt-[22px] flex flex-wrap gap-[10px]">
-          {["Bogotá", "Medellín", "Cartagena", "Ciudad de Panamá"].map((m, i) => (
-            <In key={m} delay={0.05 * i}>
-              <span className="inline-flex items-center rounded-full border border-solid border-[rgba(165,122,78,0.4)] px-[16px] py-[9px] text-[14px] text-[#5b4332]">{m}</span>
-            </In>
-          ))}
+      <section className="relative overflow-hidden">
+        {/* El plano de ciudad del diseño, al mismo 20 %, pero a lo ancho y
+            anclado arriba en vez de `object-cover`: recortando, a 390 px el
+            plano se amplía tanto que su rótulo "BOGOTÁ" sale del tamaño del
+            titular y compite con él. Así el detalle conserva la escala que
+            tiene en el lienzo. */}
+        <img src={`${A}/63f0d4b26acea5bd4269d62fe7c1683462dc68c9.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-x-0 top-0 w-full opacity-20" />
+        <div className={`${WRAP} relative py-[68px]`}>
+          <In><Eyebrow tone="brown">El criterio de entrada</Eyebrow></In>
+          <In delay={0.06}>
+            <H2 dark>¿Dónde te gustaría <span className="font-semibold">invertir?</span></H2>
+            <P dark>Los datos, el diseño, la curaduría y el seguimiento son Zequara, estés donde estés.</P>
+          </In>
+
+          <In delay={0.12}>
+            <p className="mt-[24px] text-[13px] font-semibold uppercase tracking-[2.4px]" style={{ color: "#7f8b57" }}>Operación activa hoy</p>
+          </In>
+          {/* Las tres plazas con su foto, como las tarjetas del lienzo. */}
+          <div className="mt-[14px] grid grid-cols-1 gap-[12px] sm:grid-cols-3">
+            {CIUDADES.map((c, i) => (
+              <In key={c.label} delay={0.06 * i} className="relative h-[150px] overflow-hidden rounded-[16px]">
+                <img src={`${A}/${c.img}`} alt={c.label} loading="lazy" decoding="async" className="absolute inset-0 size-full object-cover" />
+                <div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(180deg, rgba(42,30,20,0) 35%, rgba(42,30,20,0.8) 100%)" }} />
+                <span className="absolute bottom-[12px] left-[14px] text-[13px] font-semibold uppercase tracking-[2px] text-cream">{c.label}</span>
+              </In>
+            ))}
+          </div>
+
+          <In delay={0.26}>
+            <P dark>Replicamos el modelo completo a nuevos mercados según el interés de nuestros inversionistas. Cuéntanos a qué mercado mirarías.</P>
+          </In>
         </div>
-        <In delay={0.24}>
-          <P dark>Replicamos el modelo completo a nuevos mercados según el interés de nuestros inversionistas. Cuéntanos a qué mercado mirarías.</P>
-        </In>
       </section>
 
       {/* ══════════ 10 · DIAGNÓSTICO ══════════ */}
@@ -341,6 +371,10 @@ export default function HomeCompact() {
           <In delay={0.06}>
             <H2>En menos de <span className="font-semibold">5 minutos.</span></H2>
             <P>Obtén una lectura inicial sobre tu perfil de riesgo, estrategia de inversión, mercados compatibles y potencial ruta patrimonial.</P>
+          </In>
+          {/* La foto que en el lienzo va enmascarada a la derecha. */}
+          <In delay={0.12} className="mt-[24px] overflow-hidden rounded-[18px]">
+            <img src={`${A}/1d104ea194ca7ae5b0f84b1328433a3a584b589f.webp`} alt="" loading="lazy" decoding="async" className="block h-[190px] w-full object-cover" />
           </In>
           <ul className="mt-[22px] flex list-none flex-col gap-[10px] p-0">
             {DIAGNOSTICO.map((d, i) => (

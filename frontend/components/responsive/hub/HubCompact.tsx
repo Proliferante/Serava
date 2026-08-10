@@ -123,7 +123,10 @@ export default function HubCompact() {
         </section>
 
         {/* ══════════ REJILLA ══════════ */}
-        <section className={`${WRAP} pb-[62px] pt-[38px]`}>
+        <section className="relative overflow-hidden pb-[62px] pt-[38px]">
+          {/* La trama de mapa del lienzo, al mismo 15 %. */}
+          <img src={`${A}/d97817dcb8ef87e0a52ccef1d65f05587ff8c8dd.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover opacity-15" />
+          <div className={`${WRAP} relative`}>
           <div className="flex items-baseline justify-between gap-[12px]">
             <p className="m-0 text-[clamp(1.05rem,4.4vw,1.3rem)] font-medium" style={{ color: BROWN }}>Explora el contenido</p>
             <p className="m-0 text-[13px] font-light" style={{ color: MILLBROOK }}>
@@ -172,6 +175,7 @@ export default function HubCompact() {
               No hay nada con ese criterio. Prueba con otra palabra o quita el filtro.
             </p>
           )}
+          </div>
         </section>
 
         <MobileFooter />

@@ -92,8 +92,10 @@ export default function OportunidadesCompact() {
         </section>
 
         {/* ══════════ 3 · QUÉ MUESTRA CADA OPORTUNIDAD ══════════ */}
-        <section className="rounded-tr-[64px] bg-brown-dark py-[62px]">
-          <div className={WRAP}>
+        <section className="relative overflow-hidden rounded-tr-[64px] bg-brown-dark py-[62px]">
+          {/* La trama topográfica del lienzo, al mismo 5 %. */}
+          <img src={`${A}/opp-topo.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover" style={{ opacity: 0.05 }} />
+          <div className={`${WRAP} relative`}>
             <In><Eyebrow>Información para decidir</Eyebrow></In>
             <In delay={0.06}>
               <H2>Cada oportunidad muestra <span className="font-semibold">lo mismo.</span></H2>
