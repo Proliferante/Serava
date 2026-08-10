@@ -3,7 +3,6 @@
 import { MotionConfig } from "framer-motion";
 import { useState } from "react";
 import MobileNav from "@/components/responsive/MobileNav";
-import MobileFooter from "@/components/responsive/MobileFooter";
 import ConfirmacionModal from "@/components/sections/solicitud/ConfirmacionModal";
 import { BROWN, Card, CheckList, CTA, Eyebrow, H2, In, LASER, MILLBROOK, Note, P, Step, Timeline, WRAP } from "@/components/responsive/kit";
 
@@ -226,7 +225,8 @@ export default function SolicitudCompact() {
           </div>
         </section>
 
-        <MobileFooter />
+        {/* Sin pie, como el lienzo: es una página de conversión y el pie sólo
+            ofrece salidas justo donde se quiere que el usuario envíe. */}
         <ConfirmacionModal open={enviado} onClose={() => setEnviado(false)} />
       </div>
     </MotionConfig>

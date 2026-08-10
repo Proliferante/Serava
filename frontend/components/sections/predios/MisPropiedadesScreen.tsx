@@ -82,7 +82,7 @@ const DCARD: CSSProperties = { position: "absolute", top: 14, borderRadius: 18, 
 
 /* ── Contenido ───────────────────────────────────────────────────────────── */
 
-const PROPIEDADES: Propiedad[] = [
+export const PROPIEDADES: Propiedad[] = [
   {
     state: { label: "En obra", tone: "obra" },
     photo: "La Cabrera, Bogotá",
@@ -123,7 +123,7 @@ const GRID = [
 ];
 
 /** Fichas de "Lo último que revisaste" (Component 5). */
-const RECIENTES = [
+export const RECIENTES = [
   { x: 0, seen: "Visto hace 2 días", loc: "Laureles · Medellín", name: ["Casa con potencial de división", "en dos unidades"], tir: "TIR ~17%" },
   { x: 383.33, seen: "Visto hace 4 días", loc: "Punta Pacífica · Panamá", name: ["Torre exclusiva lista para", "remodelación integral"], tir: "TIR ~15%" },
   { x: 766.66, seen: "Visto hace 1 semana", loc: "Bocagrande · Cartagena", name: ["Apartamento frente al mar", "para reposicionar a premium"], tir: "TIR ~15%" },

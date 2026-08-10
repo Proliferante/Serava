@@ -1,8 +1,8 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MARK } from "@/components/brand";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -27,7 +27,29 @@ const LINKS = [
 
 export default function MobileNav() {
   const [open, setOpen] = useState(false);
+  const [oculta, setOculta] = useState(false);
   const pathname = usePathname();
+
+  /**
+   * La barra se retira al bajar y vuelve al subir. En páginas de nueve mil
+   * píxeles, 64 px fijos de cabecera son mucha pantalla en un móvil; y al
+   * volver a subir es justo cuando se busca el menú.
+   *
+   * El umbral de 8 px evita que tiemble con el rebote del scroll, y por debajo
+   * de 120 nunca se esconde: arriba del todo la cabecera siempre está.
+   */
+  const { scrollY, scrollYProgress } = useScroll();
+  const ultimo = useRef(0);
+  useMotionValueEvent(scrollY, "change", (y) => {
+    if (open) return;
+    const d = y - ultimo.current;
+    if (Math.abs(d) < 8) return;
+    ultimo.current = y;
+    setOculta(y > 120 && d > 0);
+  });
+
+  /** Barra de progreso de lectura, pegada al filo inferior de la cabecera. */
+  const progreso = useSpring(scrollYProgress, { stiffness: 120, damping: 26, mass: 0.3 });
 
   // Al cambiar de ruta el cajón se cierra solo: si no, queda abierto encima de
   // la página nueva.
@@ -47,7 +69,11 @@ export default function MobileNav() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-brown-dark/95 backdrop-blur-sm">
+      <motion.header
+        className="sticky top-0 z-50 bg-brown-dark/95 backdrop-blur-sm"
+        animate={{ y: oculta ? "-100%" : "0%" }}
+        transition={{ duration: 0.34, ease: EASE }}
+      >
         <div className="mx-auto flex h-[64px] max-w-[880px] items-center justify-between px-[20px] sm:h-[72px]">
           <a href="/" aria-label="Zequara — Inicio" className="block h-[34px] w-[37px] shrink-0 sm:h-[38px] sm:w-[42px]">
             <img src={MARK} alt="" decoding="async" className="block size-full max-w-none" />
@@ -77,7 +103,13 @@ export default function MobileNav() {
             </span>
           </button>
         </div>
-      </header>
+
+        <motion.span
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 block h-[2px] origin-left"
+          style={{ scaleX: progreso, background: "linear-gradient(90deg, #a57a4e 0%, #c9a877 100%)" }}
+        />
+      </motion.header>
 
       <AnimatePresence>
         {open && (

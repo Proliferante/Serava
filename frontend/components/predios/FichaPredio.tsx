@@ -25,12 +25,12 @@ const Eye = ({ s = 14 }: { s?: number }) => (<svg width={s} height={s} viewBox="
 const FileT = ({ s = 19 }: { s?: number }) => (<svg width={s} height={s} viewBox="0 0 24 24" {...st} aria-hidden><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5M9 13h6M9 17h6" /></svg>);
 
 /* ── Data ──────────────────────────────────────────────────────────── */
-const PHOTOS = [
+export const PHOTOS = [
   { caption: "Foto principal — fachada / sala", grad: "linear-gradient(155deg,#5b4332 0%,#3d2c1e 100%)" },
   { caption: "Cocina", grad: "linear-gradient(155deg,#6b4f38 0%,#2a1e14 100%)" },
   { caption: "Habitación / baño", grad: "linear-gradient(155deg,#4d3a2a 0%,#2a1e14 100%)" },
 ];
-const SPECS = [
+export const SPECS = [
   { l: "Área", v: "320 m²", x: 0 },
   { l: "Habitaciones", v: "3", x: 93.73 },
   { l: "Baños", v: "3", x: 211.23 },
@@ -38,7 +38,7 @@ const SPECS = [
   { l: "Antigüedad", v: "18 años", x: 408.05 },
   { l: "Estado", v: "Publicado", x: 515.18 },
 ];
-const DATOS: [string, string][] = [
+export const DATOS: [string, string][] = [
   ["Barrio", "La Cabrera"],
   ["Estrato", "6"],
   ["Piso", "4 de 6"],
@@ -46,12 +46,12 @@ const DATOS: [string, string][] = [
   ["Ubicación exacta", "Visible al reservar"],
   ["Score Zequara", "96 / 100"],
 ];
-const RIESGOS = [
+export const RIESGOS = [
   { tone: "green" as const, title: "Costo de obra cerrado", desc: "El sobrecosto no estructural lo asume Zequara. Sin sorpresas de presupuesto." },
   { tone: "green" as const, title: "Estudio jurídico completo", desc: "Títulos y validaciones legales realizados antes de habilitar el predio." },
   { tone: "orange" as const, title: "Liquidez de venta", desc: "La salida depende del mercado. Zequara acompaña pero el activo es tuyo: vendes cuando decidas." },
 ];
-const DOCS = [
+export const DOCS = [
   { t: "Ficha técnica del predio", status: "Disponible", tone: "green" as const },
   { t: "Estudio de títulos", status: "Al reservar", tone: "neutral" as const },
   { t: "Plan de remodelación", status: "Al reservar", tone: "neutral" as const },

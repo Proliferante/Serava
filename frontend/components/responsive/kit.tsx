@@ -73,17 +73,47 @@ export function P({ children, dark }: { children: ReactNode; dark?: boolean }) {
   );
 }
 
-/** Botón principal. 56 px de alto: el mínimo cómodo para el pulgar. */
+/**
+ * Botón principal. 56 px de alto: el mínimo cómodo para el pulgar.
+ *
+ * `whileTap` en vez de `:hover`: en táctil no hay hover, y sin respuesta al
+ * pulsar la interfaz se siente muerta. El hundido es la señal de que el toque
+ * entró, que en móvil llega antes que la navegación.
+ */
 export function CTA({ href, children, tone = "cream" }: { href: string; children: ReactNode; tone?: "cream" | "olive" }) {
   const cream = tone === "cream";
   return (
-    <a
+    <motion.a
       href={href}
+      whileTap={{ scale: 0.97 }}
+      transition={{ duration: 0.14, ease: EASE }}
       className="ix-press mt-[26px] flex h-[56px] w-full max-w-[340px] items-center justify-center rounded-full text-[16px] font-semibold"
       style={cream ? { background: CREAM, color: BROWN } : { background: AVOCADO, color: LINEN }}
     >
       {children}
-    </a>
+    </motion.a>
+  );
+}
+
+/**
+ * Titular que entra palabra a palabra. Se reserva para el titular de una
+ * página, no para cada sección: escalonar todo cansa.
+ */
+export function Words({ text, className, style, delay = 0 }: { text: string; className?: string; style?: CSSProperties; delay?: number }) {
+  return (
+    <span className={className} style={style}>
+      {text.split(" ").map((w, i) => (
+        <motion.span
+          key={`${w}-${i}`}
+          className="inline-block"
+          initial={{ opacity: 0, y: "0.35em" }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: delay + i * 0.045, ease: EASE }}
+        >
+          {w}&nbsp;
+        </motion.span>
+      ))}
+    </span>
   );
 }
 

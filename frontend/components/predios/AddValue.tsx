@@ -18,19 +18,19 @@ const Bolt = () => (<svg width={18} height={18} viewBox="0 0 24 24" fill="curren
 const Warn = () => (<svg width={20} height={20} viewBox="0 0 24 24" {...st} aria-hidden><path d="M12 3l9 16H3l9-16z" /><path d="M12 10v4M12 17.5v.01" /></svg>);
 
 /* ── Data ──────────────────────────────────────────────────────────── */
-const STATS = [
+export const STATS = [
   { l: "Inversión total", pfx: "$", num: 9.7, dec: 1, sfx: "M", s: "Compra + remodelación", green: false },
   { l: "Arriendo mensual", pfx: "$", num: 17, dec: 0, sfx: "M", s: "+54% tras intervención", green: false },
   { l: "Valor esperado", pfx: "$", num: 11.8, dec: 1, sfx: "M", s: "Mediana de venta en la zona", green: false },
   { l: "ROI estimado", pfx: "~", num: 22, dec: 0, sfx: "%", s: "Sobre lo invertido, según mercado", green: true },
 ];
-const WATERFALL = [
+export const WATERFALL = [
   { n: "01", title: "Precio de compra", sub: "Entramos por debajo del mercado de la zona", num: 7.2, kind: "light" as const },
   { n: "02", title: "Remodelación (costo cerrado)", sub: "Sobrecosto no estructural lo asume Zequara", num: 2.5, kind: "light" as const },
   { n: "=", title: "Inversión total", sub: "Compra + obra", num: 9.7, kind: "dark" as const },
   { n: "▲", title: "Valor esperado (mediana de venta)", sub: "70% de la oferta pide más por m² que nuestro costo", num: 11.8, kind: "green" as const },
 ];
-const COMPARABLES = [
+export const COMPARABLES = [
   { label: "Costo total Zequara (ya remodelado)", num: 9.7, pct: 78, grad: GRAD_GREEN, caption: "Entramos por debajo del mercado" },
   { label: "Mediana de venta en La Cabrera", num: 11.8, pct: 95, grad: GRAD_TAN, caption: "" },
   { label: "Oferta premium comparable", num: 12.4, pct: 100, grad: GRAD_TAN, caption: "" },

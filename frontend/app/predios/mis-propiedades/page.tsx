@@ -1,4 +1,6 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
+import { Compact, Desk } from "@/components/responsive/Adaptive";
+import MisPropiedadesCompact from "@/components/responsive/predios/MisPropiedadesCompact";
 import MisPropiedadesScreen, { MIS_PROPIEDADES_H } from "@/components/sections/predios/MisPropiedadesScreen";
 
 /**
@@ -11,9 +13,12 @@ import MisPropiedadesScreen, { MIS_PROPIEDADES_H } from "@/components/sections/p
 export default function MisPropiedadesPage() {
   return (
     <main className="bg-cream">
+      <Compact><MisPropiedadesCompact /></Compact>
+      <Desk>
       <ScaledCanvas width={1920} height={MIS_PROPIEDADES_H}>
         <MisPropiedadesScreen />
       </ScaledCanvas>
+      </Desk>
     </main>
   );
 }
