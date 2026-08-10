@@ -415,15 +415,21 @@ export default function SolicitudAccesoScreen() {
 
         {/* ══════════ 3 · FORMULARIO (311:4564) — se pinta sobre la sección 4 ══════════ */}
         <L x={0} y={1667} w={1920} h={1202.17} className="overflow-hidden" style={{ background: BROWN, borderRadius: "150px 0 0 0" }}>
-          {/* Trama de cubos (358:1107). Se estira a la sección en vez de
-              recortarse: la ilustración tiene los cubos arriba a la izquierda y
-              abajo, con el centro vacío, así que sólo mapeándola 1:1 sobre la
-              caja quedan repartidos como en el diseño. Recortada —como estaba—
-              se veía únicamente el hueco vacío del centro. */}
+          {/* Trama de cubos (358:1107): el `cuadro 1` del diseño, pasado a webp
+              sin pérdida (580 kB de PNG → 219, y las líneas son de un píxel).
+
+              Va a su tamaño nativo, 1920 × 1688, que es más alto que la sección
+              —1202— y arranca 465 px por encima de ella, así que la sección le
+              recorta lo que sobra por arriba y por abajo. Ese desbordamiento es
+              justo lo que coloca los cubos donde el diseño los pone: densos a la
+              derecha, detrás de la tarjeta, y sueltos en el borde izquierdo.
+
+              Antes se estiraba otra ilustración a la caja entera de la sección,
+              lo que deformaba los cubos y los amontonaba todos a la izquierda. */}
           <img
-            alt="" loading="lazy" src={`${A}/acceso-cubos.webp`}
-            className="pointer-events-none absolute inset-0 size-full max-w-none"
-            style={{ opacity: 0.1 }}
+            alt="" loading="lazy" src={`${A}/acceso-cuadros.webp`}
+            className="pointer-events-none absolute max-w-none object-cover"
+            style={{ left: 0, top: -465, width: 1920, height: 1688, opacity: 0.1 }}
           />
           <span id="formulario" className="absolute left-0 top-0" />
 
