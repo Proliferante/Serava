@@ -1,10 +1,10 @@
 "use client";
 
 import { MotionConfig, motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { EASE, MLine, POP, Pop, Rise, Rule } from "@/components/motion/Kinetics";
-import { MARK } from "@/components/brand";
+import { WORDMARK, wordmarkH } from "@/components/brand";
+import ConfirmacionModal from "@/components/sections/solicitud/ConfirmacionModal";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SOLICITUD DE ACCESO — reproducción 1:1 del frame de Figma 311:4483
@@ -66,10 +66,17 @@ function T({
   );
 }
 
-/** Icono de Figma: vectores SVG posicionados por `inset`. */
-function Ico({ size, layers, className, style }: { size: number; layers: [string, string, string][]; className?: string; style?: CSSProperties }) {
+/**
+ * Icono de Figma: vectores SVG posicionados por `inset`.
+ *
+ * `pos` en vez de colar `absolute` por `className`: las dos son utilidades de
+ * `position` y en la hoja de Tailwind `relative` va después, así que ganaba
+ * siempre la de aquí y el icono se quedaba en el flujo. Los chevrones de los
+ * desplegables acababan debajo del campo por eso.
+ */
+function Ico({ size, layers, className, style, pos = "relative" }: { size: number; layers: [string, string, string][]; className?: string; style?: CSSProperties; pos?: "relative" | "absolute" }) {
   return (
-    <div className={`relative shrink-0 overflow-hidden ${className ?? ""}`} style={{ width: size, height: size, ...style }}>
+    <div className={`${pos} shrink-0 overflow-hidden ${className ?? ""}`} style={{ width: size, height: size, ...style }}>
       {layers.map(([outer, inner, src], i) => (
         <div key={i} className="absolute" style={{ inset: outer }}>
           <div className="absolute" style={{ inset: inner }}>
@@ -124,7 +131,7 @@ function CTA({ x, y, tone, label, d = 0, centered }: { x: number; y: number; ton
         >
           <p>{label}</p>
         </T>
-        <Ico size={18} layers={olive ? IC_ARROW_CREAM : IC_ARROW_DARK} className="ix-cta-arrow absolute" style={{ left: 201.39, top: 20.39 }} />
+        <Ico size={18} layers={olive ? IC_ARROW_CREAM : IC_ARROW_DARK} className="ix-cta-arrow" pos="absolute" style={{ left: 201.39, top: 20.39 }} />
         <span className="ix-cta-shine" aria-hidden />
       </a>
     </Pop>
@@ -177,20 +184,38 @@ function Field({ label, placeholder, type = "text", w }: { label: string; placeh
   );
 }
 
+/**
+ * Desplegable del diseño (311:4623).
+ *
+ * Lo que se ve es un `<div>` y el `<select>` nativo va encima transparente. El
+ * motivo es que en el frame el texto se parte en dos líneas cuando no cabe
+ * —"Selecciona un / rango"—, y por eso esas dos cajas miden 60 y no 45: con
+ * Poppins Regular 15.4 el hueco útil es de 157.25 px y «Selecciona un rango»
+ * pide 158.8, «Selecciona una opción» 176. Un `<select>` nunca parte su texto,
+ * así que antes lo recortaba a media palabra. Con el div el alto sale solo.
+ *
+ * El nativo sigue siendo quien recibe el clic y el teclado, así que se conserva
+ * el desplegable del sistema y el comportamiento en móvil.
+ */
 function Select({ label, placeholder, options, w }: { label: string; placeholder: string; options: string[]; w: number }) {
+  const [value, setValue] = useState("");
   return (
     <div style={{ width: w }}>
       <p className="font-medium" style={LABEL_ST}>{label}</p>
-      <div className="relative mt-[8px]">
+      <div className="ix-field-box relative mt-[8px]" style={{ borderRadius: 12 }}>
+        <div className="flex items-center" style={{ ...FIELD_ST, paddingRight: 43 }}>
+          <span className="font-normal" style={{ lineHeight: "15px" }}>{value || placeholder}</span>
+        </div>
         <select
-          defaultValue="" aria-label={label}
-          className="ix-field block cursor-pointer appearance-none font-normal"
-          style={{ ...FIELD_ST, paddingRight: 43 }}
+          value={value} onChange={(e) => setValue(e.target.value)} aria-label={label}
+          className="absolute inset-0 cursor-pointer opacity-0"
         >
           <option value="" disabled>{placeholder}</option>
           {options.map((o) => <option key={o} value={o}>{o}</option>)}
         </select>
-        <Ico size={16} layers={IC_CHEVRON} className="pointer-events-none absolute" style={{ right: 17, top: "calc(50% - 8px)" }} />
+        <span className="pointer-events-none absolute" style={{ right: 17, top: "calc(50% - 8px)" }}>
+          <Ico size={16} layers={IC_CHEVRON} />
+        </span>
       </div>
     </div>
   );
@@ -201,24 +226,33 @@ function Select({ label, placeholder, options, w }: { label: string; placeholder
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export default function SolicitudAccesoScreen() {
-  const router = useRouter();
   const [mercados, setMercados] = useState<string[]>([]);
+  const [enviado, setEnviado] = useState(false);
   const toggle = (m: string) => setMercados((s) => (s.includes(m) ? s.filter((x) => x !== m) : [...s, m]));
 
   /**
-   * Todavía no hay endpoint al que enviar: por ahora sólo lleva a la pantalla
-   * de confirmación. Cuando exista el backend, el POST va aquí antes del push.
+   * Todavía no hay endpoint al que enviar: por ahora sólo abre el modal de
+   * confirmación. Cuando exista el backend, el POST va aquí antes de abrirlo.
+   *
+   * Antes navegaba a /solicitud-acceso/confirmacion. Esa ruta sigue existiendo
+   * y sirve la pantalla completa; lo que cambia es que al enviar el formulario
+   * la confirmación sale encima, sin perder la página.
    */
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/solicitud-acceso/confirmacion");
+    setEnviado(true);
   };
 
   return (
     <MotionConfig reducedMotion="user">
       <div className="relative size-full overflow-hidden" style={{ background: CREAM }} data-name="ACCESO">
-        {/* ══════════ 1 · HERO (311:4484) ══════════ */}
-        <L x={0} y={0} w={1920} h={936.42} className="overflow-hidden" style={{ background: OIL }}>
+        {/* ══════════ 1 · HERO (311:4484) ══════════
+            989.42 de alto, que es lo que mide el Background del frame
+            (`inset-[0 0 -0.42px 0]` sobre los 989 del hero). Estaba en 936.42 y
+            `acceso.webp` mide 1920 × 988, así que el `object-cover` le recortaba
+            52 px a lo alto en vez de encajar 1:1 como en el diseño. La sección 2
+            arranca en 840 y la tapa desde ~939, así que el solape no cambia. */}
+        <L x={0} y={0} w={1920} h={989.42} className="overflow-hidden" style={{ background: OIL }}>
           {/* Foto de fondo. Va debajo de los degradados, que son los que dejan
               legible el texto sobre la parte clara de la cocina. */}
           <img
@@ -246,22 +280,30 @@ export default function SolicitudAccesoScreen() {
                 "linear-gradient(134.987deg, rgba(201,168,119,0.12) 0%, rgba(201,168,119,0) 100%), linear-gradient(45.013deg, rgba(247,241,229,0.05) 0%, rgba(247,241,229,0.05) 0.49517%, rgba(247,241,229,0) 0.49517%, rgba(247,241,229,0) 0.99035%)",
             }}
           />
-          <Rule x={620} y={279.99} w={34} color={LASER} delay={0.15} />
-          <T x={666} cy={279.07} w={251.104} d={0.29} ry={14} className="whitespace-nowrap font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.226px", color: LASER }}>
+          {/* Columna de texto (311:4494). Va en el x=320 del diseño —el
+              contenedor está en 240 y sus hijos con 80 de sangrado—; estaba en
+              620, tres cientos px a la derecha. Las Y son las del frame, con la
+              sección tomando como origen el techo del Background. */}
+          <Rule x={320} y={276} w={34} color={LASER} delay={0.15} />
+          <T x={366} cy={275.57} w={251.104} d={0.29} ry={14} className="whitespace-nowrap font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.226px", color: LASER }}>
             <p>Portafolio privado Zequara</p>
           </T>
-          <T x={620} cy={422.11} w={591.34} className="whitespace-nowrap" style={{ fontSize: 64, lineHeight: "71.68px", letterSpacing: "-1.6px", color: LINEN }}>
+          <T x={320} cy={410.61} w={591.34} className="whitespace-nowrap" style={{ fontSize: 64, lineHeight: "71.68px", letterSpacing: "-1.6px", color: LINEN }}>
             <MLine delay={0.3}><span className="font-light">Conozcamos tu</span></MLine>
             <MLine delay={0.42}><span className="font-semibold">estrategia de</span></MLine>
             <MLine delay={0.54}><span className="font-semibold">inversión.</span></MLine>
           </T>
-          <T x={620} cy={577.72} d={0.78} className="whitespace-nowrap font-light" style={{ fontSize: 20.5, lineHeight: "31.74px", color: "rgba(247,241,229,0.86)" }}>
+          {/* 25 px Medium (311:4508), no 20.5 Light: con el tamaño viejo la
+              línea más larga medía 582 px y en el diseño mide 723. */}
+          <T x={320} cy={585.85} d={0.78} className="whitespace-nowrap font-medium" style={{ fontSize: 25, lineHeight: "31.74px", color: "rgba(247,241,229,0.86)" }}>
             <p>Completa tu perfil para iniciar el proceso de acceso a</p>
             <p>oportunidades seleccionadas según tu capital, objetivo y</p>
             <p>mercados de interés.</p>
           </T>
-          <CTA x={620} y={680.85} tone="olive" label="Completar mi perfil" d={0.94} />
-          <T x={620} cy={773.24} d={1.06} className="whitespace-nowrap font-light" style={{ fontSize: 20.5, lineHeight: "31.74px", color: BROWN }}>
+          <CTA x={320.01} y={668} tone="olive" label="Completar mi perfil" d={0.94} />
+          {/* En crema (311:4520). Iba en marrón sobre la foto oscura, así que
+              apenas se leía. */}
+          <T x={320} cy={760.65} d={1.06} className="whitespace-nowrap font-medium" style={{ fontSize: 20.5, lineHeight: "31.74px", color: CREAM }}>
             <p>El formulario toma aproximadamente 2 minutos.</p>
           </T>
         </L>
@@ -534,15 +576,21 @@ export default function SolicitudAccesoScreen() {
           </T>
         </L>
 
-        {/* ══════════ NAV (311:4801) ══════════ */}
+        {/* ══════════ NAV (311:4801) ══════════
+            Aquí el diseño pone el wordmark completo, no el monograma: su caja
+            (311:4911) mide 175.28 × 34.38, o sea 5.1:1. Se conserva el ancho y
+            el centro vertical del diseño y el alto sale de la proporción del
+            wordmark de Zequara, que es más apaisado (6.116:1). */}
         <div className="absolute left-0 top-0 h-[83px] w-full">
           <motion.a
-            href="/" className="ix-nav absolute block" style={{ left: 63, top: 22.4, width: 43.84, height: 40 }}
+            href="/" aria-label="Zequara — Inicio" className="ix-nav absolute block" style={{ left: 63, top: 39.11, width: 175.28, height: wordmarkH(175.28) }}
             initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.05, ease: EASE }}
           >
-            <img alt="Zequara" src={MARK} className="absolute inset-0 block size-full max-w-none" />
+            <img alt="Zequara" src={WORDMARK} className="absolute inset-0 block size-full max-w-none" />
           </motion.a>
         </div>
+
+        <ConfirmacionModal open={enviado} onClose={() => setEnviado(false)} />
       </div>
     </MotionConfig>
   );

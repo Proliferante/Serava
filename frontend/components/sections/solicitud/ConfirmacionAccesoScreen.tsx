@@ -1,10 +1,10 @@
 "use client";
 
-import { MotionConfig, motion } from "framer-motion";
-import type { CSSProperties, ReactNode } from "react";
-import { EASE, MLine, Pop, Rule } from "@/components/motion/Kinetics";
-import { MARK } from "@/components/brand";
+import { motion, MotionConfig } from "framer-motion";
+import { EASE } from "@/components/motion/Kinetics";
+import { WORDMARK, wordmarkH } from "@/components/brand";
 import CanvasImage from "@/components/CanvasImage";
+import ConfirmacionContenido, { CARD, CARD_CONT, CONF_H, CONF_W } from "@/components/sections/solicitud/ConfirmacionContenido";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    CONFIRMACIÓN DE ACCESO — reproducción 1:1 del frame de Figma 311:4977
@@ -15,59 +15,16 @@ import CanvasImage from "@/components/CanvasImage";
    Las cinco paradas del degradado van con alfa 0,93, así que la foto se
    transparenta un 7 % por debajo; sin ella el 7 % caía sobre nada y el fondo
    quedaba plano.
+
+   El contenido de la tarjeta vive en <ConfirmacionContenido>, porque lo comparte
+   con el modal que sale al enviar el formulario.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const A = "/figma";
-const I = "/figma/acc";
-
-const CREAM = "#e2cdae";
-const LINEN = "#f7f1e5";
 const BROWN = "#492100";
-const LASER = "#c9a877";
-const OIL = "#2a1e14";
 
-/** Nodo de texto de Figma: centrado verticalmente sobre `cy`. */
-function T({
-  x, cy, w, className, style, d, ry = 20, children,
-}: { x: number; cy: number; w?: number; className?: string; style?: CSSProperties; d?: number; ry?: number; children: ReactNode }) {
-  return (
-    <div
-      className={`absolute flex flex-col justify-center ${className ?? ""}`}
-      style={{ left: x, top: cy, width: w, transform: "translateY(-50%)", ...style }}
-    >
-      {d === undefined ? children : (
-        <motion.div
-          initial={{ opacity: 0, y: ry }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: d, ease: EASE }}
-        >
-          {children}
-        </motion.div>
-      )}
-    </div>
-  );
-}
-
-/** Icono de Figma: vectores SVG posicionados por `inset`. */
-function Ico({ size, layers, className, style }: { size: number; layers: [string, string, string][]; className?: string; style?: CSSProperties }) {
-  return (
-    <div className={`relative shrink-0 overflow-hidden ${className ?? ""}`} style={{ width: size, height: size, ...style }}>
-      {layers.map(([outer, inner, src], i) => (
-        <div key={i} className="absolute" style={{ inset: outer }}>
-          <div className="absolute" style={{ inset: inner }}>
-            <img alt="" src={`${I}/${src}`} className="block size-full max-w-none" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-const IC_CHECK: [string, string, string][] = [["25% 16.67% 29.17% 16.67%", "-6.43% -4.42% -12.86% -4.42%", "check44.svg"]];
-const IC_ARROW_DARK: [string, string, string][] = [
-  ["50% 20.83% 50% 20.83%", "-0.75px 0", "arrow-dark1.svg"],
-  ["25% 20.83% 25% 54.17%", "-5.89% -23.57% -5.89% -11.79%", "arrow-dark2.svg"],
-];
+/** Sitio de la tarjeta dentro del frame. Sus medidas van con el contenido. */
+const CARD_POS = { x: 627, y: 177 };
 
 export default function ConfirmacionAccesoScreen() {
   return (
@@ -85,85 +42,25 @@ export default function ConfirmacionAccesoScreen() {
           }}
         />
 
-        {/* Tarjeta con el halo crema (358:1108) */}
         <motion.div
           className="absolute"
-          style={{ left: 627, top: 177, width: 662, height: 888, background: BROWN, borderRadius: 150, boxShadow: "0px 5px 17.7px 19px #e2cdae" }}
+          style={{ left: CARD_POS.x, top: CARD_POS.y, width: CARD.w, height: CARD.h, background: BROWN, borderRadius: CARD.radius, boxShadow: CARD.halo }}
           initial={{ opacity: 0, y: 34, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.85, ease: EASE }}
-        />
+        >
+          <div className="absolute" style={{ left: CARD_CONT.x, top: CARD_CONT.y, width: CONF_W, height: CONF_H }}>
+            <ConfirmacionContenido />
+          </div>
+        </motion.div>
 
-        {/* Círculo del check (311:4984) */}
-        <Pop className="absolute flex items-center justify-center" style={{ left: 914, top: 330.14, width: 92, height: 92, borderRadius: 46, background: "rgba(127,139,87,0.2)" }} delay={0.35} from={0.4} dur={0.7}>
-          <Ico size={44} layers={IC_CHECK} />
-        </Pop>
-
-        {/* Eyebrow con filete a los dos lados (311:4990) */}
-        <Rule x={850.435} y={468.64} w={26} color={LASER} opacity={0.7} delay={0.5} />
-        {/* `whitespace-nowrap`: con el interletraje de 3,456 px el texto mide algo
-            más que los 140,124 px del nodo y se partía en dos líneas. En Figma el
-            nodo es de ancho automático, así que nunca parte. */}
-        <T x={888.435} cy={467.72} w={140.124} d={0.6} ry={12} className="whitespace-nowrap text-center font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.456px", color: LASER }}>
-          <p>Perfil recibido</p>
-        </T>
-        <Rule x={1043.575} y={468.64} w={26} color={LASER} opacity={0.7} delay={0.5} />
-
-        {/* Heading 1 (311:4995) */}
-        <T x={710.735} cy={526.56} w={498.53} className="whitespace-nowrap text-center" style={{ fontSize: 48, lineHeight: "53.76px", letterSpacing: "-0.96px", color: LINEN }}>
-          <MLine delay={0.7} amount={0}>
-            <span className="font-light">Recibimos tu </span>
-            <span className="font-semibold">perfil.</span>
-          </MLine>
-        </T>
-
-        {/* Párrafos (311:4999 / 311:5006) */}
-        {/* Este párrafo va a 20 px / 28 px en Medium (311:5003), no a 17,6 en
-            Light: llevaba los valores del párrafo de abajo (311:5007), que sí
-            es 17,6 Light. Por eso se veía más pequeño que en el diseño. */}
-        <T x={710.735} cy={614.56} w={498.53} d={0.9} className="whitespace-nowrap text-center font-medium" style={{ fontSize: 20, lineHeight: "28px", color: "rgba(247,241,229,0.82)" }}>
-          <p>El equipo Zequara revisará tu información y se</p>
-          <p>
-            <span>comunicará contigo para coordinar una </span>
-            <span className="font-medium" style={{ color: LINEN }}>sesión virtual</span>
-          </p>
-          <p className="font-medium" style={{ color: LINEN }}>de conocimiento mutuo.</p>
-        </T>
-        <T x={710.735} cy={697.56} w={498.53} d={1.02} className="whitespace-nowrap text-center font-light" style={{ fontSize: 17.6, lineHeight: "27.28px", color: "rgba(247,241,229,0.82)" }}>
-          <p>Después de esa conversación confirmaremos si</p>
-          <p>avanzamos con el acceso al portafolio privado.</p>
-        </T>
-
-        {/* Volver al inicio (311:5008) */}
-        {/* El botón cuelga del contenedor 311:4982 en (143.27, 425.86), y ese
-            contenedor arranca en (710.735, 330.14): sale y = 756, no 771. */}
-        <Pop className="absolute" style={{ left: 854.001, top: 756 }} delay={1.14} from={0.88} dur={0.6}>
-          <a
-            href="/"
-            className="ix-cta ix-pulse relative block overflow-hidden"
-            style={{ width: 211.63, height: 58.8, background: LINEN, borderRadius: 999, boxShadow: "0px 16px 32px -16px rgba(0,0,0,0.4)" }}
-          >
-            <T x={32} cy={28.5} w={119.182} className="text-center font-semibold" style={{ fontSize: 16, lineHeight: "24.8px", color: OIL }}>
-              <p>Volver al inicio</p>
-            </T>
-            <Ico size={18} layers={IC_ARROW_DARK} className="ix-cta-arrow absolute" style={{ left: 161.62, top: 20.39 }} />
-            <span className="ix-cta-shine" aria-hidden />
-          </a>
-        </Pop>
-
-        {/* Nota legal (311:5015) */}
-        <T x={774.001} cy={860.41} w={371.474} d={1.26} className="whitespace-nowrap text-center font-medium" style={{ fontSize: 13.1, lineHeight: "20.34px", color: CREAM }}>
-          <p>Portafolio privado. Acceso sujeto a evaluación, sesión</p>
-          <p>virtual y disponibilidad.</p>
-        </T>
-
-        {/* Nav (311:4979) */}
+        {/* Nav (311:4979) — el wordmark completo, igual que en /solicitud-acceso. */}
         <div className="absolute left-0 top-0 h-[83px] w-full">
           <motion.a
-            href="/" className="ix-nav absolute block" style={{ left: 63, top: 22.4, width: 43.84, height: 40 }}
+            href="/" aria-label="Zequara — Inicio" className="ix-nav absolute block" style={{ left: 63, top: 39.11, width: 175.28, height: wordmarkH(175.28) }}
             initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.05, ease: EASE }}
           >
-            <img alt="Zequara" src={MARK} className="absolute inset-0 block size-full max-w-none" />
+            <img alt="Zequara" src={WORDMARK} className="absolute inset-0 block size-full max-w-none" />
           </motion.a>
         </div>
       </div>

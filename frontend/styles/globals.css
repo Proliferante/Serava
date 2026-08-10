@@ -221,6 +221,19 @@ body {
 }
 .ix-orbit { animation: ixOrbit 60s linear infinite; }
 
+/* Campos del formulario de acceso. La clase `.ix-field` se usaba desde el
+   componente pero no existía aquí, así que no hacía nada.
+
+   El anillo de foco va en `box-shadow` y no en `outline` ni en `border-color`:
+   los campos llevan `outline: none` y el borde puesto en línea desde el
+   componente, y un estilo en línea gana a cualquier regla de la hoja. Sin
+   esto, moverse por el formulario con el teclado no se ve. */
+.ix-field::placeholder { color: #757575; opacity: 1; }
+.ix-field:focus-visible,
+.ix-field-box:focus-within {
+  box-shadow: 0 0 0 3px rgba(127, 139, 87, 0.22);
+}
+
 /* Tarjetas de contenido: elevación + barrido de luz diagonal al pasar el ratón. */
 .ix-card {
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s ease, box-shadow 0.4s ease;
