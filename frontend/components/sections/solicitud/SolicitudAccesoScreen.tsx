@@ -429,7 +429,7 @@ export default function SolicitudAccesoScreen() {
           <img
             alt="" loading="lazy" src={`${A}/acceso-cuadros.webp`}
             className="pointer-events-none absolute max-w-none object-cover"
-            style={{ left: 0, top: -465, width: 1920, height: 1688, opacity: 0.1 }}
+            style={{ left: 0, top: -465, width: 1920, height: 1688, opacity: 0.18 }}
           />
           <span id="formulario" className="absolute left-0 top-0" />
 
