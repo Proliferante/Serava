@@ -43,17 +43,6 @@ export default function MobileFooter() {
           <span className="font-normal italic text-[#c1986c]">Nosotros hacemos el resto.</span>
         </p>
 
-        {/* Acciones. En el escritorio son dos enlaces más de la columna CUENTA;
-            aquí van arriba y como botones. */}
-        <div className="mt-[28px] flex flex-col gap-[10px] sm:flex-row">
-          <a href="/solicitud-acceso" className="ix-press flex h-[54px] shrink-0 items-center justify-center rounded-full sm:flex-1 bg-cream text-[15.5px] font-semibold text-brown-dark">
-            Solicitar acceso
-          </a>
-          <a href="/login" className="ix-press flex h-[54px] shrink-0 items-center justify-center rounded-full sm:flex-1 border-2 border-solid border-sand text-[15.5px] font-medium text-sand">
-            Iniciar sesión
-          </a>
-        </div>
-
         {/* Navega: una fila por enlace, tocable de borde a borde. */}
         <p className="mt-[34px] text-[12px] font-extralight uppercase tracking-[6px] text-[#cd9a64]">Navega</p>
         <ul className="mt-[6px] flex list-none flex-col p-0 sm:grid sm:grid-cols-2 sm:gap-x-[24px]">
@@ -69,6 +58,18 @@ export default function MobileFooter() {
             </li>
           ))}
         </ul>
+
+        {/* Cuenta. En el escritorio es la segunda columna con dos enlaces;
+            aquí suben a botones, que es lo que se busca al llegar al final. */}
+        <p className="mt-[30px] text-[12px] font-extralight uppercase tracking-[6px] text-[#cd9a64]">Cuenta</p>
+        <div className="mt-[14px] flex flex-col gap-[10px] sm:flex-row">
+          <a href="/login" className="ix-press flex h-[54px] shrink-0 items-center justify-center rounded-full sm:flex-1 border-2 border-solid border-sand text-[15.5px] font-medium text-sand">
+            Iniciar sesión
+          </a>
+          <a href="/solicitud-acceso" className="ix-press flex h-[54px] shrink-0 items-center justify-center rounded-full sm:flex-1 bg-cream text-[15.5px] font-semibold text-brown-dark">
+            Solicita acceso
+          </a>
+        </div>
 
         <p className="mt-[26px] text-[12.5px] font-light leading-[1.5] text-[rgba(226,205,174,0.5)]">
           © {new Date().getFullYear()} Zequara. Portafolio reservado para un grupo limitado de inversionistas. Acceso sujeto a evaluación.
