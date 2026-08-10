@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import "@/styles/globals.css";
 import PageTransition from "@/components/PageTransition";
@@ -14,6 +14,18 @@ export const metadata: Metadata = {
   title: "Zequara — Inversión inmobiliaria gestionada de principio a fin",
   description:
     "Zequara encuentra el activo, lo remodela sin sobrecostos y lo administra. Tú sumas un inmueble a tu patrimonio, rentando y valorizándose.",
+};
+
+/**
+ * Se declara explícito en vez de dejar el de Next por dos motivos: fijar el
+ * color de la barra del navegador al marrón de la marca, y dejar el zoom
+ * abierto —nada de `maximumScale`—, que en un sitio con tanto texto pequeño
+ * es la diferencia entre poder leerlo o no.
+ */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#492100",
 };
 
 export default function RootLayout({

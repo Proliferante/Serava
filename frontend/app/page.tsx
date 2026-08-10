@@ -1,5 +1,7 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
 import Navbar from "@/components/Navbar";
+import { Compact, Desk } from "@/components/responsive/Adaptive";
+import HomeCompact from "@/components/responsive/home/HomeCompact";
 import { RevealLayer } from "@/components/motion/Reveal";
 import Section1Hero from "@/components/sections/Section1Hero";
 import Section2Criterio from "@/components/sections/Section2Criterio";
@@ -33,10 +35,15 @@ function Layer({ left, top, width, height, children }: Placed) {
  * HOME ZEQUARA — reproducción exacta del frame de Figma (1920 × 9539).
  * Las secciones se apilan por coordenadas absolutas respetando el orden de
  * pintado del diseño (Sección 7 se pinta antes que la 5, etc.).
+ *
+ * Por debajo de 1280 no se sirve este lienzo sino <HomeCompact>, que es el
+ * mismo relato en una columna fluida. Ver components/responsive/Adaptive.
  */
 export default function Home() {
   return (
     <main className="bg-cream">
+      <Compact><HomeCompact /></Compact>
+      <Desk>
       <ScaledCanvas width={CANVAS_W} height={CANVAS_H}>
         {/* Hero is visible on load — no scroll reveal (handled by PageTransition) */}
         <Layer left={0} top={0} width={1920} height={1634}><Section1Hero /></Layer>
@@ -51,6 +58,7 @@ export default function Home() {
         <Layer left={-2} top={9175} width={1922} height={364}><Footer /></Layer>
         <Navbar />
       </ScaledCanvas>
+      </Desk>
     </main>
   );
 }
