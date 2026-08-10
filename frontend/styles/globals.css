@@ -221,6 +221,15 @@ body {
 }
 .ix-orbit { animation: ixOrbit 60s linear infinite; }
 
+/* "Ver en escritorio" desde el móvil.
+   `VistaEscritorio` marca la raíz con `data-vista="escritorio"` y entonces se
+   invierte el corte de <Adaptive>: se apaga el árbol fluido y se enciende el
+   lienzo de 1920, que el navegador encoge al ancho de la pantalla. Sigue
+   siendo legible porque el `viewport` deja el zoom abierto, que es justo el
+   comportamiento de "vista de escritorio" de cualquier navegador móvil. */
+html[data-vista="escritorio"] .ix-compact { display: none; }
+html[data-vista="escritorio"] .ix-desk { display: block; }
+
 /* Campos del formulario de acceso. La clase `.ix-field` se usaba desde el
    componente pero no existía aquí, así que no hacía nada.
 
@@ -282,6 +291,10 @@ body {
   color: #f7f1e5;
 }
 .ix-pill[aria-current="page"] { background-color: #7f8b57; color: #f7f1e5; }
+/* En la barra fluida el olivo de la activa lo pinta una capa animada que entra
+   creciendo, así que aquí se apaga: si no, el fondo ya estaría puesto y la
+   animación no se vería. El color del texto sí se conserva. */
+.ix-pill-fluid[aria-current="page"] { background-color: transparent; }
 
 /* Tarjeta de propiedad: se eleva, el borde se enciende y el icono del hueco
    de foto respira un poco. */

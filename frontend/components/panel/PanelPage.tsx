@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import ScaledCanvas from "@/components/ScaledCanvas";
 import Shell, { type PanelKey } from "@/components/panel/Shell";
 import { PAPER } from "@/components/panel/ui";
+import AvisoPantalla from "@/components/responsive/AvisoPantalla";
 
 /**
  * Envoltorio de las páginas del panel: lienzo de 1920 px escalado al viewport
@@ -18,6 +19,8 @@ export default function PanelPage({
       <ScaledCanvas width={1920} height={h}>
         <Shell active={active} h={h} meta={meta} state={state}>{children}</Shell>
       </ScaledCanvas>
+      {/* Aviso de pantalla: sale una vez por sesión al entrar desde un móvil. */}
+      <AvisoPantalla />
     </main>
   );
 }

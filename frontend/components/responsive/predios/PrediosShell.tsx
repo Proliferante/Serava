@@ -1,8 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { MARK, tinted } from "@/components/brand";
 import { EASE } from "@/components/responsive/kit";
 
@@ -21,16 +21,55 @@ import { EASE } from "@/components/responsive/kit";
 
 const BROWN = "#492100";
 
+/** `corto` es la etiqueta de móvil: las tres completas suman 479 px y no caben. */
 const LINKS = [
-  { href: "/predios", label: "Predios disponibles" },
-  { href: "/predios/add-value", label: "Análisis de valor" },
-  { href: "/predios/mis-propiedades", label: "Mis propiedades" },
+  { href: "/predios", label: "Predios disponibles", corto: "Predios" },
+  { href: "/predios/add-value", label: "Análisis de valor", corto: "Análisis" },
+  { href: "/predios/mis-propiedades", label: "Mis propiedades", corto: "Mis propiedades" },
 ];
 
 export function PrediosNavCompact({ onLight = false }: { onLight?: boolean }) {
   const pathname = usePathname();
+  const pista = useRef<HTMLDivElement>(null);
+  const [oculta, setOculta] = useState(false);
+
+  /**
+   * La cabecera se retira al bajar y vuelve al subir, como la del sitio
+   * público. Umbral de 8 px para que no tiemble con el rebote del scroll, y
+   * por debajo de 120 nunca se esconde: arriba del todo siempre está.
+   */
+  const { scrollY } = useScroll();
+  const ultimo = useRef(0);
+  useMotionValueEvent(scrollY, "change", (y) => {
+    const d = y - ultimo.current;
+    if (Math.abs(d) < 8) return;
+    ultimo.current = y;
+    setOculta(y > 120 && d > 0);
+  });
+
+  /**
+   * La píldora activa, a la vista. Aunque con etiquetas cortas las tres caben
+   * en 390, en pantallas de 320 la última se sale; y llegar a "Mis propiedades"
+   * sin ver cuál está marcada era justo lo que se veía roto.
+   *
+   * Se mueve `scrollLeft` de la pista y no `scrollIntoView`, que arrastraría
+   * también el scroll de la página.
+   */
+  useEffect(() => {
+    const el = pista.current;
+    if (!el) return;
+    const activa = el.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!activa) return;
+    const centro = activa.offsetLeft + activa.offsetWidth / 2 - el.clientWidth / 2;
+    el.scrollLeft = Math.max(0, centro);
+  }, [pathname]);
+
   return (
-    <header className={`sticky top-0 z-40 ${onLight ? "bg-cream/95" : "bg-[#2a1e14]/95"} backdrop-blur-sm`}>
+    <motion.header
+      className={`sticky top-0 z-40 ${onLight ? "bg-cream/95" : "bg-[#2a1e14]/95"} backdrop-blur-sm`}
+      animate={{ y: oculta ? "-100%" : "0%" }}
+      transition={{ duration: 0.34, ease: EASE }}
+    >
       <div className="mx-auto max-w-[720px] px-[20px] pb-[10px] pt-[12px]">
         <div className="flex items-center justify-between">
           <a href="/" aria-label="Zequara — Inicio" className="ix-nav block size-[34px] shrink-0">
@@ -46,24 +85,44 @@ export function PrediosNavCompact({ onLight = false }: { onLight?: boolean }) {
           </span>
         </div>
 
-        {/* Barra de píldoras. `overflow-x-auto` para que las tres quepan sin
-            recortar la etiqueta en pantallas de 360. */}
-        <nav aria-label="Área de predios" className="-mx-[20px] mt-[10px] overflow-x-auto px-[20px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <div className="flex w-max gap-[6px] rounded-full p-[5px]" style={{ background: BROWN, border: "1px solid rgba(247,241,229,0.12)" }}>
-            {LINKS.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                aria-current={pathname === l.href ? "page" : undefined}
-                className="ix-pill flex h-[38px] items-center whitespace-nowrap rounded-full px-[16px] text-[13.6px] font-medium"
-              >
-                {l.label}
-              </a>
-            ))}
+        {/* Barra de píldoras. Ocupa el ancho y las tres se reparten el sitio;
+            el `overflow-x-auto` queda de red por si la etiqueta no cupiera. */}
+        <nav
+          ref={pista}
+          aria-label="Área de predios"
+          className="-mx-[20px] mt-[10px] overflow-x-auto px-[20px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          <div className="flex min-w-full gap-[4px] rounded-full p-[5px] sm:w-max" style={{ background: BROWN, border: "1px solid rgba(247,241,229,0.12)" }}>
+            {LINKS.map((l, i) => {
+              const activa = pathname === l.href;
+              return (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  aria-current={activa ? "page" : undefined}
+                  className="ix-pill ix-pill-fluid relative flex h-[38px] flex-1 items-center justify-center whitespace-nowrap rounded-full px-[12px] text-[13px] font-medium sm:flex-none sm:px-[16px] sm:text-[13.6px]"
+                >
+                  {/* El fondo de la activa entra creciendo desde el centro, para
+                      que al cambiar de pestaña se note dónde caíste. */}
+                  {activa && (
+                    <motion.span
+                      aria-hidden
+                      className="absolute inset-0 rounded-full"
+                      style={{ background: "#7f8b57" }}
+                      initial={{ scale: 0.7, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.4, delay: 0.06 + i * 0.03, ease: EASE }}
+                    />
+                  )}
+                  <span className="relative sm:hidden">{l.corto}</span>
+                  <span className="relative hidden sm:inline">{l.label}</span>
+                </a>
+              );
+            })}
           </div>
         </nav>
       </div>
-    </header>
+    </motion.header>
   );
 }
 

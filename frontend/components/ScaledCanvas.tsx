@@ -22,9 +22,31 @@ type ScaledCanvasProps = {
  * scaled content stays invisible until measured — this removes the zoom/flash
  * that happened when the canvas first rendered at scale 1 and then snapped.
  */
+/**
+ * Ancho mínimo en "vista de escritorio". Por debajo de esto el lienzo deja de
+ * encogerse y pasa a desbordar, de modo que la página se desplaza en
+ * horizontal: es lo que hace el "sitio para ordenador" de cualquier navegador
+ * móvil, y el único modo de que el panel —tablas y cronogramas pensados a lo
+ * ancho— se lea sin rehacerlo en columna.
+ */
+const MIN_ESCRITORIO = 1280;
+
 export default function ScaledCanvas({ width, height, children }: ScaledCanvasProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
+  const [escritorio, setEscritorio] = useState(false);
+
+  // La preferencia vive en `data-vista` de la raíz (ver responsive/vistaEscritorio).
+  // Se observa el atributo en vez de leerlo una vez: el usuario puede cambiar de
+  // modo sin recargar.
+  useIsomorphicLayoutEffect(() => {
+    const raiz = document.documentElement;
+    const leer = () => setEscritorio(raiz.dataset.vista === "escritorio");
+    leer();
+    const mo = new MutationObserver(leer);
+    mo.observe(raiz, { attributes: true, attributeFilter: ["data-vista"] });
+    return () => mo.disconnect();
+  }, []);
 
   useIsomorphicLayoutEffect(() => {
     const el = wrapperRef.current;
@@ -36,7 +58,7 @@ export default function ScaledCanvas({ width, height, children }: ScaledCanvasPr
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [width]);
+  }, [width, escritorio]);
 
   return (
     <div
@@ -44,6 +66,7 @@ export default function ScaledCanvas({ width, height, children }: ScaledCanvasPr
       style={{
         position: "relative",
         width: "100%",
+        minWidth: escritorio ? MIN_ESCRITORIO : undefined,
         aspectRatio: `${width} / ${height}`,
         overflow: "hidden",
       }}

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import "@/styles/globals.css";
 import PageTransition from "@/components/PageTransition";
+import BotonVistaMovil from "@/components/responsive/BotonVistaMovil";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -37,6 +38,7 @@ export default function RootLayout({
     <html lang="es" className={poppins.variable}>
       <body className="font-sans antialiased">
         <PageTransition>{children}</PageTransition>
+        <BotonVistaMovil />
       </body>
     </html>
   );

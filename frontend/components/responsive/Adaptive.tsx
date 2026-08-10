@@ -22,10 +22,10 @@ import type { ReactNode } from "react";
 
 /** Vista fluida: móvil y tablet, por debajo de 1280. */
 export function Compact({ children }: { children: ReactNode }) {
-  return <div className="xl:hidden">{children}</div>;
+  return <div className="ix-compact xl:hidden">{children}</div>;
 }
 
 /** Lienzo fijo de 1920: de 1280 para arriba. */
 export function Desk({ children }: { children: ReactNode }) {
-  return <div className="hidden xl:block">{children}</div>;
+  return <div className="ix-desk hidden xl:block">{children}</div>;
 }
