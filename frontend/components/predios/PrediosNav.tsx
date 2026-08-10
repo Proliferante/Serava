@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { EASE } from "@/components/motion/Kinetics";
-import { MARK } from "@/components/brand";
+import { MARK, tinted } from "@/components/brand";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    NAV DEL ÁREA DE PREDIOS — el grupo de tres píldoras que comparten
@@ -51,7 +51,24 @@ const GEO: Record<"predios" | "propiedades", Geo> = {
   },
 };
 
-export default function PrediosNav({ active, geo = "propiedades" }: { active: NavKey; geo?: keyof typeof GEO }) {
+/**
+ * Marrón de la marca. Es el mismo `#492100` que llevan el saludo, la cabecera
+ * de lista y la nota al pie de Mis propiedades, así que el logotipo entra en la
+ * misma tinta que el resto del texto de la página.
+ */
+const BROWN = "#492100";
+
+/**
+ * `onLight` para las páginas de fondo claro.
+ *
+ * Cambia dos cosas. El logotipo se pinta en marrón con `mask-image` en vez de
+ * ir como `<img>`: los SVG de marca llevan el crema dentro del archivo y
+ * cargados con `<img>` el color no se puede tocar desde CSS (ver el comentario
+ * de components/brand.ts). Y la barra de las píldoras pasa al marrón sólido que
+ * pide el frame (656:2804); el crema al 6 % que usan las páginas oscuras
+ * desaparecía sobre el beige.
+ */
+export default function PrediosNav({ active, geo = "propiedades", onLight = false }: { active: NavKey; geo?: keyof typeof GEO; onLight?: boolean }) {
   const g = GEO[geo];
   const reduce = useReducedMotion();
   const anim = (delay: number) =>
@@ -66,14 +83,17 @@ export default function PrediosNav({ active, geo = "propiedades" }: { active: Na
         style={{ left: g.logo.x, top: g.logo.y, width: g.logo.w, height: g.logo.h }}
         {...anim(0)}
       >
-        <img src={MARK} alt="Zequara" decoding="async" className="absolute inset-0 block size-full max-w-none" />
+        {onLight
+          ? <span aria-hidden className="absolute inset-0 block size-full" style={tinted(MARK, BROWN)} />
+          : <img src={MARK} alt="" decoding="async" className="absolute inset-0 block size-full max-w-none" />}
       </motion.a>
 
       <motion.div
         className="absolute"
         style={{
           left: g.menu.x, top: g.menu.y, width: g.menu.w, height: g.menu.h, borderRadius: 999,
-          background: "rgba(247,241,229,0.06)", border: "1px solid rgba(247,241,229,0.12)",
+          background: onLight ? BROWN : "rgba(247,241,229,0.06)",
+          border: "1px solid rgba(247,241,229,0.12)",
         }}
         {...anim(0.06)}
       >

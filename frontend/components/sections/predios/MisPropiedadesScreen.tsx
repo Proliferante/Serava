@@ -140,7 +140,7 @@ export default function MisPropiedadesScreen() {
         style={{ left: 0, top: 172, width: 1920, height: 1641, opacity: 0.6 }}
       />
 
-      <PrediosNav active="propiedades" />
+      <PrediosNav active="propiedades" onLight />
 
       {/* ══════════ HERO (656:2813) ══════════ */}
       <div className="absolute flex items-center gap-[20px]" style={{ left: X, top: 94.39 + 44, width: W }}>
