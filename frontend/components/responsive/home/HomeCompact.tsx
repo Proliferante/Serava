@@ -1,11 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import CountUp from "@/components/motion/CountUp";
-import { WORDMARK, wordmarkH } from "@/components/brand";
+import ComparativaModal from "@/components/ComparativaModal";
+import { TABLE_ROWS } from "@/components/sections/Section4Caso";
+import { tinted, WORDMARK, WORDMARK_RATIO, wordmarkH } from "@/components/brand";
 import MobileNav from "@/components/responsive/MobileNav";
 import MobileFooter from "@/components/responsive/MobileFooter";
+import DiagnosticoTrigger from "@/components/DiagnosticoTrigger";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    HOME — vista fluida para móvil y tablet (por debajo de 1280).
@@ -72,6 +75,22 @@ function P({ children, dark }: { children: ReactNode; dark?: boolean }) {
   );
 }
 
+/**
+ * El wordmark cerrando una frase, como en el lienzo: donde el diseño pone el
+ * logotipo dentro del texto no se escribe "Zequara", se pinta la marca.
+ *
+ * En crema va como `<img>`, que es el color que el SVG lleva dentro; en marrón
+ * hay que pintarlo con máscara, porque cargado con `<img>` ese color no se
+ * puede tocar desde CSS (ver components/brand.ts).
+ */
+function Wordmark({ w, tone = "cream" }: { w: string; tone?: "cream" | "brown" }) {
+  const base = { width: w, aspectRatio: String(WORDMARK_RATIO), verticalAlign: "-0.06em" } as const;
+  if (tone === "brown") {
+    return <span role="img" aria-label="Zequara" className="inline-block" style={{ ...base, ...tinted(WORDMARK, "#492100") }} />;
+  }
+  return <img src={WORDMARK} alt="Zequara" loading="lazy" decoding="async" className="inline-block max-w-none" style={base} />;
+}
+
 /** Botón principal. 54 px de alto: el mínimo cómodo para el pulgar. */
 function CTA({ href, children, tone = "cream" }: { href: string; children: ReactNode; tone?: "cream" | "olive" }) {
   const cream = tone === "cream";
@@ -123,6 +142,7 @@ const CIUDADES = [
 ];
 
 export default function HomeCompact() {
+  const [comparar, setComparar] = useState(false);
   const wm = 230;
   return (
     <div className="bg-cream">
@@ -207,7 +227,7 @@ export default function HomeCompact() {
         <div className={`${WRAP} relative py-[68px]`}>
         <In><Eyebrow tone="brown">Pocas oportunidades. Para pocos.</Eyebrow></In>
         <In delay={0.06}>
-          <H2 dark>No todo inmueble entra a <span className="font-semibold">.zequara.</span></H2>
+          <H2 dark>No todo inmueble entra a <Wordmark w="clamp(130px,33vw,190px)" tone="brown" /></H2>
           <P dark>Zonas consolidadas, con alta demanda, baja oferta y bajo riesgo de pérdida de valor, seleccionadas por el Score Zequara.</P>
           <P dark>Pocas propiedades superan los filtros. Cuando una aparece, quienes tienen el capital disponible son los primeros en adquirirla.</P>
           <p className="mt-[18px] text-[clamp(1.15rem,5vw,1.6rem)] font-semibold leading-[1.2] text-brown-dark">Así se construye patrimonio.</p>
@@ -246,6 +266,29 @@ export default function HomeCompact() {
               </In>
             ))}
           </div>
+
+          {/* El mismo comparador "por tu cuenta vs. con Zequara" del lienzo. En
+              escritorio la pastilla mide 454 × 104 y va en absoluto; aquí ocupa
+              el ancho y el círculo de la flecha se encoge. */}
+          <In delay={0.4}>
+            <button
+              type="button"
+              onClick={() => setComparar(true)}
+              aria-label="Compara tu inversión: por tu cuenta vs. con Zequara"
+              className="ix-cta relative mt-[6px] flex w-full items-center justify-between gap-[14px] overflow-hidden rounded-full bg-cream py-[14px] pl-[22px] pr-[14px] text-left"
+            >
+              <span className="text-brown-dark">
+                <span className="block text-[16px] font-semibold leading-[1.25]">Compara tu inversión:</span>
+                <span className="block text-[13.5px] font-light leading-[1.3]">por tu cuenta vs. con Zequara</span>
+              </span>
+              <span className="ix-cta-circle flex size-[46px] shrink-0 items-center justify-center rounded-full bg-brown-dark">
+                <svg className="ix-cta-arrow" width={20} height={20} viewBox="0 0 28 28" fill="none" aria-hidden>
+                  <path d="M5 14h17M14.5 6.5 22 14l-7.5 7.5" stroke="#ffffff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              <span className="ix-cta-shine" aria-hidden />
+            </button>
+          </In>
         </div>
       </section>
 
@@ -267,11 +310,46 @@ export default function HomeCompact() {
           ))}
         </div>
 
-        <In delay={0.16} className="mt-[18px] rounded-[16px] bg-brown-dark p-[22px]">
-          <p className="m-0 text-[13px] font-semibold uppercase tracking-[1.4px] text-tan-63">Escenario base a 5 años</p>
-          <p className="m-0 mt-[8px] text-[clamp(1.6rem,8vw,2.4rem)] font-extrabold leading-[1.05] text-cream-93">1,75×</p>
-          <p className="m-0 mt-[6px] text-[15px] font-light leading-[1.5] text-[rgba(247,241,229,0.72)]">
-            tu patrimonio en 5 años, cobrando renta cada año. TIR neta estimada: 16,5% anual.
+        {/* Año a año. En el lienzo es una tabla de cuatro columnas; aquí la
+            columna del múltiplo se dibuja como barra —que es lo que se entiende
+            de un vistazo en pequeño— y la renta y el valor van debajo de cada
+            año. La barra arranca en 1× para que la diferencia entre 1,32 y 1,79
+            se vea; contra cero, las cinco parecerían iguales. */}
+        <In delay={0.16} className="mt-[18px] rounded-[16px] bg-brown-dark p-[20px]">
+          <div className="flex items-baseline justify-between gap-[10px]">
+            <p className="m-0 text-[12.5px] font-semibold uppercase tracking-[1.4px] text-tan-63">Escenario base · año a año</p>
+            <p className="m-0 text-[12px] font-light text-[rgba(247,241,229,0.6)]">TIR neta 16,5%</p>
+          </div>
+
+          <div className="mt-[16px] flex flex-col gap-[13px]">
+            {TABLE_ROWS.map((r, i) => (
+              <div key={r.year}>
+                <div className="flex items-baseline justify-between gap-[10px]">
+                  <span className="text-[13px] font-medium text-cream-93">{r.year}</span>
+                  <span className="text-[15px] font-semibold text-tan-63">{r.mult.toFixed(2).replace(".", ",")}×</span>
+                </div>
+                <div className="mt-[5px] h-[8px] w-full overflow-hidden rounded-full" style={{ background: "rgba(247,241,229,0.1)" }}>
+                  {/* El ancho es fijo y lo que se anima es `scaleX`: animando
+                      `width` entre porcentajes, framer resolvía las cinco al
+                      100 % y todas salían iguales. Además así no toca layout. */}
+                  <motion.div
+                    className="h-full origin-left rounded-full"
+                    style={{ width: `${((r.mult - 1) / 0.85) * 100}%`, backgroundImage: "linear-gradient(90deg, #a57a4e 0%, #c9a877 100%)" }}
+                    initial={{ scaleX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true, amount: 0.6 }}
+                    transition={{ duration: 0.9, delay: 0.1 + i * 0.09, ease: EASE }}
+                  />
+                </div>
+                <p className="m-0 mt-[4px] text-[12px] font-light text-[rgba(247,241,229,0.6)]">
+                  Renta ${r.renta}M · valor ${r.valor.toFixed(2).replace(".", ",")}.000M
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <p className="m-0 mt-[16px] border-t border-solid pt-[14px] text-[15px] font-light leading-[1.5] text-[rgba(247,241,229,0.72)]" style={{ borderColor: "rgba(247,241,229,0.12)" }}>
+            <span className="font-extrabold text-cream-93">1,75× tu patrimonio en 5 años</span>, cobrando renta cada año.
           </p>
         </In>
       </section>
@@ -279,7 +357,10 @@ export default function HomeCompact() {
       {/* ══════════ 5 · NO ES CROWDFUNDING ══════════ */}
       <section className="bg-brown-dark py-[62px]">
         <div className={WRAP}>
-          <In><H2>No es <span className="font-semibold">crowdfunding.</span></H2></In>
+          <In>
+            <Wordmark w="clamp(180px,50vw,260px)" />
+            <H2><span style={{ color: "#cd9a63" }}>no es</span> <span className="font-semibold">crowdfunding.</span></H2>
+          </In>
           <In delay={0.06}>
             <P>Es inversión patrimonial en activos reales. No compras una fracción colectiva.</P>
             <P>Inviertes en un inmueble tangible, seleccionado por su ubicación, potencial de valorización y capacidad de transformación.</P>
@@ -291,6 +372,9 @@ export default function HomeCompact() {
       <section className={`${WRAP} py-[68px]`}>
         <In><Eyebrow tone="brown">La obra</Eyebrow></In>
         <In delay={0.06}>
+          {/* En el lienzo la marca preside esta sección en grande, encima del
+              titular. Aquí va en marrón porque el fondo es crema. */}
+          <div className="mt-[14px]"><Wordmark w="clamp(190px,54vw,290px)" tone="brown" /></div>
           <H2 dark>Remodelamos para que el <span className="font-semibold">activo valga más</span>, no para impresionar.</H2>
         </In>
         <div className="mt-[26px] grid grid-cols-1 gap-[12px] sm:grid-cols-2">
@@ -388,11 +472,20 @@ export default function HomeCompact() {
               </In>
             ))}
           </ul>
-          <In delay={0.24}><CTA href="/solicitud-acceso" tone="olive">Hacer diagnóstico</CTA></In>
+          {/* Abre el mismo cuestionario que el lienzo, no un enlace: el
+              diagnóstico ES esta sección. El modal ya venía con sus propias
+              medidas para pantalla pequeña. */}
+          <In delay={0.24}>
+            <DiagnosticoTrigger className="ix-press mt-[26px] flex h-[56px] w-full max-w-[340px] items-center justify-center gap-[10px] rounded-full text-[16px] font-semibold" style={{ background: "#7f8b57", color: "#f7f1e5" }}>
+              Hacer diagnóstico
+              <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </DiagnosticoTrigger>
+          </In>
         </div>
       </section>
 
       <MobileFooter />
+      <ComparativaModal open={comparar} onClose={() => setComparar(false)} />
     </div>
   );
 }

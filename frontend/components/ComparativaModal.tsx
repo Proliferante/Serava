@@ -97,7 +97,7 @@ const STEPS: Step[] = [
 /* ── Step card ─────────────────────────────────────────────────────── */
 function StepCard({ step }: { step: Step }) {
   return (
-    <div className="w-[520px] max-w-full rounded-[24px] bg-[#f7f1e5] px-[28px] pt-[24px] pb-[24px]">
+    <div className="w-full max-w-[520px] rounded-[24px] bg-[#f7f1e5] px-[20px] pb-[24px] pt-[24px] sm:px-[28px]">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
@@ -112,8 +112,9 @@ function StepCard({ step }: { step: Step }) {
         </div>
       </div>
 
-      {/* Comparison */}
-      <div className="mt-[18px] flex items-stretch gap-[10px]">
+      {/* Comparison. En móvil las dos columnas se apilan: a 390 px cada una se
+          quedaba en 142 y el texto salía en palabras sueltas. */}
+      <div className="mt-[18px] flex flex-col items-stretch gap-[10px] sm:flex-row">
         {/* Por tu cuenta */}
         <div className="flex-1 rounded-[12px] border border-solid border-[rgba(181,84,47,0.18)] bg-[rgba(181,84,47,0.06)] p-[13px]">
           <p className="font-bold text-[9px] leading-[13px] text-[#b5542f]">Por tu cuenta</p>
@@ -187,8 +188,12 @@ function ModalContent() {
       {/* Carousel */}
       <div className="mt-[26px] flex min-h-[360px] items-start justify-center">
         <AnimatePresence initial={false} custom={dir} mode="wait">
+          {/* `w-full`: sin ancho, esta capa se ajusta a los 520 de la tarjeta y
+              el `max-w` de dentro se mide contra ella en vez de contra el
+              panel, así que en móvil la tarjeta se salía por los dos lados. */}
           <motion.div
             key={idx}
+            className="flex w-full justify-center"
             custom={dir}
             variants={variants}
             initial="enter"

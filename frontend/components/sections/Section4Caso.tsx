@@ -6,7 +6,8 @@ import CountUp from "@/components/motion/CountUp";
 
 const COLS = "grid grid-cols-[153px_258px_321px_322px]";
 
-const TABLE_ROWS = [
+/** Se exporta porque la vista fluida de móvil pinta los mismos cinco años. */
+export const TABLE_ROWS = [
   { year: "Año 1", renta: 143, valor: 4.08, mult: 1.32 },
   { year: "Año 2", renta: 152, valor: 4.4, mult: 1.42 },
   { year: "Año 3", renta: 161, valor: 4.76, mult: 1.54 },
