@@ -42,14 +42,14 @@ const BADGE = {
 export type BadgeTone = keyof typeof BADGE;
 
 /** Explicación del Score, igual en las ocho variantes de Figma (311:2402). */
-const SCORE_TIP = "Evaluación especializada de la zona y su afinidad con la estrategia Zequara.";
+export const SCORE_TIP = "Evaluación especializada de la zona y su afinidad con la estrategia Zequara.";
 
 /**
  * Qué significa cada tipo de transformación (Component 3, una por variante).
  * Se busca por la etiqueta del chip, así que los datos del predio siguen
  * llevando sólo el nombre del tipo.
  */
-const CHIP_TIP: Record<string, string> = {
+export const CHIP_TIP: Record<string, string> = {
   "Reposicionamiento premium": "La propiedad se transforma para competir en una categoría superior: mejor diseño, materiales, funcionalidad y percepción de valor.",
   "División en dos unidades": "Un inmueble se adapta para funcionar como dos unidades independientes, cuando la normativa lo permite.",
   "Remodelación completa": "Se renueva todo el interior: cocina, baños, pisos, iluminación, carpintería, redes y acabados.",

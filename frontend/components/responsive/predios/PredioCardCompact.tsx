@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { Predio } from "@/components/predios/PredioCard";
+import { CHIP_TIP, SCORE_TIP, type Predio } from "@/components/predios/PredioCard";
 import { EASE } from "@/components/responsive/kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -58,8 +58,8 @@ export default function PredioCardCompact({ data, delay = 0, href = "/predios/fi
         <span className="absolute left-[12px] top-[12px] rounded-[8px] px-[10px] py-[5px] text-[9.9px] font-bold uppercase tracking-[0.6px]" style={{ background: b.bg, color: b.fg }}>
           {data.badge.label}
         </span>
-        <span className="absolute right-[12px] top-[12px] flex items-center gap-[5px] rounded-[8px] border border-solid px-[9px] py-[4px] text-[10px] font-bold" style={{ background: "rgba(34,24,18,0.6)", borderColor: "rgba(201,168,119,0.3)", color: "#c9a877" }}>
-          Score {data.score}
+        <span className="absolute right-[12px] top-[12px] flex items-center gap-[5px] rounded-[8px] border border-solid px-[9px] py-[4px] text-[10px] font-bold" style={{ background: "rgba(34,24,18,0.6)", borderColor: "rgba(201,168,119,0.3)", color: "#c9a877" }} title={SCORE_TIP}>
+          Score Zequara {data.score}
         </span>
         <span className="absolute bottom-[10px] left-[12px] text-[9.6px] font-semibold uppercase tracking-[0.96px]" style={{ color: "rgba(247,241,229,0.55)" }}>
           Foto — {data.photo}
@@ -72,21 +72,29 @@ export default function PredioCardCompact({ data, delay = 0, href = "/predios/fi
         </span>
         <h3 className="m-0 mt-[8px] text-[16.5px] font-semibold leading-[1.28]" style={{ color: INK }}>{data.title}</h3>
         <span className="mt-[10px] inline-block w-fit rounded-full px-[11px] py-[5px] text-[11px] font-medium" style={{ background: "rgba(127,139,87,0.14)", color: VERD }}>{data.chip}</span>
+        {/* En escritorio estas dos explicaciones salen al pasar el ratón. En
+            táctil no hay ratón, así que van visibles: la información tiene que
+            estar igual, y aquí hay sitio en vertical. */}
+        {CHIP_TIP[data.chip] && (
+          <p className="m-0 mt-[7px] text-[12px] font-light leading-[1.45]" style={{ color: MUTED }}>{CHIP_TIP[data.chip]}</p>
+        )}
         <p className="m-0 mt-[10px] text-[12.5px] font-light" style={{ color: MUTED }}>{data.specs}</p>
 
         <div className="mt-[14px] flex items-end justify-between gap-[10px] border-t border-solid pt-[12px]" style={{ borderColor: LINE }}>
           <span>
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.8px]" style={{ color: MUTED }}>Inversión total estimada</span>
             <span className="block text-[15.5px] font-semibold" style={{ color: INK }}>{data.price}</span>
             <span className="block text-[11.5px] font-light" style={{ color: MUTED }}>{data.priceNote}</span>
           </span>
           <span className="text-right">
-            <span className="block text-[15.5px] font-semibold" style={{ color: VERD }}>TIR ~{data.tir}%</span>
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.8px]" style={{ color: MUTED }}>TIR estimada</span>
+            <span className="block text-[15.5px] font-semibold" style={{ color: VERD }}>{data.tir}% anual</span>
             <span className="block text-[11.5px] font-light" style={{ color: MUTED }}>{data.horizon}</span>
           </span>
         </div>
 
         <span className="mt-[14px] flex h-[46px] items-center justify-center gap-[8px] rounded-full text-[14.5px] font-semibold" style={{ background: "#7f8b57", color: CREAM }}>
-          Ver ficha <span className="ix-prop-arrow"><Arrow /></span>
+          Ver oportunidad <span className="ix-prop-arrow"><Arrow /></span>
         </span>
         <span className="mt-[10px] text-center text-[11.5px] font-light" style={{ color: MUTED }}>{data.status}</span>
       </div>
