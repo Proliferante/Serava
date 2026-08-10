@@ -71,6 +71,12 @@ export default function LoginCompact() {
             >
               El acceso a Zequara <span className="font-semibold">es selectivo.</span>
             </motion.p>
+            <motion.p
+              className="mt-[14px] text-[15.5px] font-light leading-[1.55]" style={{ color: "rgba(247,241,229,0.75)" }}
+              initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.14, ease: EASE }}
+            >
+              Cada operación pasa por un criterio técnico de veinte años. Entra para ver las oportunidades disponibles hoy.
+            </motion.p>
           </div>
         </section>
 
