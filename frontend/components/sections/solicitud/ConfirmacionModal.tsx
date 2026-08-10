@@ -61,10 +61,42 @@ export default function ConfirmacionModal({ open, onClose }: { open: boolean; on
         >
           <div className="absolute inset-0 bg-black/70" aria-hidden onClick={onClose} />
 
+          {/* Por debajo de 1280 la tarjeta no se escala sino que se rehace
+              fluida: a 390 px el factor sería 0.52 y el cuerpo de 20 px
+              acabaría en 10. Mismo contenido, tamaños propios. */}
+          <motion.div
+            className="relative w-[min(420px,92vw)] rounded-[32px] px-[26px] py-[38px] text-center xl:hidden"
+            style={{ background: BROWN, boxShadow: "0 0 0 10px rgba(226,205,174,0.9)" }}
+            initial={{ opacity: 0, y: 26, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 14, scale: 0.98 }}
+            transition={{ duration: 0.55, ease: EASE }}
+          >
+            <span className="mx-auto flex size-[68px] items-center justify-center rounded-full" style={{ background: "rgba(127,139,87,0.2)" }}>
+              <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="#9aa66f" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6 9 17l-5-5" /></svg>
+            </span>
+            <p className="mt-[18px] text-[11px] font-semibold uppercase tracking-[3px]" style={{ color: "#c9a877" }}>Perfil recibido</p>
+            <h2 className="mt-[10px] text-[clamp(1.6rem,7.4vw,2.1rem)] font-light leading-[1.15]" style={{ color: LINEN }}>
+              Recibimos tu <span className="font-semibold">perfil.</span>
+            </h2>
+            <p className="mt-[14px] text-[15.5px] font-medium leading-[1.45]" style={{ color: "rgba(247,241,229,0.82)" }}>
+              El equipo Zequara revisará tu información y se comunicará contigo para coordinar una <span style={{ color: LINEN }}>sesión virtual de conocimiento mutuo.</span>
+            </p>
+            <p className="mt-[12px] text-[14px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.7)" }}>
+              Después de esa conversación confirmaremos si avanzamos con el acceso al portafolio privado.
+            </p>
+            <a href="/" className="ix-press mt-[24px] flex h-[54px] w-full items-center justify-center rounded-full text-[15.5px] font-semibold" style={{ background: LINEN, color: "#2a1e14" }}>
+              Volver al inicio
+            </a>
+            <p className="mt-[16px] text-[12.5px] font-medium leading-[1.45]" style={{ color: "#e2cdae" }}>
+              Portafolio privado. Acceso sujeto a evaluación, sesión virtual y disponibilidad.
+            </p>
+          </motion.div>
+
           {/* La caja exterior reserva el sitio ya escalado, para que el flex la
               centre bien; la de dentro va al tamaño del diseño y se encoge. */}
           <motion.div
-            className="relative"
+            className="relative hidden xl:block"
             style={{ width: CARD.w * escala, height: CARD.h * escala }}
             initial={{ opacity: 0, y: 26, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
