@@ -25,12 +25,12 @@ const CAPACIDADES = [
 
 const PASOS = [
   {
-    n: "01", q: "¿Cómo identificamos dónde operar?", t: "Encontramos mercados donde el valor puede crecer.",
+    n: "01", img: "como-zona.webp", q: "¿Cómo identificamos dónde operar?", t: "Encontramos mercados donde el valor puede crecer.",
     p: ["Seleccionamos activos con condiciones reales para generar renta, aumentar su valor y conservar alternativas de salida en el tiempo."],
     nota: "Solo las zonas que cumplen los criterios del modelo avanzan a selección de inmuebles.",
   },
   {
-    n: "02", q: "¿Cómo validamos cada oportunidad?", t: "Dos filtros antes de recomendar una compra.",
+    n: "02", img: "como-inmueble.webp", q: "¿Cómo validamos cada oportunidad?", t: "Dos filtros antes de recomendar una compra.",
     p: [
       "Primero analizamos la microzona, el precio por metro cuadrado, la inversión estimada y el potencial de valorización.",
       "Cada activo debe cumplir los criterios comerciales y técnicos de Zequara para avanzar.",
@@ -38,7 +38,7 @@ const PASOS = [
     nota: "De cada 100 oportunidades evaluadas, menos de 3 llegan a recomendación de compra.",
   },
   {
-    n: "03", q: "¿Qué establece la relación desde el comienzo?", t: "Un acuerdo claro antes de acceder al portafolio.",
+    n: "03", img: "como-preacuerdo.webp", q: "¿Qué establece la relación desde el comienzo?", t: "Un acuerdo claro antes de acceder al portafolio.",
     p: [
       "El preacuerdo protege la confidencialidad de las oportunidades y define cómo se ejecuta el modelo Zequara.",
       "Cuando adquieres un inmueble presentado en la plataforma, la remodelación se desarrolla con nuestro equipo, bajo un alcance, presupuesto y contrato previamente aprobados.",
@@ -46,12 +46,12 @@ const PASOS = [
     nota: "La administración posterior del activo permanece como una decisión del inversionista.",
   },
   {
-    n: "04", q: "¿Cómo cobra Zequara?", t: "Honorarios vinculados a la ejecución sobre el activo.",
+    n: "04", img: null, q: "¿Cómo cobra Zequara?", t: "Honorarios vinculados a la ejecución sobre el activo.",
     p: ["Conoces los honorarios y las condiciones antes de aprobar cada alcance, contrato y estructura."],
     nota: "Acceso sin membresía. Compra sin comisión para el inversionista.",
   },
   {
-    n: "05", q: "¿Cómo protegemos el presupuesto?", t: "Alcance, costos y cronograma definidos antes de comenzar.",
+    n: "05", img: null, q: "¿Cómo protegemos el presupuesto?", t: "Alcance, costos y cronograma definidos antes de comenzar.",
     p: [
       "Los hallazgos técnicos identificados durante la evaluación se incorporan al presupuesto inicial.",
       "Las modificaciones posteriores se documentan, cotizan y aprueban antes de ejecutarse.",
@@ -59,7 +59,7 @@ const PASOS = [
     nota: "Durante la obra puedes consultar el avance, el cronograma, la documentación y las aprobaciones desde tu plataforma.",
   },
   {
-    n: "06", q: "¿Cómo se diseña un inmueble para atraer demanda?", t: "El perfil del arrendatario se define primero.",
+    n: "06", img: "como-renta.webp", q: "¿Cómo se diseña un inmueble para atraer demanda?", t: "El perfil del arrendatario se define primero.",
     p: [
       "Antes de remodelar, identificamos quién debe querer vivir en el inmueble y qué características valora.",
       "La distribución, los materiales, el mobiliario y el canon se proyectan según la demanda de cada microzona.",
@@ -67,7 +67,7 @@ const PASOS = [
     nota: "Cada oportunidad incluye una hipótesis de demanda, canon y ocupación.",
   },
   {
-    n: "07", q: "¿Cómo identificamos el momento de vender?", t: "Los datos orientan. Tú decides.",
+    n: "07", img: "como-salida.webp", q: "¿Cómo identificamos el momento de vender?", t: "Los datos orientan. Tú decides.",
     p: [
       "Zequara monitorea el comportamiento de la microzona, la oferta disponible, la velocidad de venta y los nuevos proyectos en construcción.",
       "Cuando los indicadores muestran una oportunidad de salida, presentamos un escenario con valor estimado de mercado.",
@@ -127,6 +127,11 @@ export default function ModeloCompact() {
               {PASOS.map((p, i) => (
                 <Step key={p.n} n={p.n} title={p.t} delay={0.06 + i * 0.05}>
                   <p className="m-0 text-[12.5px] font-semibold uppercase leading-[1.4] tracking-[1.1px] text-tan-63">{p.q}</p>
+                  {p.img && (
+                    <span className="mt-[12px] block overflow-hidden rounded-[14px]">
+                      <img src={`${A}/${p.img}`} alt="" loading="lazy" decoding="async" className="block h-[150px] w-full object-cover" />
+                    </span>
+                  )}
                   {p.p.map((t) => <p key={t} className="m-0 mt-[8px]">{t}</p>)}
                   <p className="m-0 mt-[10px] text-[13px] leading-[1.5] text-[rgba(247,241,229,0.5)]">{p.nota}</p>
                 </Step>
@@ -186,7 +191,9 @@ export default function ModeloCompact() {
         </section>
 
         {/* ══════════ 12 · CIERRE ══════════ */}
-        <section className={`${WRAP} py-[62px]`}>
+        <section className="relative overflow-hidden">
+          <img src={`${A}/como-cierre.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover" style={{ opacity: 0.25 }} />
+          <div className={`${WRAP} relative py-[62px]`}>
           <In><Eyebrow tone="brown">Tu capital trabaja</Eyebrow></In>
           <In delay={0.06}>
             <H2 dark>Zequara se ocupa de la <span className="font-semibold">operación.</span></H2>
@@ -197,6 +204,7 @@ export default function ModeloCompact() {
             <CTA href="/solicitud-acceso">Solicitar acceso</CTA>
             <Note dark>Portafolio reservado para un grupo limitado de inversionistas. Acceso sujeto a evaluación.</Note>
           </In>
+          </div>
         </section>
 
         <MobileFooter />

@@ -293,7 +293,9 @@ export default function HomeCompact() {
       </section>
 
       {/* ══════════ 4 · UN CASO REAL ══════════ */}
-      <section className={`${WRAP} py-[68px]`}>
+      <section className="relative overflow-hidden">
+        <img src={`${A}/166ec568ae1676f084cc41728776b7aedc389e86.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover opacity-25" />
+        <div className={`${WRAP} relative py-[68px]`}>
         <In><Eyebrow tone="brown">Un caso real · La Cabrera, Bogotá</Eyebrow></In>
         <In delay={0.06}><H2 dark>Los números <span className="font-semibold">del proyecto.</span></H2></In>
 
@@ -352,6 +354,7 @@ export default function HomeCompact() {
             <span className="font-extrabold text-cream-93">1,75× tu patrimonio en 5 años</span>, cobrando renta cada año.
           </p>
         </In>
+        </div>
       </section>
 
       {/* ══════════ 5 · NO ES CROWDFUNDING ══════════ */}
@@ -369,7 +372,12 @@ export default function HomeCompact() {
       </section>
 
       {/* ══════════ 7 · REMODELAMOS ══════════ */}
-      <section className={`${WRAP} py-[68px]`}>
+      <section className="relative overflow-hidden">
+        {/* La foto a sangre del lienzo con su degradado, que es lo que oscurece
+            el pie de la sección. */}
+        <img src={`${A}/7941b044560d1095b5aec747e08e5f1281f727b4.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover" />
+        <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "linear-gradient(180deg, rgba(226,205,174,0.9) 0%, rgba(226,205,174,0.82) 55%, rgba(226,205,174,0.9) 100%)" }} />
+        <div className={`${WRAP} relative py-[68px]`}>
         <In><Eyebrow tone="brown">La obra</Eyebrow></In>
         <In delay={0.06}>
           {/* En el lienzo la marca preside esta sección en grande, encima del
@@ -379,11 +387,12 @@ export default function HomeCompact() {
         </In>
         <div className="mt-[26px] grid grid-cols-1 gap-[12px] sm:grid-cols-2">
           {REMODELACION.map((c, i) => (
-            <In key={c.t} delay={0.06 * i} className="rounded-[16px] border border-solid border-[rgba(165,122,78,0.28)] bg-[rgba(255,255,255,0.4)] p-[20px]">
+            <In key={c.t} delay={0.06 * i} className="rounded-[16px] border border-solid border-[rgba(165,122,78,0.28)] bg-[rgba(255,255,255,0.55)] p-[20px]">
               <h3 className="m-0 text-[17px] font-semibold text-brown-dark">{c.t}</h3>
               <p className="m-0 mt-[7px] text-[14.5px] font-light leading-[1.55] text-[#5b4332]">{c.d}</p>
             </In>
           ))}
+        </div>
         </div>
       </section>
 

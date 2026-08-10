@@ -112,7 +112,9 @@ export default function HubCompact() {
             <form className="mt-[16px] flex flex-col gap-[10px] sm:flex-row" onSubmit={(e) => e.preventDefault()}>
               <input
                 type="email" required placeholder="nombre@correo.com" aria-label="Correo electrónico"
-                className="ix-field h-[52px] flex-1 rounded-full border border-solid px-[18px] text-[15px] outline-none"
+                /* `sm:flex-1` y no `flex-1`: en columna, `flex-basis: 0` cae
+                   sobre el alto y aplasta el campo a la altura del texto. */
+                className="ix-field h-[52px] shrink-0 rounded-full border border-solid px-[18px] text-[15px] outline-none sm:flex-1"
                 style={{ background: "rgba(255,255,255,0.6)", borderColor: "rgba(165,122,78,0.35)", color: "#2a1e14" }}
               />
               <button type="submit" className="ix-press h-[52px] shrink-0 rounded-full px-[26px] text-[15px] font-semibold" style={{ background: BROWN, color: CREAM }}>
