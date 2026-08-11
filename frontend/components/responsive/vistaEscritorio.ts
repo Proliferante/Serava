@@ -1,6 +1,8 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { CLAVE_VISTA, esPrivada } from "@/components/responsive/vista";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    "VER EN ESCRITORIO" desde el móvil.
@@ -12,17 +14,23 @@ import { useCallback, useEffect, useState } from "react";
    mismo que hace el "sitio para ordenador" de Chrome o Safari, pero sin salir
    de la aplicación.
 
-   La preferencia se guarda en `localStorage` para que no haya que repetirla en
-   cada página, y se aplica antes de pintar (`useState` con inicializador) para
-   que no se vea el árbol equivocado un instante.
-   ═══════════════════════════════════════════════════════════════════════════ */
+   Sólo vale dentro del área privada. Es ahí donde se ofrece —el panel son diez
+   pantallas de tablas que piden ancho— y ahí se queda: la preferencia se
+   guardaba para toda la web, así que quien la aceptaba en el panel se
+   encontraba después la portada en versión de escritorio sin haberlo pedido.
+   El predicado y el guion de <head> están en `vista.ts`, que no es de cliente:
+   el layout los necesita y es un componente de servidor.
 
-const CLAVE = "zq:vista";
+   La preferencia se guarda en `localStorage` para no repetirla en cada pantalla
+   del área privada, y se aplica antes de pintar desde el guion de <head> (ver
+   `GUION_VISTA` en `vista.ts`), no aquí: leyéndola tras montar se veía un
+   instante el árbol equivocado.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 function leer(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    return window.localStorage.getItem(CLAVE) === "escritorio";
+    return window.localStorage.getItem(CLAVE_VISTA) === "escritorio";
   } catch {
     // Navegación privada de Safari puede lanzar al tocar localStorage.
     return false;
@@ -39,14 +47,18 @@ function leer(): boolean {
  */
 export function useVistaEscritorio() {
   const [escritorio, setEscritorio] = useState(false);
+  const ruta = usePathname();
 
   useEffect(() => {
     const raiz = document.documentElement;
 
-    // Primera pasada: la preferencia guardada manda sobre el atributo, que en
-    // el HTML servido no viene. Se lee tras montar y no en el render porque en
-    // el servidor no hay `localStorage` y habría desajuste al hidratar.
-    if (!raiz.dataset.vista) raiz.dataset.vista = leer() ? "escritorio" : "movil";
+    // Al navegar dentro de la aplicación el guion de <head> no vuelve a correr,
+    // así que aquí se reevalúa: saliendo del área privada la vista vuelve a la
+    // fluida aunque la preferencia siga guardada.
+    const debe = esPrivada(ruta) && leer();
+    if (raiz.dataset.vista !== (debe ? "escritorio" : "movil")) {
+      raiz.dataset.vista = debe ? "escritorio" : "movil";
+    }
 
     const sincronizar = () => setEscritorio(raiz.dataset.vista === "escritorio");
     sincronizar();
@@ -54,12 +66,12 @@ export function useVistaEscritorio() {
     const mo = new MutationObserver(sincronizar);
     mo.observe(raiz, { attributes: true, attributeFilter: ["data-vista"] });
     return () => mo.disconnect();
-  }, []);
+  }, [ruta]);
 
   const cambiar = useCallback((valor: boolean) => {
     document.documentElement.dataset.vista = valor ? "escritorio" : "movil";
     try {
-      window.localStorage.setItem(CLAVE, valor ? "escritorio" : "movil");
+      window.localStorage.setItem(CLAVE_VISTA, valor ? "escritorio" : "movil");
     } catch {
       /* sin persistencia, pero la sesión actual funciona igual */
     }
