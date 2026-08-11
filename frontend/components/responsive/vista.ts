@@ -9,15 +9,16 @@
 export const CLAVE_VISTA = "zq:vista";
 
 /**
- * Rutas donde la vista de escritorio tiene sentido y está ofrecida.
+ * Rutas donde la vista de escritorio tiene sentido y está ofrecida: sólo el
+ * panel.
  *
- * El aviso sólo aparece al entrar al área privada —diez pantallas de tablas y
+ * El aviso aparece únicamente al entrar al panel —diez pantallas de tablas y
  * cronogramas que piden ancho—, así que la preferencia se queda ahí. Antes
- * valía para todo el sitio, y quien la aceptaba en el panel se encontraba la
- * portada en versión de escritorio sin haberlo pedido.
+ * valía para todo el sitio, y quien la aceptaba se encontraba la portada en
+ * versión de escritorio sin haberlo pedido.
  */
 export function esPrivada(ruta: string): boolean {
-  return ruta.startsWith("/panel") || ruta.startsWith("/predios");
+  return ruta.startsWith("/panel");
 }
 
 /**
@@ -28,7 +29,7 @@ export function esPrivada(ruta: string): boolean {
  * fotograma salía con el árbol de móvil y saltaba al de escritorio a la vista.
  */
 export const GUION_VISTA = `try{
-  var p=location.pathname, priv=p.indexOf('/panel')===0||p.indexOf('/predios')===0;
+  var priv=location.pathname.indexOf('/panel')===0;
   var v=priv&&localStorage.getItem('${CLAVE_VISTA}')==='escritorio'?'escritorio':'movil';
   document.documentElement.dataset.vista=v;
 }catch(e){document.documentElement.dataset.vista='movil'}`;
