@@ -4,7 +4,7 @@ import { MotionConfig } from "framer-motion";
 import { useState } from "react";
 import MobileNav from "@/components/responsive/MobileNav";
 import ConfirmacionModal from "@/components/sections/solicitud/ConfirmacionModal";
-import { BROWN, Card, CheckList, CTA, Eyebrow, H2, In, LASER, MILLBROOK, Note, P, Step, Timeline, WRAP } from "@/components/responsive/kit";
+import { BROWN, Card, CheckList, CTA, Eyebrow, H2, In, LASER, MILLBROOK, Note, P, Reveal, Step, Timeline, WRAP } from "@/components/responsive/kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SOLICITUD DE ACCESO — vista fluida para móvil y tablet (por debajo de 1280).
@@ -91,7 +91,7 @@ export default function SolicitudCompact() {
             <In y={16}><Eyebrow>Portafolio privado Zequara</Eyebrow></In>
             <In y={20} delay={0.08}>
               <h1 className="mt-[14px] text-[clamp(2rem,8.4vw,3.1rem)] font-light leading-[1.1] tracking-[-0.02em] text-cream-93">
-                Conozcamos tu <span className="font-semibold">estrategia de inversión.</span>
+                <Reveal delay={0.14}>Conozcamos tu <span className="font-semibold">estrategia de inversión.</span></Reveal>
               </h1>
               <P>Completa tu perfil para iniciar el proceso de acceso a oportunidades seleccionadas según tu capital, objetivo y mercados de interés.</P>
             </In>

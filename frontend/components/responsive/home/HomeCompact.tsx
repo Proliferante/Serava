@@ -9,6 +9,7 @@ import { tinted, WORDMARK, WORDMARK_RATIO, wordmarkH } from "@/components/brand"
 import MobileNav from "@/components/responsive/MobileNav";
 import MobileFooter from "@/components/responsive/MobileFooter";
 import DiagnosticoTrigger from "@/components/DiagnosticoTrigger";
+import { Parallax, Reveal } from "@/components/responsive/kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    HOME — vista fluida para móvil y tablet (por debajo de 1280).
@@ -184,14 +185,20 @@ export default function HomeCompact() {
 
       {/* ══════════ 1 · HERO ══════════ */}
       <section className="relative overflow-hidden" style={{ background: "#2a1e14" }}>
-        <video
+        {/* El vídeo abre desde un plano un 8 % más cerrado y se va abriendo:
+            en el escritorio la escena es enorme y ya respira sola, pero en 390
+            px un plano fijo se lee como una foto. Sólo se anima `scale`. */}
+        <motion.video
           className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
           autoPlay muted loop playsInline preload="metadata"
           poster={`${A}/hero-home-poster.webp`}
+          initial={{ scale: 1.08 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 2.4, ease: EASE }}
         >
           <source src={`${A}/hero-home.webm`} type="video/webm" />
           <source src={`${A}/hero-home.mp4`} type="video/mp4" />
-        </video>
+        </motion.video>
         <div className="pointer-events-none absolute inset-0" style={{ background: "rgba(73,33,0,0.68)" }} />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[160px]" style={{ backgroundImage: "linear-gradient(180deg, rgba(226,205,174,0) 0%, #e2cdae 92%)" }} />
 
@@ -204,14 +211,10 @@ export default function HomeCompact() {
             <img src={WORDMARK} alt="Zequara" decoding="async" className="block size-full max-w-none" />
           </motion.div>
 
-          <motion.h1
-            className="mt-[30px] text-[clamp(2.1rem,9.2vw,3.5rem)] font-semibold leading-[1.05] text-cream"
-            initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.1, ease: EASE }}
-          >
-            <span className="block">Invierte tu capital,</span>
-            <span className="block text-tan">no tu tiempo.</span>
-          </motion.h1>
+          <h1 className="mt-[30px] text-[clamp(2.1rem,9.2vw,3.5rem)] font-semibold leading-[1.05] text-cream">
+            <Reveal delay={0.12}><span className="block">Invierte tu capital,</span></Reveal>
+            <Reveal delay={0.22}><span className="block text-tan">no tu tiempo.</span></Reveal>
+          </h1>
 
           <motion.p
             className="mt-[16px] text-[clamp(1.05rem,4.4vw,1.5rem)] font-medium leading-[1.3] text-cream"
@@ -257,7 +260,7 @@ export default function HomeCompact() {
 
       {/* ══════════ 2 · CRITERIO ══════════ */}
       <section className="relative overflow-hidden">
-        <img src={`${A}/2cddbd3323c70d04c23ee3ff2c94699c7988af39.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover opacity-20" />
+        <Parallax src={`${A}/2cddbd3323c70d04c23ee3ff2c94699c7988af39.webp`} opacity={0.2} amount={56} />
         <div className={`${WRAP} relative py-[68px]`}>
         <In><Eyebrow tone="brown">Pocas oportunidades. Para pocos.</Eyebrow></In>
         <In delay={0.06}>
@@ -283,7 +286,7 @@ export default function HomeCompact() {
       <section className="relative overflow-hidden rounded-tr-[64px] bg-brown-dark py-[68px]">
         {/* La foto del diseño va a sangre; aquí se vela para que el texto de la
             línea de tiempo siga legible sobre ella. */}
-        <img src={`${A}/c711c71d04448a3a0e845fd9b958b2015dfbf6aa.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover opacity-30" />
+        <Parallax src={`${A}/c711c71d04448a3a0e845fd9b958b2015dfbf6aa.webp`} opacity={0.3} amount={64} />
         <div className="pointer-events-none absolute inset-0" style={{ background: "rgba(73,33,0,0.72)" }} />
         <div className={`${WRAP} relative`}>
           <In><Eyebrow>Así funciona tu inversión</Eyebrow></In>
@@ -305,9 +308,17 @@ export default function HomeCompact() {
             />
             {PASOS.map((p, i) => (
               <In key={p.n} delay={0.1 + i * 0.1} className="relative pb-[30px] last:pb-0">
-                <span className="absolute -left-[38px] top-[2px] flex size-[27px] items-center justify-center rounded-full border border-solid border-[rgba(201,168,119,0.5)] bg-brown-dark text-[10px] font-semibold text-tan-63">
+                {/* El número entra creciendo desde el centro cuando su paso
+                    llega: marca el avance por la línea al ir bajando. */}
+                <motion.span
+                  className="absolute -left-[38px] top-[2px] flex size-[27px] items-center justify-center rounded-full border border-solid border-[rgba(201,168,119,0.5)] bg-brown-dark text-[10px] font-semibold text-tan-63"
+                  initial={{ scale: 0.3, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{ type: "spring", stiffness: 320, damping: 18, delay: 0.14 + i * 0.1 }}
+                >
                   {p.n.slice(-2)}
-                </span>
+                </motion.span>
                 <p className="m-0 text-[13px] font-semibold leading-[1.32] text-cream">{p.n}</p>
                 <h3 className="m-0 mt-[4px] text-[clamp(1.05rem,4.4vw,1.35rem)] font-semibold leading-[1.15] text-cream">{p.t}</h3>
                 <p className="m-0 mt-[10px] text-[15px] font-light leading-[1.35] text-white">{p.d}</p>
@@ -481,8 +492,12 @@ export default function HomeCompact() {
           que la apaga hacia abajo, la marca y el titular en crema y las cuatro
           tarjetas en marrón. Iba al revés —velo crema y tarjetas blancas—. */}
       <section className="relative overflow-hidden" style={{ background: "#2a1e14" }}>
-        <img src={`${A}/7941b044560d1095b5aec747e08e5f1281f727b4.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover" />
-        <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "linear-gradient(180deg, rgba(175,79,0,0) 31%, rgba(61,26,0,0.73) 64%, rgba(73,33,0,0.73) 80%)" }} />
+        <Parallax src={`${A}/7941b044560d1095b5aec747e08e5f1281f727b4.webp`} amount={72} />
+        {/* El degradado del lienzo arranca transparente porque allí el titular
+            cae en el tercio inferior de una foto de 1639 px. Apilado, el
+            titular queda arriba, así que la parada inicial lleva algo de velo
+            —lo justo para que el texto se lea sobre la parte clara. */}
+        <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "linear-gradient(180deg, rgba(42,30,20,0.62) 0%, rgba(61,26,0,0.74) 55%, rgba(73,33,0,0.78) 100%)" }} />
         <div className={`${WRAP} relative py-[68px]`}>
           <In><Eyebrow>La obra</Eyebrow></In>
           <In delay={0.06}>
@@ -548,7 +563,7 @@ export default function HomeCompact() {
             plano se amplía tanto que su rótulo "BOGOTÁ" sale del tamaño del
             titular y compite con él. Así el detalle conserva la escala que
             tiene en el lienzo. */}
-        <img src={`${A}/63f0d4b26acea5bd4269d62fe7c1683462dc68c9.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-x-0 top-0 w-full opacity-20" />
+        <Parallax src={`${A}/63f0d4b26acea5bd4269d62fe7c1683462dc68c9.webp`} opacity={0.2} amount={48} anchor="top" />
         <div className={`${WRAP} relative py-[68px]`}>
           <In>
             <h2 className="m-0 text-[clamp(1.9rem,7.4vw,2.8rem)] font-black leading-[1.08] text-cream">El criterio de entrada</h2>

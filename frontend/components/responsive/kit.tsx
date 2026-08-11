@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
-import type { CSSProperties, ReactNode } from "react";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useRef, type CSSProperties, type ReactNode } from "react";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    KIT DE LA VISTA FLUIDA — las piezas que comparten las páginas por debajo de
@@ -198,5 +198,84 @@ export function CheckList({ items, dark }: { items: string[]; dark?: boolean }) 
         </In>
       ))}
     </ul>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOVIMIENTO LIGADO AL SCROLL
+
+   El escritorio mueve las fotos de fondo con `par` mientras la página baja.
+   Aquí se hace igual: la foto recorre unos píxeles en sentido contrario al
+   scroll, lo justo para dar profundidad sin marear en una pantalla pequeña.
+
+   Sólo se anima `y` —una transformación—, así que lo compone la GPU y no
+   provoca reflujo. `useReducedMotion` lo apaga entero cuando el sistema pide
+   menos movimiento; ahí la foto se queda quieta y centrada.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Foto de fondo con parallax. Va dentro de una sección `relative` y se coloca
+ * ella misma en absoluto, como la haría un `<img>` de fondo.
+ *
+ * `amount` es el recorrido total en píxeles. La foto se escala un poco por
+ * encima del hueco (`scale`) para que al desplazarse no deje ver el borde.
+ */
+export function Parallax({
+  src, alt = "", amount = 40, opacity = 1, className, anchor = "cover",
+}: {
+  src: string;
+  alt?: string;
+  amount?: number;
+  opacity?: number;
+  className?: string;
+  /** `cover` recorta al hueco; `top` la ancla arriba a lo ancho. */
+  anchor?: "cover" | "top";
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const quieto = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], [-amount / 2, amount / 2]);
+
+  return (
+    <div ref={ref} aria-hidden={alt === "" || undefined} className={`pointer-events-none absolute inset-0 overflow-hidden ${className ?? ""}`}>
+      <motion.img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        style={{
+          y: quieto ? 0 : y,
+          opacity,
+          // El sobreancho compensa el recorrido: sin él se vería el hueco al
+          // llegar a los extremos del desplazamiento.
+          height: anchor === "cover" ? `calc(100% + ${amount}px)` : undefined,
+          top: anchor === "cover" ? -amount / 2 : 0,
+        }}
+        className={anchor === "cover"
+          ? "absolute inset-x-0 max-w-none object-cover"
+          : "absolute inset-x-0 w-full max-w-none"}
+      />
+    </div>
+  );
+}
+
+/**
+ * Entrada del titular de una página: aparece desde abajo detrás de un borde
+ * que lo recorta, como si subiera al descubierto. El escritorio hace esto
+ * línea a línea con `MLine`; aquí no se puede saber dónde parte cada línea a
+ * un ancho fluido, así que se revela el bloque entero.
+ */
+export function Reveal({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
+  return (
+    <span className={`block overflow-hidden ${className ?? ""}`}>
+      <motion.span
+        className="block"
+        initial={{ y: "105%" }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.85, delay, ease: EASE }}
+      >
+        {children}
+      </motion.span>
+    </span>
   );
 }

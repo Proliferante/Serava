@@ -4,7 +4,7 @@ import { MotionConfig } from "framer-motion";
 import MobileNav from "@/components/responsive/MobileNav";
 import MobileFooter from "@/components/responsive/MobileFooter";
 import BeforeAfterTouch from "@/components/responsive/BeforeAfterTouch";
-import { BROWN, Card, CheckList, CTA, Eyebrow, H2, In, LASER, Note, P, WRAP } from "@/components/responsive/kit";
+import { BROWN, Card, CheckList, CTA, Eyebrow, H2, In, LASER, Note, P, Parallax, Reveal, WRAP } from "@/components/responsive/kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    OPORTUNIDADES — vista fluida para móvil y tablet (por debajo de 1280).
@@ -60,16 +60,13 @@ export default function OportunidadesCompact() {
 
         {/* ══════════ 1 · HERO ══════════ */}
         <section className="relative overflow-hidden bg-brown-dark">
-          <img
-            src={`${A}/opp-hero.webp`} alt="" loading="eager" decoding="async"
-            className="pointer-events-none absolute inset-0 size-full object-cover opacity-45"
-          />
+          <Parallax src={`${A}/opp-hero.webp`} opacity={0.45} amount={60} />
           <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "linear-gradient(180deg, rgba(73,33,0,0.7) 0%, rgba(73,33,0,0.93) 100%)" }} />
           <div className={`${WRAP} relative pb-[64px] pt-[52px]`}>
             <In y={16}><Eyebrow>Oportunidades</Eyebrow></In>
             <In y={20} delay={0.08}>
               <h1 className="mt-[14px] text-[clamp(2rem,8.2vw,3.1rem)] font-light leading-[1.1] tracking-[-0.02em] text-cream-93">
-                Propiedades con potencial real de <span className="font-semibold">transformación.</span>
+                <Reveal delay={0.14}>Propiedades con potencial real de <span className="font-semibold">transformación.</span></Reveal>
               </h1>
               <P>Zequara selecciona activos en zonas consolidadas, con condiciones para aumentar su valor mediante diseño, remodelación y mejor operación.</P>
             </In>
@@ -128,7 +125,7 @@ export default function OportunidadesCompact() {
         {/* ══════════ 3 · QUÉ MUESTRA CADA OPORTUNIDAD ══════════ */}
         <section className="relative overflow-hidden rounded-tl-[64px] bg-brown-dark py-[62px]">
           {/* La trama topográfica del lienzo, al mismo 5 %. */}
-          <img src={`${A}/opp-topo.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover" style={{ opacity: 0.05 }} />
+          <Parallax src={`${A}/opp-topo.webp`} opacity={0.05} amount={40} />
           <div className={`${WRAP} relative`}>
             <In><Eyebrow>Información para decidir</Eyebrow></In>
             <In delay={0.06}>
@@ -181,10 +178,7 @@ export default function OportunidadesCompact() {
 
         {/* ══════════ 5 · ACCESO ══════════ */}
         <section className="relative overflow-hidden rounded-tl-[64px] py-[68px]" style={{ background: "rgba(73,33,0,0.96)" }}>
-          <img
-            src={`${A}/opp-dusk.webp`} alt="" loading="lazy" decoding="async"
-            className="pointer-events-none absolute inset-0 size-full object-cover opacity-25"
-          />
+          <Parallax src={`${A}/opp-dusk.webp`} opacity={0.25} amount={56} />
           {/* El aro del diseño no cabe a este ancho; queda su filete superior
               como remate, que es lo que aporta en pequeño. */}
           <div className={`${WRAP} relative text-center`}>

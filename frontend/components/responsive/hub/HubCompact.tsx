@@ -1,11 +1,11 @@
 "use client";
 
-import { MotionConfig } from "framer-motion";
+import { motion, MotionConfig } from "framer-motion";
 import { useMemo, useState } from "react";
 import MobileNav from "@/components/responsive/MobileNav";
 import MobileFooter from "@/components/responsive/MobileFooter";
 import { CARDS } from "@/components/sections/hub/HubCardsGrid";
-import { BROWN, CREAM, In, LASER, MILLBROOK, WRAP } from "@/components/responsive/kit";
+import { BROWN, CREAM, In, LASER, MILLBROOK, Parallax, Reveal, WRAP } from "@/components/responsive/kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    HUB — vista fluida para móvil y tablet (por debajo de 1280).
@@ -55,10 +55,7 @@ export default function HubCompact() {
 
         {/* ══════════ HERO ══════════ */}
         <section className="relative overflow-hidden bg-brown-dark">
-          <img
-            src={`${A}/0399392c61096f2f9a6febf99f556a00af4eb6ac.webp`} alt="" loading="eager" decoding="async"
-            className="pointer-events-none absolute inset-0 size-full object-cover opacity-45"
-          />
+          <Parallax src={`${A}/0399392c61096f2f9a6febf99f556a00af4eb6ac.webp`} opacity={0.45} amount={60} />
           <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "linear-gradient(180deg, rgba(73,33,0,0.66) 0%, rgba(73,33,0,0.94) 100%)" }} />
           <div className={`${WRAP} relative pb-[52px] pt-[52px]`}>
             <In y={16}>
@@ -66,7 +63,7 @@ export default function HubCompact() {
             </In>
             <In y={20} delay={0.08}>
               <h1 className="mt-[12px] text-[clamp(2rem,8.4vw,3rem)] font-light leading-[1.1] tracking-[-0.02em] text-cream-93">
-                Criterio para invertir mejor en <span className="font-semibold">finca raíz.</span>
+                <Reveal delay={0.14}>Criterio para invertir mejor en <span className="font-semibold">finca raíz.</span></Reveal>
               </h1>
               <p className="mt-[14px] text-[clamp(0.95rem,3.6vw,1.05rem)] font-light leading-[1.6] text-[rgba(247,241,229,0.78)]">
                 Artículos, análisis y videos sobre patrimonio, mercado inmobiliario y el método Zequara. Lo que necesitas saber antes de cada decisión.
@@ -139,7 +136,7 @@ export default function HubCompact() {
         {/* ══════════ REJILLA ══════════ */}
         <section className="relative overflow-hidden pb-[62px] pt-[38px]">
           {/* La trama de mapa del lienzo, al mismo 15 %. */}
-          <img src={`${A}/d97817dcb8ef87e0a52ccef1d65f05587ff8c8dd.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover opacity-15" />
+          <Parallax src={`${A}/d97817dcb8ef87e0a52ccef1d65f05587ff8c8dd.webp`} opacity={0.15} amount={44} />
           <div className={`${WRAP} relative`}>
           <div className="flex items-baseline justify-between gap-[12px]">
             <p className="m-0 text-[clamp(1.05rem,4.4vw,1.3rem)] font-medium" style={{ color: BROWN }}>Explora el contenido</p>
@@ -186,7 +183,7 @@ export default function HubCompact() {
           <div className="mt-[20px] grid grid-cols-1 gap-[14px] sm:grid-cols-2">
             {visibles.map((c, i) => (
               <In key={c.title.join("")} delay={Math.min(i, 5) * 0.05}>
-                <a href="#" className="ix-card flex h-full flex-col overflow-hidden rounded-[20px] border border-solid" style={{ borderColor: "rgba(165,122,78,0.28)", background: "#f7f1e5" }}>
+                <motion.a href="#" whileTap={{ scale: 0.98 }} transition={{ duration: 0.14 }} className="ix-card flex h-full flex-col overflow-hidden rounded-[20px] border border-solid" style={{ borderColor: "rgba(165,122,78,0.28)", background: "#f7f1e5" }}>
                   <div className="relative flex h-[128px] items-center justify-center" style={{ backgroundImage: "linear-gradient(155deg, #5b4332 0%, #3d2c1e 100%)" }}>
                     <span className="text-[9.6px] font-semibold uppercase tracking-[1.15px]" style={{ color: "rgba(247,241,229,0.6)" }}>{c.imageLabel}</span>
                     <span className="absolute left-[12px] top-[12px] rounded-full px-[11px] py-[4px] text-[10.6px] font-semibold uppercase tracking-[1.7px]" style={{ background: "rgba(201,168,119,0.22)", color: LASER }}>{TIPO[c.type] ?? c.type}</span>
@@ -197,7 +194,7 @@ export default function HubCompact() {
                     <p className="m-0 mt-[6px] text-[13.5px] font-light leading-[1.5]" style={{ color: MILLBROOK }}>{c.desc.join(" ")}</p>
                     <span className="mt-auto pt-[12px] text-[12px] font-medium" style={{ color: "rgba(91,67,50,0.7)" }}>{c.meta}</span>
                   </div>
-                </a>
+                </motion.a>
               </In>
             ))}
           </div>
