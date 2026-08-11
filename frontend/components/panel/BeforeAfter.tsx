@@ -55,14 +55,21 @@ function BaTag({ side, label }: { side: "left" | "right"; label: string }) {
   );
 }
 
+/**
+ * Sin `x`/`y`/`w`/`h` el comparador rellena a su contenedor, que es lo que
+ * necesita la vista fluida: allí el ancho lo pone la columna y el alto una
+ * proporción, no un número de píxeles del lienzo. El arrastre es el mismo en
+ * los dos casos porque el recorte va en porcentaje.
+ */
 export default function BeforeAfter({
   x, y, w, h, r = 12,
   beforeLabel = "Foto ANTES — estado original",
   afterLabel = "Foto DESPUÉS — estado actual",
 }: {
-  x: number; y: number; w: number; h: number; r?: number;
+  x?: number; y?: number; w?: number; h?: number; r?: number;
   beforeLabel?: string; afterLabel?: string;
 }) {
+  const suelto = x == null;
   const box = useRef<HTMLDivElement>(null);
   const [pct, setPct] = useState(50);
   const [dragging, setDragging] = useState(false);
@@ -105,8 +112,13 @@ export default function BeforeAfter({
   return (
     <div
       ref={box}
-      className="absolute overflow-hidden"
-      style={{ left: x, top: y, width: w, height: h, borderRadius: r, background: AFTER_BG, cursor: dragging ? "grabbing" : "ew-resize", touchAction: "none" }}
+      className={`${suelto ? "absolute inset-0" : "absolute"} overflow-hidden`}
+      style={{
+        left: suelto ? undefined : x, top: suelto ? undefined : y,
+        width: suelto ? undefined : w, height: suelto ? undefined : h,
+        borderRadius: r, background: AFTER_BG,
+        cursor: dragging ? "grabbing" : "ew-resize", touchAction: "none",
+      }}
       onPointerDown={(e) => { setDragging(true); moveTo(e.clientX); }}
     >
       {/* Estado actual, de fondo */}

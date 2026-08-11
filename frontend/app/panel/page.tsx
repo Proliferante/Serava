@@ -1,4 +1,5 @@
 import PanelPage from "@/components/panel/PanelPage";
+import ResumenCompact from "@/components/responsive/panel/ResumenCompact";
 import ResumenScreen, { RESUMEN_H } from "@/components/sections/panel/ResumenScreen";
 
 /**
@@ -9,7 +10,7 @@ import ResumenScreen, { RESUMEN_H } from "@/components/sections/panel/ResumenScr
  */
 export default function PanelResumenPage() {
   return (
-    <PanelPage active="resumen" h={RESUMEN_H}>
+    <PanelPage active="resumen" h={RESUMEN_H} compact={<ResumenCompact />}>
       <ResumenScreen />
     </PanelPage>
   );

@@ -2,8 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import "@/styles/globals.css";
 import PageTransition from "@/components/PageTransition";
-import BotonVistaMovil from "@/components/responsive/BotonVistaMovil";
-import { GUION_VISTA } from "@/components/responsive/vista";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -37,15 +35,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={poppins.variable}>
-      <head>
-        {/* Fija `data-vista` antes del primer pintado. Puesto en un efecto, la
-            primera imagen salía en móvil y saltaba a escritorio a la vista de
-            quien hubiera aceptado esa opción en el panel. */}
-        <script dangerouslySetInnerHTML={{ __html: GUION_VISTA }} />
-      </head>
       <body className="font-sans antialiased">
         <PageTransition>{children}</PageTransition>
-        <BotonVistaMovil />
       </body>
     </html>
   );

@@ -4,19 +4,22 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { MARK } from "@/components/brand";
-import { useVistaEscritorio } from "@/components/responsive/vistaEscritorio";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    AVISO DE PANTALLA — al entrar al panel desde un móvil.
 
-   El panel son diez pantallas de tablas, cronogramas y gráficas de obra:
-   información pensada para leerse a lo ancho. En vez de rehacerla en columna y
-   perder la comparación entre filas, se avisa y se dan las dos salidas reales:
-   cambiar a la vista de escritorio aquí mismo, o seguir en el móvil.
+   Es sólo un aviso: no cambia ninguna configuración. Las diez pantallas del
+   panel ya están adaptadas a la columna, así que aquí no hay nada que
+   arreglar; lo que se dice es que en un computador se ve todo de un vistazo
+   —tablas y cronogramas lado a lado— y que apilado hay que desplazarse más.
+
+   Antes ofrecía cambiar a la vista de escritorio. Se quitó porque esa opción
+   guardaba una preferencia que después seguía al usuario a otras pantallas, y
+   porque con las vistas fluidas terminadas ya no hace falta.
 
    Se muestra una sola vez por sesión —`sessionStorage`, no `localStorage`: si
    alguien vuelve mañana desde el móvil, el aviso sigue siendo útil— y sólo por
-   debajo de 1024, que es donde una tabla de obra deja de caber.
+   debajo de 1024, que es donde el panel de escritorio deja de caber.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -31,7 +34,6 @@ const LASER = "#c9a877";
 export default function AvisoPantalla() {
   const [abierto, setAbierto] = useState(false);
   const [montado, setMontado] = useState(false);
-  const { cambiar } = useVistaEscritorio();
 
   useEffect(() => setMontado(true), []);
 
@@ -95,41 +97,28 @@ export default function AvisoPantalla() {
             </p>
 
             <h2 id="aviso-pantalla-titulo" className="mt-[10px] text-[clamp(1.35rem,6.2vw,1.7rem)] font-light leading-[1.2]" style={{ color: LINEN }}>
-              Esta sección se aprecia mejor en <span className="font-semibold">pantalla grande.</span>
+              Tienes el panel completo, <span className="font-semibold">también aquí.</span>
             </h2>
 
             <p className="mx-auto mt-[14px] max-w-[320px] text-[14.5px] font-light leading-[1.55]" style={{ color: "rgba(247,241,229,0.78)" }}>
-              El seguimiento de tu obra reúne cronogramas, presupuestos y comparativas
-              pensados para leerse a lo ancho. Desde un computador verás cada cifra en su
-              contexto y podrás revisar los documentos con comodidad.
+              Toda la información de tu obra está en esta pantalla: avance, presupuesto,
+              aprobaciones, interventoría y documentos. Desde un computador la verás en
+              menos desplazamientos, con las tablas y el cronograma lado a lado.
             </p>
 
-            <div className="mt-[24px] flex flex-col gap-[10px]">
-              <button
-                type="button"
-                onClick={() => { cambiar(true); cerrar(); }}
-                className="ix-press flex h-[54px] items-center justify-center gap-[9px] rounded-full text-[15.5px] font-semibold"
-                style={{ background: CREAM, color: BROWN }}
-              >
-                <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                  <rect x="2.5" y="4" width="19" height="13" rx="2" /><path d="M8 20h8M12 17v3" />
-                </svg>
-                Ver en vista de escritorio
-              </button>
-
+            <div className="mt-[24px]">
               <button
                 type="button"
                 onClick={cerrar}
-                className="ix-press flex h-[52px] items-center justify-center rounded-full border border-solid text-[15px] font-medium"
-                style={{ borderColor: "rgba(247,241,229,0.22)", color: LINEN }}
+                className="ix-press flex h-[54px] w-full items-center justify-center gap-[9px] rounded-full text-[15.5px] font-semibold"
+                style={{ background: CREAM, color: BROWN }}
               >
-                Continuar en el móvil
+                Entendido, sigo aquí
               </button>
             </div>
 
             <p className="mt-[16px] text-[12.5px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.5)" }}>
-              La vista de escritorio muestra la plataforma completa; puedes ampliar con los
-              dedos y volver al móvil cuando quieras.
+              Este aviso sale una sola vez por visita.
             </p>
           </motion.div>
         </motion.div>
