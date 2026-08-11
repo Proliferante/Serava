@@ -92,7 +92,8 @@ export default function PrediosCompact() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div style={{ background: "#2a1e14" }}>
+      {/* El mismo degradado del lienzo: marrón arriba, crema al pie. */}
+      <div style={{ backgroundImage: "linear-gradient(0deg, #e2cdae 0%, #492100 83%)" }}>
         <PrediosNavCompact />
 
         {/* ══════════ ENCABEZADO ══════════ */}

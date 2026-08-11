@@ -91,19 +91,19 @@ export default function HubCompact() {
         {/* ══════════ DESTACADO ══════════ */}
         <section className={`${WRAP} pt-[40px]`}>
           <In>
-            <a href="#" className="ix-card block overflow-hidden rounded-[18px] border border-solid" style={{ borderColor: "rgba(165,122,78,0.3)", background: "rgba(255,255,255,0.45)" }}>
-              <div className="flex h-[172px] items-center justify-center" style={{ backgroundImage: "linear-gradient(135deg, rgba(201,168,119,0.35) 0%, rgba(165,122,78,0.18) 100%)" }}>
-                <span className="text-[11px] font-semibold uppercase tracking-[1.4px]" style={{ color: "rgba(73,33,0,0.55)" }}>Imagen artículo — patrimonio</span>
+            <a href="#" className="ix-card block overflow-hidden rounded-[24px] bg-brown-dark shadow-[0px_34px_70px_-36px_rgba(42,30,20,0.55)]">
+              <div className="flex h-[172px] items-center justify-center" style={{ backgroundImage: "linear-gradient(155deg, #5b4332 0%, #3d2c1e 100%)" }}>
+                <span className="text-[11px] font-semibold uppercase tracking-[1.4px]" style={{ color: "rgba(247,241,229,0.6)" }}>Imagen artículo — patrimonio</span>
               </div>
-              <div className="p-[20px]">
-                <span className="inline-block rounded-full px-[11px] py-[4px] text-[10px] font-bold uppercase tracking-[0.8px]" style={{ background: BROWN, color: CREAM }}>Artículo · Patrimonio</span>
-                <h2 className="m-0 mt-[12px] text-[clamp(1.25rem,5.4vw,1.7rem)] font-semibold leading-[1.2]" style={{ color: BROWN }}>
+              <div className="p-[24px]">
+                <span className="inline-flex items-center gap-[7px] rounded-full px-[12px] py-[5px] text-[10.6px] font-semibold uppercase tracking-[1.7px]" style={{ background: "rgba(201,168,119,0.22)", color: LASER }}>Artículo · Patrimonio</span>
+                <h2 className="m-0 mt-[14px] text-[clamp(1.3rem,5.8vw,1.85rem)] font-light leading-[1.14] tracking-[-0.02em] text-cream-93">
                   Cómo se construye patrimonio con finca raíz (y no solo se compra)
                 </h2>
-                <p className="m-0 mt-[8px] text-[14.5px] font-light leading-[1.55]" style={{ color: MILLBROOK }}>
+                <p className="m-0 mt-[10px] text-[15px] font-light leading-[1.55]" style={{ color: "rgba(247,241,229,0.82)" }}>
                   La diferencia entre tener un inmueble y hacerlo trabajar para tu patrimonio.
                 </p>
-                <span className="mt-[12px] inline-flex items-center gap-[7px] text-[14px] font-semibold" style={{ color: BROWN }}>
+                <span className="mt-[14px] inline-flex items-center gap-[7px] text-[15px] font-semibold" style={{ color: LASER }}>
                   Leer ahora
                   <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M4.5 12h15M13.6 6.2 19.5 12l-5.9 5.8" /></svg>
                 </span>
@@ -128,7 +128,7 @@ export default function HubCompact() {
                 className="ix-field h-[52px] shrink-0 rounded-full border border-solid px-[23px] text-[15px] text-cream-93 outline-none sm:flex-1"
                 style={{ background: "rgba(247,241,229,0.1)", borderColor: "rgba(247,241,229,0.4)" }}
               />
-              <button type="submit" className="ix-press h-[52px] shrink-0 rounded-full px-[26px] text-[15px] font-semibold" style={{ background: CREAM, color: BROWN }}>
+              <button type="submit" className="ix-press h-[52px] shrink-0 rounded-full px-[26px] text-[15px] font-semibold" style={{ background: "#f7f1e5", color: BROWN }}>
                 Suscribirme
               </button>
             </form>
@@ -186,13 +186,14 @@ export default function HubCompact() {
           <div className="mt-[20px] grid grid-cols-1 gap-[14px] sm:grid-cols-2">
             {visibles.map((c, i) => (
               <In key={c.title.join("")} delay={Math.min(i, 5) * 0.05}>
-                <a href="#" className="ix-card flex h-full flex-col overflow-hidden rounded-[16px] border border-solid" style={{ borderColor: "rgba(165,122,78,0.28)", background: "rgba(255,255,255,0.42)" }}>
-                  <div className="flex h-[128px] items-center justify-center" style={{ backgroundImage: "linear-gradient(135deg, rgba(201,168,119,0.3) 0%, rgba(165,122,78,0.14) 100%)" }}>
-                    <span className="text-[10px] font-semibold uppercase tracking-[1.2px]" style={{ color: "rgba(73,33,0,0.5)" }}>{c.imageLabel}</span>
+                <a href="#" className="ix-card flex h-full flex-col overflow-hidden rounded-[20px] border border-solid" style={{ borderColor: "rgba(165,122,78,0.28)", background: "#f7f1e5" }}>
+                  <div className="relative flex h-[128px] items-center justify-center" style={{ backgroundImage: "linear-gradient(155deg, #5b4332 0%, #3d2c1e 100%)" }}>
+                    <span className="text-[9.6px] font-semibold uppercase tracking-[1.15px]" style={{ color: "rgba(247,241,229,0.6)" }}>{c.imageLabel}</span>
+                    <span className="absolute left-[12px] top-[12px] rounded-full px-[11px] py-[4px] text-[10.6px] font-semibold uppercase tracking-[1.7px]" style={{ background: "rgba(201,168,119,0.22)", color: LASER }}>{TIPO[c.type] ?? c.type}</span>
                   </div>
                   <div className="flex flex-1 flex-col p-[16px]">
-                    <span className="text-[10px] font-bold uppercase tracking-[0.9px]" style={{ color: "#a57a4e" }}>{TIPO[c.type] ?? c.type} · {c.category}</span>
-                    <h3 className="m-0 mt-[7px] text-[15.5px] font-semibold leading-[1.3]" style={{ color: BROWN }}>{c.title.join(" ")}</h3>
+                    <span className="text-[11.5px] font-semibold uppercase tracking-[1.6px]" style={{ color: "#a57a4e" }}>{c.category}</span>
+                    <h3 className="m-0 mt-[12px] text-[17.5px] font-semibold leading-[1.3]" style={{ color: "#2a1e14" }}>{c.title.join(" ")}</h3>
                     <p className="m-0 mt-[6px] text-[13.5px] font-light leading-[1.5]" style={{ color: MILLBROOK }}>{c.desc.join(" ")}</p>
                     <span className="mt-auto pt-[12px] text-[12px] font-medium" style={{ color: "rgba(91,67,50,0.7)" }}>{c.meta}</span>
                   </div>

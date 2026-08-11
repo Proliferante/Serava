@@ -92,14 +92,20 @@ function Wordmark({ w, tone = "cream" }: { w: string; tone?: "cream" | "brown" }
   return <img src={WORDMARK} alt="Zequara" loading="lazy" decoding="async" className="inline-block max-w-none" style={base} />;
 }
 
-/** Botón principal. 54 px de alto: el mínimo cómodo para el pulgar. */
-function CTA({ href, children, tone = "cream" }: { href: string; children: ReactNode; tone?: "cream" | "olive" }) {
-  const cream = tone === "cream";
+/** Los tres colores de botón del lienzo: crema en el hero, marrón sobre
+    crema y oliva para el diagnóstico. */
+const CTA_TONO = {
+  cream: { background: "#e2cdae", color: "#492100" },
+  brown: { background: "#492100", color: "#e2cdae" },
+  olive: { background: "#7f8b57", color: "#f7f1e5" },
+} as const;
+
+function CTA({ href, children, tone = "cream" }: { href: string; children: ReactNode; tone?: keyof typeof CTA_TONO }) {
   return (
     <a
       href={href}
       className="ix-press mt-[26px] flex h-[56px] w-full max-w-[340px] items-center justify-center rounded-full text-[16px] font-semibold"
-      style={cream ? { background: "#e2cdae", color: "#492100" } : { background: "#7f8b57", color: "#f7f1e5" }}
+      style={CTA_TONO[tone]}
     >
       {children}
     </a>
@@ -219,7 +225,7 @@ export default function HomeCompact() {
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3, ease: EASE }}
           >
-            <CTA href="/solicitud-acceso">Solicitar entrevista</CTA>
+            <CTA href="/solicitud-acceso">Solicitar Entrevista</CTA>
           </motion.div>
 
           {/* Las tres cifras. En móvil una debajo de otra con su filete; a
@@ -259,7 +265,7 @@ export default function HomeCompact() {
           <P dark>Zonas consolidadas, con alta demanda, baja oferta y bajo riesgo de pérdida de valor, seleccionadas por el Score Zequara.</P>
           <P dark>Pocas propiedades superan los filtros. Cuando una aparece, quienes tienen el capital disponible son los primeros en adquirirla.</P>
           <p className="mt-[18px] text-[clamp(1.15rem,5vw,1.6rem)] font-semibold leading-[1.2] text-brown-dark">Así se construye patrimonio.</p>
-          <CTA href="/solicitud-acceso">Solicitar Entrevista</CTA>
+          <CTA href="/solicitud-acceso" tone="brown">Solicitar Entrevista</CTA>
         </In>
         <div className="mt-[24px] grid grid-cols-1 gap-[12px] sm:grid-cols-3">
           {FILTROS.map((f, i) => (
@@ -453,7 +459,8 @@ export default function HomeCompact() {
       </section>
 
       {/* ══════════ 5 · NO ES CROWDFUNDING ══════════ */}
-      <section className="bg-brown-dark py-[62px]">
+      {/* Su marrón propio del lienzo, más oscuro que el de las demás. */}
+      <section className="py-[62px]" style={{ background: "#3d1a00" }}>
         <div className={WRAP}>
           <In>
             <Wordmark w="clamp(180px,50vw,260px)" />
@@ -470,55 +477,63 @@ export default function HomeCompact() {
       </section>
 
       {/* ══════════ 7 · REMODELAMOS ══════════ */}
-      <section className="relative overflow-hidden">
-        {/* La foto a sangre del lienzo con su degradado, que es lo que oscurece
-            el pie de la sección. */}
+      {/* Oscura, como en el lienzo: la foto a sangre con el degradado marrón
+          que la apaga hacia abajo, la marca y el titular en crema y las cuatro
+          tarjetas en marrón. Iba al revés —velo crema y tarjetas blancas—. */}
+      <section className="relative overflow-hidden" style={{ background: "#2a1e14" }}>
         <img src={`${A}/7941b044560d1095b5aec747e08e5f1281f727b4.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover" />
-        <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "linear-gradient(180deg, rgba(226,205,174,0.9) 0%, rgba(226,205,174,0.82) 55%, rgba(226,205,174,0.9) 100%)" }} />
+        <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "linear-gradient(180deg, rgba(175,79,0,0) 31%, rgba(61,26,0,0.73) 64%, rgba(73,33,0,0.73) 80%)" }} />
         <div className={`${WRAP} relative py-[68px]`}>
-        <In><Eyebrow tone="brown">La obra</Eyebrow></In>
-        <In delay={0.06}>
-          {/* En el lienzo la marca preside esta sección en grande, encima del
-              titular. Aquí va en marrón porque el fondo es crema. */}
-          <div className="mt-[14px]"><Wordmark w="clamp(190px,54vw,290px)" tone="brown" /></div>
-          <H2 dark>Remodelamos para que el <span className="font-semibold">activo valga más</span>, no para impresionar.</H2>
-        </In>
-        <div className="mt-[26px] grid grid-cols-1 gap-[12px] sm:grid-cols-2">
-          {REMODELACION.map((c, i) => (
-            <In key={c.t} delay={0.06 * i} className="rounded-[16px] border border-solid border-[rgba(165,122,78,0.28)] bg-[rgba(255,255,255,0.55)] p-[20px]">
-              <h3 className="m-0 text-[17px] font-semibold text-brown-dark">{c.t}</h3>
-              <p className="m-0 mt-[7px] text-[14.5px] font-light leading-[1.55] text-[#5b4332]">{c.d}</p>
-            </In>
-          ))}
-        </div>
+          <In><Eyebrow>La obra</Eyebrow></In>
+          <In delay={0.06}>
+            {/* En el lienzo la marca preside esta sección en grande, encima del
+                titular, y va en crema sobre el fondo oscuro. */}
+            <div className="mt-[14px]"><Wordmark w="clamp(190px,54vw,290px)" /></div>
+            <H2>Remodelamos para que el <span className="font-semibold">activo valga más</span>, no para impresionar</H2>
+          </In>
+          <div className="mt-[26px] grid grid-cols-1 gap-[12px] sm:grid-cols-2">
+            {REMODELACION.map((c, i) => (
+              <In key={c.t} delay={0.06 * i} className="rounded-[16px] border border-solid p-[20px]" style={{ background: "#492100", borderColor: "rgba(247,241,229,0.14)" }}>
+                <h3 className="m-0 text-[17px] font-semibold text-cream-93">{c.t}</h3>
+                <p className="m-0 mt-[7px] text-[14.5px] font-light leading-[1.55]" style={{ color: "rgba(247,241,229,0.86)" }}>{c.d}</p>
+              </In>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ══════════ 8 · CONTROL ══════════ */}
-      <section className="rounded-tr-[64px] bg-brown-dark py-[68px]">
+      {/* Crema y con la esquina superior derecha redondeada, como el lienzo;
+          iba en marrón. La franja de las tres columnas lleva su mismo tostado
+          translúcido, y el pie de la imagen su pastilla color arena. */}
+      <section className="rounded-tr-[64px] bg-cream py-[68px]">
         <div className={WRAP}>
-          <In><Eyebrow>Control de obra + indicadores financieros</Eyebrow></In>
-          <In delay={0.06}>
-            <H2>No solo ves tu inversión. <span className="font-semibold">La entiendes.</span></H2>
-            <P>Nosotros la gestionamos. Tú la sigues y la entiendes, mes a mes.</P>
+          <In>
+            <p className="m-0 text-[clamp(1rem,4.2vw,1.25rem)] font-normal leading-[1.1] text-brown-dark">Control de obra + indicadores financieros</p>
+            <h2 className="m-0 mt-[6px] text-[clamp(1.9rem,7.4vw,2.8rem)] font-black leading-[1.1] text-brown-dark">No solo ves tu inversión. La entiendes.</h2>
+            <p className="m-0 mt-[14px] text-[clamp(1rem,4.2vw,1.25rem)] font-normal leading-[1.4] text-brown-dark">
+              Nosotros la gestionamos. Tú la sigues y la entiendes, mes a mes
+            </p>
           </In>
-          <div className="mt-[28px] flex flex-col gap-[2px]">
-            {CONTROL.map((c, i) => (
-              <In key={c.t} delay={0.06 * i} className="border-t border-solid border-[rgba(247,241,229,0.14)] py-[18px]">
-                <h3 className="m-0 text-[17px] font-semibold text-cream-93">{c.t}</h3>
-                <p className="m-0 mt-[6px] text-[15px] font-light leading-[1.55] text-[rgba(247,241,229,0.72)]">{c.d}</p>
-              </In>
-            ))}
+
+          <div className="mt-[24px] overflow-hidden rounded-bl-[50px] rounded-tr-[50px]" style={{ background: "rgba(197,156,108,0.2)" }}>
+            <div className="flex flex-col gap-px" style={{ background: "rgba(73,33,0,0.12)" }}>
+              {CONTROL.map((c, i) => (
+                <In key={c.t} delay={0.06 * i} className="px-[22px] py-[18px]" style={{ background: "transparent" }}>
+                  <h3 className="m-0 text-[18px] font-black leading-[1.25] text-brown-dark">{c.t}</h3>
+                  <p className="m-0 mt-[6px] text-[15px] font-normal leading-[1.4] text-brown-dark">{c.d}</p>
+                </In>
+              ))}
+            </div>
           </div>
-          <In delay={0.24}>
-            <p className="mt-[26px] text-[13px] font-semibold uppercase tracking-[2.4px] text-tan-63">Así se ve tu inversión</p>
+
+          <In delay={0.24} className="mt-[24px] overflow-hidden rounded-[28px] shadow-[10px_14px_18px_-6px_rgba(226,205,174,0.73)]">
+            <img src={`${A}/panel-zequara.webp`} alt="Panel de seguimiento de la inversión" loading="lazy" decoding="async" className="block w-full" />
           </In>
-          <In delay={0.28} className="mt-[12px] overflow-hidden rounded-[16px] border border-solid border-[rgba(247,241,229,0.14)]">
-            <img src={`${A}/panel-zequara.webp`} alt="Panel de seguimiento de Zequara" loading="lazy" decoding="async" className="block w-full" />
-          </In>
-          <In delay={0.32}>
-            <p className="mt-[16px] text-[15px] font-light leading-[1.55] text-[rgba(247,241,229,0.72)]">
-              El mismo modelo que eligió tu inmueble, ahora lo cuida.
+          <In delay={0.3} className="mt-[16px] rounded-bl-[40px] rounded-tr-[40px] px-[22px] py-[16px] shadow-[6px_4px_4px_0px_rgba(0,0,0,0.18)]" style={{ background: "#c1986c" }}>
+            <p className="m-0 text-[16px] font-extrabold leading-[1.14] text-brown-dark">Así se ve tu inversión</p>
+            <p className="m-0 text-[16px] leading-[1.14] text-white">
+              El mismo modelo que eligió tu inmueble, <span className="font-extrabold">ahora lo cuida.</span>
             </p>
           </In>
         </div>

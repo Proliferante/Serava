@@ -87,7 +87,11 @@ export default function AddValueCompact() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div style={{ background: "#2a1e14" }}>
+      {/* Base, ilustración y difuminado del lienzo, en el mismo orden. */}
+      <div className="relative" style={{ backgroundImage: "linear-gradient(180deg, #492100 17%, #e2cdae 100%)" }}>
+        <img src="/figma/Fondo_Add_Value.webp" alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-x-0 top-0 w-full opacity-10" />
+        <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "linear-gradient(180deg, rgba(73,33,0,0.65) 10%, rgba(226,205,174,0.65) 100%)" }} />
+        <div className="relative">
         <PrediosNavCompact />
 
         {/* ══════════ ENCABEZADO ══════════ */}
@@ -275,6 +279,7 @@ export default function AddValueCompact() {
             </p>
           </In>
         </section>
+        </div>
       </div>
     </MotionConfig>
   );

@@ -48,7 +48,11 @@ export default function MobileNav() {
     setOculta(y > 120 && d > 0);
   });
 
-  /** Barra de progreso de lectura, pegada al filo inferior de la cabecera. */
+  /**
+   * Barra de progreso de lectura. Va aparte de la cabecera y no dentro: si
+   * fuera hija, se iría con ella al esconderse, y es justo mientras se baja
+   * cuando interesa ver cuánto queda. Queda pegada al filo de la pantalla.
+   */
   const progreso = useSpring(scrollYProgress, { stiffness: 120, damping: 26, mass: 0.3 });
 
   // Al cambiar de ruta el cajón se cierra solo: si no, queda abierto encima de
@@ -104,12 +108,13 @@ export default function MobileNav() {
           </button>
         </div>
 
-        <motion.span
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 block h-[2px] origin-left"
-          style={{ scaleX: progreso, background: "linear-gradient(90deg, #a57a4e 0%, #c9a877 100%)" }}
-        />
       </motion.header>
+
+      <motion.span
+        aria-hidden
+        className="fixed inset-x-0 top-0 z-[60] block h-[3px] origin-left"
+        style={{ scaleX: progreso, background: "linear-gradient(90deg, #a57a4e 0%, #c9a877 100%)" }}
+      />
 
       <AnimatePresence>
         {open && (

@@ -83,7 +83,8 @@ export default function SolicitudCompact() {
         <MobileNav />
 
         {/* ══════════ 1 · HERO ══════════ */}
-        <section className="relative overflow-hidden bg-brown-dark">
+        {/* El hero va en el marrón más oscuro del lienzo, no en el de marca. */}
+        <section className="relative overflow-hidden" style={{ background: "#2a1e14" }}>
           <img src={`${A}/acceso.webp`} alt="" loading="eager" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover opacity-45" />
           <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "linear-gradient(180deg, rgba(45,22,4,0.72) 0%, rgba(45,22,4,0.94) 100%)" }} />
           <div className={`${WRAP} relative pb-[60px] pt-[52px]`}>
@@ -120,7 +121,7 @@ export default function SolicitudCompact() {
         </section>
 
         {/* ══════════ 3 · FORMULARIO ══════════ */}
-        <section id="formulario" className="relative overflow-hidden rounded-tr-[64px] bg-brown-dark py-[58px]">
+        <section id="formulario" className="relative overflow-hidden rounded-tl-[64px] bg-brown-dark py-[58px]">
           <img src={`${A}/acceso-cuadros.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-x-0 top-0 w-full object-cover" style={{ height: 900, opacity: 0.18 }} />
           <div className={`${WRAP} relative`}>
             <In><Eyebrow>Tu perfil de inversión</Eyebrow></In>
@@ -203,7 +204,7 @@ export default function SolicitudCompact() {
         </section>
 
         {/* ══════════ 5 · CIERRE ══════════ */}
-        <section className="relative overflow-hidden rounded-tr-[64px] bg-brown-dark py-[62px]">
+        <section className="relative overflow-hidden rounded-tl-[64px] bg-brown-dark py-[62px]">
           <img src={`${A}/acceso-torres.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-0 size-full object-cover" style={{ opacity: 0.12 }} />
           <div className={`${WRAP} relative text-center`}>
             <In className="flex justify-center"><span className="block h-px w-[34px]" style={{ background: LASER, opacity: 0.8 }} /></In>
@@ -217,7 +218,7 @@ export default function SolicitudCompact() {
               </p>
             </In>
             <In delay={0.14} className="flex flex-col items-center">
-              <CTA href="#formulario">Completar mi perfil</CTA>
+              <CTA href="#formulario" tone="cream">Completar mi perfil</CTA>
               <p className="mt-[18px] text-[13px] font-light" style={{ color: "rgba(247,241,229,0.6)" }}>
                 Portafolio privado. Acceso sujeto a evaluación, sesión virtual y disponibilidad de oportunidades.
               </p>

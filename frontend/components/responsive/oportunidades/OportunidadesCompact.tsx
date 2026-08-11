@@ -74,7 +74,7 @@ export default function OportunidadesCompact() {
               <P>Zequara selecciona activos en zonas consolidadas, con condiciones para aumentar su valor mediante diseño, remodelación y mejor operación.</P>
             </In>
             <In delay={0.16}>
-              <CTA href="/solicitud-acceso">Solicitar acceso</CTA>
+              <CTA href="/solicitud-acceso" tone="olive">Solicitar acceso</CTA>
               <Note>Las oportunidades activas están disponibles únicamente para inversionistas aprobados.</Note>
             </In>
           </div>
@@ -201,7 +201,7 @@ export default function OportunidadesCompact() {
               </p>
             </In>
             <In delay={0.14} className="flex flex-col items-center">
-              <CTA href="/solicitud-acceso">Solicitar acceso</CTA>
+              <CTA href="/solicitud-acceso" tone="linen">Solicitar acceso</CTA>
               <p className="mt-[18px] text-[13px] font-light" style={{ color: "rgba(247,241,229,0.6)" }}>
                 Portafolio confidencial. Acceso sujeto a evaluación y disponibilidad.
               </p>

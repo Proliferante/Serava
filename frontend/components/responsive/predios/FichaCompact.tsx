@@ -45,7 +45,11 @@ export default function FichaCompact() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div style={{ background: "#2a1e14" }}>
+      {/* Crema con el velo marrón del lienzo y la ilustración al 15 %. */}
+      <div className="relative" style={{ background: "#e2cdae" }}>
+        <img src="/figma/Fondo_Ficha_predio.webp" alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-x-0 top-0 w-full opacity-[0.15]" />
+        <div className="pointer-events-none absolute inset-0" style={{ background: "rgba(73,33,0,0.79)" }} />
+        <div className="relative">
         <PrediosNavCompact />
 
         <div className={`${WRAP} pt-[16px]`}>
@@ -245,6 +249,7 @@ export default function FichaCompact() {
               Reservar ahora
             </button>
           </div>
+        </div>
         </div>
       </div>
     </MotionConfig>

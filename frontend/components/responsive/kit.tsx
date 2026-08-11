@@ -80,17 +80,31 @@ export function P({ children, dark }: { children: ReactNode; dark?: boolean }) {
  * pulsar la interfaz se siente muerta. El hundido es la señal de que el toque
  * entró, que en móvil llega antes que la navegación.
  */
-export function CTA({ href, children, tone = "cream" }: { href: string; children: ReactNode; tone?: "cream" | "olive" }) {
-  const cream = tone === "cream";
+export const CTA_TONO = {
+  /** Crema sobre fondo oscuro — el del hero de la home. */
+  cream: { background: CREAM, color: BROWN },
+  /** Lino sobre fondo oscuro — el del cierre de Oportunidades. */
+  linen: { background: LINEN, color: "#2a1e14" },
+  /** Marrón sobre crema — el de la sección de criterio. */
+  brown: { background: BROWN, color: CREAM },
+  /** Oliva — el de acceso y diagnóstico. */
+  olive: { background: AVOCADO, color: LINEN },
+} as const;
+
+export function CTA({ href, children, tone = "cream" }: { href: string; children: ReactNode; tone?: keyof typeof CTA_TONO }) {
   return (
     <motion.a
       href={href}
       whileTap={{ scale: 0.97 }}
       transition={{ duration: 0.14, ease: EASE }}
-      className="ix-press mt-[26px] flex h-[56px] w-full max-w-[340px] items-center justify-center rounded-full text-[16px] font-semibold"
-      style={cream ? { background: CREAM, color: BROWN } : { background: AVOCADO, color: LINEN }}
+      className="ix-cta ix-press relative mt-[26px] flex h-[56px] w-full max-w-[340px] items-center justify-center gap-[10px] overflow-hidden rounded-full text-[16px] font-semibold"
+      style={CTA_TONO[tone]}
     >
       {children}
+      <svg className="ix-cta-arrow" width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+      <span className="ix-cta-shine" aria-hidden />
     </motion.a>
   );
 }

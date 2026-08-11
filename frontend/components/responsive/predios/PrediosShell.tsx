@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { motion, useMotionValueEvent, useScroll, useSpring } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { MARK, tinted } from "@/components/brand";
@@ -38,7 +38,7 @@ export function PrediosNavCompact({ onLight = false }: { onLight?: boolean }) {
    * público. Umbral de 8 px para que no tiemble con el rebote del scroll, y
    * por debajo de 120 nunca se esconde: arriba del todo siempre está.
    */
-  const { scrollY } = useScroll();
+  const { scrollY, scrollYProgress } = useScroll();
   const ultimo = useRef(0);
   useMotionValueEvent(scrollY, "change", (y) => {
     const d = y - ultimo.current;
@@ -46,6 +46,13 @@ export function PrediosNavCompact({ onLight = false }: { onLight?: boolean }) {
     ultimo.current = y;
     setOculta(y > 120 && d > 0);
   });
+
+  /**
+   * Progreso de lectura. Va fuera de la cabecera y fijo al filo de la
+   * pantalla: si fuera hijo se escondería con ella, y es justo mientras se
+   * baja cuando interesa ver cuánto queda de ficha.
+   */
+  const progreso = useSpring(scrollYProgress, { stiffness: 120, damping: 26, mass: 0.3 });
 
   /**
    * La píldora activa, a la vista. Aunque con etiquetas cortas las tres caben
@@ -65,6 +72,7 @@ export function PrediosNavCompact({ onLight = false }: { onLight?: boolean }) {
   }, [pathname]);
 
   return (
+    <>
     <motion.header
       className={`sticky top-0 z-40 ${onLight ? "bg-cream/95" : "bg-[#2a1e14]/95"} backdrop-blur-sm`}
       animate={{ y: oculta ? "-100%" : "0%" }}
@@ -123,6 +131,13 @@ export function PrediosNavCompact({ onLight = false }: { onLight?: boolean }) {
         </nav>
       </div>
     </motion.header>
+
+    <motion.span
+      aria-hidden
+      className="fixed inset-x-0 top-0 z-[60] block h-[3px] origin-left"
+      style={{ scaleX: progreso, background: "linear-gradient(90deg, #a57a4e 0%, #c9a877 100%)" }}
+    />
+    </>
   );
 }
 

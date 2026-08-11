@@ -208,7 +208,11 @@ export default function MisPropiedadesCompact() {
                 <p className="m-0 text-[clamp(1.25rem,5.4vw,1.6rem)] font-light" style={{ color: LINEN }}>
                   Lo último que <span className="font-semibold">revisaste</span>
                 </p>
-                <a href="/predios" className="shrink-0 text-[12.5px] font-semibold" style={{ color: LASER }}>Ver todos los predios →</a>
+                {/* En el lienzo es una pastilla de lino, no un enlace suelto. */}
+                <a href="/predios" className="ix-press flex h-[44px] shrink-0 items-center gap-[8px] rounded-full px-[18px] text-[13.4px] font-semibold" style={{ background: LINEN, color: "#2a1e14" }}>
+                  Ver todos los predios
+                  <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M4.5 12h15M13.6 6.2 19.5 12l-5.9 5.8" /></svg>
+                </a>
               </div>
               <p className="m-0 mt-[8px] text-[13.5px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.6)" }}>
                 Retoma donde quedaste. Estas oportunidades siguen disponibles para sumar tu próxima propiedad.
