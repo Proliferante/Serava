@@ -265,11 +265,10 @@ export default function HomeCompact() {
         <In><Eyebrow tone="brown">Pocas oportunidades. Para pocos.</Eyebrow></In>
         <In delay={0.06}>
           <H2 dark>No todo inmueble entra a <Wordmark w="clamp(130px,33vw,190px)" tone="brown" /></H2>
-          <P dark>Zonas consolidadas, con alta demanda, baja oferta y bajo riesgo de pérdida de valor, seleccionadas por el Score Zequara.</P>
-          <P dark>Pocas propiedades superan los filtros. Cuando una aparece, quienes tienen el capital disponible son los primeros en adquirirla.</P>
-          <p className="mt-[18px] text-[clamp(1.15rem,5vw,1.6rem)] font-semibold leading-[1.2] text-brown-dark">Así se construye patrimonio.</p>
-          <CTA href="/solicitud-acceso" tone="brown">Solicitar Entrevista</CTA>
         </In>
+        {/* Los tres filtros. El cuerpo de cada uno vive sólo aquí: cuando esta
+            rejilla no estaba, el texto de los filtros 01 y 03 iba suelto bajo
+            el titular y quedó duplicado al traerla. */}
         <div className="mt-[24px] grid grid-cols-1 gap-[12px] sm:grid-cols-3">
           {FILTROS.map((f, i) => (
             <In key={f.label} delay={0.06 * i} className="rounded-[26px] bg-brown-dark p-[22px]">
@@ -279,6 +278,15 @@ export default function HomeCompact() {
             </In>
           ))}
         </div>
+        {/* El cierre de la sección va después de los filtros, como en el
+            lienzo: primero el criterio, luego la conclusión. */}
+        <In delay={0.1}>
+          <p className="mt-[26px] text-[clamp(1.4rem,6.4vw,2.2rem)] leading-[1.14] text-brown-dark">
+            <span className="font-light">Así se construye </span>
+            <span className="font-semibold">patrimonio.</span>
+          </p>
+          <CTA href="/solicitud-acceso" tone="brown">Solicitar Entrevista</CTA>
+        </In>
         </div>
       </section>
 
