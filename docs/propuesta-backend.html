@@ -1,0 +1,1163 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Zequara — Propuesta de backend</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm 18mm 18mm; }
+  @page { @bottom-center { content: counter(page); } }
+
+  :root {
+    --brown: #492100;
+    --oil: #2a1e14;
+    --ink: #3d2c1e;
+    --muted: #5b4332;
+    --laser: #c9a877;
+    --drift: #a57a4e;
+    --avocado: #7f8b57;
+    --verd: #5f6b3e;
+    --tuscany: #b5542f;
+    --paper: #f7f1e5;
+    --line: #ddd5c8;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 10.2pt;
+    line-height: 1.52;
+    color: var(--ink);
+  }
+
+  /* ── Portada ─────────────────────────────────────────────── */
+  .cover {
+    /* A4 completo (297 mm) menos lo que los márgenes de @page ya descuentan por
+       arriba: los márgenes negativos de abajo la llevan al filo de la hoja. */
+    height: 296mm;
+    background: linear-gradient(160deg, #5b4332 0%, #2a1e14 62%, #1c1610 100%);
+    color: var(--paper);
+    padding: 34mm 20mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    page-break-after: always;
+    margin: -20mm -18mm 0 -18mm;
+  }
+  .cover .mark {
+    font-size: 11pt; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--laser); font-weight: 600;
+  }
+  .cover h1 {
+    font-size: 33pt; line-height: 1.08; font-weight: 300; margin: 0 0 6mm 0;
+    letter-spacing: -0.5pt;
+  }
+  .cover h1 b { font-weight: 600; }
+  .cover .sub {
+    font-size: 12pt; font-weight: 300; line-height: 1.5;
+    color: rgba(247,241,229,0.8); max-width: 130mm;
+  }
+  .cover .rule { width: 40mm; height: 2px; background: var(--laser); margin: 8mm 0; }
+  .cover .meta { font-size: 9pt; color: rgba(247,241,229,0.62); line-height: 1.8; }
+  .cover .meta b { color: var(--laser); font-weight: 600; }
+
+  /* ── Estructura ──────────────────────────────────────────── */
+  h2 {
+    font-size: 16pt; font-weight: 600; color: var(--brown);
+    margin: 11mm 0 3mm 0; padding-bottom: 2mm;
+    border-bottom: 1.5px solid var(--laser);
+    page-break-after: avoid;
+  }
+  h2 .n {
+    font-size: 10pt; color: var(--drift); font-weight: 600;
+    display: inline-block; min-width: 9mm;
+  }
+  h3 {
+    font-size: 11.6pt; font-weight: 600; color: var(--oil);
+    margin: 6mm 0 2mm 0; page-break-after: avoid;
+  }
+  h4 {
+    font-size: 9.4pt; font-weight: 700; color: var(--drift);
+    text-transform: uppercase; letter-spacing: 1.1px;
+    margin: 5mm 0 1.5mm 0; page-break-after: avoid;
+  }
+  p { margin: 0 0 2.6mm 0; }
+  ul, ol { margin: 0 0 3mm 0; padding-left: 5.5mm; }
+  li { margin-bottom: 1.3mm; }
+  b, strong { font-weight: 600; color: var(--oil); }
+  code {
+    font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+    font-size: 8.7pt; background: #efe6d5; padding: 0.4mm 1.1mm;
+    border-radius: 1.5px; color: var(--brown);
+  }
+  a { color: var(--verd); text-decoration: none; }
+
+  .lead {
+    font-size: 11pt; font-weight: 300; line-height: 1.55; color: var(--muted);
+    border-left: 2.5px solid var(--laser); padding-left: 5mm; margin-bottom: 5mm;
+  }
+
+  /* ── Tablas ──────────────────────────────────────────────── */
+  table {
+    width: 100%; border-collapse: collapse; margin: 3mm 0 4mm 0;
+    font-size: 9.1pt; page-break-inside: avoid;
+  }
+  th {
+    text-align: left; background: var(--brown); color: var(--paper);
+    font-weight: 600; font-size: 8.4pt; text-transform: uppercase;
+    letter-spacing: 0.6px; padding: 2mm 2.4mm;
+  }
+  td { padding: 1.9mm 2.4mm; border-bottom: 0.5px solid var(--line); vertical-align: top; }
+  tr:nth-child(even) td { background: #faf6ee; }
+  td code { font-size: 8.2pt; }
+
+  /* ── Bloques ─────────────────────────────────────────────── */
+  .box {
+    background: var(--paper); border: 0.7px solid var(--line);
+    border-left: 3px solid var(--drift);
+    padding: 3.5mm 4.5mm; margin: 3.5mm 0; border-radius: 2px;
+    page-break-inside: avoid;
+  }
+  .box.warn { border-left-color: var(--tuscany); background: #fdf3ee; }
+  .box.good { border-left-color: var(--avocado); background: #f4f6ec; }
+  .box h4 { margin-top: 0; }
+  .box p:last-child, .box ul:last-child { margin-bottom: 0; }
+
+  pre {
+    background: var(--oil); color: #e9dfcd; padding: 3.5mm 4mm;
+    font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+    font-size: 8.2pt; line-height: 1.45; border-radius: 2.5px;
+    margin: 3mm 0; overflow: hidden; white-space: pre-wrap;
+    page-break-inside: avoid;
+  }
+  pre b { color: var(--laser); font-weight: 600; }
+
+  /* ── Cabecera de fase ────────────────────────────────────── */
+  .phase {
+    page-break-before: always;
+  }
+  .phase-head {
+    background: linear-gradient(135deg, #3d2c1e 0%, #2a1e14 100%);
+    color: var(--paper); padding: 5mm 6mm; border-radius: 3px;
+    margin: 0 0 5mm 0;
+  }
+  .phase-head .tag {
+    font-size: 8.2pt; text-transform: uppercase; letter-spacing: 2.4px;
+    color: var(--laser); font-weight: 600;
+  }
+  .phase-head h2 {
+    color: var(--paper); border: 0; margin: 1.5mm 0 1.5mm 0;
+    padding: 0; font-size: 17pt; font-weight: 300;
+  }
+  .phase-head h2 b { font-weight: 600; }
+  .phase-head .facts {
+    font-size: 8.8pt; color: rgba(247,241,229,0.72);
+    border-top: 0.5px solid rgba(201,168,119,0.3); padding-top: 2.5mm; margin-top: 2.5mm;
+  }
+  .phase-head .facts b { color: var(--laser); font-weight: 600; }
+
+  .accept {
+    background: #f4f6ec; border: 0.7px solid #cdd6b8;
+    padding: 3.5mm 4.5mm; border-radius: 2px; margin: 4mm 0 0 0;
+    page-break-inside: avoid;
+  }
+  .accept h4 { color: var(--verd); margin-top: 0; }
+  .accept ul { margin-bottom: 0; }
+
+  .pill {
+    display: inline-block; font-size: 7.8pt; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.7px;
+    padding: 0.7mm 2.2mm; border-radius: 8px; color: #fff;
+    vertical-align: 0.4mm;
+  }
+  .pill.p1 { background: var(--tuscany); }
+  .pill.p2 { background: var(--drift); }
+  .pill.p3 { background: var(--avocado); }
+
+  .toc { columns: 2; column-gap: 10mm; font-size: 9.4pt; }
+  .toc div { margin-bottom: 1.6mm; break-inside: avoid; }
+  .toc .num { color: var(--drift); font-weight: 600; display: inline-block; min-width: 7mm; }
+
+  .avoid { page-break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ PORTADA ══════════════════ -->
+<div class="cover">
+  <div>
+    <div class="mark">Zequara</div>
+  </div>
+  <div>
+    <h1>Propuesta de <b>backend</b><br>por fases</h1>
+    <div class="rule"></div>
+    <div class="sub">
+      Cómo construir el lado servidor de la plataforma: qué se hace en cada fase,
+      en qué orden, con qué decisiones técnicas y con qué criterio para dar cada
+      fase por terminada.
+    </div>
+  </div>
+  <div class="meta">
+    Documento técnico · versión 1<br>
+    Punto de partida: <b>frontend completo (21 rutas), backend en 0 bytes</b><br>
+    Alcance estimado: <b>7 fases · ~20 semanas</b> · primer entorno usable en la fase 3
+  </div>
+</div>
+
+<!-- ══════════════════ ÍNDICE ══════════════════ -->
+<h2><span class="n">—</span>Contenido</h2>
+<div class="toc">
+  <div><span class="num">1</span> Resumen ejecutivo</div>
+  <div><span class="num">2</span> Punto de partida</div>
+  <div><span class="num">3</span> Decisiones de arquitectura</div>
+  <div><span class="num">4</span> Dominio, actores y permisos</div>
+  <div><span class="num">F0</span> Fundaciones</div>
+  <div><span class="num">F1</span> Identidad y cierre del área privada</div>
+  <div><span class="num">F2</span> Catálogo de predios</div>
+  <div><span class="num">F3</span> Proyecto y panel de obra</div>
+  <div><span class="num">F4</span> Documentos y fotos</div>
+  <div><span class="num">F5</span> Captación y notificaciones</div>
+  <div><span class="num">F6</span> Operación del activo</div>
+  <div><span class="num">F7</span> Endurecimiento y operación</div>
+  <div><span class="num">5</span> Temas transversales</div>
+  <div><span class="num">6</span> Infraestructura y despliegue</div>
+  <div><span class="num">7</span> Calidad: pruebas y CI</div>
+  <div><span class="num">8</span> Seguridad y cumplimiento</div>
+  <div><span class="num">9</span> Plan, esfuerzo e hitos</div>
+  <div><span class="num">10</span> Riesgos y decisiones pendientes</div>
+  <div><span class="num">A</span> Anexo: pantalla → endpoint</div>
+</div>
+
+<!-- ══════════════════ 1 ══════════════════ -->
+<h2><span class="n">1</span>Resumen ejecutivo</h2>
+
+<p class="lead">
+  El frontend está terminado y no tiene con qué hablar. La propuesta es construir el
+  backend en siete fases, cada una cerrando un hueco concreto que hoy está pintado
+  en la interfaz pero no opera, y en un orden que pone primero lo que hay que
+  arreglar sí o sí: el área privada no está protegida.
+</p>
+
+<p>
+  La forma del backend no se inventa desde cero. El repositorio ya tiene un esqueleto
+  —<code>app/api</code>, <code>app/core</code>, <code>app/services</code>, con un
+  <code>gcs_service.py</code> entre ellos— y el frontend ya define las estructuras de
+  datos que sabe pintar. La propuesta respeta las dos cosas: <b>FastAPI sobre
+  PostgreSQL, desplegado en Google Cloud</b>, con el contrato de datos derivado de lo
+  que las pantallas ya muestran.
+</p>
+
+<h4>Las siete fases de un vistazo</h4>
+<table>
+  <tr>
+    <th style="width:7%">Fase</th><th style="width:26%">Qué entrega</th>
+    <th style="width:12%">Duración</th><th>Por qué va en ese puesto</th>
+  </tr>
+  <tr><td><b>F0</b></td><td>Fundaciones: proyecto, base de datos, migraciones, CI, entorno local</td><td>2 semanas</td><td>Nada se puede construir dos veces bien si el suelo se mueve</td></tr>
+  <tr><td><b>F1</b></td><td>Identidad, sesiones y cierre real del área privada</td><td>2 semanas</td><td><span class="pill p1">Urgente</span> Hoy <code>/panel</code> y <code>/predios</code> son públicos</td></tr>
+  <tr><td><b>F2</b></td><td>Catálogo de predios, ficha, análisis de valor, filtros</td><td>3 semanas</td><td>Es la primera pantalla que un inversionista ve tras entrar</td></tr>
+  <tr><td><b>F3</b></td><td>Proyecto de obra y las diez vistas del panel</td><td>5 semanas</td><td>El núcleo del producto y la fase más grande</td></tr>
+  <tr><td><b>F4</b></td><td>Documentos y fotos sobre Cloud Storage</td><td>2 semanas</td><td>Depende de F3: los archivos cuelgan de un proyecto</td></tr>
+  <tr><td><b>F5</b></td><td>Solicitudes de acceso, diagnóstico, HUB, notificaciones</td><td>2 semanas</td><td>Es captación: no bloquea a nadie que ya sea cliente</td></tr>
+  <tr><td><b>F6</b></td><td>Operación del activo entregado: arriendo, bitácora, estado de cuenta</td><td>3 semanas</td><td>Sólo aplica cuando hay un activo entregado</td></tr>
+  <tr><td><b>F7</b></td><td>Observabilidad, respaldos, límites, cumplimiento</td><td>continuo</td><td>Empieza en F0 y se cierra formalmente al final</td></tr>
+</table>
+
+<div class="box good">
+  <h4>El hito que importa</h4>
+  <p>
+    Al terminar <b>F3</b> —unas doce semanas— existe una plataforma real: un
+    inversionista entra con sus credenciales, ve su predio, entra a su proyecto y
+    sigue su obra con datos verdaderos. F4 a F6 completan; F0 a F3 hacen que
+    exista.
+  </p>
+</div>
+
+<div class="box warn">
+  <h4>Advertencia de esfuerzo del lado frontend</h4>
+  <p>
+    El frontend tiene <b>dos árboles</b> para cada pantalla: el lienzo de 1920 px y la
+    vista fluida de móvil. Cada integración se cablea dos veces. La estimación de cada
+    fase incluye ese trabajo, pero conviene tenerlo presente al negociar plazos: no es
+    duplicación accidental, es la arquitectura del frontend.
+  </p>
+</div>
+
+<!-- ══════════════════ 2 ══════════════════ -->
+<h2><span class="n">2</span>Punto de partida</h2>
+
+<h3>2.1 Lo que existe</h3>
+<p>
+  El frontend está en marcha: 21 rutas, cada una con vista de escritorio y vista
+  fluida, con todo el contenido escrito dentro de los componentes. El backend es un
+  esqueleto de carpetas con <b>doce archivos <code>.py</code> a 0 bytes</b>, más
+  <code>schema.sql</code>, <code>seeds/data.sql</code>, <code>docker-compose.yml</code>
+  y los dos <code>.env.example</code>, también vacíos.
+</p>
+
+<h3>2.2 Lo que el esqueleto ya decide</h3>
+<p>
+  Aunque no haya código, los nombres de archivo son una decisión tomada y coherente,
+  y esta propuesta la respeta en lugar de reabrirla:
+</p>
+<table>
+  <tr><th style="width:34%">Archivo previsto</th><th>Lo que implica</th></tr>
+  <tr><td><code>app/main.py</code> + <code>app/api/*</code></td><td>Un único servicio HTTP con routers por dominio. Reparto típico de FastAPI</td></tr>
+  <tr><td><code>app/core/database.py</code></td><td>Base de datos relacional con capa propia de conexión y sesión</td></tr>
+  <tr><td><code>app/core/security.py</code></td><td>Autenticación y autorización propias, no delegadas a un proveedor externo</td></tr>
+  <tr><td><code>app/services/gcs_service.py</code></td><td><b>Google Cloud Storage</b>, y por tanto GCP como nube. Es la señal más fuerte del esqueleto</td></tr>
+  <tr><td><code>app/api/notificaciones.py</code></td><td>Notificaciones como dominio propio, no un efecto colateral</td></tr>
+</table>
+
+<h3>2.3 Lo que el frontend ya define</h3>
+<p>
+  Tres estructuras del frontend son, de hecho, el contrato mínimo que el backend tiene
+  que alimentar. Están documentadas en <code>docs/api-reference.md</code>: el tipo
+  <code>Predio</code> (catálogo y tarjeta), <code>Propiedad</code> (portafolio del
+  inversionista, con una unión discriminada entre activo <i>en obra</i> y activo
+  <i>arrendado</i>) y <code>PanelKey</code> (las diez vistas privadas).
+</p>
+<div class="box">
+  <h4>Un detalle que vale una decisión de diseño</h4>
+  <p>
+    Las cinco etiquetas de estado de la tarjeta de predio —<code>Disponible</code>,
+    <code>Nueva oportunidad</code>, <code>Alta actividad</code>,
+    <code>En proceso de reserva</code>, <code>Reservada</code>, más
+    <code>Reserva liberada</code>— no son adornos: son <b>una máquina de estados de
+    reserva ya diseñada</b>. El backend debe modelarla como tal, con transiciones
+    explícitas, y no como un campo de texto libre.
+  </p>
+</div>
+
+<!-- ══════════════════ 3 ══════════════════ -->
+<h2><span class="n">3</span>Decisiones de arquitectura</h2>
+
+<h3>3.1 La pila</h3>
+<table>
+  <tr><th style="width:24%">Pieza</th><th style="width:28%">Propuesta</th><th>Por qué</th></tr>
+  <tr><td>Runtime / framework</td><td>Python 3.12 + <b>FastAPI</b></td><td>Es lo que el esqueleto ya asume. Da OpenAPI gratis, y de ahí salen los tipos del frontend (§7.3)</td></tr>
+  <tr><td>Base de datos</td><td><b>PostgreSQL 16</b></td><td>El dominio es relacional y con integridad dura (dinero, aprobaciones). Además da JSONB para lo semiestructurado</td></tr>
+  <tr><td>ORM / migraciones</td><td>SQLAlchemy 2.0 + <b>Alembic</b></td><td>Migraciones versionadas desde el primer día; <code>schema.sql</code> pasa a ser generado, no escrito a mano</td></tr>
+  <tr><td>Validación</td><td>Pydantic v2</td><td>Un solo sitio define la forma de entrada, salida y documentación</td></tr>
+  <tr><td>Archivos</td><td><b>Google Cloud Storage</b> con URLs firmadas</td><td>Ya está decidido por <code>gcs_service.py</code>. Firmadas para no pasar bytes por la API</td></tr>
+  <tr><td>Cómputo</td><td><b>Cloud Run</b></td><td>Escala a cero, encaja con tráfico irregular de un portafolio privado, y evita administrar servidores</td></tr>
+  <tr><td>Trabajos en segundo plano</td><td>Cloud Tasks + un worker del mismo contenedor</td><td>Correo, miniaturas y recálculos no deben bloquear una petición. Evita montar Celery + Redis para poco volumen</td></tr>
+  <tr><td>Correo transaccional</td><td>Proveedor externo (SendGrid / Resend)</td><td>Credenciales de acceso, avisos de aprobación y confirmaciones. No merece infraestructura propia</td></tr>
+</table>
+
+<div class="box">
+  <h4>Lo que se propone <i>no</i> hacer</h4>
+  <ul>
+    <li><b>Microservicios.</b> Un dominio, un equipo pequeño, un servicio. La separación por routers y servicios ya da orden suficiente.</li>
+    <li><b>GraphQL.</b> Las pantallas son fijas y conocidas; cada una tiene su endpoint. GraphQL resolvería un problema que aquí no existe y complicaría permisos.</li>
+    <li><b>Un CMS.</b> Ver §5.5: casi todo el texto del sitio está acoplado al diseño de 1920 px y debe quedarse en el código.</li>
+    <li><b>Proveedor de identidad externo</b> (Auth0, Firebase Auth). No hay registro público: las credenciales las emite Zequara. Un modelo propio es más simple y más barato, y <code>core/security.py</code> ya lo anticipa.</li>
+  </ul>
+</div>
+
+<h3>3.2 Forma de la API</h3>
+<p>
+  REST con prefijo de versión <code>/api/v1</code>, JSON, verbos convencionales, y una
+  regla de oro: <b>un endpoint por pantalla cuando la pantalla lo pide</b>. El panel
+  tiene diez vistas y cada una necesita un agregado distinto; obligar al frontend a
+  hacer seis llamadas y recomponer sería trasladarle trabajo del servidor.
+</p>
+<pre>GET  /api/v1/predios?ciudad=bogota&amp;capital=1000-2000&amp;orden=score
+GET  /api/v1/predios/{slug}
+GET  /api/v1/predios/{slug}/analisis-valor
+GET  /api/v1/mis-propiedades
+GET  /api/v1/proyectos/{id}/resumen        <b>← una llamada por vista del panel</b>
+POST /api/v1/proyectos/{id}/aprobaciones/{aid}/decision</pre>
+
+<!-- ══════════════════ 4 ══════════════════ -->
+<h2><span class="n">4</span>Dominio, actores y permisos</h2>
+
+<p>
+  El modelo de permisos no es genérico: sale directamente de la promesa comercial. El
+  sitio dice, con estas palabras, que la interventoría es <i>«un equipo independiente
+  del que ejecuta la obra»</i> y que hay <i>«control real, no juez y parte»</i>. Eso
+  tiene que ser cierto <b>en la base de datos</b>, no sólo en la copia.
+</p>
+
+<table>
+  <tr><th style="width:20%">Rol</th><th style="width:34%">Puede</th><th>No puede</th></tr>
+  <tr><td><b>Inversionista</b></td><td>Ver su predio, su proyecto y sus documentos. Decidir aprobaciones. Escribir al gestor</td><td>Ver proyectos de otros. Modificar avance, presupuesto o hallazgos</td></tr>
+  <tr><td><b>Gestor de proyecto</b></td><td>Actualizar avance, subir fotos y documentos, responder mensajes, proponer aprobaciones</td><td><b>Crear ni editar hallazgos de interventoría</b>, ni cerrar los suyos propios</td></tr>
+  <tr><td><b>Interventoría</b></td><td>Registrar inspecciones y hallazgos, verificar cierres</td><td>Modificar el avance que audita, ni el presupuesto</td></tr>
+  <tr><td><b>Analista / curador</b></td><td>Crear predios, cargar el análisis de valor, calcular el Score</td><td>Entrar a proyectos de obra</td></tr>
+  <tr><td><b>Administrador</b></td><td>Emitir credenciales, asignar gestores, ver la bitácora de auditoría</td><td>Borrar registros de auditoría (nadie puede)</td></tr>
+</table>
+
+<div class="box good">
+  <h4>Regla de oro del modelo</h4>
+  <p>
+    La separación gestor / interventoría se implementa como una restricción del sistema
+    de permisos, comprobada en el servicio y cubierta por una prueba automatizada
+    explícita. Si algún día alguien afloja esa regla, una prueba tiene que ponerse en
+    rojo: es el argumento de venta del producto.
+  </p>
+</div>
+
+<h3>4.1 Mapa del dominio</h3>
+<pre>usuario ──┬── rol
+          │
+          └── inversionista ──┬── predio_interes / reserva
+                              └── <b>activo</b> ──┬── proyecto ──┬── etapa ── actividad
+                                              │             ├── presupuesto ── partida ── hito_pago
+                                              │             ├── aprobacion ── decision
+                                              │             ├── inspeccion ── hallazgo
+                                              │             ├── foto ── par_antes_despues
+                                              │             └── documento (GCS)
+                                              └── operacion ──┬── contrato_arriendo ── pago
+                                                              ├── bitacora_evento
+                                                              ├── mantenimiento / asamblea
+                                                              └── proyeccion_valor
+
+predio ── ubicacion (pais/ciudad/zona) ── score_zequara ── analisis_valor
+solicitud_acceso · diagnostico · articulo_hub · notificacion · auditoria</pre>
+
+<!-- ══════════════════ FASE 0 ══════════════════ -->
+<div class="phase">
+<div class="phase-head">
+  <div class="tag">Fase 0</div>
+  <h2>Fundaciones: <b>que el suelo no se mueva</b></h2>
+  <div class="facts">
+    <b>2 semanas</b> · sin dependencias · resultado: <code>docker compose up</code> levanta una API viva con migraciones
+  </div>
+</div>
+
+<h3>Objetivo</h3>
+<p>
+  Que cualquiera clone el repositorio y tenga el backend corriendo en un comando, y
+  que a partir de ahí todo cambio de esquema quede versionado. Es la fase que nadie ve
+  y que decide si las seis siguientes cuestan lo estimado o el doble.
+</p>
+
+<h3>Alcance</h3>
+<ul>
+  <li><b><code>requirements.txt</code> con versiones fijadas</b> (hoy está vacío), y un
+      <code>pyproject.toml</code> con las herramientas de estilo: <code>ruff</code>,
+      <code>black</code>, <code>mypy</code>.</li>
+  <li><b><code>app/main.py</code></b>: fábrica de aplicación, montaje de routers, CORS
+      restringido al dominio del frontend, manejadores de error globales.</li>
+  <li><b><code>app/core/config.py</code></b>: configuración con <code>pydantic-settings</code>,
+      leída de variables de entorno. Se llenan a la vez los dos
+      <code>.env.example</code> vacíos.</li>
+  <li><b><code>app/core/database.py</code></b>: motor, sesión por petición como
+      dependencia de FastAPI, y <i>pool</i> dimensionado para Cloud Run.</li>
+  <li><b>Alembic</b> configurado, con la primera migración. <code>database/schema.sql</code>
+      pasa a ser un volcado generado, no una fuente que se edita.</li>
+  <li><b><code>docker-compose.yml</code></b> (hoy vacío): Postgres + API con recarga en
+      caliente + un visor de base de datos.</li>
+  <li><b>Sobre transversal</b>: <code>/health</code> y <code>/ready</code>, registro
+      estructurado en JSON con identificador de correlación, y el sobre de error único
+      que usará toda la API.</li>
+  <li><b>CI</b> en GitHub Actions: estilo, tipos y pruebas en cada <i>push</i>.</li>
+  <li><b>Lado frontend</b>: llenar <code>frontend/lib/api.ts</code> con un cliente
+      tipado (<code>fetch</code> con base URL, manejo de error y credenciales) y
+      <code>frontend/.env.local.example</code>.</li>
+</ul>
+
+<h4>El sobre de error, decidido una vez</h4>
+<pre>{ "error": { "code": "PREDIO_NO_ENCONTRADO",
+             "message": "No existe un predio con ese identificador.",
+             "details": {}, "request_id": "01HX..." } }</pre>
+<p>
+  Un único formato para los cuatro casos que el frontend tendrá que pintar: no
+  encontrado, sin permiso, validación fallida y error del servidor. Decidirlo aquí
+  evita que cada pantalla invente el suyo.
+</p>
+
+<div class="accept">
+  <h4>Criterio de aceptación</h4>
+  <ul>
+    <li><code>docker compose up</code> deja la API respondiendo y la base migrada, en una máquina limpia.</li>
+    <li><code>alembic upgrade head</code> y <code>alembic downgrade -1</code> funcionan las dos.</li>
+    <li>CI verde con estilo, tipos y al menos una prueba de integración real contra Postgres.</li>
+    <li><code>/docs</code> sirve el OpenAPI, y de él ya se generan tipos TypeScript.</li>
+  </ul>
+</div>
+</div>
+
+<!-- ══════════════════ FASE 1 ══════════════════ -->
+<div class="phase">
+<div class="phase-head">
+  <div class="tag">Fase 1 · prioridad máxima</div>
+  <h2>Identidad y <b>cierre del área privada</b></h2>
+  <div class="facts">
+    <b>2 semanas</b> · depende de F0 · cierra el agujero de seguridad que hoy existe
+  </div>
+</div>
+
+<div class="box warn">
+  <h4>El problema que resuelve</h4>
+  <p>
+    Hoy el <i>login</i> sólo comprueba que los campos no estén vacíos y hace
+    <code>router.push("/predios")</code>. <b>No hay sesión, ni <i>middleware</i>, ni
+    comprobación en servidor</b>: cualquiera que escriba <code>/panel/presupuesto</code>
+    ve el panel. Mientras el contenido sea de muestra el daño es nulo; el día que haya
+    un dato real de un cliente, deja de serlo. Por eso esta fase va antes que cualquier
+    funcionalidad.
+  </p>
+</div>
+
+<h3>Alcance</h3>
+<h4>Modelo</h4>
+<pre>usuario        (id, email, hash_clave, nombre, iniciales, estado, ultimo_acceso,
+                debe_cambiar_clave, creado_por)
+rol            (inversionista | gestor | interventoria | analista | admin)
+usuario_rol    (usuario_id, rol, ambito_id)   <b>← el ámbito acota el rol a un activo</b>
+sesion         (id, usuario_id, emitida, expira, revocada, ip, agente)
+auditoria      (id, actor_id, accion, entidad, entidad_id, antes, despues, cuando)</pre>
+
+<h4>Decisiones</h4>
+<ul>
+  <li><b>Sin registro público.</b> La pantalla de acceso ya dice que las credenciales
+      llegan por correo: el administrador crea el usuario, el sistema envía una clave
+      temporal de un solo uso y fuerza el cambio en el primer ingreso.</li>
+  <li><b>Cookie de sesión <code>HttpOnly</code>, <code>Secure</code>,
+      <code>SameSite=Lax</code></b>, en lugar de un <i>token</i> en JavaScript. El
+      frontend es Next.js con componentes de servidor: el <i>middleware</i> puede
+      validar la cookie antes de renderizar, y así ninguna pantalla privada se pinta
+      nunca sin permiso. Un <i>token</i> en <code>localStorage</code> obligaría a
+      renderizar primero y comprobar después, y sería robable con un XSS.</li>
+  <li><b>Contraseñas con Argon2id.</b> Límite de intentos por cuenta y por IP, con
+      espera creciente.</li>
+  <li><b>Auditoría desde el primer día.</b> La fase 3 tiene aprobaciones que mueven
+      dinero; añadir la bitácora después es reescribir servicios.</li>
+</ul>
+
+<h4>Endpoints</h4>
+<table>
+  <tr><th style="width:38%">Endpoint</th><th>Qué hace</th></tr>
+  <tr><td><code>POST /api/v1/auth/login</code></td><td>Valida credenciales, crea sesión, fija la cookie</td></tr>
+  <tr><td><code>POST /api/v1/auth/logout</code></td><td>Revoca la sesión</td></tr>
+  <tr><td><code>GET&nbsp; /api/v1/auth/yo</code></td><td>Usuario, roles y activos accesibles. Alimenta el avatar y la barra de proyecto</td></tr>
+  <tr><td><code>POST /api/v1/auth/clave</code></td><td>Cambio de clave, obligatorio en el primer ingreso</td></tr>
+  <tr><td><code>POST /api/v1/auth/recuperar</code></td><td>Envío de enlace de un solo uso, con caducidad</td></tr>
+</table>
+
+<h4>Lado frontend</h4>
+<ul>
+  <li><code>middleware.ts</code> protegiendo <code>/predios/*</code> y <code>/panel/*</code>.</li>
+  <li><code>LoginScreen</code> y <code>LoginCompact</code>: llamada real, estado de carga y de error (hoy no existen).</li>
+  <li>El avatar <code>NR</code> y el nombre del proyecto, hoy fijos en <code>Shell</code>, pasan a venir de <code>/auth/yo</code>.</li>
+</ul>
+
+<div class="accept">
+  <h4>Criterio de aceptación</h4>
+  <ul>
+    <li>Sin sesión, <code>/panel</code> redirige a <code>/login</code> <b>en el servidor</b>, sin pintar nada.</li>
+    <li>Un inversionista que pide el activo de otro recibe 404, no 403: no se confirma la existencia.</li>
+    <li>Una prueba automatizada verifica que un gestor no puede escribir hallazgos de interventoría.</li>
+    <li>Toda acción que cambia estado deja una fila en <code>auditoria</code>.</li>
+  </ul>
+</div>
+</div>
+
+<!-- ══════════════════ FASE 2 ══════════════════ -->
+<div class="phase">
+<div class="phase-head">
+  <div class="tag">Fase 2</div>
+  <h2>Catálogo de <b>predios</b></h2>
+  <div class="facts">
+    <b>3 semanas</b> · depende de F1 · pantallas: <code>/predios</code>, <code>/predios/ficha</code>, <code>/predios/add-value</code>, <code>/predios/mis-propiedades</code>
+  </div>
+</div>
+
+<h3>Objetivo</h3>
+<p>
+  Que las cuatro pantallas del área de predios dejen de leer
+  <code>components/predios/data.ts</code> y lean la base de datos, con los seis filtros
+  funcionando.
+</p>
+
+<h4>Modelo</h4>
+<pre>ubicacion         (pais, ciudad, zona)
+predio            (id, slug, ubicacion_id, titulo, especificaciones, area_m2,
+                   habitaciones, banos, parqueaderos, tipo_transformacion_id,
+                   precio_compra, precio_remodelacion, moneda, horizonte_anios,
+                   tir_estimada, estado_reserva, publicado_en)
+tipo_transformacion (codigo, nombre, descripcion)   <b>← el texto del tooltip, no un literal</b>
+score_zequara     (predio_id, valor, version_modelo, componentes JSONB, calculado_en)
+predio_media      (predio_id, orden, gcs_path, tipo, texto_alternativo)
+analisis_valor    (predio_id, inversion_total, arriendo_mensual, valor_esperado,
+                   roi_estimado, cascada JSONB, supuestos, vigente_hasta)
+reserva           (predio_id, usuario_id, estado, creada, expira, liberada_en)</pre>
+
+<div class="box">
+  <h4>Dos decisiones que evitan deuda</h4>
+  <ul>
+    <li><b>El Score Zequara se guarda con sus componentes y la versión del modelo.</b>
+        El tooltip promete «evaluación especializada de la zona y su afinidad con la
+        estrategia Zequara»: guardar sólo el número 96 hace esa frase indefendible en
+        cuanto alguien pregunte. Con componentes y versión, el número es explicable y
+        recalculable.</li>
+    <li><b>El estado de reserva es una máquina de estados</b> con transiciones
+        permitidas y caducidad automática, no un texto. Las seis etiquetas del diseño
+        son sus estados; <code>Reserva liberada</code> y <code>Alta actividad</code>
+        son estados derivados, calculados de la actividad reciente.</li>
+  </ul>
+</div>
+
+<h4>Endpoints</h4>
+<table>
+  <tr><th style="width:42%">Endpoint</th><th>Notas</th></tr>
+  <tr><td><code>GET /api/v1/predios</code></td><td>Filtros: país, ciudad, zona, capital, tipo de transformación, orden. Paginación por cursor</td></tr>
+  <tr><td><code>GET /api/v1/predios/filtros</code></td><td>Las opciones reales de cada desplegable, con conteos. Hoy los valores son literales</td></tr>
+  <tr><td><code>GET /api/v1/predios/{slug}</code></td><td>Ficha completa</td></tr>
+  <tr><td><code>GET /api/v1/predios/{slug}/analisis-valor</code></td><td>Alimenta Add Value</td></tr>
+  <tr><td><code>POST /api/v1/predios/{slug}/reserva</code></td><td>Activa el «Reservar ahora», que hoy es un botón muerto. Idempotente por clave de petición</td></tr>
+  <tr><td><code>GET /api/v1/mis-propiedades</code></td><td>Portafolio: resumen + un elemento por activo, con la métrica según esté en obra o arrendado</td></tr>
+</table>
+
+<h4>Lado frontend</h4>
+<ul>
+  <li><code>data.ts</code> se convierte en el tipo y en datos de prueba; los datos reales llegan del servidor.</li>
+  <li><b>El formateo se mueve.</b> Hoy la API tendría que devolver <code>"COP $3.100M"</code>
+      porque el tipo <code>Predio</code> guarda el precio como texto ya compuesto. Se
+      cambia a número + moneda, y el formateo pasa a una utilidad del frontend
+      (§5.1).</li>
+  <li>Se cablean los seis filtros, «Limpiar filtros» y el orden por Score.</li>
+</ul>
+
+<div class="accept">
+  <h4>Criterio de aceptación</h4>
+  <ul>
+    <li>Los ocho predios de muestra salen de la base y se pintan igual que hoy, en las dos vistas.</li>
+    <li>Cada filtro reduce el conjunto, y el resultado se puede compartir por URL.</li>
+    <li>Un predio ya reservado no admite una segunda reserva, ni con dos pulsaciones simultáneas.</li>
+    <li>El listado responde por debajo de 300 ms con 10 000 predios cargados.</li>
+  </ul>
+</div>
+</div>
+
+<!-- ══════════════════ FASE 3 ══════════════════ -->
+<div class="phase">
+<div class="phase-head">
+  <div class="tag">Fase 3 · la fase grande</div>
+  <h2>Proyecto y <b>panel de obra</b></h2>
+  <div class="facts">
+    <b>5 semanas</b> · depende de F1 y F2 · seis de las diez vistas del panel
+  </div>
+</div>
+
+<h3>Objetivo</h3>
+<p>
+  Que las vistas <i>Resumen</i>, <i>Avance</i>, <i>Presupuesto</i>,
+  <i>Aprobaciones</i>, <i>Interventoría</i> y <i>Mi gestor</i> muestren el estado real
+  de una obra, y que las aprobaciones se puedan decidir de verdad.
+</p>
+
+<h4>Modelo</h4>
+<pre>activo        (id, predio_id, inversionista_id, estado, entregado_en)
+proyecto      (id, activo_id, gestor_id, nombre, semana_actual, semanas_totales,
+               estado, inicio, fin_previsto)
+etapa         (proyecto_id, orden, nombre, estado, pct_avance, inicio, fin)
+actividad     (etapa_id, nombre, estado, responsable, fecha_prevista)
+nota_etapa    (etapa_id, autor_id, texto, creada)         <b>← hoy no persiste</b>
+
+presupuesto   (proyecto_id, version, total_cerrado, total_ejecutado, moneda, vigente)
+partida       (presupuesto_id, capitulo, nombre, cerrado, ejecutado)
+hito_pago     (presupuesto_id, nombre, monto, vencimiento, estado, pagado_en)
+
+aprobacion    (id, proyecto_id, titulo, descripcion, propuesta_por,
+               impacto_costo, impacto_dias, impacto_interventoria,
+               estado, vence, decidida_en, decidida_por, version)
+decision      (aprobacion_id, actor_id, valor, motivo, cuando)   <b>← inmutable</b>
+
+inspeccion    (proyecto_id, interventor_id, fecha, tipo, veredicto)
+hallazgo      (inspeccion_id, titulo, descripcion, severidad, estado,
+               aprobacion_id)    <b>← el enlace a Aprobaciones que ya insinúa el diseño</b>
+
+mensaje       (proyecto_id, autor_id, cuerpo, leido_en)
+reunion       (proyecto_id, cuando, medio, enlace, estado)</pre>
+
+<div class="box warn">
+  <h4>Aprobaciones: el camino de escritura más delicado del sistema</h4>
+  <p>
+    Es el único sitio donde el inversionista toma una decisión con consecuencias de
+    dinero y de plazo. Requiere cuatro cosas que no se pueden añadir después:
+  </p>
+  <ul>
+    <li><b>Bloqueo optimista</b> por <code>version</code>: si la aprobación cambió desde
+        que se cargó la pantalla, la decisión se rechaza y se pide recargar. Sin esto,
+        dos pestañas abiertas pueden decidir sobre información distinta.</li>
+    <li><b>Clave de idempotencia</b> en la petición: una doble pulsación no puede
+        producir dos decisiones.</li>
+    <li><b>Decisión inmutable</b>: no se actualiza, se inserta. Cambiar de opinión es
+        una decisión nueva sobre una aprobación nueva.</li>
+    <li><b>Impacto guardado con la propuesta</b>, no calculado al decidir: lo que el
+        inversionista aceptó es lo que vio.</li>
+  </ul>
+</div>
+
+<h4>Endpoints</h4>
+<table>
+  <tr><th style="width:46%">Endpoint</th><th>Alimenta</th></tr>
+  <tr><td><code>GET&nbsp; /proyectos/{id}/resumen</code></td><td><code>/panel</code></td></tr>
+  <tr><td><code>GET&nbsp; /proyectos/{id}/avance</code></td><td><code>/panel/avance</code></td></tr>
+  <tr><td><code>POST /proyectos/{id}/etapas/{eid}/notas</code></td><td>Las notas por etapa, que hoy se pierden</td></tr>
+  <tr><td><code>GET&nbsp; /proyectos/{id}/presupuesto</code></td><td><code>/panel/presupuesto</code>. El sobrecosto se calcula, nunca se guarda como texto</td></tr>
+  <tr><td><code>GET&nbsp; /proyectos/{id}/aprobaciones</code></td><td><code>/panel/aprobaciones</code> y el badge del sidebar (hoy un <code>2</code> fijo)</td></tr>
+  <tr><td><code>POST /proyectos/{id}/aprobaciones/{aid}/decision</code></td><td>Los botones «Aprobar» y «Rechazar», hoy sin manejador</td></tr>
+  <tr><td><code>GET&nbsp; /proyectos/{id}/interventoria</code></td><td><code>/panel/interventoria</code></td></tr>
+  <tr><td><code>GET&nbsp; /proyectos/{id}/gestor</code> · <code>POST .../mensajes</code></td><td><code>/panel/gestor</code></td></tr>
+</table>
+
+<div class="accept">
+  <h4>Criterio de aceptación</h4>
+  <ul>
+    <li>Las seis vistas pintan datos de la base, en escritorio y en móvil.</li>
+    <li>Una aprobación decidida se refleja en el historial, en el badge y en la auditoría.</li>
+    <li>Dos decisiones simultáneas sobre la misma aprobación: una gana, la otra recibe conflicto.</li>
+    <li>Un gestor autenticado recibe 403 al intentar escribir un hallazgo de interventoría.</li>
+    <li>El sobrecosto que se muestra siempre iguala <code>ejecutado − cerrado</code> sumado por partidas.</li>
+  </ul>
+</div>
+</div>
+
+<!-- ══════════════════ FASE 4 ══════════════════ -->
+<div class="phase">
+<div class="phase-head">
+  <div class="tag">Fase 4</div>
+  <h2>Documentos y <b>fotos</b></h2>
+  <div class="facts">
+    <b>2 semanas</b> · depende de F3 · pantallas: <code>/panel/documentos</code>, <code>/panel/fotos</code>, y las descargas del Resumen
+  </div>
+</div>
+
+<h3>Objetivo</h3>
+<p>
+  Que el expediente del proyecto sea real: contrato, cifras, cronograma, planos y
+  estudios descargables, y la galería de obra con su comparador antes/después.
+</p>
+
+<h4>Modelo</h4>
+<pre>documento   (id, proyecto_id, tipo, nombre, version, estado, gcs_path,
+             bytes, sha256, mime, visible_para[], subido_por, subido_en)
+foto        (id, proyecto_id, etapa_id, ambiente, tomada_en, gcs_path,
+             derivadas JSONB, subida_por)
+foto_par    (proyecto_id, ambiente, foto_antes_id, foto_despues_id)</pre>
+
+<div class="box good">
+  <h4><code>foto_par</code>: lo que el comparador necesita y hoy no tiene</h4>
+  <p>
+    Los dos comparadores del frontend —el arrastrable de escritorio y el táctil de
+    móvil— no muestran una foto: muestran <b>una pareja</b> del mismo ambiente en dos
+    momentos. Modelar la pareja explícitamente evita adivinarla por nombre de archivo,
+    que es exactamente lo que hoy hace la vista táctil con el patrón
+    <code>{slug}-antes.webp</code> / <code>{slug}-despues.webp</code>.
+  </p>
+</div>
+
+<h4>Decisiones</h4>
+<ul>
+  <li><b>URLs firmadas en las dos direcciones.</b> Para subir, la API entrega una URL
+      de escritura de vida corta y el navegador sube directo a GCS. Para descargar,
+      una URL de lectura de pocos minutos, emitida sólo tras comprobar permiso. La API
+      nunca mueve los bytes: es lo que hace que Cloud Run siga siendo barato.</li>
+  <li><b>Derivadas al subir</b>, en segundo plano: miniatura, versión de galería y
+      versión completa, en AVIF y WebP. El frontend ya sirve las imágenes con
+      <code>next/image</code> y un <code>sizes</code> exacto; conviene alimentarlo con
+      tamaños coherentes.</li>
+  <li><b>Verificaciones de carga</b>: lista blanca de tipos, tamaño máximo, análisis
+      antivírico y <code>sha256</code> guardado para detectar duplicados y
+      corrupción.</li>
+  <li><b>Visibilidad por rol en cada documento.</b> No todo el expediente es para el
+      inversionista; algunos anexos son internos.</li>
+</ul>
+
+<div class="accept">
+  <h4>Criterio de aceptación</h4>
+  <ul>
+    <li>Una descarga funciona para su dueño y falla para un tercero, incluso con la URL copiada tras caducar.</li>
+    <li>Subir una foto de 12 MP desde el móvil del gestor termina y genera derivadas sin bloquear la petición.</li>
+    <li>El comparador carga una pareja real de un ambiente concreto.</li>
+    <li>Ningún archivo se sirve a través de la API.</li>
+  </ul>
+</div>
+</div>
+
+<!-- ══════════════════ FASE 5 ══════════════════ -->
+<div class="phase">
+<div class="phase-head">
+  <div class="tag">Fase 5</div>
+  <h2>Captación y <b>notificaciones</b></h2>
+  <div class="facts">
+    <b>2 semanas</b> · depende de F0 (puede adelantarse) · pantallas: <code>/solicitud-acceso</code>, diagnóstico, <code>/hub</code>
+  </div>
+</div>
+
+<h3>Objetivo</h3>
+<p>
+  Que lo que hoy se pierde se guarde: la solicitud de acceso, las siete respuestas del
+  Diagnóstico Patrimonial y las suscripciones del HUB. Y que la campana del panel
+  deje de ser un adorno.
+</p>
+
+<h4>Modelo</h4>
+<pre>solicitud_acceso (id, nombre, email, telefono, mercados[], capital_rango,
+                  mensaje, origen, estado, creada, atendida_por)
+diagnostico      (id, respuestas JSONB, perfil_calculado, nombre, email,
+                  telefono, completado, creada)
+suscripcion      (email, confirmada_en, origen, baja_en)
+articulo_hub     (slug, tipo, titulo, resumen, cuerpo, categorias[],
+                  portada_gcs, publicado_en, destacado)
+notificacion     (usuario_id, tipo, entidad, entidad_id, titulo,
+                  leida_en, creada)</pre>
+
+<div class="box warn">
+  <h4>Estos son los únicos endpoints públicos de escritura</h4>
+  <p>
+    Y por eso el único blanco de abuso del sistema. Necesitan, desde el primer
+    despliegue: límite de tasa por IP y por correo, prueba anti-robot en los
+    formularios, honeypot, validación estricta, y <b>ninguna respuesta que revele si un
+    correo ya existe</b>. El diagnóstico además guarda parcialmente —el diseño ya tiene
+    un paso de corte antes de pedir los datos—, así que hay que decidir cuánto se
+    conserva de un recorrido abandonado (ver §8.2).
+  </p>
+</div>
+
+<h4>Notificaciones</h4>
+<p>
+  Un único servicio con dos salidas: la campana del panel (en base de datos) y el
+  correo transaccional (en cola). Los disparadores nacen del dominio ya modelado:
+  aprobación pendiente, hallazgo abierto, hito de pago próximo, documento nuevo,
+  mensaje del gestor. El badge <code>2</code> del sidebar pasa a ser el conteo real.
+</p>
+
+<div class="accept">
+  <h4>Criterio de aceptación</h4>
+  <ul>
+    <li>Una solicitud enviada queda registrada y notifica al equipo comercial.</li>
+    <li>Un diagnóstico completo guarda las siete respuestas y el perfil calculado.</li>
+    <li>Cien envíos automatizados desde una IP se frenan sin tumbar el servicio.</li>
+    <li>El HUB pinta artículos de la base y sus filtros funcionan.</li>
+  </ul>
+</div>
+</div>
+
+<!-- ══════════════════ FASE 6 ══════════════════ -->
+<div class="phase">
+<div class="phase-head">
+  <div class="tag">Fase 6</div>
+  <h2>Operación del <b>activo entregado</b></h2>
+  <div class="facts">
+    <b>3 semanas</b> · depende de F3 y F4 · pantallas: <code>/panel/operacion</code>, <code>/panel/valor</code>
+  </div>
+</div>
+
+<h3>Objetivo</h3>
+<p>
+  Cubrir la vida del inmueble después de la entrega: arrendado, rentando y
+  administrado. Es la vista más grande del panel (2299 px de lienzo) y la única que
+  entra con su propio estado, <i>«Entregado y en operación · Arrendado»</i>.
+</p>
+
+<h4>Modelo</h4>
+<pre>contrato_arriendo (activo_id, inquilino_id, canon, moneda, inicio, fin,
+                   incremento_anual, deposito, estado)
+inquilino         (nombre, documento, contacto, verificado_en)
+pago              (contrato_id, periodo, monto, vencimiento, pagado_en,
+                   medio, estado)
+estado_cuenta     (activo_id, periodo, ingresos, gastos, retenciones, neto)
+bitacora_evento   (activo_id, tipo, titulo, detalle, ocurrido_en, adjuntos[])
+mantenimiento     (activo_id, tipo, proveedor, costo, estado, programado, cerrado)
+asamblea          (activo_id, fecha, tema, acta_documento_id, cuota_extra)
+proyeccion_valor  (activo_id, escenario, valor, tir, supuestos JSONB,
+                   calculada_en, vigente_hasta)</pre>
+
+<h4>Decisiones</h4>
+<ul>
+  <li><b>La bitácora es un registro de eventos tipado</b>, con tipos cerrados
+      (pago, mantenimiento, asamblea, visita, incidencia, documento). Los filtros de la
+      vista, hoy decorativos, se convierten en filtros por tipo y por rango de fechas
+      sobre un índice.</li>
+  <li><b>El estado de cuenta se calcula por periodo</b> y se guarda cerrado. Un
+      histórico que cambia solo porque cambió una regla de cálculo es un problema
+      contable, no un detalle técnico.</li>
+  <li><b>La proyección de valor guarda sus supuestos y su caducidad.</b> La vista lleva
+      un descargo de responsabilidad en el diseño; los supuestos guardados son lo que
+      lo respalda.</li>
+</ul>
+
+<div class="accept">
+  <h4>Criterio de aceptación</h4>
+  <ul>
+    <li>Los filtros de la bitácora filtran de verdad y la vista responde por debajo de 400 ms con 5 000 eventos.</li>
+    <li>Un estado de cuenta cerrado no cambia al recalcular periodos posteriores.</li>
+    <li>Un pago registrado aparece en bitácora, estado de cuenta y notificación, sin duplicarse.</li>
+  </ul>
+</div>
+</div>
+
+<!-- ══════════════════ FASE 7 ══════════════════ -->
+<div class="phase">
+<div class="phase-head">
+  <div class="tag">Fase 7 · continua</div>
+  <h2>Endurecimiento y <b>operación</b></h2>
+  <div class="facts">
+    empieza en F0, se cierra formalmente al final · sin ella el sistema funciona hasta el día que falla
+  </div>
+</div>
+
+<h3>Alcance</h3>
+<table>
+  <tr><th style="width:26%">Área</th><th>Qué se entrega</th></tr>
+  <tr><td>Observabilidad</td><td>Registro estructurado con identificador de correlación, métricas de latencia y error por endpoint, trazas, y alertas sobre tasa de error y saturación de conexiones</td></tr>
+  <tr><td>Respaldos</td><td>Copias automáticas de Postgres con recuperación a un punto en el tiempo, y <b>un ensayo de restauración documentado</b>. Un respaldo sin ensayo no es un respaldo</td></tr>
+  <tr><td>Rendimiento</td><td>Revisión de índices contra las consultas reales, caché de las respuestas públicas del catálogo, presupuesto de latencia por endpoint</td></tr>
+  <tr><td>Límites</td><td>Límite de tasa por IP, por usuario y por endpoint sensible; cuotas de subida</td></tr>
+  <tr><td>Seguridad</td><td>Análisis de dependencias en CI, cabeceras de seguridad, rotación de secretos, revisión externa antes del primer cliente real</td></tr>
+  <tr><td>Cumplimiento</td><td>Ley 1581 de 2012: aviso de privacidad, registro de consentimiento, atención de derechos, retención y borrado (ver §8.2)</td></tr>
+  <tr><td>Operación</td><td>Guías de actuación: cómo restaurar, cómo revocar sesiones, cómo emitir credenciales, a quién llamar</td></tr>
+</table>
+</div>
+
+<!-- ══════════════════ 5 ══════════════════ -->
+<h2><span class="n">5</span>Temas transversales</h2>
+
+<h3>5.1 Dinero</h3>
+<p>
+  <b>Nunca en coma flotante.</b> Enteros en la unidad mínima más un código de moneda
+  ISO. Hoy el frontend recibe <code>"COP $3.100M"</code> ya compuesto; la API debe
+  devolver <code>{ "monto": 3100000000, "moneda": "COP" }</code> y el formateo pasa a
+  una utilidad del frontend, compartida por las dos vistas. El sitio maneja Colombia y
+  Panamá, así que la moneda es un dato, no una constante.
+</p>
+
+<h3>5.2 Fechas y zona horaria</h3>
+<p>
+  Almacenar siempre en UTC con zona explícita; presentar en
+  <code>America/Bogota</code>. Los vencimientos de aprobaciones y de hitos de pago
+  dependen del día local: una diferencia de cinco horas cambia si algo venció.
+</p>
+
+<h3>5.3 Escrituras seguras</h3>
+<ul>
+  <li><b>Clave de idempotencia</b> obligatoria en toda escritura que produce un efecto:
+      reserva, decisión de aprobación, subida, pago.</li>
+  <li><b>Bloqueo optimista</b> por versión donde hay concurrencia real.</li>
+  <li><b>Paginación por cursor</b>, no por número de página: los listados se ordenan por
+      Score y por fecha, y con desplazamiento se saltan o repiten filas.</li>
+</ul>
+
+<h3>5.4 Contratos tipados entre frontend y backend</h3>
+<p>
+  FastAPI publica OpenAPI. En CI se generan los tipos TypeScript
+  (<code>openapi-typescript</code>) y se escriben en <code>frontend/lib/api-types.ts</code>.
+  Si el backend cambia una respuesta y el frontend no se adapta, <b>la compilación
+  falla</b>. Esto importa más aquí que en un proyecto normal: hay dos árboles que
+  consumen los mismos datos, y un cambio silencioso rompería sólo la mitad de las
+  pantallas —probablemente la que nadie mira en el móvil.
+</p>
+
+<h3>5.5 Contenido: lo que <i>no</i> debe ir al backend</h3>
+<div class="box good">
+  <p>
+    Es la trampa más clásica de este proyecto. Casi todo el texto del sitio está escrito
+    dentro de componentes posicionados al píxel: los titulares de la home van partidos
+    en dos pesos tipográficos, la comparativa tiene siete pasos con negritas dentro de
+    las frases, el diagnóstico tiene siete preguntas con cuatro opciones cada una.
+    Sacar eso a un CMS costaría semanas y produciría un sitio peor.
+  </p>
+  <p><b>La regla propuesta:</b></p>
+  <ul>
+    <li><b>Se queda en el código</b> el texto de marca acoplado al diseño: home, Cómo
+        operamos, Oportunidades, los dos modales, todos los rótulos y microcopias.</li>
+    <li><b>Va al backend</b> lo que es dato del negocio y cambia sin diseñador: predios,
+        proyectos, presupuestos, documentos, fotos, artículos del HUB, contratos.</li>
+  </ul>
+  <p>
+    La frontera es sencilla de aplicar: si cambiarlo exige mover un píxel, es diseño;
+    si cambia porque cambió el mundo, es dato.
+  </p>
+</div>
+
+<!-- ══════════════════ 6 ══════════════════ -->
+<h2><span class="n">6</span>Infraestructura y despliegue</h2>
+
+<pre>Internet
+   │
+   ├── Vercel / Cloud Run ──── frontend Next.js
+   │                                │  (fetch con cookie de sesión)
+   └── Cloud Load Balancing ──── <b>Cloud Run: API FastAPI</b>
+                                    ├── Cloud SQL (PostgreSQL 16, IP privada)
+                                    ├── Cloud Storage (documentos y fotos)
+                                    ├── Secret Manager (claves y credenciales)
+                                    ├── Cloud Tasks ──── worker (correo, derivadas)
+                                    └── Cloud Logging / Monitoring</pre>
+
+<table>
+  <tr><th style="width:26%">Decisión</th><th>Motivo</th></tr>
+  <tr><td>Dos entornos: <code>staging</code> y <code>producción</code></td><td>Con bases y buckets separados. Las migraciones se prueban en staging con un volcado anonimizado</td></tr>
+  <tr><td>Cloud SQL con IP privada</td><td>La base nunca se expone a Internet; el acceso va por conector desde Cloud Run</td></tr>
+  <tr><td>Migraciones como paso de despliegue</td><td><code>alembic upgrade head</code> antes de cambiar el tráfico, y sólo migraciones compatibles hacia atrás para poder revertir</td></tr>
+  <tr><td>Imagen en Artifact Registry, etiquetada por <i>commit</i></td><td>Revertir es apuntar al contenedor anterior, no reconstruir</td></tr>
+  <tr><td>Región <code>southamerica-east1</code> o <code>us-east1</code></td><td>Latencia hacia Colombia y Panamá. Decidir junto con dónde se aloje el frontend</td></tr>
+</table>
+
+<!-- ══════════════════ 7 ══════════════════ -->
+<h2><span class="n">7</span>Calidad: pruebas y CI</h2>
+
+<table>
+  <tr><th style="width:24%">Nivel</th><th style="width:30%">Herramienta</th><th>Qué cubre</th></tr>
+  <tr><td>Unitario</td><td><code>pytest</code></td><td>Cálculos: sobrecosto, Score, ROI, estado de cuenta, transiciones de reserva</td></tr>
+  <tr><td>Integración</td><td><code>pytest</code> + Postgres real en contenedor</td><td>Cada endpoint contra base de datos de verdad. Sin bases en memoria: el dialecto miente</td></tr>
+  <tr><td>Permisos</td><td>Batería propia por rol</td><td>Cada endpoint probado con los cinco roles. Aquí vive la prueba de gestor ≠ interventoría</td></tr>
+  <tr><td>Contrato</td><td><code>openapi-typescript</code> en CI</td><td>Los tipos del frontend se regeneran; si divergen, falla la compilación</td></tr>
+  <tr><td>Carga</td><td><code>k6</code>, antes de F7</td><td>Listado de predios, resumen del panel y bitácora, que son las consultas caras</td></tr>
+</table>
+<p>
+  Cobertura como umbral mínimo en los servicios de dominio, no como número global. Lo
+  que hay que tener cubierto al 100 % es el camino de aprobaciones y el de permisos.
+</p>
+
+<!-- ══════════════════ 8 ══════════════════ -->
+<h2><span class="n">8</span>Seguridad y cumplimiento</h2>
+
+<h3>8.1 Seguridad</h3>
+<ul>
+  <li><b>Cerrar el área privada es la fase 1</b>, no una tarea posterior.</li>
+  <li>Autorización comprobada <b>en el servicio</b>, nunca sólo en el router, y por
+      pertenencia del recurso: un identificador válido de otro activo devuelve 404.</li>
+  <li>Argon2id, límite de intentos, sesiones revocables, caducidad y renovación.</li>
+  <li>Consultas siempre parametrizadas; nada de SQL compuesto por concatenación.</li>
+  <li>Secretos en Secret Manager, nunca en el repositorio. Los <code>.env.example</code>
+      llevan nombres de variable, jamás valores.</li>
+  <li>CORS restringido a los dominios propios; cookies <code>HttpOnly</code>,
+      <code>Secure</code>, <code>SameSite</code>.</li>
+  <li>Auditoría inmutable de toda acción que cambia estado.</li>
+</ul>
+
+<h3>8.2 Datos personales (Colombia, Ley 1581 de 2012)</h3>
+<div class="box">
+  <p>
+    El sistema captura datos personales de residentes en Colombia —solicitudes de
+    acceso, diagnóstico patrimonial con rango de capital, inquilinos con documento de
+    identidad—, así que el régimen de habeas data aplica de lleno. Lo que hay que
+    tener resuelto antes del primer formulario en producción:
+  </p>
+  <ul>
+    <li><b>Autorización previa, expresa e informada</b>, con registro de cuándo y con
+        qué texto se dio. Un <i>checkbox</i> sin guardar la versión del aviso no sirve
+        como prueba.</li>
+    <li><b>Finalidad declarada</b> y aviso de privacidad accesible.</li>
+    <li><b>Derechos del titular</b>: consulta, actualización, rectificación y supresión,
+        con un procedimiento y un plazo.</li>
+    <li><b>Retención con caducidad</b>: un diagnóstico abandonado sin datos de contacto
+        no debería conservarse indefinidamente.</li>
+    <li><b>Cifrado en reposo y en tránsito</b>, y minimización: no pedir lo que no se
+        va a usar.</li>
+  </ul>
+  <p>
+    Conviene revisarlo con asesoría legal; aquí se señala como requisito de diseño, no
+    como dictamen jurídico.
+  </p>
+</div>
+
+<!-- ══════════════════ 9 ══════════════════ -->
+<h2><span class="n">9</span>Plan, esfuerzo e hitos</h2>
+
+<p>
+  Estimación con <b>un desarrollador de backend a tiempo completo</b> más
+  <b>disponibilidad parcial de frontend</b> para cablear cada fase en sus dos árboles.
+  Son estimaciones, no compromisos: el margen razonable es ±30 %, y la fase 3 es la de
+  mayor incertidumbre.
+</p>
+
+<table>
+  <tr><th style="width:8%">Fase</th><th style="width:32%">Entrega</th><th style="width:12%">Backend</th><th style="width:12%">Frontend</th><th>Acumulado</th></tr>
+  <tr><td><b>F0</b></td><td>Fundaciones</td><td>2 sem</td><td>0,3 sem</td><td>2 sem</td></tr>
+  <tr><td><b>F1</b></td><td>Identidad y cierre del área privada</td><td>2 sem</td><td>0,7 sem</td><td>4 sem</td></tr>
+  <tr><td><b>F2</b></td><td>Catálogo de predios</td><td>3 sem</td><td>1,5 sem</td><td>7 sem</td></tr>
+  <tr><td><b>F3</b></td><td>Proyecto y panel de obra</td><td>5 sem</td><td>2,5 sem</td><td><b>12 sem ← plataforma usable</b></td></tr>
+  <tr><td><b>F4</b></td><td>Documentos y fotos</td><td>2 sem</td><td>1 sem</td><td>14 sem</td></tr>
+  <tr><td><b>F5</b></td><td>Captación y notificaciones</td><td>2 sem</td><td>1 sem</td><td>16 sem</td></tr>
+  <tr><td><b>F6</b></td><td>Operación del activo</td><td>3 sem</td><td>1,5 sem</td><td>19 sem</td></tr>
+  <tr><td><b>F7</b></td><td>Endurecimiento</td><td>continuo</td><td>—</td><td>~20 sem</td></tr>
+</table>
+
+<h4>Si hay que recortar</h4>
+<ul>
+  <li><b>Mínimo defendible:</b> F0 + F1. Cierra el agujero de seguridad y deja base para todo lo demás. Cuatro semanas.</li>
+  <li><b>Demostrable a un inversionista real:</b> F0 → F3. Doce semanas.</li>
+  <li><b>F5 se puede adelantar</b> y correr en paralelo si captar contactos es la prioridad comercial: sólo depende de F0.</li>
+  <li><b>F6 se puede posponer</b> hasta que exista el primer activo entregado. Antes de eso, no tiene usuarios.</li>
+</ul>
+
+<!-- ══════════════════ 10 ══════════════════ -->
+<h2><span class="n">10</span>Riesgos y decisiones pendientes</h2>
+
+<table>
+  <tr><th style="width:30%">Riesgo</th><th style="width:12%">Impacto</th><th>Mitigación</th></tr>
+  <tr><td>El área privada sigue abierta mientras se construye otra cosa</td><td><span class="pill p1">Alto</span></td><td>F1 va segunda, antes de cualquier funcionalidad. No negociable</td></tr>
+  <tr><td>Cada integración se cablea dos veces por los dos árboles del frontend</td><td><span class="pill p2">Medio</span></td><td>Extraer los datos a un módulo compartido por vista, como ya hace <code>predios/data.ts</code></td></tr>
+  <tr><td>El contenido está dentro de los componentes</td><td><span class="pill p2">Medio</span></td><td>La frontera diseño/dato de §5.5, aplicada fase por fase y no de golpe</td></tr>
+  <tr><td>Los tipos del frontend guardan importes ya formateados</td><td><span class="pill p2">Medio</span></td><td>Cambiar a número + moneda en F2, cuando sólo hay una pantalla que lo usa</td></tr>
+  <tr><td>La fase 3 es grande y tiene el camino de escritura más delicado</td><td><span class="pill p2">Medio</span></td><td>Partirla en dos entregas: lectura de las seis vistas primero, decisión de aprobaciones después</td></tr>
+  <tr><td>Falta un dueño del dato de obra</td><td><span class="pill p3">Bajo</span></td><td>Definir en F3 quién actualiza el avance y con qué frecuencia. Sin eso, el panel muestra datos viejos y pierde credibilidad</td></tr>
+</table>
+
+<h4>Decisiones que hay que tomar antes de empezar</h4>
+<ol>
+  <li><b>¿Se confirma GCP?</b> El esqueleto lo asume por <code>gcs_service.py</code>. Si
+      el frontend se despliega en Vercel, conviene decidir si la API va también allí o
+      se queda en Cloud Run junto a la base.</li>
+  <li><b>¿Quién carga el avance de obra?</b> El gestor desde el móvil en sitio, o un
+      administrador desde el escritorio. Cambia las prioridades de F3 y F4.</li>
+  <li><b>¿Hay integración contable?</b> Si el estado de cuenta debe conciliar con un
+      sistema contable existente, eso es alcance adicional en F6.</li>
+  <li><b>¿Cuántos activos por inversionista?</b> El modelo los soporta varios, pero
+      define si el panel necesita un selector de proyecto en la barra superior.</li>
+  <li><b>¿Multi-moneda desde el principio?</b> El catálogo ya muestra Panamá. Decidirlo
+      en F2 es baratísimo; decidirlo en F6 no.</li>
+</ol>
+
+<!-- ══════════════════ ANEXO ══════════════════ -->
+<div class="phase">
+<h2><span class="n">A</span>Anexo: pantalla → endpoint → fase</h2>
+<p>
+  Trazabilidad completa entre lo que hoy está pintado y no opera, y la fase que lo
+  resuelve.
+</p>
+<table>
+  <tr><th style="width:26%">Pantalla</th><th style="width:26%">Qué no funciona hoy</th><th style="width:34%">Endpoint que lo resuelve</th><th style="width:8%">Fase</th></tr>
+  <tr><td><code>/login</code></td><td>No autentica; entra directo</td><td><code>POST /auth/login</code></td><td>F1</td></tr>
+  <tr><td>Todo <code>/panel/*</code>, <code>/predios/*</code></td><td>Accesibles sin sesión</td><td><i>middleware</i> + <code>GET /auth/yo</code></td><td>F1</td></tr>
+  <tr><td><code>/predios</code></td><td>Los seis filtros no filtran</td><td><code>GET /predios</code>, <code>GET /predios/filtros</code></td><td>F2</td></tr>
+  <tr><td><code>/predios/ficha</code></td><td>«Reservar ahora» no hace nada</td><td><code>POST /predios/{slug}/reserva</code></td><td>F2</td></tr>
+  <tr><td><code>/predios/add-value</code></td><td>Cifras fijas</td><td><code>GET /predios/{slug}/analisis-valor</code></td><td>F2</td></tr>
+  <tr><td><code>/predios/mis-propiedades</code></td><td>Portafolio fijo</td><td><code>GET /mis-propiedades</code></td><td>F2</td></tr>
+  <tr><td><code>/panel</code></td><td>Todo fijo</td><td><code>GET /proyectos/{id}/resumen</code></td><td>F3</td></tr>
+  <tr><td><code>/panel/avance</code></td><td>Las notas por etapa no persisten</td><td><code>POST /proyectos/{id}/etapas/{eid}/notas</code></td><td>F3</td></tr>
+  <tr><td><code>/panel/presupuesto</code></td><td>Cifras fijas</td><td><code>GET /proyectos/{id}/presupuesto</code></td><td>F3</td></tr>
+  <tr><td><code>/panel/aprobaciones</code></td><td>Aprobar/rechazar sin manejador; badge <code>2</code> fijo</td><td><code>POST .../aprobaciones/{aid}/decision</code></td><td>F3</td></tr>
+  <tr><td><code>/panel/interventoria</code></td><td>Registro fijo</td><td><code>GET /proyectos/{id}/interventoria</code></td><td>F3</td></tr>
+  <tr><td><code>/panel/gestor</code></td><td>Escribir, agendar y calendario</td><td><code>POST .../mensajes</code>, <code>POST .../reuniones</code></td><td>F3</td></tr>
+  <tr><td><code>/panel/documentos</code></td><td>Descargas sin archivo detrás</td><td><code>GET /documentos/{id}/url</code></td><td>F4</td></tr>
+  <tr><td><code>/panel/fotos</code></td><td>Galería y comparador fijos</td><td><code>GET /proyectos/{id}/fotos</code></td><td>F4</td></tr>
+  <tr><td><code>/solicitud-acceso</code></td><td>No envía el formulario</td><td><code>POST /solicitudes-acceso</code></td><td>F5</td></tr>
+  <tr><td>Diagnóstico Patrimonial</td><td>No envía respuestas ni contacto</td><td><code>POST /diagnosticos</code></td><td>F5</td></tr>
+  <tr><td><code>/hub</code></td><td>Buscador, pestañas y chips no filtran</td><td><code>GET /articulos</code></td><td>F5</td></tr>
+  <tr><td>Campana del panel</td><td>Adorno</td><td><code>GET /notificaciones</code></td><td>F5</td></tr>
+  <tr><td><code>/panel/operacion</code></td><td>Los filtros de la bitácora no filtran</td><td><code>GET /activos/{id}/bitacora</code></td><td>F6</td></tr>
+  <tr><td><code>/panel/valor</code></td><td>Proyección fija</td><td><code>GET /activos/{id}/proyeccion-valor</code></td><td>F6</td></tr>
+</table>
+
+<div class="box" style="margin-top:8mm">
+  <h4>Referencias en el repositorio</h4>
+  <p>
+    <code>docs/arquitectura.md</code> — cómo está construido el frontend.<br>
+    <code>docs/flujos-negocio.md</code> — el recorrido pantalla por pantalla.<br>
+    <code>docs/api-reference.md</code> — inventario de puntos de integración, con archivo y línea.
+  </p>
+</div>
+</div>
+
+</body>
+</html>

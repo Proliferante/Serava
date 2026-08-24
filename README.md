@@ -60,3 +60,12 @@ docs/              esta documentación
   qué muestra cada una y qué está pintado pero todavía no funciona.
 - [docs/api-reference.md](docs/api-reference.md) — estado del backend y los puntos de
   integración que el frontend deja abiertos, con archivo y línea.
+- [docs/propuesta-backend.pdf](docs/propuesta-backend.pdf) — propuesta de construcción
+  del backend en siete fases: stack, modelo de dominio, endpoints, plan y riesgos.
+  La fuente es [docs/propuesta-backend.html](docs/propuesta-backend.html); para
+  regenerar el PDF:
+
+  ```bash
+  chrome --headless=new --no-pdf-header-footer \
+    --print-to-pdf=docs/propuesta-backend.pdf docs/propuesta-backend.html
+  ```
