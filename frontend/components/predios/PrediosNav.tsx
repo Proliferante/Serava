@@ -1,8 +1,9 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import AccountMenu, { type CuentaKey } from "@/components/AccountMenu";
 import { EASE } from "@/components/motion/Kinetics";
-import { MARK, tinted } from "@/components/brand";
+import { MARK, tinted, WORDMARK, wordmarkH } from "@/components/brand";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    NAV DEL ÁREA DE PREDIOS — el grupo de tres píldoras que comparten
@@ -31,10 +32,17 @@ type Geo = {
   menu: { x: number; y: number; w: number; h: number };
   pill: { y: number; h: number; fs: number; lh: string; xs: number[]; ws: number[] };
   avatar: { x: number; y: number; bg: string; border: string; fs: number; color: string };
+  /** El área de cuenta trae el wordmark completo, no el monograma. */
+  wordmark?: boolean;
 };
 
-/** Geometría por frame. `predios` es 100:2349; `propiedades`, 600:3028. */
-const GEO: Record<"predios" | "propiedades", Geo> = {
+/**
+ * Geometría por frame. `predios` es 100:2349; `propiedades`, 600:3028;
+ * `cuenta`, las dos pantallas del área de cuenta (688:4032 y 688:4280), que
+ * corren la barra entera 60 px a la derecha y cambian el monograma por el
+ * wordmark.
+ */
+const GEO: Record<"predios" | "propiedades" | "cuenta", Geo> = {
   predios: {
     h: 81.81,
     logo: { x: 101, y: 22.9, w: 39.46, h: 36 },
@@ -48,6 +56,16 @@ const GEO: Record<"predios" | "propiedades", Geo> = {
     menu: { x: 738.64, y: 22, w: 492, h: 50.39 },
     pill: { y: 6, h: 38.39, fs: 13.6, lh: "20.4px", xs: [6, 181, 336], ws: [169, 149, 150] },
     avatar: { x: 1488, y: 28.195, bg: "rgba(201,168,119,0.28)", border: "rgba(247,241,229,0.12)", fs: 13.1, color: "#c9a877" },
+  },
+  cuenta: {
+    h: 94.39,
+    /* El wordmark va centrado en el hueco de 32.39 px que reserva el frame
+       para el logotipo: 118 de ancho son 19.3 de alto con su proporción. */
+    logo: { x: 454, y: 37.55, w: 118, h: wordmarkH(118) },
+    menu: { x: 746.52, y: 22, w: 492, h: 50.39 },
+    pill: { y: 6, h: 38.39, fs: 13.6, lh: "20.4px", xs: [6, 181, 336], ws: [169, 149, 150] },
+    avatar: { x: 1429.12, y: 28.195, bg: "rgba(201,168,119,0.3)", border: "rgba(247,241,229,0.12)", fs: 13.1, color: "#c9a877" },
+    wordmark: true,
   },
 };
 
@@ -68,7 +86,16 @@ const BROWN = "#492100";
  * pide el frame (656:2804); el crema al 6 % que usan las páginas oscuras
  * desaparecía sobre el beige.
  */
-export default function PrediosNav({ active, geo = "propiedades", onLight = false }: { active: NavKey; geo?: keyof typeof GEO; onLight?: boolean }) {
+export default function PrediosNav({
+  active, geo = "propiedades", onLight = false, cuenta,
+}: {
+  /** `none` es para el área de cuenta, que no marca ninguna de las tres. */
+  active: NavKey | "none";
+  geo?: keyof typeof GEO;
+  onLight?: boolean;
+  /** En qué pantalla de cuenta estamos, para marcarla en el menú del avatar. */
+  cuenta?: CuentaKey;
+}) {
   const g = GEO[geo];
   const reduce = useReducedMotion();
   const anim = (delay: number) =>
@@ -84,8 +111,8 @@ export default function PrediosNav({ active, geo = "propiedades", onLight = fals
         {...anim(0)}
       >
         {onLight
-          ? <span aria-hidden className="absolute inset-0 block size-full" style={tinted(MARK, BROWN)} />
-          : <img src={MARK} alt="" decoding="async" className="absolute inset-0 block size-full max-w-none" />}
+          ? <span aria-hidden className="absolute inset-0 block size-full" style={tinted(g.wordmark ? WORDMARK : MARK, BROWN)} />
+          : <img src={g.wordmark ? WORDMARK : MARK} alt="" decoding="async" className="absolute inset-0 block size-full max-w-none" />}
       </motion.a>
 
       <motion.div
@@ -125,16 +152,15 @@ export default function PrediosNav({ active, geo = "propiedades", onLight = fals
         })}
       </motion.div>
 
-      <motion.div
-        className="absolute flex items-center justify-center rounded-full border border-solid"
-        style={{
-          left: g.avatar.x, top: g.avatar.y, width: 38, height: 38,
-          background: g.avatar.bg, borderColor: g.avatar.border,
-          color: g.avatar.color, fontSize: g.avatar.fs, fontWeight: 600,
-        }}
-        {...anim(0.34)}
-      >
-        NR
+      {/* El avatar es el `button#meBtn` del diseño: la única entrada al área de
+          cuenta. Cuelga de él el menú con "Mi perfil" y "Configuración". */}
+      <motion.div className="absolute" style={{ left: g.avatar.x, top: g.avatar.y }} {...anim(0.34)}>
+        <AccountMenu
+          size={38} fontSize={g.avatar.fs} activo={cuenta}
+          bg={g.avatar.bg}
+          borderColor={onLight ? "rgba(73,33,0,0.18)" : g.avatar.border}
+          color={onLight ? BROWN : g.avatar.color}
+        />
       </motion.div>
     </nav>
   );

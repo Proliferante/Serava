@@ -443,7 +443,14 @@ body {
 .pnl-photo-img { transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
 .pnl-photo:hover .pnl-photo-img { transform: scale(1.06); }
 
+/* Fila del menú del avatar (AccountMenu). El fondo se aclara al pasar por
+   encima; el destino en el que ya estás va en dorado y no se ilumina, para
+   que la lista diga dónde estás además de a dónde puedes ir. */
+.ix-menuitem { transition: background-color 0.2s ease; }
+.ix-menuitem:hover { background-color: rgba(247, 241, 229, 0.07); }
+
 @media (prefers-reduced-motion: reduce) {
+  .ix-menuitem { transition: none; }
   .pnl-card, .pnl-btn, .pnl-nav, .pnl-navitem, .pnl-navitem-ico, .pnl-row, .pnl-link-arrow, .pnl-photo-img, .pnl-input, .pnl-ba-handle, .pnl-fchip { transition: none; }
   .pnl-fchip:active { transform: none; }
   .pnl-ba-handle:hover { transform: none; }

@@ -3,6 +3,7 @@
 import { motion, useMotionValueEvent, useScroll, useSpring } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import AccountMenu, { type CuentaKey } from "@/components/AccountMenu";
 import { MARK, tinted } from "@/components/brand";
 import { EASE } from "@/components/responsive/kit";
 
@@ -28,7 +29,7 @@ const LINKS = [
   { href: "/predios/mis-propiedades", label: "Mis propiedades", corto: "Mis propiedades" },
 ];
 
-export function PrediosNavCompact({ onLight = false }: { onLight?: boolean }) {
+export function PrediosNavCompact({ onLight = false, cuenta }: { onLight?: boolean; cuenta?: CuentaKey }) {
   const pathname = usePathname();
   const pista = useRef<HTMLDivElement>(null);
   const [oculta, setOculta] = useState(false);
@@ -85,12 +86,13 @@ export function PrediosNavCompact({ onLight = false }: { onLight?: boolean }) {
               ? <span aria-hidden className="block size-full" style={tinted(MARK, BROWN)} />
               : <img src={MARK} alt="" decoding="async" className="block size-full max-w-none" />}
           </a>
-          <span
-            className="flex size-[36px] items-center justify-center rounded-full border border-solid text-[12.5px] font-semibold"
-            style={{ background: "rgba(201,168,119,0.28)", borderColor: onLight ? "rgba(73,33,0,0.18)" : "rgba(247,241,229,0.12)", color: onLight ? BROWN : "#c9a877" }}
-          >
-            NR
-          </span>
+          {/* El avatar abre el menú de cuenta, igual que el `meBtn` del lienzo. */}
+          <AccountMenu
+            size={36} fontSize={12.5} activo={cuenta}
+            bg="rgba(201,168,119,0.28)"
+            borderColor={onLight ? "rgba(73,33,0,0.18)" : "rgba(247,241,229,0.12)"}
+            color={onLight ? BROWN : "#c9a877"}
+          />
         </div>
 
         {/* Barra de píldoras. Ocupa el ancho y las tres se reparten el sitio;
