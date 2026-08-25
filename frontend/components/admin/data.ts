@@ -1,0 +1,180 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CONSOLA INTERNA — datos y constantes.
+
+   Al integrar la consola (venía como `public/admin-app/index.html`, un archivo
+   suelto servido en un iframe) las listas que estaban escritas dentro del
+   marcado o declaradas al vuelo en el `<script>` se juntaron aquí. Son datos
+   de maqueta salvo lo que baja del pipeline, que vive en `api.ts`.
+
+   Las etiquetas y los textos son los del archivo original, palabra por
+   palabra: la integración cambia dónde vive el código, no lo que dice.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export type VistaKey =
+  | "panel" | "predios" | "extraccion" | "nuevo" | "comite"
+  | "arq" | "data" | "comercial" | "equipo" | "gestion";
+
+export type AreaKey = "arq" | "data" | "com";
+
+export const AREAS: Record<AreaKey, string> = {
+  arq: "Arquitectura",
+  data: "Data",
+  com: "Comercial",
+};
+
+/** Los ocho estados por los que pasa un predio, en orden. */
+export const ESTADOS = [
+  "Borrador", "En evaluación", "En comité", "Publicado",
+  "Reservado", "En obra", "Arrendado", "En venta",
+];
+
+/** Clave de estado → clase de la píldora y etiqueta. */
+export const EST: Record<string, { c: string; t: string }> = {
+  bor: { c: "e-bor", t: "Borrador" },
+  eval: { c: "e-eval", t: "En evaluación" },
+  com: { c: "e-com", t: "En comité" },
+  pub: { c: "e-pub", t: "Publicado" },
+  res: { c: "e-res", t: "Reservado" },
+  obra: { c: "e-obra", t: "En obra" },
+  rent: { c: "e-rent", t: "Arrendado" },
+};
+
+export type Predio = {
+  id: string;
+  nombre: string;
+  zona: string;
+  est: keyof typeof EST | string;
+  score: string;
+  inversion: string;
+  area: AreaKey;
+  city: string;
+  publicado: boolean;
+  /** Enlace al anuncio original, cuando el predio entró por extracción. */
+  link?: string;
+};
+
+/** El listado maestro con el que arranca la consola. */
+export const PREDIOS_SEED: Predio[] = [
+  { id: "p1", nombre: "Apto gran formato", zona: "La Cabrera · Bogotá", est: "obra", score: "96", inversion: "$1.350M", area: "arq", city: "Bogotá", publicado: true },
+  { id: "p2", nombre: "Casa división 2 unidades", zona: "Laureles · Medellín", est: "eval", score: "88", inversion: "$980M", area: "data", city: "Medellín", publicado: false },
+  { id: "p3", nombre: "Torre remodelación integral", zona: "Punta Pacífica · Panamá", est: "pub", score: "94", inversion: "US$420k", area: "com", city: "Panamá", publicado: true },
+  { id: "p4", nombre: "Unidad edificio boutique", zona: "El Poblado · Medellín", est: "com", score: "90", inversion: "$1.120M", area: "arq", city: "Medellín", publicado: false },
+  { id: "p5", nombre: "Apto frente al mar", zona: "Bocagrande · Cartagena", est: "res", score: "87", inversion: "$1.540M", area: "com", city: "Cartagena", publicado: true },
+  { id: "p6", nombre: "Piso alto con vista", zona: "Chicó · Bogotá", est: "rent", score: "92", inversion: "$1.280M", area: "data", city: "Bogotá", publicado: true },
+  { id: "p7", nombre: "Clásico de Rosales", zona: "Rosales · Bogotá", est: "bor", score: "—", inversion: "—", area: "arq", city: "Bogotá", publicado: false },
+];
+
+/* ── Comercial ───────────────────────────────────────────────────────────── */
+
+export const STAGES = ["Lead nuevo", "Contactado", "Sesión agendada", "Acceso aprobado", "Reservó"];
+
+/** Clase de píldora por etapa del embudo, en el orden de `STAGES`. */
+export const STAGE_EST = ["e-bor", "e-com", "e-eval", "e-apr", "e-res"];
+
+export type Lead = { n: string; cap: string; mk: string; s: number };
+
+export const LEADS_SEED: Lead[] = [
+  { n: "M. Gómez", cap: "$1.500–3.000M", mk: "Bogotá", s: 2 },
+  { n: "J. Ortiz", cap: "> $3.000M", mk: "Panamá", s: 3 },
+  { n: "L. Ferro", cap: "$800–1.500M", mk: "Medellín", s: 1 },
+  { n: "P. Suárez", cap: "$500–800M", mk: "Cartagena", s: 0 },
+];
+
+export type Reserva = { predio: string; inv: string; nota: string; validada: boolean };
+
+export const RESERVAS_SEED: Reserva[] = [
+  { predio: "Bocagrande · Cartagena", inv: "J. Ortiz", nota: "Bloqueo activo · vence en 2 h", validada: false },
+  { predio: "Rosales · Bogotá", inv: "Lead directo", nota: "Documentos pendientes", validada: false },
+];
+
+export type Sesion = { inv: string; fecha: string; canal: string; notas: string };
+
+export const AGENDA_SEED: Sesion[] = [
+  { inv: "M. Gómez", fecha: "19 jul 10:00", canal: "Videollamada", notas: "Conocer estrategia" },
+];
+
+/* ── Equipo ──────────────────────────────────────────────────────────────── */
+
+export type Miembro = { ini: string; n: string; e: string; area: AreaKey | "admin"; perms: string };
+
+export const MIEMBROS_SEED: Miembro[] = [
+  { ini: "CM", n: "Christian Mejía", e: "christian@zequara.com", area: "arq", perms: "Evaluación técnica · alcance · presupuesto · obra" },
+  { ini: "DP", n: "Daniela Peña", e: "daniela@zequara.com", area: "data", perms: "Score · valoración · comparables · cifras de ficha" },
+  { ini: "AR", n: "Andrés Ruiz", e: "andres@zequara.com", area: "com", perms: "Leads · sesiones · reservas · publicar" },
+  { ini: "AD", n: "Administrador", e: "admin@zequara.com", area: "admin", perms: "Acceso total · equipo y permisos" },
+];
+
+/** Qué hace cada área en la consola. */
+export const AREA_DESC: { k: AreaKey; d: string }[] = [
+  { k: "arq", d: "Evalúa técnicamente, define alcance y presupuesto cerrado, gestiona obra e interventoría." },
+  { k: "data", d: "Calcula el Score, valoración y comparables. Publica cifras de la ficha. Aprueba en comité." },
+  { k: "com", d: "Gestiona leads, sesiones, reservas e inversionistas. Publica el predio tras el comité." },
+];
+
+/* ── Comité ──────────────────────────────────────────────────────────────── */
+
+export type Firma = { area: AreaKey; quien: string; estado: "ok" | "pend" | "obs"; nota?: string };
+export type CasoComite = {
+  id: string;
+  titulo: string;
+  meta: string;
+  firmas: Firma[];
+  /** Bloqueado por observación: no se puede publicar aunque falte solo firmar. */
+  bloqueado?: string;
+};
+
+export const COMITE_SEED: CasoComite[] = [
+  {
+    id: "l",
+    titulo: "Casa con potencial de división en dos unidades",
+    meta: "Laureles · Medellín · en comité desde el 12 jul",
+    firmas: [
+      { area: "arq", quien: "C. Mejía", estado: "ok" },
+      { area: "data", quien: "Sin asignar", estado: "pend" },
+      { area: "com", quien: "A. Ruiz", estado: "pend" },
+    ],
+  },
+  {
+    id: "p",
+    titulo: "Unidad reconvertible en edificio boutique",
+    meta: "El Poblado · Medellín · en comité desde el 10 jul",
+    firmas: [
+      { area: "arq", quien: "C. Mejía", estado: "ok" },
+      { area: "data", quien: "D. Peña", estado: "ok" },
+      { area: "com", quien: "A. Ruiz", estado: "pend" },
+    ],
+  },
+  {
+    id: "b",
+    titulo: "Apartamento frente al mar para reposicionar",
+    meta: "Bocagrande · Cartagena · con observación",
+    firmas: [
+      { area: "arq", quien: "C. Mejía", estado: "ok" },
+      { area: "data", quien: "D. Peña", estado: "obs", nota: "Observación en la valoración" },
+      { area: "com", quien: "A. Ruiz", estado: "pend" },
+    ],
+    bloqueado: "Data marcó una observación en la valoración. No puede publicarse hasta resolverla.",
+  },
+];
+
+/* ── Extracción ──────────────────────────────────────────────────────────── */
+
+/** Motivos de descarte del modal de la tabla de extracción. */
+export const MOTIVOS_DESCARTE = [
+  "Fuera del alcance arquitectónico",
+  "Precio no sostiene la remodelación",
+  "Anuncio incompleto o poco confiable",
+  "Precio atípico: probable error de digitación",
+  "Zona no prioritaria este trimestre",
+];
+
+/** Las cabeceras del CSV, en el orden en que se escriben las columnas. */
+export const CSV_COLS = [
+  "pais", "ciudad", "zona", "portal", "tipo", "titulo", "link", "area_m2",
+  "precio", "moneda", "precio_m2", "mediana_zona", "bajo_mediana",
+  "validacion_geografica", "similar_a_zona", "atipico", "republicacion",
+  "modelo_repetido", "descartado", "motivo",
+];
+
+/** Las cuatro ciudades con zonas monitoreadas en Data & Score. */
+export const CIUDADES_DATA = ["Bogotá", "Medellín", "Cartagena", "Ciudad de Panamá"];
