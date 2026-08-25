@@ -1,0 +1,18 @@
+# --- consola interna (app/api/admin.py + app/services/admin/) -------------
+requests
+beautifulsoup4
+fastapi
+uvicorn
+pandas
+numpy
+scipy
+scikit-learn
+shapely
+psycopg2-binary
+sqlalchemy
+python-dotenv
+
+# --- backend oficial (auth, inmuebles, dashboard, notificaciones) ---------
+# TODO (backend oficial): agregar aquí lo que haga falta (Alembic, pytest,
+# ruff, etc. — ver recomendacion_backend.pdf). fastapi/uvicorn/sqlalchemy/
+# psycopg2-binary ya están arriba, no hace falta repetirlos.
