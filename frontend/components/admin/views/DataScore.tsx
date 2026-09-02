@@ -114,7 +114,8 @@ export default function DataScore() {
     <section className="view active">
       <VHead titulo="Data &" fuerte="Score">
         Estadísticas reales de <code>serava_clean.db</code> por zona (macro) y por predio (micro).
-        Lo que el pipeline todavía no captura se marca <MkChip t="na">Estimado</MkChip>.
+        Lo que el pipeline todavía no captura se marca <MkChip t="na">Estimado</MkChip> — nunca se
+        presenta como si fuera un dato medido.
       </VHead>
 
       <div className="citybar">
@@ -179,7 +180,9 @@ export default function DataScore() {
           <Hint>
             Inventario, precio y antigüedad del anuncio son datos reales de la corrida más reciente
             (no es «días para vender»: el pipeline no rastrea cuándo se retira un anuncio). El score
-            de zona es real solo para La Cabrera; el resto va estimado.
+            de zona es real solo para La Cabrera (nota técnica); en las demás zonas se muestra un
+            estimado a partir de señales reales de mercado, marcado <MkChip t="na">Estimado</MkChip>,
+            mientras no haya una corrida guardada del agente.
           </Hint>
         </Card>
 
@@ -265,7 +268,7 @@ export default function DataScore() {
         <p className="hint" style={{ margin: "0 0 16px" }}>
           Combina todo lo de arriba en un solo número para que el arquitecto sepa qué predio revisar
           primero — con más de 5.000 predios habilitados hoy, no se pueden revisar todos. No
-          reemplaza su criterio: lo ordena.
+          reemplaza su criterio ni es el Score de Zonas oficial del agente.
         </p>
 
         <Grid cols={2}>

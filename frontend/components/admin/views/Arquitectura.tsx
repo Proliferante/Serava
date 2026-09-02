@@ -44,7 +44,7 @@ export default function Arquitectura({ abrirGestion }: { abrirGestion: () => voi
           <SecTitle>Obra en curso</SecTitle>
           <Task
             color="var(--amber)" small="Carpintería en ejecución"
-            accion={<span className="go" onClick={abrirGestion}>Abrir →</span>}
+            accion={<span className="go" onClick={abrirGestion}>Abrir obra →</span>}
           >
             La Cabrera · avance 78%, semana 9/12{" "}
           </Task>

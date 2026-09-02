@@ -395,7 +395,31 @@
 .adm .fc .k{display:block;font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--caramel);}
 .adm .fc .v{display:block;font-size:.85rem;font-weight:500;color:var(--coffee);margin-top:3px;}
 .adm .ex-config{grid-template-columns:repeat(2,1fr)!important;max-width:640px;}
-
+.adm .flow-tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:18px;}
+.adm .flow-tab{white-space:nowrap;font-family:inherit;font-size:.84rem;font-weight:500;color:var(--mocha);background:none;border:none;border-bottom:2px solid transparent;padding:11px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;}
+.adm .flow-tab .cnt{background:var(--cream);color:var(--mocha);font-size:.66rem;font-weight:700;border-radius:999px;padding:1px 8px;}
+.adm .flow-tab.active{color:var(--espresso2);border-bottom-color:var(--caramel);font-weight:600;}
+.adm .flow-tab.active .cnt{background:var(--caramel);color:#fff;}
+.adm .flow-panel{display:none;}
+.adm .flow-panel.active{display:block;animation:f .3s ease;}
+.adm .e-desc{background:rgba(181,84,47,.14);color:var(--terra);}
+.adm .e-nuevo{background:rgba(200,145,63,.16);color:var(--amber);}
+.adm .e-pre{background:rgba(94,122,138,.16);color:var(--blue);}
+.adm .e-vis{background:rgba(165,122,78,.18);color:var(--caramel);}
+.adm .auto-note{display:flex;gap:11px;align-items:flex-start;background:rgba(94,122,138,.1);border:1px solid rgba(94,122,138,.3);border-radius:12px;padding:13px 15px;margin-bottom:16px;}
+.adm .auto-note svg{width:18px;height:18px;stroke:var(--blue);fill:none;stroke-width:1.9;flex-shrink:0;margin-top:1px;}
+.adm .auto-note p{font-size:.83rem;color:var(--coffee);font-weight:300;}
+.adm .auto-note b{font-weight:600;}
+.adm .btn-wa{background:#2f7d5b;color:#fff;}
+.adm .btn-wa:hover{background:#276a4d;}
+.adm .btn-mini{padding:7px 11px;font-size:.76rem;border-radius:8px;}
+.adm .tacts-wrap{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+.adm .flow-sum{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:14px;}
+.adm .flow-sum .it .k{font-size:.64rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mocha);font-weight:600;}
+.adm .flow-sum .it .v{font-size:1.3rem;font-weight:300;color:var(--coffee);}
+.adm .urllink{color:var(--blue);font-weight:500;display:inline-flex;align-items:center;gap:5px;font-size:.8rem;}
+.adm .urllink svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;}
+.adm .empty{padding:26px;text-align:center;color:var(--mocha);font-weight:300;font-size:.86rem;}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ANCHOS ESTRECHOS — lo que faltaba para que no desborde en horizontal.

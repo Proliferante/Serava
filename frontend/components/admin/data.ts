@@ -11,7 +11,7 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export type VistaKey =
-  | "panel" | "predios" | "extraccion" | "nuevo" | "comite"
+  | "panel" | "predios" | "extraccion" | "flujo" | "nuevo" | "comite"
   | "arq" | "data" | "comercial" | "equipo" | "gestion";
 
 export type AreaKey = "arq" | "data" | "com";
@@ -39,6 +39,60 @@ export const EST: Record<string, { c: string; t: string }> = {
   rent: { c: "e-rent", t: "Arrendado" },
 };
 
+/* ── Flujo de inmuebles ──────────────────────────────────────────────────── */
+
+/**
+ * Las seis etapas por las que pasa un inmueble desde el scraping hasta la
+ * publicación. Tres de ellas comparten el mismo estado del dato: la etapa 1
+ * (lo que trajo el scraping) y la 2 (revisarlo) miran los dos el estado
+ * `nuevo`, porque son dos lecturas de la misma bandeja —lo que llegó, y lo que
+ * hay que decidir—.
+ */
+export type FlujoStage = "nuevo" | "preseleccion" | "visita" | "publicado" | "descartado";
+
+export type Inmueble = {
+  id: string;
+  t: string;
+  zona: string;
+  city: string;
+  /** Precio en millones de pesos. */
+  precio: number;
+  m2: number;
+  /** Precio por m², en millones. */
+  ppm: number;
+  /** Enlace a la publicación original del portal. */
+  url: string;
+  fecha: string;
+  stage: FlujoStage;
+  tel?: string;
+  /** Fecha y hora de la visita, cuando ya está agendada. */
+  cita?: string;
+  /** Por qué se descartó. Queda registrado para no reingresarlo. */
+  motivo?: string;
+};
+
+export const INMUEBLES_SEED: Inmueble[] = [
+  { id: "i1", t: "Apartamento 3 alcobas con vista", zona: "La Cabrera", city: "Bogotá", precio: 2450, m2: 180, ppm: 13.6, url: "https://portal.example.com/aviso/48213", fecha: "Hoy", stage: "nuevo" },
+  { id: "i2", t: "Casa para dividir en dos unidades", zona: "Laureles", city: "Medellín", precio: 1180, m2: 260, ppm: 4.5, url: "https://portal.example.com/aviso/48260", fecha: "Hoy", stage: "nuevo" },
+  { id: "i3", t: "Penthouse con terraza", zona: "Chicó", city: "Bogotá", precio: 2900, m2: 210, ppm: 13.8, url: "https://portal.example.com/aviso/48277", fecha: "Hoy", stage: "nuevo" },
+  { id: "i4", t: "Apto frente al mar", zona: "Bocagrande", city: "Cartagena", precio: 1620, m2: 150, ppm: 10.8, url: "https://portal.example.com/aviso/48291", fecha: "Ayer", stage: "nuevo" },
+  { id: "i5", t: "Unidad en edificio boutique", zona: "El Poblado", city: "Medellín", precio: 980, m2: 145, ppm: 6.8, url: "https://portal.example.com/aviso/48120", fecha: "Ayer", stage: "preseleccion", tel: "3009876543" },
+  { id: "i6", t: "Clásico para reposicionar", zona: "Rosales", city: "Bogotá", precio: 1750, m2: 190, ppm: 9.2, url: "https://portal.example.com/aviso/48090", fecha: "12 jul", stage: "visita", tel: "3005551212", cita: "Jue 18 jul · 10:00 a.m." },
+  { id: "i7", t: "Torre lista para remodelar", zona: "Punta Pacífica", city: "Panamá", precio: 1520, m2: 150, ppm: 10.1, url: "https://portal.example.com/aviso/48001", fecha: "10 jul", stage: "publicado" },
+  { id: "i8", t: "Apto sobrevalorado", zona: "Centro", city: "Cartagena", precio: 1400, m2: 120, ppm: 11.7, url: "https://portal.example.com/aviso/47980", fecha: "08 jul", stage: "descartado", motivo: "Precio por encima de comparables" },
+];
+
+/** Tipos de transformación que se eligen al completar tras la visita. */
+export const TRANSFORMACIONES = [
+  "Reposicionamiento premium",
+  "Remodelación completa",
+  "Cambio de distribución",
+  "División en dos unidades",
+];
+
+/** Cabeceras del CSV del listado de scraping. */
+export const CSV_SCRAPING = ["Titulo", "Zona", "Ciudad", "Precio(COP M)", "m2", "$/m2(COP M)", "URL"];
+
 export type Predio = {
   id: string;
   nombre: string;
@@ -55,13 +109,13 @@ export type Predio = {
 
 /** El listado maestro con el que arranca la consola. */
 export const PREDIOS_SEED: Predio[] = [
-  { id: "p1", nombre: "Apto gran formato", zona: "La Cabrera · Bogotá", est: "obra", score: "96", inversion: "$1.350M", area: "arq", city: "Bogotá", publicado: true },
-  { id: "p2", nombre: "Casa división 2 unidades", zona: "Laureles · Medellín", est: "eval", score: "88", inversion: "$980M", area: "data", city: "Medellín", publicado: false },
-  { id: "p3", nombre: "Torre remodelación integral", zona: "Punta Pacífica · Panamá", est: "pub", score: "94", inversion: "US$420k", area: "com", city: "Panamá", publicado: true },
-  { id: "p4", nombre: "Unidad edificio boutique", zona: "El Poblado · Medellín", est: "com", score: "90", inversion: "$1.120M", area: "arq", city: "Medellín", publicado: false },
-  { id: "p5", nombre: "Apto frente al mar", zona: "Bocagrande · Cartagena", est: "res", score: "87", inversion: "$1.540M", area: "com", city: "Cartagena", publicado: true },
-  { id: "p6", nombre: "Piso alto con vista", zona: "Chicó · Bogotá", est: "rent", score: "92", inversion: "$1.280M", area: "data", city: "Bogotá", publicado: true },
-  { id: "p7", nombre: "Clásico de Rosales", zona: "Rosales · Bogotá", est: "bor", score: "—", inversion: "—", area: "arq", city: "Bogotá", publicado: false },
+  { id: "p1", nombre: "Apto gran formato", zona: "La Cabrera · Bogotá", est: "obra", score: "96", inversion: "$3.100M", area: "arq", city: "Bogotá", publicado: true },
+  { id: "p2", nombre: "Casa división 2 unidades", zona: "Laureles · Medellín", est: "eval", score: "—", inversion: "$1.450M", area: "data", city: "Medellín", publicado: false },
+  { id: "p3", nombre: "Torre remodelación integral", zona: "Punta Pacífica · Panamá", est: "pub", score: "85", inversion: "$1.520M", area: "com", city: "Panamá", publicado: true },
+  { id: "p4", nombre: "Unidad edificio boutique", zona: "El Poblado · Medellín", est: "com", score: "90", inversion: "$1.180M", area: "arq", city: "Medellín", publicado: false },
+  { id: "p5", nombre: "Apto frente al mar", zona: "Bocagrande · Cartagena", est: "res", score: "87", inversion: "$1.950M", area: "com", city: "Cartagena", publicado: true },
+  { id: "p6", nombre: "Piso alto con vista", zona: "Chicó · Bogotá", est: "rent", score: "92", inversion: "$2.050M", area: "com", city: "Bogotá", publicado: true },
+  { id: "p7", nombre: "Clásico de Rosales", zona: "Rosales · Bogotá", est: "bor", score: "—", inversion: "$1.900M", area: "data", city: "Bogotá", publicado: false },
 ];
 
 /* ── Comercial ───────────────────────────────────────────────────────────── */
@@ -98,22 +152,22 @@ export const AGENDA_SEED: Sesion[] = [
 export type Miembro = { ini: string; n: string; e: string; area: AreaKey | "admin"; perms: string };
 
 export const MIEMBROS_SEED: Miembro[] = [
-  { ini: "CM", n: "Christian Mejía", e: "christian@zequara.com", area: "arq", perms: "Evaluación técnica · alcance · presupuesto · obra" },
-  { ini: "DP", n: "Daniela Peña", e: "daniela@zequara.com", area: "data", perms: "Score · valoración · comparables · cifras de ficha" },
-  { ini: "AR", n: "Andrés Ruiz", e: "andres@zequara.com", area: "com", perms: "Leads · sesiones · reservas · publicar" },
-  { ini: "AD", n: "Administrador", e: "admin@zequara.com", area: "admin", perms: "Acceso total · equipo y permisos" },
+  { ini: "CM", n: "Christian Mejía", e: "christian@zequara.com", area: "arq", perms: "Evaluación técnica · obra · aprobación en comité" },
+  { ini: "DP", n: "Daniela Peña", e: "daniela@zequara.com", area: "data", perms: "Score · valoración · comparables · aprobación en comité" },
+  { ini: "AR", n: "Andrés Ruiz", e: "andres@zequara.com", area: "com", perms: "Leads · reservas · inversionistas · publicar predio" },
+  { ini: "AD", n: "Administrador", e: "admin@zequara.com", area: "admin", perms: "Acceso total · gestión de equipo y permisos" },
 ];
 
 /** Qué hace cada área en la consola. */
 export const AREA_DESC: { k: AreaKey; d: string }[] = [
-  { k: "arq", d: "Evalúa técnicamente, define alcance y presupuesto cerrado, gestiona obra e interventoría." },
+  { k: "arq", d: "Evalúa técnicamente, define alcance y presupuesto cerrado, gestiona obra e interventoría. Aprueba en comité." },
   { k: "data", d: "Calcula el Score, valoración y comparables. Publica cifras de la ficha. Aprueba en comité." },
   { k: "com", d: "Gestiona leads, sesiones, reservas e inversionistas. Publica el predio tras el comité." },
 ];
 
 /* ── Comité ──────────────────────────────────────────────────────────────── */
 
-export type Firma = { area: AreaKey; quien: string; estado: "ok" | "pend" | "obs"; nota?: string };
+export type Firma = { area: AreaKey; quien: string; estado: "ok" | "pend" | "obs" };
 export type CasoComite = {
   id: string;
   titulo: string;
@@ -150,7 +204,7 @@ export const COMITE_SEED: CasoComite[] = [
     meta: "Bocagrande · Cartagena · con observación",
     firmas: [
       { area: "arq", quien: "C. Mejía", estado: "ok" },
-      { area: "data", quien: "D. Peña", estado: "obs", nota: "Observación en la valoración" },
+      { area: "data", quien: "D. Peña", estado: "obs" },
       { area: "com", quien: "A. Ruiz", estado: "pend" },
     ],
     bloqueado: "Data marcó una observación en la valoración. No puede publicarse hasta resolverla.",

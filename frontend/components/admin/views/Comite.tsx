@@ -66,10 +66,13 @@ export default function Comite() {
                     <AreaChip a={f.area} />
                     <span className="who">{f.quien}</span>
                   </div>
+                  {/* En el caso bloqueado la firma pendiente dice "En espera" y no
+                      "Pendiente": no hay nada que pulsar hasta que Data resuelva su
+                      observación, así que prometer una acción sería mentir. */}
                   <div className="status">
                     {f.estado === "ok" ? <><IcoCheck />Aprobado</>
-                      : f.estado === "obs" ? <>{ALERTA}{f.nota || "Con observación"}</>
-                      : <>{RELOJ}Pendiente</>}
+                      : f.estado === "obs" ? <>{ALERTA}Observación</>
+                      : <>{RELOJ}{c.bloqueado ? "En espera" : "Pendiente"}</>}
                   </div>
                   {f.estado === "pend" && !c.bloqueado && (
                     <button type="button" className="btn btn-ghost" onClick={() => firmar(c.id, f.area)}>Aprobar</button>

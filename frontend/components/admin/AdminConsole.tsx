@@ -9,6 +9,7 @@ import Comercial from "@/components/admin/views/Comercial";
 import Comite from "@/components/admin/views/Comite";
 import DataScore from "@/components/admin/views/DataScore";
 import Extraccion from "@/components/admin/views/Extraccion";
+import FlujoInmuebles from "@/components/admin/views/FlujoInmuebles";
 import GestionPredio from "@/components/admin/views/GestionPredio";
 import NuevoPredio from "@/components/admin/views/NuevoPredio";
 import PanelGeneral from "@/components/admin/views/PanelGeneral";
@@ -41,6 +42,7 @@ const GRUPOS: { g: string; items: Item[] }[] = [
     items: [
       { k: "predios", l: "Predios", d: "M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" },
       { k: "extraccion", l: "Extracción de predios", d: "M12 3v12M8 11l4 4 4-4", d2: "M4 17v3h16v-3" },
+      { k: "flujo", l: "Flujo de inmuebles", d: "M3 6h18M7 12h10M11 18h2" },
       { k: "nuevo", l: "Nuevo predio", d: "M12 5v14M5 12h14" },
       { k: "comite", l: "Comité de aprobación", d: "M9 12l2 2 4-4", d2: "M21 12c0 5-9 9-9 9s-9-4-9-9a9 9 0 0 1 18 0z", badge: 3 },
       { k: "arq", l: "Arquitectura", d: "M12 3l9 6-9 6-9-6z", d2: "M3 15l9 6 9-6" },
@@ -146,6 +148,9 @@ export default function AdminConsole({ onSalir }: { onSalir: () => void }) {
               )}
               {vista === "extraccion" && (
                 <Extraccion onEnviarARevision={(nuevos) => setPredios((ps) => [...nuevos, ...ps])} />
+              )}
+              {vista === "flujo" && (
+                <FlujoInmuebles onCrearFicha={(p) => setPredios((ps) => [p, ...ps])} />
               )}
               {vista === "nuevo" && <NuevoPredio onCrear={(p) => setPredios((ps) => [p, ...ps])} />}
               {vista === "comite" && <Comite />}

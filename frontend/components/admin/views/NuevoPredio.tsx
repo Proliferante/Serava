@@ -188,7 +188,7 @@ export default function NuevoPredio({ onCrear }: { onCrear: (p: Predio) => void 
           <button type="button" className="dropzone" onClick={() => { setDocs((d) => [...d, "Documento nuevo.pdf"]); av("Documento cargado"); }}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M12 3v12M7 10l5 5 5-5M5 21h14" /></svg>
             <div className="t">Arrastra o selecciona archivos</div>
-            <div className="s">Ficha técnica, estudio de títulos, plan de remodelación</div>
+            <div className="s">Ficha técnica, estudio de títulos, plan de remodelación…</div>
           </button>
           <Tabla ancho="auto">
             <tbody>

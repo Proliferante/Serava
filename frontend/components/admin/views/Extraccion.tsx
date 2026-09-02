@@ -430,8 +430,8 @@ export default function Extraccion({ onEnviarARevision }: { onEnviarARevision: (
         acciones={<Btn onClick={() => go("predios")}><IcoBack />Volver a predios</Btn>}
       >
         Trae desde los portales públicos los inmuebles en venta de las zonas activas cuyo precio por m²
-        está por debajo de la mediana de su zona. Desde aquí no se publica nada: lo que pase el filtro
-        entra como Borrador a revisión arquitectónica.
+        está por debajo de la mediana de su zona. Desde aquí no se publica nada: lo que se acepta entra
+        a Predios como borrador.
       </VHead>
 
       <div className={`conn ${api === null ? "" : api ? "on" : "off"}`}>
@@ -455,7 +455,8 @@ export default function Extraccion({ onEnviarARevision }: { onEnviarARevision: (
         </div>
         <Hint style={{ margin: "10px 0 18px" }}>
           Estos cuatro criterios son fijos y se aplican por dentro: el tipo va en la propia consulta al
-          portal, el portal lo determina la zona, y el precio se compara contra la mediana de la zona.
+          portal, el portal lo determina la zona, y el precio se compara contra la mediana de cada zona
+          por separado. No se eligen desde aquí para que dos corridas nunca sean distintas por accidente.
         </Hint>
 
         <div className="ex-config mb">
@@ -550,7 +551,14 @@ export default function Extraccion({ onEnviarARevision }: { onEnviarARevision: (
             <Hint>
               Salvo dos excepciones deliberadas —el filtro de barrio real y los duplicados confirmados
               de grupo chico— <b style={{ color: "var(--coffee)" }}>nada se elimina</b>: lo cuestionable
-              queda marcado en la base.
+              queda marcado en la base, no borrado. Este listado ya viene deduplicado desde la limpieza
+              y solo muestra los predios <b style={{ color: "var(--coffee)" }}>habilitados para gestión
+              manual</b>: precio/m² bajo la mediana de su zona, con validación geográfica a favor
+              (dentro del polígono, similar estadístico MCD, o sin evaluar por falta de coordenadas).
+              Las únicas marcas visibles por predio son si tiene coordenadas evaluadas y si su
+              precio/m² es atípico para su zona; los totales del embudo arriba sí reflejan el universo
+              completo. El listado se ordena de mayor a menor Score Zequara — con miles de predios
+              habilitados, así se ve primero cuáles conviene revisar antes.
             </Hint>
           </Card>
 
