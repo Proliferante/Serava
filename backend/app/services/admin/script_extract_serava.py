@@ -52,6 +52,7 @@ SALIDA:
     PASO 4).
 """
 
+import os
 import re
 import time
 import logging
@@ -96,7 +97,16 @@ METROCUADRADO_MAX_REGISTROS = 3000  # techo de seguridad por zona, no limite rea
 # normalmente al usar la pagina. Puede rotar en el futuro; si deja de
 # funcionar, hay que volver a capturarla igual que la primera vez (ver
 # Seccion de notas al final del archivo).
-METROCUADRADO_API_KEY = "P1MfFHfQMOtL16Zpg36NcntJYCLFm8FqFfudnavl"
+#
+# El valor por defecto sigue siendo el capturado, para que el script funcione
+# recien clonado. Lo que se gano al leerlo del entorno es poder cambiarlo el
+# dia que rote sin editar codigo ni redesplegar: basta poner
+# METROCUADRADO_API_KEY en el .env. No es un secreto que haya que esconder
+# (esta en el JavaScript de la pagina, a la vista de cualquiera).
+METROCUADRADO_API_KEY = (
+    os.environ.get("METROCUADRADO_API_KEY", "").strip()
+    or "P1MfFHfQMOtL16Zpg36NcntJYCLFm8FqFfudnavl"
+)
 ENCUENTRA24_MAX_PAGINAS = 60         # techo de SEGURIDAD, no un limite real:
                                       # el robots.txt de Encuentra24 no
                                       # restringe paginacion (a diferencia de

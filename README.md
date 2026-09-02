@@ -10,24 +10,34 @@ nombre anterior del proyecto. La marca, los textos y los logotipos son Zequara.
 
 | Parte | Estado |
 |---|---|
-| `frontend/` | **En marcha.** 21 rutas, cada una con vista de escritorio y vista fluida de móvil/tablet. Sin datos reales: todo el contenido está escrito en el código. |
-| `backend/` | **Vacío.** Existe el esqueleto de carpetas (`api/`, `core/`, `services/`) pero los doce archivos `.py` tienen 0 bytes. |
-| `database/` | **Vacío.** `schema.sql` y `seeds/data.sql` a 0 bytes. |
-| `docker-compose.yml`, `.env.example` | **Vacíos.** |
+| `frontend/` | **En marcha.** 22 rutas con vista de escritorio y vista fluida de móvil/tablet. La consola interna (`/admin`) opera contra el backend; el resto del sitio sigue sobre contenido escrito en el código. |
+| `backend/` | **En marcha, parcial.** Sesión y usuarios internos, el flujo de inmuebles y la consola del pipeline (scraping, limpieza, seguimiento) funcionan. Inmuebles, dashboard y notificaciones del portal de cliente siguen a 0 bytes. |
+| `database/` | **Postgres en Supabase.** Cinco tablas: `raw_listings` y `clean_listings` (las reconstruye el pipeline), `usuarios`, `seguimiento_propiedades` e `inmueble_detalle` (las escriben las personas). El esquema está en `database/schema.sql`. |
+| `docker-compose.yml` | Vacío. |
 
-Es decir: hoy esto es un frontend completo sobre contenido fijo. No hay API, ni
-base de datos, ni autenticación real. Los puntos exactos donde entraría cada uno
-están inventariados en [docs/api-reference.md](docs/api-reference.md).
+Para arrancar el backend y crear los usuarios del equipo:
+**[backend/LEEME.md](backend/LEEME.md)**.
 
 ## Arrancar
+
+Dos procesos. El backend primero:
+
+```bash
+cd backend                      # ver backend/LEEME.md para .env y usuarios
+.venv/Scripts/python.exe -m uvicorn app.main:app --reload --port 8000
+```
 
 ```bash
 cd frontend
 npm install
-npm run dev        # http://localhost:3000
+npm run dev                     # http://localhost:3000
 ```
 
-Scripts: `dev`, `build`, `start`, `lint`.
+El sitio público funciona sin backend. La consola interna
+(http://localhost:3000/admin) lo necesita: sin él, el acceso responde que no
+hay conexión con la base.
+
+Scripts del frontend: `dev`, `build`, `start`, `lint`.
 
 Nota: no lances `npm run build` con el `dev` corriendo — comparten `.next` y el
 servidor de desarrollo se rompe.
@@ -46,8 +56,13 @@ frontend/          Next.js 14 (App Router) · React 18 · TypeScript · Tailwind
   styles/globals.css   micro-interacciones (.ix-*, .pnl-*) y prefers-reduced-motion
   public/figma/    assets exportados de Figma
 
-backend/           esqueleto FastAPI, sin código
-database/          esqueleto SQL, sin contenido
+backend/           FastAPI · Postgres (Supabase)
+  app/api/         auth.py (sesión y usuarios) · admin.py (pipeline) · flujo.py
+  app/core/        config, conexión, contraseñas y tokens
+  app/services/    auth_service.py · admin/ (scraping, limpieza, seguimiento)
+  scripts/         crear_usuarios.py — siembra el equipo
+  tests/           pruebas de sesión y permisos
+database/          schema.sql — las cinco tablas
 docs/              esta documentación
 ```
 

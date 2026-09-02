@@ -1,46 +1,41 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useState } from "react";
 import AdminConsole from "@/components/admin/AdminConsole";
 import AdminLogin from "@/components/admin/AdminLogin";
+import CambiarClave from "@/components/admin/CambiarClave";
+import { SesionProvider, useSesion } from "@/components/admin/sesion";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   PUERTA DE /admin — decide si se ve el acceso o la consola.
+   PUERTA DE /admin — decide qué de las tres se ve.
 
-   La entrada se guarda en `sessionStorage` y no en `localStorage`: una consola
-   de operación no debe quedar abierta para siempre en el navegador de nadie.
-   Al cerrar la pestaña hay que volver a entrar.
+       sin sesión            → el acceso
+       sesión + clave temporal → el cambio obligatorio de contraseña
+       sesión normal         → la consola
 
-   La comprobación va en `useLayoutEffect` y no en `useEffect`, con el mismo
-   patrón que `ScaledCanvas`: corre después de montar pero antes de que el
-   navegador pinte, así que quien ya tenía sesión no llega a ver el acceso ni
-   un fotograma. En el servidor no existe `sessionStorage`, de modo que el HTML
-   inicial es siempre el del acceso — que es también lo que debe indexarse y lo
-   que hay que enseñar si el JavaScript no llega a cargar.
+   `listo` evita el parpadeo: mientras se comprueba el token guardado no se
+   pinta nada. Sin eso, quien ya tenía sesión vería el formulario de acceso
+   durante un instante en cada recarga.
+
+   El HTML que sale del servidor es el hueco, no el formulario: `sessionStorage`
+   no existe allí, así que el servidor no puede saber cuál de las tres toca. La
+   decisión se toma en el cliente, y para quien llega sin sesión se toma antes
+   de pintar (ver el `useLayoutEffect` de `SesionProvider`), de modo que el
+   hueco sólo se ve mientras se valida un token que sí existía.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const CLAVE = "zq:admin";
+function Puerta() {
+  const { usuario, listo } = useSesion();
 
-const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+  if (!listo) return <div style={{ minHeight: "100vh", background: "#2a1e14" }} />;
+  if (!usuario) return <AdminLogin />;
+  if (usuario.debe_cambiar_clave) return <CambiarClave />;
+  return <AdminConsole />;
+}
 
 export default function AdminGate() {
-  const [dentro, setDentro] = useState(false);
-
-  useIsoLayoutEffect(() => {
-    try {
-      if (window.sessionStorage.getItem(CLAVE) === "1") setDentro(true);
-    } catch { /* sin sessionStorage se pide entrar cada vez */ }
-  }, []);
-
-  const entrar = () => {
-    try { window.sessionStorage.setItem(CLAVE, "1"); } catch { /* da igual */ }
-    setDentro(true);
-  };
-
-  const salir = () => {
-    try { window.sessionStorage.removeItem(CLAVE); } catch { /* da igual */ }
-    setDentro(false);
-  };
-
-  return dentro ? <AdminConsole onSalir={salir} /> : <AdminLogin onEntrar={entrar} />;
+  return (
+    <SesionProvider>
+      <Puerta />
+    </SesionProvider>
+  );
 }

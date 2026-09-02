@@ -41,46 +41,10 @@ export const EST: Record<string, { c: string; t: string }> = {
 
 /* ── Flujo de inmuebles ──────────────────────────────────────────────────── */
 
-/**
- * Las seis etapas por las que pasa un inmueble desde el scraping hasta la
- * publicación. Tres de ellas comparten el mismo estado del dato: la etapa 1
- * (lo que trajo el scraping) y la 2 (revisarlo) miran los dos el estado
- * `nuevo`, porque son dos lecturas de la misma bandeja —lo que llegó, y lo que
- * hay que decidir—.
- */
-export type FlujoStage = "nuevo" | "preseleccion" | "visita" | "publicado" | "descartado";
-
-export type Inmueble = {
-  id: string;
-  t: string;
-  zona: string;
-  city: string;
-  /** Precio en millones de pesos. */
-  precio: number;
-  m2: number;
-  /** Precio por m², en millones. */
-  ppm: number;
-  /** Enlace a la publicación original del portal. */
-  url: string;
-  fecha: string;
-  stage: FlujoStage;
-  tel?: string;
-  /** Fecha y hora de la visita, cuando ya está agendada. */
-  cita?: string;
-  /** Por qué se descartó. Queda registrado para no reingresarlo. */
-  motivo?: string;
-};
-
-export const INMUEBLES_SEED: Inmueble[] = [
-  { id: "i1", t: "Apartamento 3 alcobas con vista", zona: "La Cabrera", city: "Bogotá", precio: 2450, m2: 180, ppm: 13.6, url: "https://portal.example.com/aviso/48213", fecha: "Hoy", stage: "nuevo" },
-  { id: "i2", t: "Casa para dividir en dos unidades", zona: "Laureles", city: "Medellín", precio: 1180, m2: 260, ppm: 4.5, url: "https://portal.example.com/aviso/48260", fecha: "Hoy", stage: "nuevo" },
-  { id: "i3", t: "Penthouse con terraza", zona: "Chicó", city: "Bogotá", precio: 2900, m2: 210, ppm: 13.8, url: "https://portal.example.com/aviso/48277", fecha: "Hoy", stage: "nuevo" },
-  { id: "i4", t: "Apto frente al mar", zona: "Bocagrande", city: "Cartagena", precio: 1620, m2: 150, ppm: 10.8, url: "https://portal.example.com/aviso/48291", fecha: "Ayer", stage: "nuevo" },
-  { id: "i5", t: "Unidad en edificio boutique", zona: "El Poblado", city: "Medellín", precio: 980, m2: 145, ppm: 6.8, url: "https://portal.example.com/aviso/48120", fecha: "Ayer", stage: "preseleccion", tel: "3009876543" },
-  { id: "i6", t: "Clásico para reposicionar", zona: "Rosales", city: "Bogotá", precio: 1750, m2: 190, ppm: 9.2, url: "https://portal.example.com/aviso/48090", fecha: "12 jul", stage: "visita", tel: "3005551212", cita: "Jue 18 jul · 10:00 a.m." },
-  { id: "i7", t: "Torre lista para remodelar", zona: "Punta Pacífica", city: "Panamá", precio: 1520, m2: 150, ppm: 10.1, url: "https://portal.example.com/aviso/48001", fecha: "10 jul", stage: "publicado" },
-  { id: "i8", t: "Apto sobrevalorado", zona: "Centro", city: "Cartagena", precio: 1400, m2: 120, ppm: 11.7, url: "https://portal.example.com/aviso/47980", fecha: "08 jul", stage: "descartado", motivo: "Precio por encima de comparables" },
-];
+/* El inmueble y su etapa ya no se declaran aquí: los trae el backend
+   (`GET /api/admin/flujo`) y su forma vive junto a la vista que la consume,
+   en views/FlujoInmuebles.tsx. Lo que queda abajo es texto fijo del
+   producto: las opciones de un desplegable y las cabeceras de un CSV. */
 
 /** Tipos de transformación que se eligen al completar tras la visita. */
 export const TRANSFORMACIONES = [
@@ -149,14 +113,9 @@ export const AGENDA_SEED: Sesion[] = [
 
 /* ── Equipo ──────────────────────────────────────────────────────────────── */
 
-export type Miembro = { ini: string; n: string; e: string; area: AreaKey | "admin"; perms: string };
-
-export const MIEMBROS_SEED: Miembro[] = [
-  { ini: "CM", n: "Christian Mejía", e: "christian@zequara.com", area: "arq", perms: "Evaluación técnica · obra · aprobación en comité" },
-  { ini: "DP", n: "Daniela Peña", e: "daniela@zequara.com", area: "data", perms: "Score · valoración · comparables · aprobación en comité" },
-  { ini: "AR", n: "Andrés Ruiz", e: "andres@zequara.com", area: "com", perms: "Leads · reservas · inversionistas · publicar predio" },
-  { ini: "AD", n: "Administrador", e: "admin@zequara.com", area: "admin", perms: "Acceso total · gestión de equipo y permisos" },
-];
+/* Los miembros de maqueta se fueron: la lista real la trae
+   `GET /api/auth/usuarios` (ver views/Usuarios.tsx). Lo que sigue aquí es
+   la descripción de cada área, que es texto fijo del producto. */
 
 /** Qué hace cada área en la consola. */
 export const AREA_DESC: { k: AreaKey; d: string }[] = [

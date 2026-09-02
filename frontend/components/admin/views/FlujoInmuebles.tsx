@@ -1,37 +1,42 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { MCuerpo, MPie, useConsola } from "@/components/admin/ctx";
-import {
-  CSV_SCRAPING, INMUEBLES_SEED, TRANSFORMACIONES,
-  type FlujoStage, type Inmueble, type Predio,
-} from "@/components/admin/data";
-import { Card, IcoCheck, IcoDown, IcoExt, SecTitle, Tabla } from "@/components/admin/ui";
+import { useSesion } from "@/components/admin/sesion";
+import { CSV_SCRAPING, TRANSFORMACIONES } from "@/components/admin/data";
+import { Card, Hint, IcoCheck, IcoDown, IcoExt, SecTitle, Tabla } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FLUJO DE INMUEBLES — del scraping a la publicación.
 
-   Seis pestañas que son una sola bandeja vista por etapas. El dato tiene cinco
-   estados, no seis: las pestañas 1 y 2 miran las dos el estado `nuevo`, porque
-   son dos lecturas de lo mismo —lo que trajo el scraping, y lo que hay que
-   decidir uno por uno—. Los contadores de esas dos pestañas coinciden a
+   Seis pestañas que son una sola bandeja vista por etapas. El dato tiene
+   cinco estados, no seis: las pestañas 1 y 2 miran las dos la etapa `nuevo`,
+   porque son dos lecturas de lo mismo —lo que trajo el scraping, y lo que
+   hay que decidir uno por uno—. Los contadores de esas dos coinciden a
    propósito.
 
    El recorrido: nuevo → preselección (continúa) → visita (agendada) →
-   publicado (completado tras la visita). En cualquier punto se puede descartar,
-   y el descarte queda con su motivo en la pestaña de registro. Eso es lo que
-   promete la nota: un inmueble descartado no vuelve a entrar en los scrapings
-   siguientes.
+   publicado (completado tras la visita). En cualquier punto se puede
+   descartar, y el descarte queda con su motivo en la pestaña de registro.
+   Eso es lo que hace que un inmueble descartado no vuelva a entrar en los
+   scrapings siguientes: el estado vive en `seguimiento_propiedades`, que el
+   pipeline lee pero nunca reconstruye.
 
-   Hoy los ocho inmuebles son de maqueta y viven en memoria. Cuando el backend
-   exponga el flujo, `INMUEBLES_SEED` se reemplaza por la llamada y las cinco
-   acciones pasan a ser peticiones; la estructura de la pantalla no cambia.
+   DE DÓNDE SALEN LOS DATOS
+   Del backend: `GET /api/admin/flujo?etapa=` para el listado y
+   `/flujo/conteos` para los números de las pestañas. Las tres acciones
+   —decidir, agendar, completar— son peticiones que escriben en la base y
+   devuelven; después se recarga la etapa. No hay estado optimista a
+   propósito: si el servidor rechaza una decisión (porque el inmueble ya no
+   cumple los criterios, por ejemplo), la pantalla no debe haber mentido
+   antes de saberlo.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 type PanelKey = "p1" | "p2" | "p3" | "p4" | "p5" | "p6";
+type Etapa = "nuevo" | "preseleccion" | "visita" | "publicado" | "descartado";
 
-/** Qué estado del dato alimenta cada pestaña. */
-const FUENTE: Record<PanelKey, FlujoStage> = {
+/** Qué etapa del dato alimenta cada pestaña. */
+const FUENTE: Record<PanelKey, Etapa> = {
   p1: "nuevo", p2: "nuevo", p3: "preseleccion",
   p4: "visita", p5: "publicado", p6: "descartado",
 };
@@ -44,6 +49,34 @@ const PESTANAS: { k: PanelKey; l: string }[] = [
   { k: "p5", l: "5 · Publicados" },
   { k: "p6", l: "Descartados" },
 ];
+
+/** Un inmueble como lo devuelve el backend (clean_listings + estado). */
+type Inmueble = {
+  link: string;
+  titulo: string | null;
+  zona: string;
+  ciudad: string;
+  pais: string;
+  moneda: string;
+  portal: string;
+  tipo_inmueble: string | null;
+  precio_venta: number | null;
+  area_m2: number | null;
+  precio_m2: number | null;
+  mediana_precio_m2_zona: number | null;
+  habitaciones: number | null;
+  banos: number | null;
+  precio_m2_clasificacion: string | null;
+  fecha_extraccion: string | null;
+  etapa: Etapa;
+  motivo_no_pasa: string | null;
+  motivo_no_disponible: string | null;
+  contacto_nombre: string | null;
+  contacto_telefono: string | null;
+  visita_fecha: string | null;
+  visita_hora: string | null;
+  area_confirmada_m2: number | null;
+};
 
 const trazo = {
   fill: "none", stroke: "currentColor", strokeWidth: 1.9,
@@ -58,45 +91,58 @@ const IcoTel = () => <svg viewBox="0 0 24 24" {...trazo}><path d="M22 16.9v3a2 2
 const IcoCal = () => <svg viewBox="0 0 24 24" {...trazo}><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M3 9h18M8 2v4M16 2v4" /></svg>;
 const IcoFlecha = () => <svg viewBox="0 0 24 24" {...trazo}><path d="M5 12h14M13 6l6 6-6 6" /></svg>;
 
-/** Nota azul de contexto que encabeza tres de las pestañas. */
 function Nota({ ico, children }: { ico: ReactNode; children: ReactNode }) {
   return <div className="auto-note">{ico}<p>{children}</p></div>;
 }
 
-function Vacio({ children }: { children: string }) {
+function Vacio({ children }: { children: ReactNode }) {
   return <Card><div className="empty">{children}</div></Card>;
 }
 
-/** Nombre del inmueble con su zona y ciudad debajo, en la primera columna. */
 function Info({ x }: { x: Inmueble }) {
   return (
     <>
-      <div className="pname">{x.t}</div>
-      <div className="pzone">{x.zona} · {x.city}</div>
+      <div className="pname">{x.titulo || "(sin título)"}</div>
+      <div className="pzone">{x.zona} · {x.ciudad}</div>
     </>
   );
 }
 
 function Url({ x, texto = "Ver publicación" }: { x: Inmueble; texto?: string }) {
   return (
-    <a className="urllink" href={x.url} target="_blank" rel="noopener">
+    <a className="urllink" href={x.link} target="_blank" rel="noopener">
       {texto} <IcoExt />
     </a>
   );
 }
 
-const precio = (x: Inmueble) => "$" + x.precio.toLocaleString("es-CO") + "M";
+/* Precio en millones cuando es peso, entero cuando es dólar: los dos números
+   con la misma notación harían que $1.400M y US$1.400 se leyeran igual. */
+const precio = (x: Inmueble) => {
+  if (x.precio_venta == null) return "—";
+  return x.moneda === "COP"
+    ? "$" + (x.precio_venta / 1e6).toLocaleString("es-CO", { maximumFractionDigits: 0 }) + "M"
+    : "US$" + Math.round(x.precio_venta).toLocaleString("es-CO");
+};
+
+const pm2 = (v: number | null, moneda: string) => {
+  if (v == null) return "—";
+  return moneda === "COP"
+    ? "$" + (v / 1e6).toLocaleString("es-CO", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "M"
+    : "US$" + Math.round(v).toLocaleString("es-CO");
+};
 
 /* ── Modales ─────────────────────────────────────────────────────────────── */
 
-/** Agendar la visita. La cita y el teléfono vuelven al inmueble. */
 function FormVisita({ x, onGuardar, onCancelar }: {
-  x: Inmueble; onGuardar: (cita: string, tel: string) => void; onCancelar: () => void;
+  x: Inmueble;
+  onGuardar: (d: { fecha: string; hora: string; contacto_nombre: string; contacto_telefono: string; notas: string }) => void;
+  onCancelar: () => void;
 }) {
-  const [fecha, setFecha] = useState("");
-  const [hora, setHora] = useState("");
-  const [contacto, setContacto] = useState("");
-  const [tel, setTel] = useState(x.tel ?? "");
+  const [fecha, setFecha] = useState(x.visita_fecha ?? "");
+  const [hora, setHora] = useState(x.visita_hora ?? "");
+  const [contacto, setContacto] = useState(x.contacto_nombre ?? "");
+  const [tel, setTel] = useState(x.contacto_telefono ?? "");
   const [notas, setNotas] = useState("");
   return (
     <>
@@ -116,7 +162,7 @@ function FormVisita({ x, onGuardar, onCancelar }: {
         <button type="button" className="btn btn-ghost" onClick={onCancelar}>Cancelar</button>
         <button
           type="button" className="btn btn-primary"
-          onClick={() => onGuardar((fecha || "Por confirmar") + (hora ? " · " + hora : ""), tel)}
+          onClick={() => onGuardar({ fecha, hora, contacto_nombre: contacto, contacto_telefono: tel, notas })}
         >
           Agendar
         </button>
@@ -125,29 +171,33 @@ function FormVisita({ x, onGuardar, onCancelar }: {
   );
 }
 
-/** Completar la información tras la visita y publicar. */
 function FormCompletar({ x, onPublicar, onCancelar }: {
-  x: Inmueble; onPublicar: (titulo: string, m2: number) => void; onCancelar: () => void;
+  x: Inmueble;
+  onPublicar: (d: { titulo: string; habitaciones: string; banos: string; area: string; tipo: string; notas: string }) => void;
+  onCancelar: () => void;
 }) {
-  const [t, setT] = useState(x.t);
-  const [hab, setHab] = useState("");
-  const [ban, setBan] = useState("");
-  const [m2, setM2] = useState(String(x.m2));
-  const [tr, setTr] = useState(TRANSFORMACIONES[0]);
+  const [titulo, setTitulo] = useState(x.titulo ?? "");
+  const [hab, setHab] = useState(x.habitaciones != null ? String(x.habitaciones) : "");
+  const [ban, setBan] = useState(x.banos != null ? String(x.banos) : "");
+  const [area, setArea] = useState(
+    x.area_confirmada_m2 != null ? String(x.area_confirmada_m2)
+    : x.area_m2 != null ? String(x.area_m2) : "",
+  );
+  const [tipo, setTipo] = useState(TRANSFORMACIONES[0]);
   const [notas, setNotas] = useState("");
   return (
     <>
       <MCuerpo>
         <label htmlFor="c-t">Título del inmueble</label>
-        <input className="t" id="c-t" value={t} onChange={(e) => setT(e.target.value)} />
+        <input className="t" id="c-t" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
         <label htmlFor="c-hab">Habitaciones</label>
         <input className="t" id="c-hab" type="number" placeholder="3" value={hab} onChange={(e) => setHab(e.target.value)} />
         <label htmlFor="c-ban">Baños</label>
         <input className="t" id="c-ban" type="number" placeholder="3" value={ban} onChange={(e) => setBan(e.target.value)} />
         <label htmlFor="c-m2">Área confirmada (m²)</label>
-        <input className="t" id="c-m2" type="number" value={m2} onChange={(e) => setM2(e.target.value)} />
+        <input className="t" id="c-m2" type="number" value={area} onChange={(e) => setArea(e.target.value)} />
         <label htmlFor="c-tr">Tipo de transformación</label>
-        <select className="t" id="c-tr" value={tr} onChange={(e) => setTr(e.target.value)}>
+        <select className="t" id="c-tr" value={tipo} onChange={(e) => setTipo(e.target.value)}>
           {TRANSFORMACIONES.map((o) => <option key={o}>{o}</option>)}
         </select>
         <label htmlFor="c-notas">Notas de la visita</label>
@@ -155,7 +205,10 @@ function FormCompletar({ x, onPublicar, onCancelar }: {
       </MCuerpo>
       <MPie>
         <button type="button" className="btn btn-ghost" onClick={onCancelar}>Cancelar</button>
-        <button type="button" className="btn btn-primary" onClick={() => onPublicar(t, Number(m2) || x.m2)}>
+        <button
+          type="button" className="btn btn-primary"
+          onClick={() => onPublicar({ titulo, habitaciones: hab, banos: ban, area, tipo, notas })}
+        >
           <IcoCheck />Publicar
         </button>
       </MPie>
@@ -163,39 +216,117 @@ function FormCompletar({ x, onPublicar, onCancelar }: {
   );
 }
 
-export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Predio) => void }) {
-  const { go, av, modal } = useConsola();
+/** Modal de descarte: el motivo es obligatorio y queda en la base. */
+function FormDescartar({ x, etiqueta, onConfirmar, onCancelar }: {
+  x: Inmueble; etiqueta: string;
+  onConfirmar: (motivo: string) => void; onCancelar: () => void;
+}) {
+  const [motivo, setMotivo] = useState("");
+  return (
+    <>
+      <MCuerpo>
+        <p style={{ fontSize: ".88rem", color: "var(--mocha)", fontWeight: 300 }}>
+          <b style={{ color: "var(--coffee)" }}>{x.titulo || x.zona}</b> deja el flujo y queda
+          registrado: no volverá a aparecer en futuros scrapings.
+        </p>
+        <label htmlFor="d-motivo">Motivo (obligatorio)</label>
+        <textarea
+          className="t" id="d-motivo" value={motivo} onChange={(e) => setMotivo(e.target.value)}
+          placeholder="Por qué no continúa. Queda guardado junto al descarte."
+        />
+      </MCuerpo>
+      <MPie>
+        <button type="button" className="btn btn-ghost" onClick={onCancelar}>Cancelar</button>
+        <button
+          type="button" className="btn btn-primary" disabled={!motivo.trim()}
+          onClick={() => onConfirmar(motivo.trim())}
+        >
+          {etiqueta}
+        </button>
+      </MPie>
+    </>
+  );
+}
+
+/* ── Vista ───────────────────────────────────────────────────────────────── */
+
+export default function FlujoInmuebles() {
+  const { av, modal } = useConsola();
+  const { pedir } = useSesion();
+
   const [panel, setPanel] = useState<PanelKey>("p1");
-  const [inm, setInm] = useState<Inmueble[]>(INMUEBLES_SEED);
+  const [filas, setFilas] = useState<Inmueble[]>([]);
+  const [conteos, setConteos] = useState<Record<Etapa, number> | null>(null);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const de = (s: FlujoStage) => inm.filter((x) => x.stage === s);
-  const nuevos = de("nuevo");
+  const etapa = FUENTE[panel];
 
-  const cambia = (id: string, parche: Partial<Inmueble>) =>
-    setInm((xs) => xs.map((x) => x.id === id ? { ...x, ...parche } : x));
+  const cargar = useCallback(async (e: Etapa) => {
+    setCargando(true);
+    setError(null);
+    try {
+      const [lista, n] = await Promise.all([
+        pedir<{ filas: Inmueble[] }>(`/api/admin/flujo?etapa=${e}`),
+        pedir<Record<Etapa, number>>("/api/admin/flujo/conteos"),
+      ]);
+      setFilas(lista.filas);
+      setConteos(n);
+    } catch (err) {
+      setFilas([]);
+      setError((err as Error).message);
+    } finally {
+      setCargando(false);
+    }
+  }, [pedir]);
 
-  const descartar = (x: Inmueble, motivo: string) => {
-    cambia(x.id, { stage: "descartado", motivo });
-    av("Registrado como descartado · no reingresará");
+  useEffect(() => { void cargar(etapa); }, [etapa, cargar]);
+
+  /** Cualquier acción: la ejecuta, avisa y recarga la etapa visible. */
+  const accion = async (ruta: string, cuerpo: object, aviso: string, irA?: PanelKey) => {
+    try {
+      await pedir(ruta, { method: "POST", body: JSON.stringify(cuerpo) });
+      av(aviso);
+      if (irA) setPanel(irA); else await cargar(etapa);
+    } catch (err) {
+      av((err as Error).message);
+    }
   };
 
-  /** El teléfono va sin formato al enlace; el prefijo de país lo pone `wa.me`. */
-  const soloDigitos = (t?: string) => (t || "3001234567").replace(/\D/g, "");
+  const decidir = (x: Inmueble, decision: string, motivo: string | null, aviso: string) =>
+    accion("/api/admin/flujo/decidir", { links: [x.link], decision, motivo }, aviso);
+
+  const descartar = (x: Inmueble, decision: "no_continua" | "no_disponible", titulo: string, etiqueta: string) => {
+    modal(titulo, (cierra) => (
+      <FormDescartar
+        x={x} etiqueta={etiqueta} onCancelar={cierra}
+        onConfirmar={async (motivo) => {
+          cierra();
+          await decidir(x, decision, motivo, "Registrado · no reingresará");
+        }}
+      />
+    ));
+  };
+
+  const soloDigitos = (t: string | null) => (t || "").replace(/\D/g, "");
 
   const whatsapp = (x: Inmueble) => {
-    const texto = `Hola, le contacto de ZEQUARA por el inmueble en ${x.zona}, ${x.city}.`;
-    window.open(`https://wa.me/57${soloDigitos(x.tel)}?text=${encodeURIComponent(texto)}`, "_blank", "noopener");
+    const tel = soloDigitos(x.contacto_telefono);
+    if (!tel) {
+      av("Este inmueble no tiene teléfono guardado. Agrégalo al agendar la visita.");
+      return;
+    }
+    const texto = `Hola, le contacto de ZEQUARA por el inmueble en ${x.zona}, ${x.ciudad}.`;
+    window.open(`https://wa.me/57${tel}?text=${encodeURIComponent(texto)}`, "_blank", "noopener");
   };
 
   const agendar = (x: Inmueble) => {
     modal("Agendar visita · " + x.zona, (cierra) => (
       <FormVisita
         x={x} onCancelar={cierra}
-        onGuardar={(cita, tel) => {
-          cambia(x.id, { stage: "visita", cita, ...(tel ? { tel } : {}) });
+        onGuardar={async (d) => {
           cierra();
-          setPanel("p4");
-          av("Visita agendada");
+          await accion("/api/admin/flujo/visita", { link: x.link, ...d }, "Visita agendada", "p4");
         }}
       />
     ));
@@ -205,27 +336,20 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
     modal("Completar información · " + x.zona, (cierra) => (
       <FormCompletar
         x={x} onCancelar={cierra}
-        onPublicar={(t, m2) => {
-          cambia(x.id, { stage: "publicado", t, m2 });
+        onPublicar={async (d) => {
           cierra();
-          setPanel("p5");
-          av("Inmueble publicado");
+          await accion("/api/admin/flujo/completar", {
+            link: x.link,
+            titulo: d.titulo || null,
+            habitaciones: d.habitaciones ? Number(d.habitaciones) : null,
+            banos: d.banos ? Number(d.banos) : null,
+            area_confirmada_m2: d.area ? Number(d.area) : null,
+            tipo_transformacion: d.tipo,
+            notas_visita: d.notas || null,
+          }, "Inmueble publicado", "p5");
         }}
       />
     ));
-  };
-
-  /** Manda el inmueble a Predios como borrador y salta allá. */
-  const crearFicha = (x: Inmueble) => {
-    onCrearFicha({
-      id: "fl_" + x.id,
-      nombre: x.t.slice(0, 40),
-      zona: `${x.zona} · ${x.city}`,
-      est: "bor", score: "—", inversion: precio(x),
-      area: "arq", city: x.city, publicado: false, link: x.url,
-    });
-    av(`"${x.zona}" enviado a Predios como borrador`);
-    window.setTimeout(() => go("predios"), 700);
   };
 
   const automatizar = () => {
@@ -251,11 +375,14 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
     ));
   };
 
+  /** CSV de lo que trajo el scraping — pantalla 1 del correo. */
   const descargar = () => {
-    if (!nuevos.length) { av("No hay inmuebles para descargar"); return; }
-    const cita = (v: string | number) => '"' + String(v).replace(/"/g, '""') + '"';
+    if (!filas.length) { av("No hay inmuebles para descargar"); return; }
+    const cita = (v: unknown) => '"' + String(v ?? "").replace(/"/g, '""') + '"';
     const lineas = [CSV_SCRAPING.join(",")].concat(
-      nuevos.map((r) => [r.t, r.zona, r.city, r.precio, r.m2, r.ppm, r.url].map(cita).join(",")),
+      filas.map((r) => [
+        r.titulo, r.zona, r.ciudad, r.precio_venta, r.area_m2, r.precio_m2, r.link,
+      ].map(cita).join(",")),
     );
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob(["﻿" + lineas.join("\n")], { type: "text/csv;charset=utf-8;" }));
@@ -263,14 +390,31 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
     document.body.appendChild(a);
     a.click();
     a.remove();
-    av(`Listado descargado (${nuevos.length} inmuebles)`);
+    av(`Listado descargado (${filas.length} inmuebles)`);
   };
 
-  /* $/m² medio de lo que trajo el scraping, para la tira de resumen. */
-  const medio = nuevos.length
-    ? (nuevos.reduce((a, x) => a + x.ppm, 0) / nuevos.length).toFixed(1)
-    : "0";
-  const ciudades = new Set(nuevos.map((x) => x.city)).size;
+  /* Resumen de la pestaña 1, calculado sobre lo que se está viendo. */
+  const conPm2 = filas.filter((x) => x.precio_m2 != null);
+  const medio = conPm2.length
+    ? conPm2.reduce((a, x) => a + (x.precio_m2 as number), 0) / conPm2.length
+    : null;
+  const ciudades = new Set(filas.map((x) => x.ciudad)).size;
+
+  /** Cabecera de estado compartida por las seis pestañas. */
+  const estado = () => {
+    if (cargando) return <Vacio>Cargando…</Vacio>;
+    if (error) {
+      return (
+        <Card>
+          <div className="empty">
+            <b style={{ color: "var(--terra)" }}>No se pudo leer el flujo.</b>
+            <br />{error}
+          </div>
+        </Card>
+      );
+    }
+    return null;
+  };
 
   return (
     <section className="view active">
@@ -291,7 +435,7 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
             className={`flow-tab${panel === p.k ? " active" : ""}`}
             onClick={() => setPanel(p.k)}
           >
-            {p.l} <span className="cnt">{de(FUENTE[p.k]).length}</span>
+            {p.l} <span className="cnt">{conteos ? conteos[FUENTE[p.k]] ?? 0 : "—"}</span>
           </button>
         ))}
       </div>
@@ -299,7 +443,7 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
       {/* ══════════ 1 · DEL SCRAPING ══════════ */}
       {panel === "p1" && (
         <div className="flow-panel active">
-          {!nuevos.length ? <Vacio>No hay inmuebles nuevos del scraping.</Vacio> : (
+          {estado() ?? (!filas.length ? <Vacio>No hay inmuebles nuevos del scraping.</Vacio> : (
             <Card>
               <SecTitle style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 Resultado del último scraping
@@ -309,8 +453,11 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
               </SecTitle>
 
               <div className="flow-sum">
-                <div className="it"><div className="k">Inmuebles</div><div className="v">{nuevos.length}</div></div>
-                <div className="it"><div className="k">$/m² medio</div><div className="v">${medio}M</div></div>
+                <div className="it"><div className="k">Inmuebles</div><div className="v">{filas.length}</div></div>
+                <div className="it">
+                  <div className="k">$/m² medio</div>
+                  <div className="v">{medio != null ? pm2(medio, filas[0].moneda) : "—"}</div>
+                </div>
                 <div className="it"><div className="k">Ciudades</div><div className="v">{ciudades}</div></div>
               </div>
 
@@ -322,19 +469,19 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
                   </tr>
                 </thead>
                 <tbody>
-                  {nuevos.map((x) => (
-                    <tr key={x.id}>
+                  {filas.map((x) => (
+                    <tr key={x.link}>
                       <td><Info x={x} /></td>
                       <td className="num">{precio(x)}</td>
-                      <td className="num">{x.m2}</td>
-                      <td className="num">${x.ppm}M</td>
-                      <td>{x.fecha}</td>
+                      <td className="num">{x.area_m2 ?? "—"}</td>
+                      <td className="num">{pm2(x.precio_m2, x.moneda)}</td>
+                      <td>{(x.fecha_extraccion || "").slice(0, 10) || "—"}</td>
                     </tr>
                   ))}
                 </tbody>
               </Tabla>
             </Card>
-          )}
+          ))}
         </div>
       )}
 
@@ -346,7 +493,7 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
             <b>No continúa</b> queda registrado para no reingresar en futuros scrapings.
           </Nota>
 
-          {!nuevos.length ? <Vacio>Nada por revisar.</Vacio> : (
+          {estado() ?? (!filas.length ? <Vacio>Nada por revisar.</Vacio> : (
             <Card style={{ padding: "6px 6px 2px" }}>
               <Tabla ancho="md">
                 <thead>
@@ -356,22 +503,22 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
                   </tr>
                 </thead>
                 <tbody>
-                  {nuevos.map((x) => (
-                    <tr key={x.id}>
+                  {filas.map((x) => (
+                    <tr key={x.link}>
                       <td><Info x={x} /></td>
-                      <td className="num">${x.ppm}M</td>
+                      <td className="num">{pm2(x.precio_m2, x.moneda)}</td>
                       <td><Url x={x} /></td>
                       <td>
                         <div className="tacts-wrap">
                           <button
                             type="button" className="btn btn-primary btn-mini"
-                            onClick={() => { cambia(x.id, { stage: "preseleccion" }); av("Pasa a preseleccionados"); }}
+                            onClick={() => decidir(x, "continua", null, "Pasa a preseleccionados")}
                           >
                             <IcoCheck />Continúa
                           </button>
                           <button
                             type="button" className="btn btn-ghost btn-mini"
-                            onClick={() => descartar(x, "No continúa en revisión inicial")}
+                            onClick={() => descartar(x, "no_continua", "No continúa en revisión inicial", "Registrar descarte")}
                           >
                             No continúa
                           </button>
@@ -382,7 +529,7 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
                 </tbody>
               </Tabla>
             </Card>
-          )}
+          ))}
         </div>
       )}
 
@@ -401,7 +548,7 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
             </button>
           </Nota>
 
-          {!de("preseleccion").length ? <Vacio>No hay inmuebles preseleccionados.</Vacio> : (
+          {estado() ?? (!filas.length ? <Vacio>No hay inmuebles preseleccionados.</Vacio> : (
             <Card style={{ padding: "6px 6px 2px" }}>
               <Tabla ancho="lg">
                 <thead>
@@ -411,59 +558,74 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
                   </tr>
                 </thead>
                 <tbody>
-                  {de("preseleccion").map((x) => (
-                    <tr key={x.id}>
-                      <td><Info x={x} /></td>
-                      <td className="num">{precio(x)}</td>
-                      <td>
-                        <div className="tacts-wrap">
-                          <button type="button" className="btn btn-wa btn-mini" onClick={() => whatsapp(x)}>
-                            <IcoWa />WhatsApp
-                          </button>
-                          <a className="btn btn-ghost btn-mini" href={`tel:+57${soloDigitos(x.tel)}`}>
-                            <IcoTel />Llamar
-                          </a>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="tacts-wrap">
-                          <button type="button" className="btn btn-primary btn-mini" onClick={() => agendar(x)}>
-                            <IcoCal />Agendar visita
-                          </button>
-                          <button type="button" className="btn btn-ghost btn-mini" onClick={() => descartar(x, "No disponible")}>
-                            No disponible
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {filas.map((x) => {
+                    const tel = soloDigitos(x.contacto_telefono);
+                    return (
+                      <tr key={x.link}>
+                        <td><Info x={x} /></td>
+                        <td className="num">{precio(x)}</td>
+                        <td>
+                          <div className="tacts-wrap">
+                            <button type="button" className="btn btn-wa btn-mini" onClick={() => whatsapp(x)}>
+                              <IcoWa />WhatsApp
+                            </button>
+                            {tel
+                              ? <a className="btn btn-ghost btn-mini" href={`tel:+57${tel}`}><IcoTel />Llamar</a>
+                              : <span className="pzone">Sin teléfono</span>}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="tacts-wrap">
+                            <button type="button" className="btn btn-primary btn-mini" onClick={() => agendar(x)}>
+                              <IcoCal />Agendar visita
+                            </button>
+                            <button
+                              type="button" className="btn btn-ghost btn-mini"
+                              onClick={() => descartar(x, "no_disponible", "Marcar como no disponible", "Registrar")}
+                            >
+                              No disponible
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </Tabla>
             </Card>
-          )}
+          ))}
         </div>
       )}
 
       {/* ══════════ 4 · VISITA AGENDADA ══════════ */}
       {panel === "p4" && (
         <div className="flow-panel active">
-          {!de("visita").length ? <Vacio>No hay visitas agendadas.</Vacio> : (
+          {estado() ?? (!filas.length ? <Vacio>No hay visitas agendadas.</Vacio> : (
             <Card style={{ padding: "6px 6px 2px" }}>
               <Tabla ancho="md">
                 <thead>
                   <tr><th>Inmueble</th><th>Visita</th><th style={{ textAlign: "right" }}>Tras la visita</th></tr>
                 </thead>
                 <tbody>
-                  {de("visita").map((x) => (
-                    <tr key={x.id}>
+                  {filas.map((x) => (
+                    <tr key={x.link}>
                       <td><Info x={x} /></td>
-                      <td><span className="est e-vis">{x.cita || "Por confirmar"}</span></td>
+                      <td>
+                        <span className="est e-vis">
+                          {x.visita_fecha
+                            ? `${x.visita_fecha}${x.visita_hora ? " · " + x.visita_hora : ""}`
+                            : "Por confirmar"}
+                        </span>
+                      </td>
                       <td>
                         <div className="tacts-wrap">
                           <button type="button" className="btn btn-primary btn-mini" onClick={() => completar(x)}>
                             <IcoCheck />Continúa · completar
                           </button>
-                          <button type="button" className="btn btn-ghost btn-mini" onClick={() => descartar(x, "Descartado tras la visita")}>
+                          <button
+                            type="button" className="btn btn-ghost btn-mini"
+                            onClick={() => descartar(x, "no_continua", "Descartado tras la visita", "Registrar descarte")}
+                          >
                             No continúa
                           </button>
                         </div>
@@ -473,40 +635,42 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
                 </tbody>
               </Tabla>
             </Card>
-          )}
+          ))}
         </div>
       )}
 
       {/* ══════════ 5 · PUBLICADOS ══════════ */}
       {panel === "p5" && (
         <div className="flow-panel active">
-          {!de("publicado").length ? <Vacio>Aún no hay inmuebles publicados.</Vacio> : (
+          {estado() ?? (!filas.length ? <Vacio>Aún no hay inmuebles publicados.</Vacio> : (
             <Card style={{ padding: "6px 6px 2px" }}>
               <Tabla ancho="md">
                 <thead>
                   <tr>
                     <th>Inmueble</th><th className="num">Precio</th><th className="num">m²</th>
-                    <th>Estado</th><th style={{ textAlign: "right" }}>Acción</th>
+                    <th>Estado</th><th style={{ textAlign: "right" }}>Publicación</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {de("publicado").map((x) => (
-                    <tr key={x.id}>
+                  {filas.map((x) => (
+                    <tr key={x.link}>
                       <td><Info x={x} /></td>
                       <td className="num">{precio(x)}</td>
-                      <td className="num">{x.m2}</td>
+                      <td className="num">{x.area_confirmada_m2 ?? x.area_m2 ?? "—"}</td>
                       <td><span className="est e-pub">Publicado</span></td>
                       <td style={{ textAlign: "right" }}>
-                        <button type="button" className="btn btn-ghost btn-mini" onClick={() => crearFicha(x)}>
-                          <IcoFlecha />Crear ficha en Predios
-                        </button>
+                        <Url x={x} texto="Ver original" />
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </Tabla>
+              <Hint>
+                Desde aquí se conectan con el proceso de clientes y con el resto de la plataforma,
+                que es el siguiente paso del backend. <IcoFlecha />
+              </Hint>
             </Card>
-          )}
+          ))}
         </div>
       )}
 
@@ -517,24 +681,28 @@ export default function FlujoInmuebles({ onCrearFicha }: { onCrearFicha: (p: Pre
             Registro de descartados. Estos inmuebles <b>no volverán a aparecer</b> en futuros scrapings.
           </Nota>
 
-          {!de("descartado").length ? <Vacio>No hay inmuebles descartados.</Vacio> : (
+          {estado() ?? (!filas.length ? <Vacio>No hay inmuebles descartados.</Vacio> : (
             <Card style={{ padding: "6px 6px 2px" }}>
               <Tabla ancho="md">
                 <thead>
                   <tr><th>Inmueble</th><th>Motivo</th><th>Publicación</th></tr>
                 </thead>
                 <tbody>
-                  {de("descartado").map((x) => (
-                    <tr key={x.id}>
+                  {filas.map((x) => (
+                    <tr key={x.link}>
                       <td><Info x={x} /></td>
-                      <td><span className="est e-desc">{x.motivo || "Descartado"}</span></td>
+                      <td>
+                        <span className="est e-desc">
+                          {x.motivo_no_pasa || x.motivo_no_disponible || "Descartado"}
+                        </span>
+                      </td>
                       <td><Url x={x} texto="Ver" /></td>
                     </tr>
                   ))}
                 </tbody>
               </Tabla>
             </Card>
-          )}
+          ))}
         </div>
       )}
     </section>

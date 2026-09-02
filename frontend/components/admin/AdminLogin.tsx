@@ -3,32 +3,26 @@
 import { motion, MotionConfig } from "framer-motion";
 import { useState } from "react";
 import { WORDMARK, wordmarkH } from "@/components/brand";
+import { useSesion } from "@/components/admin/sesion";
 import { EASE, LASER } from "@/components/responsive/kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ACCESO A LA CONSOLA INTERNA.
 
-   La consola vivía sin puerta: cualquiera con la URL entraba. Esta es la
-   puerta, con el mismo lenguaje visual del acceso de inversionistas
-   (`sections/login/LoginScreen.tsx` y su versión fluida): marrón de la marca,
-   wordmark arriba, antetítulo dorado con su filete y los dos campos con icono.
+   Autentica de verdad contra `POST /api/auth/login`: el backend comprueba el
+   hash bcrypt y devuelve un token de sesión con el rol dentro. Ya no entra
+   cualquiera con cualquier cosa, como la primera versión de esta pantalla.
 
-   No es una columna de 1920 escalada como el resto del sitio: es una pantalla
-   fluida, con `clamp()`, que sirve igual a 390 y a 1920. La consola tampoco es
-   un lienzo fijo, así que no había nada que emparejar.
+   El lenguaje visual es el del acceso de inversionistas
+   (`sections/login/LoginScreen.tsx` y su versión fluida): marrón de la
+   marca, wordmark arriba, antetítulo dorado con su filete y los dos campos
+   con icono. No es una columna de 1920 escalada como el resto del sitio,
+   sino una pantalla fluida con `clamp()` que sirve igual a 390 y a 1920 —la
+   consola tampoco es un lienzo fijo, así que no había nada que emparejar—.
 
-   AVISO IMPORTANTE SOBRE LO QUE ESTO ES Y LO QUE NO ES
-   ---------------------------------------------------
-   Esto NO autentica. Todavía no hay backend de sesiones —es la fase F1 de
-   `docs/propuesta-backend.pdf`, la que cierra el área privada—, así que la
-   puerta deja pasar con cualquier usuario y contraseña no vacíos y guarda la
-   entrada en `sessionStorage`. Es exactamente lo mismo que hace hoy el acceso
-   de inversionistas.
-
-   Sirve para dos cosas reales: que la consola no sea la primera pantalla que
-   ve quien llegue a `/admin`, y que el día que exista `POST /api/auth/login`
-   solo haya que cambiar el cuerpo de `entrar()`. No sirve para proteger nada:
-   cualquiera que abra las herramientas del navegador entra igual.
+   El error que llega del servidor se muestra tal cual, y es a propósito el
+   mismo para "no existe ese correo" y "contraseña equivocada": distinguirlos
+   le diría a cualquiera qué correos tienen cuenta.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const LINEN = "#f7f1e5";
@@ -48,19 +42,30 @@ const IcoUser = () => <svg width={19} height={19} viewBox="0 0 24 24" {...trazo}
 const IcoKey = () => <svg width={19} height={19} viewBox="0 0 24 24" {...trazo} aria-hidden><rect x="4" y="10" width="16" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>;
 const IcoLock = () => <svg width={13} height={13} viewBox="0 0 24 24" {...trazo} strokeWidth={2} aria-hidden><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>;
 
-export default function AdminLogin({ onEntrar }: { onEntrar: () => void }) {
-  const [usuario, setUsuario] = useState("");
+export default function AdminLogin() {
+  const { entrar } = useSesion();
+  const [correo, setCorreo] = useState("");
   const [clave, setClave] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
 
-  const enviar = (e: React.FormEvent) => {
+  const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!usuario.trim() || !clave) {
-      setError("Escribe tu usuario y tu contraseña.");
+    if (!correo.trim() || !clave) {
+      setError("Escribe tu correo y tu contraseña.");
       return;
     }
     setError(null);
-    onEntrar();
+    setEnviando(true);
+    try {
+      await entrar(correo, clave);
+      /* No hace falta navegar: al quedar la sesión puesta, `AdminGate`
+         cambia solo de pantalla. */
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setEnviando(false);
+    }
   };
 
   const wm = 190;
@@ -90,17 +95,17 @@ export default function AdminLogin({ onEntrar }: { onEntrar: () => void }) {
               Acceso del <span className="font-semibold">equipo.</span>
             </h1>
             <p className="mt-[12px] text-[15px] font-light leading-[1.55]" style={{ color: "rgba(247,241,229,0.72)" }}>
-              Esta es la herramienta de operación de ZEQUARA: embudo de predios, extracción,
+              Esta es la herramienta de operación de ZEQUARA: flujo de inmuebles, extracción,
               comité y seguimiento. No es el portal de inversionistas.
             </p>
 
             <form className="mt-[26px]" onSubmit={enviar} noValidate>
-              <label className={ETIQUETA} style={ETIQUETA_ST} htmlFor="ad-user">Usuario</label>
+              <label className={ETIQUETA} style={ETIQUETA_ST} htmlFor="ad-user">Correo</label>
               <div className="relative">
                 <span className="absolute left-[15px] top-1/2 -translate-y-1/2" style={{ color: "rgba(247,241,229,0.45)" }}><IcoUser /></span>
                 <input
-                  id="ad-user" type="text" autoComplete="username" placeholder="persona@zequara.com"
-                  value={usuario} onChange={(e) => setUsuario(e.target.value)}
+                  id="ad-user" type="email" autoComplete="username" placeholder="persona@zequara.com"
+                  value={correo} onChange={(e) => setCorreo(e.target.value)} disabled={enviando}
                   className={`ix-field ${CAJA} placeholder:text-[rgba(247,241,229,0.42)]`} style={CAJA_ST}
                 />
               </div>
@@ -110,7 +115,7 @@ export default function AdminLogin({ onEntrar }: { onEntrar: () => void }) {
                 <span className="absolute left-[15px] top-1/2 -translate-y-1/2" style={{ color: "rgba(247,241,229,0.45)" }}><IcoKey /></span>
                 <input
                   id="ad-pass" type="password" autoComplete="current-password" placeholder="••••••••••••"
-                  value={clave} onChange={(e) => setClave(e.target.value)}
+                  value={clave} onChange={(e) => setClave(e.target.value)} disabled={enviando}
                   className={`ix-field ${CAJA} placeholder:text-[rgba(247,241,229,0.42)]`} style={CAJA_ST}
                 />
               </div>
@@ -120,18 +125,23 @@ export default function AdminLogin({ onEntrar }: { onEntrar: () => void }) {
               )}
 
               <button
-                type="submit"
-                className="ix-press mt-[22px] flex h-[56px] w-full items-center justify-center gap-[10px] rounded-full text-[16px] font-semibold"
+                type="submit" disabled={enviando}
+                className="ix-press mt-[22px] flex h-[56px] w-full items-center justify-center gap-[10px] rounded-full text-[16px] font-semibold disabled:opacity-60"
                 style={{ background: "#7f8b57", color: LINEN }}
               >
-                Entrar a la consola
-                <svg width={18} height={18} viewBox="0 0 24 24" {...trazo} strokeWidth={2} aria-hidden><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                {enviando ? "Entrando…" : "Entrar a la consola"}
+                {!enviando && (
+                  <svg width={18} height={18} viewBox="0 0 24 24" {...trazo} strokeWidth={2} aria-hidden><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                )}
               </button>
             </form>
 
             <div className="mt-[22px] flex items-start gap-[8px] text-[12.5px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.5)" }}>
               <span className="mt-[3px] shrink-0"><IcoLock /></span>
-              <span>Acceso restringido al equipo de ZEQUARA. Cada entrada y cada decisión quedan registradas.</span>
+              <span>
+                Acceso restringido al equipo de ZEQUARA. Las cuentas las crea un administrador;
+                cada entrada y cada decisión quedan registradas.
+              </span>
             </div>
           </div>
 

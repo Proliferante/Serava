@@ -1,12 +1,22 @@
+# --- Node / Next -----------------------------------------------------------
 node_modules/
 .next/
-.env
-.env.local
 dist/
 .cache/
-node_modules/
-.next/
+
+# --- Secretos --------------------------------------------------------------
+# Nunca se suben: DATABASE_URL, JWT_SECRET y las llaves viven aquí.
+# `backend/.env.example` sí está en el repo, como plantilla.
 .env
 .env.local
-dist/
-.cache/
+
+# --- Python ----------------------------------------------------------------
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Bases SQLite de corridas antiguas del pipeline (hoy es Postgres, pero un
+# `python script_extract_serava.py` viejo podría dejar una suelta).
+*.db

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import AvisoPantalla from "@/components/responsive/AvisoPantalla";
 import { ConsolaProvider } from "@/components/admin/ctx";
+import { puedeVer, useSesion } from "@/components/admin/sesion";
 import { PREDIOS_SEED, type Predio, type VistaKey } from "@/components/admin/data";
 import Arquitectura from "@/components/admin/views/Arquitectura";
 import Comercial from "@/components/admin/views/Comercial";
@@ -14,20 +15,29 @@ import GestionPredio from "@/components/admin/views/GestionPredio";
 import NuevoPredio from "@/components/admin/views/NuevoPredio";
 import PanelGeneral from "@/components/admin/views/PanelGeneral";
 import Predios from "@/components/admin/views/Predios";
-import Equipo from "@/components/admin/views/Equipo";
+import Usuarios from "@/components/admin/views/Usuarios";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   CONSOLA INTERNA — el marco: menú lateral, barra superior y las diez vistas.
+   CONSOLA INTERNA — el marco: menú lateral, barra superior y las vistas.
 
-   Es el `.app` del archivo original. Por debajo de 900 px el menú se convierte
-   en un cajón que entra desde la izquierda con su velo, igual que antes; el
-   CSS de eso ya venía hecho y vive en `styles/admin.css`.
+   Por debajo de 900 px el menú se convierte en un cajón que entra desde la
+   izquierda con su velo; el CSS de eso vive en `styles/admin.css`.
 
-   El listado de predios vive aquí y no dentro de la vista de Predios porque lo
-   escriben tres pantallas: Extracción envía a revisión, Nuevo predio crea, y
-   Predios publica. En el archivo original eso se hacía metiendo `<tr>` con
-   `innerHTML` en la tabla de otra vista desde el `<script>`; con el estado
-   arriba, cada pantalla solo dice qué pasó.
+   MENÚ Y ROLES
+   El menú sólo enseña los módulos que el rol puede ver (`puedeVer`), y si
+   alguien llega a una vista que no le toca se le muestra el aviso de acceso
+   en vez de la vista. Nada de esto es la seguridad: cada endpoint la
+   comprueba por su cuenta. Es no ofrecer puertas que van a dar 403.
+
+   Hoy los roles están abiertos salvo "Equipo & permisos", que es sólo de
+   admin —así se acordó en la reunión, para habilitar el primer flujo—. Los
+   permisos por módulo están en un solo sitio (`PERMISOS`, en sesion.tsx)
+   para cerrarlos cuando toque.
+
+   EL LISTADO DE PREDIOS
+   Sigue siendo de maqueta: es la parte de la consola que el correo dejó "en
+   espera" (remodelación, administración, data y comercial). Lo que sí está
+   contra la base es el flujo de inmuebles y los usuarios.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 type Item = { k: VistaKey; l: string; d: string; d2?: string; badge?: number; circulo?: boolean };
@@ -40,9 +50,9 @@ const GRUPOS: { g: string; items: Item[] }[] = [
   {
     g: "Operación",
     items: [
+      { k: "flujo", l: "Flujo de inmuebles", d: "M3 6h18M7 12h10M11 18h2" },
       { k: "predios", l: "Predios", d: "M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" },
       { k: "extraccion", l: "Extracción de predios", d: "M12 3v12M8 11l4 4 4-4", d2: "M4 17v3h16v-3" },
-      { k: "flujo", l: "Flujo de inmuebles", d: "M3 6h18M7 12h10M11 18h2" },
       { k: "nuevo", l: "Nuevo predio", d: "M12 5v14M5 12h14" },
       { k: "comite", l: "Comité de aprobación", d: "M9 12l2 2 4-4", d2: "M21 12c0 5-9 9-9 9s-9-4-9-9a9 9 0 0 1 18 0z", badge: 3 },
       { k: "arq", l: "Arquitectura", d: "M12 3l9 6-9 6-9-6z", d2: "M3 15l9 6 9-6" },
@@ -56,13 +66,39 @@ const GRUPOS: { g: string; items: Item[] }[] = [
   },
 ];
 
-export default function AdminConsole({ onSalir }: { onSalir: () => void }) {
-  const [vista, setVista] = useState<VistaKey>("panel");
+/** Iniciales para el avatar de la barra: "Nati C." → "NC". */
+function iniciales(nombre: string) {
+  return nombre.trim().split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase();
+}
+
+const ROL_ETIQUETA: Record<string, string> = {
+  admin: "Administrador",
+  arquitectura: "Arquitectura",
+  data: "Data",
+  comercial: "Comercial",
+};
+
+export default function AdminConsole() {
+  const { usuario, salir } = useSesion();
+  const [vista, setVista] = useState<VistaKey>("flujo");
   const [cajon, setCajon] = useState(false);
   const [predios, setPredios] = useState<Predio[]>(PREDIOS_SEED);
 
+  const rol = usuario?.rol;
   const ir = (v: VistaKey) => { setVista(v); setCajon(false); };
   const abrirGestion = () => ir("gestion");
+
+  /* Los grupos ya filtrados por rol. Un grupo cuyos módulos no puede ver
+     nadie de este rol no se dibuja: un encabezado suelto sin nada debajo
+     parece un error. */
+  const grupos = useMemo(
+    () => GRUPOS
+      .map((g) => ({ ...g, items: g.items.filter((i) => puedeVer(i.k, rol)) }))
+      .filter((g) => g.items.length > 0),
+    [rol],
+  );
+
+  const permitida = puedeVer(vista, rol);
 
   return (
     <div className="adm">
@@ -80,7 +116,7 @@ export default function AdminConsole({ onSalir }: { onSalir: () => void }) {
             </div>
             <span className="env">Consola interna</span>
 
-            {GRUPOS.map(({ g, items }) => (
+            {grupos.map(({ g, items }) => (
               <div key={g}>
                 <div className="nav-l">{g}</div>
                 {items.map((i) => (
@@ -105,7 +141,7 @@ export default function AdminConsole({ onSalir }: { onSalir: () => void }) {
             <div className="foot">
               ZEQUARA · v0.1 interna<br />Acceso restringido al equipo.
               <br />
-              <button type="button" className="pnl-link" style={{ marginTop: 8, color: "var(--sand)" }} onClick={onSalir}>
+              <button type="button" className="pnl-link" style={{ marginTop: 8, color: "var(--sand)" }} onClick={salir}>
                 Cerrar sesión
               </button>
             </div>
@@ -129,36 +165,49 @@ export default function AdminConsole({ onSalir }: { onSalir: () => void }) {
                   <span className="dot" />
                 </div>
                 <div className="who">
-                  <div className="av">AD</div>
+                  <div className="av">{usuario ? iniciales(usuario.nombre) : "··"}</div>
                   <div>
-                    <div className="nm">Equipo ZEQUARA</div>
-                    <div className="rl">Administrador</div>
+                    <div className="nm">{usuario?.nombre ?? "—"}</div>
+                    <div className="rl">{rol ? ROL_ETIQUETA[rol] ?? rol : ""}</div>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="content">
-              {vista === "panel" && <PanelGeneral />}
-              {vista === "predios" && (
-                <Predios
-                  predios={predios} abrirGestion={abrirGestion}
-                  onPublicar={(id) => setPredios((ps) => ps.map((p) => p.id === id ? { ...p, publicado: !p.publicado } : p))}
-                />
+              {!permitida ? (
+                <section className="view active">
+                  <div className="card">
+                    <div className="empty">
+                      <b style={{ color: "var(--coffee)" }}>Este módulo no está disponible para tu rol.</b>
+                      <br />
+                      Tu rol es {rol ? ROL_ETIQUETA[rol] ?? rol : "—"}. Si necesitas entrar, pídeselo a
+                      un administrador.
+                    </div>
+                  </div>
+                </section>
+              ) : (
+                <>
+                  {vista === "panel" && <PanelGeneral />}
+                  {vista === "flujo" && <FlujoInmuebles />}
+                  {vista === "predios" && (
+                    <Predios
+                      predios={predios} abrirGestion={abrirGestion}
+                      onPublicar={(id) => setPredios((ps) => ps.map((p) => p.id === id ? { ...p, publicado: !p.publicado } : p))}
+                    />
+                  )}
+                  {vista === "extraccion" && (
+                    <Extraccion onEnviarARevision={(nuevos) => setPredios((ps) => [...nuevos, ...ps])} />
+                  )}
+                  {vista === "nuevo" && <NuevoPredio onCrear={(p) => setPredios((ps) => [p, ...ps])} />}
+                  {vista === "comite" && <Comite />}
+                  {vista === "arq" && <Arquitectura abrirGestion={abrirGestion} />}
+                  {vista === "data" && <DataScore />}
+                  {vista === "comercial" && <Comercial abrirGestion={abrirGestion} />}
+                  {vista === "equipo" && <Usuarios />}
+                  {vista === "gestion" && <GestionPredio />}
+                </>
               )}
-              {vista === "extraccion" && (
-                <Extraccion onEnviarARevision={(nuevos) => setPredios((ps) => [...nuevos, ...ps])} />
-              )}
-              {vista === "flujo" && (
-                <FlujoInmuebles onCrearFicha={(p) => setPredios((ps) => [p, ...ps])} />
-              )}
-              {vista === "nuevo" && <NuevoPredio onCrear={(p) => setPredios((ps) => [p, ...ps])} />}
-              {vista === "comite" && <Comite />}
-              {vista === "arq" && <Arquitectura abrirGestion={abrirGestion} />}
-              {vista === "data" && <DataScore />}
-              {vista === "comercial" && <Comercial abrirGestion={abrirGestion} />}
-              {vista === "equipo" && <Equipo />}
-              {vista === "gestion" && <GestionPredio />}
             </div>
           </div>
         </div>
@@ -173,7 +222,7 @@ export default function AdminConsole({ onSalir }: { onSalir: () => void }) {
         eyebrow="Consola interna"
         titulo={<>La consola completa, <span className="font-semibold">también aquí.</span></>}
       >
-        Las diez pantallas están adaptadas a la columna: el menú se vuelve un cajón y las tablas se
+        Las pantallas están adaptadas a la columna: el menú se vuelve un cajón y las tablas se
         desplazan solas. Aun así, la extracción trabaja con once columnas por anuncio y desde un
         computador la revisas sin arrastrar.
       </AvisoPantalla>

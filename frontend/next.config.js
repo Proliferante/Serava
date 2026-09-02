@@ -17,6 +17,21 @@ const nextConfig = {
     // los de `/figma` van con `immutable` un año (ver `headers()` abajo), así
     // que las versiones optimizadas se cachean igual de bien.
   },
+  // La consola llama a rutas relativas (`/api/auth/...`, `/api/admin/...`).
+  // Sin esto, esas peticiones las atiende Next y devuelven 404 — que es por
+  // lo que la consola siempre decía "Sin servidor" aunque el backend
+  // estuviera corriendo: nunca llegaba a él.
+  //
+  // En desarrollo el destino es el uvicorn local; al desplegar se pone
+  // BACKEND_URL apuntando al backend real. Va por reescritura y no llamando
+  // directo a `http://127.0.0.1:8000` desde el navegador para que todo salga
+  // del mismo origen: así no hay preflight de CORS ni un dominio distinto
+  // que configurar en el frontend.
+  async rewrites() {
+    const backend = process.env.BACKEND_URL || "http://127.0.0.1:8000";
+    return [{ source: "/api/:ruta*", destination: `${backend}/api/:ruta*` }];
+  },
+
   async headers() {
     return [
       {
