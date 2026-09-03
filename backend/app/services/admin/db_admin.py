@@ -35,7 +35,6 @@ import psycopg2.extensions
 import psycopg2.extras
 import psycopg2.pool
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
 
 load_dotenv()
 
@@ -206,9 +205,15 @@ _engine = None
 
 
 def engine():
-    """Motor de SQLAlchemy, para pandas.read_sql()/to_sql()."""
+    """Motor de SQLAlchemy, para pandas.read_sql()/to_sql().
+
+    SQLAlchemy se importa aquí dentro y no arriba: de este módulo cuelga todo
+    el backend, y el motor sólo lo usan las funciones del pipeline que van con
+    pandas. Ver la nota de los imports diferidos en `app/api/admin.py`.
+    """
     global _engine
     if _engine is None:
+        from sqlalchemy import create_engine
         _engine = create_engine(_dsn())
     return _engine
 

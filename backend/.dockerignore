@@ -1,0 +1,10 @@
+# El .env NUNCA entra en la imagen: las variables las pone el proveedor.
+.env
+.env.*
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+tests/
+scripts/
+claves-temporales*.txt

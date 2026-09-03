@@ -1,0 +1,51 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  Despliegue del backend (Render Blueprint).
+#
+#  En Render: New → Blueprint → conectar este repositorio. Lee este archivo,
+#  crea el servicio y sólo pide la única variable que no puede estar aquí:
+#  DATABASE_URL. El resto queda configurado.
+#
+#  El frontend sigue en Vercel. Cuando el servicio esté arriba, se copia su
+#  URL (https://…onrender.com) a la variable BACKEND_URL del proyecto de
+#  Vercel y se vuelve a desplegar: las reescrituras de `next.config.js` se
+#  resuelven al construir, así que sin redespliegue el cambio no se aplica.
+# ═══════════════════════════════════════════════════════════════════════════
+
+services:
+  - type: web
+    name: zequara-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    # El contexto es `backend/` para que `COPY requirements.txt` y `COPY app`
+    # sean relativos a él y la imagen no se lleve el frontend entero.
+    dockerContext: ./backend
+    plan: free
+    region: oregon
+    healthCheckPath: /api/salud
+    envVars:
+      # La cadena de Supabase. `sync: false` = Render la pide al crear el
+      # servicio y no queda escrita en el repositorio.
+      #
+      # Importante: usar el host del *pooler* (aws-1-…pooler.supabase.com),
+      # no `db.<ref>.supabase.co`. El directo sólo tiene registro AAAA y
+      # falla desde cualquier red sin IPv6.
+      - key: DATABASE_URL
+        sync: false
+
+      # La cookie de sesión, sólo por HTTPS. Aquí sí, porque el sitio
+      # desplegado es https; en local se deja apagada para poder entrar por
+      # http://localhost:3000.
+      - key: COOKIE_SEGURA
+        value: "1"
+
+      # Con la reescritura de Vercel el navegador habla siempre con su propio
+      # dominio, así que CORS no se usa. Se declara igual para que el día que
+      # alguien llame al backend directo, la lista ya sea la correcta y no un
+      # comodín.
+      - key: CORS_ORIGINS
+        value: https://serava-ashy.vercel.app
+
+      # Fija la firma de los tokens entre reinicios. Render la genera una vez
+      # y la conserva; sin esto, cada despliegue invalidaría lo firmado antes.
+      - key: JWT_SECRET
+        generateValue: true

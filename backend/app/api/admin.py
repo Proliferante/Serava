@@ -45,8 +45,17 @@ from pydantic import BaseModel
 # --- el pipeline real -------------------------------------------------------
 from app.services.admin import db_admin as db
 from app.services.admin import script_extract_serava as extract
-from app.services.admin import script_transform_serava as transform
-from app.services.admin import seguimiento
+
+# `script_transform_serava` y `seguimiento` se importan dentro de las dos
+# funciones que los usan, y no aquí arriba. Arrastran pandas, numpy, scipy,
+# scikit-learn y shapely: unos 300 MB de librería y varios segundos de
+# arranque para algo que sólo hace falta cuando alguien lanza una extracción
+# o registra una decisión. Con el backend desplegado en un servicio pequeño,
+# cargarlos al importar el módulo era la diferencia entre arrancar y morir
+# por falta de memoria.
+#
+# `extract` sí se importa arriba: sólo trae requests y BeautifulSoup, y su
+# `CONFIG_ZONAS` la leen cuatro endpoints de consulta.
 
 router = APIRouter()
 
@@ -297,6 +306,7 @@ def _correr(zonas_pedidas: list[str], solo_transformar: bool):
         ESTADO["paso"] += 1
 
         _log("Limpieza y validación (transform)…")
+        from app.services.admin import script_transform_serava as transform
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             transform.main()
@@ -397,6 +407,7 @@ def guardar_seguimiento(p: PeticionSeguimiento):
             )
             continue
         try:
+            from app.services.admin import seguimiento
             seguimiento.actualizar_seguimiento(
                 url_inmueble=link,
                 filtro_arquitectonico=p.decision,
