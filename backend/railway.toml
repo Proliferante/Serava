@@ -1,0 +1,28 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  Despliegue del backend en Railway.
+#
+#  Railway lee este archivo desde el "Root Directory" del servicio, que hay
+#  que poner en `/backend` (Settings → Source). Con eso el contexto de la
+#  imagen es esta carpeta y el Dockerfile encuentra `requirements.txt` y
+#  `app/` donde los espera.
+#
+#  El puerto lo asigna Railway por la variable PORT; el CMD del Dockerfile ya
+#  lo lee, con 8000 de respaldo para correr la imagen a mano.
+# ═══════════════════════════════════════════════════════════════════════════
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+# `/api/salud` responde sin tocar la base, así que sirve para saber si el
+# proceso está vivo aunque Supabase esté caído: son dos fallos distintos y
+# conviene no confundirlos.
+healthcheckPath = "/api/salud"
+# Generoso a propósito: el primer arranque instala pandas y compañía.
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+# Una sola réplica: el pool de conexiones y la caché de tablas son por
+# proceso, y con varias cada una abriría su propio pool contra Supabase.
+numReplicas = 1
