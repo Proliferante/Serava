@@ -41,8 +41,11 @@ def _mal_configurado(_: Request, exc: RuntimeError):
     log.error("Configuración incompleta: %s", exc)
     return JSONResponse(
         status_code=503,
-        content={"detail": "El servidor no tiene configurada la base de datos "
-                           "(falta DATABASE_URL en backend/.env)."},
+        # Sin mencionar `backend/.env`: desplegado, el sitio donde falta la
+        # variable son las del proveedor (Railway, Render), y mandar a alguien
+        # a un archivo que no existe en el servidor cuesta un rato de más.
+        content={"detail": "El servidor no tiene configurada la base de datos: "
+                           "falta la variable DATABASE_URL."},
     )
 
 # CORS: la lista de dominios permitidos sale del entorno (CORS_ORIGINS), y
