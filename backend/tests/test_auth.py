@@ -20,6 +20,7 @@ QUÉ SE PRUEBA Y QUÉ NO
     de siembra contra Supabase.
 """
 
+import re
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -366,3 +367,67 @@ def test_crear_rechaza_correo_repetido(base):
 def test_crear_rechaza_correo_sin_arroba(base):
     with pytest.raises(svc.ErrorAuth, match="Correo inválido"):
         svc.crear("X", "sin-arroba", "data", CLAVE_BUENA)
+
+
+# ---------------------------------------------------------------------------
+# La superficie entera: qué queda abierto sin sesión
+# ---------------------------------------------------------------------------
+
+# Las tres rutas que TIENEN que estar abiertas, y por qué:
+#   /api/salud            el proveedor la usa como healthcheck, antes de que
+#                         exista ninguna sesión.
+#   /api/auth/login       es donde se consigue la sesión.
+#   /api/auth/politica    la pantalla de acceso necesita las reglas de la
+#                         contraseña para no aceptar lo que el servidor
+#                         rechaza, y eso pasa antes de entrar.
+ABIERTAS = {"/api/salud", "/api/auth/login", "/api/auth/politica"}
+
+
+def _rutas_de(aplicacion):
+    """Todas las rutas y métodos, leídos del esquema OpenAPI.
+
+    Del esquema y no de `app.routes` a propósito: FastAPI cambió la forma en
+    que guarda los routers incluidos (ahora van envueltos en un objeto que no
+    expone sus rutas), y una prueba de seguridad no debería romperse por eso.
+    El esquema es el contrato público y no cambia de forma.
+    """
+    esquema = aplicacion.openapi()
+    for ruta, metodos in esquema["paths"].items():
+        for metodo in metodos:
+            if metodo.lower() in ("get", "post", "put", "patch", "delete"):
+                yield metodo.upper(), ruta
+
+
+def test_ninguna_ruta_nueva_queda_abierta_por_descuido():
+    """Sin cookie, toda ruta responde 401 salvo las tres de `ABIERTAS`.
+
+    Esta prueba existe por un fallo real: los siete endpoints de
+    `app/api/admin.py` se escribieron antes de que hubiera login y se quedaron
+    sin pedir nada. Con el backend ya publicado, cualquiera podía leer el
+    listado completo del scraping y —peor— lanzar una extracción o escribir
+    decisiones de descarte. Ahora la sesión se exige en el `include_router`.
+
+    Se comprueba llamando de verdad, no leyendo el árbol de dependencias: lo
+    que importa es qué contesta el servidor a quien no tiene sesión.
+
+    Importar `app.main` cuesta poco desde que el pipeline se carga en diferido
+    (ver la nota de los imports en `app/api/admin.py`).
+    """
+    from app.main import app as aplicacion
+
+    sin_sesion = TestClient(aplicacion)
+    sin_sesion.cookies.clear()
+
+    abiertas = set()
+    for metodo, ruta in _rutas_de(aplicacion):
+        # Los parámetros de la ruta se rellenan con algo válido: da igual que
+        # no exista, porque no se debería llegar a buscarlo.
+        concreta = re.sub(r"\{[^}]+\}", "1", ruta)
+        r = sin_sesion.request(metodo, concreta, json={} if metodo != "GET" else None)
+        if r.status_code != 401:
+            abiertas.add(ruta)
+
+    assert abiertas == ABIERTAS, (
+        "estas rutas contestan sin sesión y no deberían: "
+        f"{sorted(abiertas - ABIERTAS)}"
+    )

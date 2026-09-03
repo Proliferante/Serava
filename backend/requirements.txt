@@ -13,12 +13,14 @@ sqlalchemy
 python-dotenv
 
 # --- sesión y usuarios internos (app/api/auth.py, app/core/security.py) ---
-# passlib con bcrypt para las contraseñas; python-jose para firmar los
-# tokens. bcrypt se fija por debajo de 4.1 porque a partir de ahí passlib
-# 1.7.4 no puede leer su número de versión y lanza un aviso en cada hash.
+# passlib con bcrypt para las contraseñas. bcrypt se fija por debajo de 4.1
+# porque a partir de ahí passlib 1.7.4 no puede leer su número de versión y
+# lanza un aviso en cada hash.
+#
+# `python-jose[cryptography]` estuvo aquí para firmar tokens JWT y se quitó
+# con ellos: la sesión tiene estado en la tabla `sesiones`, no va firmada.
 passlib[bcrypt]
 bcrypt<4.1
-python-jose[cryptography]
 
 # --- backend oficial (inmuebles, dashboard, notificaciones) ---------------
 # TODO (backend oficial): agregar aquí lo que haga falta (Alembic, pytest,

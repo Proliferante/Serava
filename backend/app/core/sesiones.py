@@ -47,7 +47,7 @@ log = logging.getLogger("zequara.sesiones")
 COOKIE = "zq_sesion"
 
 # Tope absoluto y cierre por inactividad.
-DURACION = timedelta(hours=config.JWT_HORAS)
+DURACION = timedelta(hours=config.SESION_HORAS)
 INACTIVIDAD = timedelta(hours=2)
 
 

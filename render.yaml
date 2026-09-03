@@ -45,7 +45,3 @@ services:
       - key: CORS_ORIGINS
         value: https://serava-ashy.vercel.app
 
-      # Fija la firma de los tokens entre reinicios. Render la genera una vez
-      # y la conserva; sin esto, cada despliegue invalidaría lo firmado antes.
-      - key: JWT_SECRET
-        generateValue: true

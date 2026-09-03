@@ -1,22 +1,41 @@
 import logging
+from contextlib import asynccontextmanager
 
 import psycopg2
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.admin import router as admin_router
-from app.api.auth import router as auth_router
+from app.api.auth import router as auth_router, usuario_actual
 from app.api.flujo import router as flujo_router
 from app.core import config, sesiones
 
 log = logging.getLogger("zequara")
+
+@asynccontextmanager
+async def _ciclo_de_vida(_: FastAPI):
+    """Barre las sesiones muertas al arrancar. No hay tarea programada ni hace
+    falta: con reiniciar de vez en cuando, la tabla no crece sin control.
+
+    Con `lifespan` y no con `@app.on_event("startup")`, que FastAPI dio por
+    obsoleto y avisaba en cada arranque y en cada corrida de pruebas.
+    """
+    try:
+        n = sesiones.limpiar()
+        if n:
+            log.info("Sesiones vencidas borradas: %s", n)
+    except Exception as e:
+        log.warning("No se pudieron limpiar las sesiones: %s", e)
+    yield
+
 
 # Sin documentación interactiva a menos que DOCS_ABIERTAS lo pida: ver la nota
 # en `core/config.py`. `openapi_url=None` también, o `/openapi.json` seguiría
 # sirviendo el esquema entero aunque `/docs` no lo pinte.
 app = FastAPI(
     title="Zequara API",
+    lifespan=_ciclo_de_vida,
     docs_url="/docs" if config.DOCS_ABIERTAS else None,
     redoc_url="/redoc" if config.DOCS_ABIERTAS else None,
     openapi_url="/openapi.json" if config.DOCS_ABIERTAS else None,
@@ -117,29 +136,39 @@ async def _cabeceras_y_origen(peticion: Request, siguiente):
     return r
 
 
-@app.on_event("startup")
-def _al_arrancar():
-    """Barre las sesiones muertas. No hay tarea programada ni hace falta:
-    con reiniciar de vez en cuando, la tabla no crece sin control."""
-    try:
-        n = sesiones.limpiar()
-        if n:
-            log.info("Sesiones vencidas borradas: %s", n)
-    except Exception as e:
-        log.warning("No se pudieron limpiar las sesiones: %s", e)
 
 
 # Sesión y usuarios internos.
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 
+# TODO lo que va bajo /api/admin exige sesión, y se exige AQUÍ, en el
+# include, no endpoint por endpoint.
+#
+# Es la corrección de un agujero real: `app/api/admin.py` se escribió antes de
+# que hubiera login y ninguno de sus siete endpoints pedía nada. Con el backend
+# ya publicado, eso significaba que cualquiera podía leer el listado completo
+# del scraping (`GET /predios`), ver la configuración de zonas, y —peor—
+# lanzar una extracción (`POST /extraer`) o escribir decisiones de descarte
+# (`POST /seguimiento`) sin ser nadie. Comprobado contra el servicio antes de
+# arreglarlo: 200 y datos, sin cookie.
+#
+# Puesto en el `include_router`, la protección no depende de que alguien se
+# acuerde de añadir `Depends` al escribir el siguiente endpoint: cubre los que
+# hay y los que vengan. Los que además necesitan saber QUIÉN llama siguen
+# declarando `usuario_actual` en su firma, y eso no cuesta otra validación
+# —FastAPI resuelve la misma dependencia una vez por petición—.
+SESION = [Depends(usuario_actual)]
+
 # Consola interna del equipo (embudo/seguimiento/add-value), coordinada con
 # David — ver app/api/admin.py y app/services/admin/.
-app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
+app.include_router(admin_router, prefix="/api/admin", tags=["admin"],
+                   dependencies=SESION)
 
 # Las cinco pantallas del flujo de inmuebles. Va con el prefijo de admin
 # porque es parte de la consola interna, pero en su propio archivo: admin.py
 # ya son 700 líneas.
-app.include_router(flujo_router, prefix="/api/admin/flujo", tags=["flujo"])
+app.include_router(flujo_router, prefix="/api/admin/flujo", tags=["flujo"],
+                   dependencies=SESION)
 
 # TODO (backend oficial): sumar aquí los routers de inmuebles, dashboard y
 # notificaciones cuando estén — no reemplazar este archivo, sólo añadir.

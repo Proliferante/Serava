@@ -40,7 +40,7 @@ import contextlib
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 # --- el pipeline real -------------------------------------------------------
 from app.services.admin import db_admin as db
@@ -182,7 +182,10 @@ def predios(
     paises: str = Query("", description="Colombia,Panamá"),
     ciudades: str = Query(""),
     zonas: str = Query(""),
-    limite: int = Query(1500),
+    # Con tope: `limite=10000000` pedía diez millones de filas y el servidor
+    # se iba a construir la respuesta hasta quedarse sin memoria. 5000 es más
+    # de lo que cualquier pantalla pinta y sigue siendo una respuesta que cabe.
+    limite: int = Query(1500, ge=1, le=5000),
 ):
     if not db.tabla_existe("clean_listings"):
         raise HTTPException(404, "Todavía no existe clean_listings. Corre una extracción primero.")
@@ -271,7 +274,9 @@ def predios(
 
 
 class PeticionExtraer(BaseModel):
-    zonas: list[str] = []          # vacío = las 10
+    # Diez zonas configuradas; el tope de 50 es para que una lista absurda no
+    # entre a construir consultas.
+    zonas: list[str] = Field(default=[], max_length=50)   # vacío = las 10
     solo_transformar: bool = False  # rehacer limpieza sin volver a scrapear
 
 
@@ -362,10 +367,12 @@ def estado(desde: int = 0):
 
 
 class PeticionSeguimiento(BaseModel):
-    links: list[str]
-    decision: str            # 'pasa' | 'no_pasa'
-    motivo: str | None = None
-    responsable: str | None = None
+    # Mismos topes que en el flujo, y por lo mismo: sin ellos, una petición
+    # con cien mil links o un motivo de diez megas se acepta tal cual.
+    links: list[str] = Field(min_length=1, max_length=500)
+    decision: str = Field(max_length=32)   # 'pasa' | 'no_pasa'
+    motivo: str | None = Field(default=None, max_length=2000)
+    responsable: str | None = Field(default=None, max_length=120)
 
 
 def _links_que_cumplen_criterio(links: list[str]) -> set[str]:

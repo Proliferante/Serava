@@ -13,6 +13,7 @@ al entrar: es la misma persona. El índice único de la tabla va sobre
 lower(correo), así que la base lo garantiza aunque este módulo se equivoque.
 """
 
+import secrets
 import unicodedata
 from datetime import datetime, timezone
 
@@ -128,17 +129,45 @@ def crear(nombre: str, correo: str, rol: str, clave: str,
     return dict(fila)
 
 
+_senuelo: str | None = None
+
+
+def _hash_senuelo() -> str:
+    """Un hash contra el que comparar cuando el correo no existe.
+
+    Es de una contraseña al azar que nadie conoce, así que nunca acierta. Lo
+    único que aporta es tardar: bcrypt con el mismo coste que los de verdad.
+    Se calcula la primera vez que hace falta y se guarda, porque calcularlo
+    es justo lo que cuesta 300 ms.
+    """
+    global _senuelo
+    if _senuelo is None:
+        _senuelo = security.hashear(secrets.token_urlsafe(32))
+    return _senuelo
+
+
 def autenticar(correo: str, clave: str) -> dict:
     """Comprueba credenciales y devuelve el usuario. Lanza ErrorAuth si no.
 
     El mensaje de error es el mismo para "no existe" y para "contraseña
     equivocada", a propósito: distinguirlos le diría a cualquiera qué
     correos tienen cuenta.
+
+    Y el mismo mensaje no basta: hay que tardar lo mismo. Medido antes de
+    arreglarlo, un correo inexistente contestaba en 1,60 s y uno con cuenta y
+    contraseña mala en 2,03 s — los 400 ms de bcrypt, que no se gastaban
+    cuando no había nada que comparar—. Con eso, probar una lista de correos
+    y cronometrar dice cuáles tienen cuenta, que es el primer paso para
+    atacarlas. Por eso, si el correo no existe, se compara igual contra un
+    hash señuelo.
     """
     u = por_correo(correo)
     generico = "Correo o contraseña incorrectos."
 
-    if not u or not security.verificar(clave, u.get("clave_hash", "")):
+    if not u:
+        security.verificar(clave, _hash_senuelo())
+        raise ErrorAuth(generico)
+    if not security.verificar(clave, u.get("clave_hash", "")):
         raise ErrorAuth(generico)
     if not u["activo"]:
         raise ErrorAuth("Esta cuenta está desactivada. Habla con un administrador.")

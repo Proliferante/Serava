@@ -1,7 +1,14 @@
 import AdminGate from "@/components/admin/AdminGate";
 import "@/styles/admin.css";
 
-export const metadata = { title: "Zequara · Consola interna" };
+export const metadata = {
+  title: "Zequara · Consola interna",
+  /* Fuera de los buscadores. No es una medida de seguridad —lo que protege es
+     el login y el 401 del servidor— pero una consola interna no tiene nada
+     que hacer en los resultados de Google, y su URL en un índice público es
+     una invitación a probar contraseñas. */
+  robots: { index: false, follow: false },
+};
 
 /**
  * CONSOLA INTERNA DEL EQUIPO — embudo de predios, extracción, comité,
@@ -15,8 +22,10 @@ export const metadata = { title: "Zequara · Consola interna" };
  * `backend/app/api/admin.py`), no al backend de inversionistas.
  *
  * Se entra por `AdminGate`, que enseña el acceso del equipo antes de la
- * consola. Ese acceso todavía no autentica de verdad —falta la fase F1 del
- * backend—; está explicado en `components/admin/AdminLogin.tsx`.
+ * consola. Autentica de verdad contra `POST /api/auth/login`: sesión en
+ * cookie HttpOnly con estado en la tabla `sesiones`, y todo lo que hay bajo
+ * `/api/admin` exige esa sesión en el servidor (ver `backend/app/main.py`).
+ * Esconder un módulo del menú es comodidad; lo que protege es el 401.
  */
 export default function AdminPage() {
   return <AdminGate />;

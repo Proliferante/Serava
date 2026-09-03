@@ -96,9 +96,19 @@ solo_admin = exige_rol("admin")
 # ENTRAR Y SALIR
 # ---------------------------------------------------------------------------
 
+# Topes de tamaño en todo lo que entra. El de la contraseña no es capricho:
+# bcrypt sólo mira los primeros 72 bytes, así que aceptar cadenas enormes no
+# añade seguridad y sí da por dónde mandar cuerpos gigantes a un endpoint que
+# es el único abierto sin sesión. 254 en el correo es el máximo que permite la
+# norma de direcciones.
+LIMITE_CORREO = 254
+LIMITE_CLAVE = 128
+LIMITE_NOMBRE = 80        # el mismo que valida auth_service.cambiar_nombre
+
+
 class PeticionLogin(BaseModel):
-    correo: str
-    clave: str
+    correo: str = Field(max_length=LIMITE_CORREO)
+    clave: str = Field(max_length=LIMITE_CLAVE)
 
 
 @router.post("/login")
@@ -132,7 +142,7 @@ def login(p: PeticionLogin, peticion: Request, respuesta: Response):
     # El cuerpo NO lleva el identificador de la sesión: si lo llevara, el
     # JavaScript podría guardárselo y volveríamos al problema que la cookie
     # HttpOnly resuelve.
-    return {"usuario": u, "horas": config.JWT_HORAS}
+    return {"usuario": u, "horas": config.SESION_HORAS}
 
 
 @router.post("/salir")
@@ -197,7 +207,7 @@ def mis_sesiones(u: dict = Depends(usuario_actual)):
 
 
 class PeticionNombre(BaseModel):
-    nombre: str
+    nombre: str = Field(max_length=LIMITE_NOMBRE)
 
 
 @router.post("/perfil/nombre")
@@ -212,8 +222,8 @@ def cambiar_nombre(p: PeticionNombre, peticion: Request, u: dict = Depends(usuar
 
 
 class PeticionCorreo(BaseModel):
-    correo: str
-    clave_actual: str
+    correo: str = Field(max_length=LIMITE_CORREO)
+    clave_actual: str = Field(max_length=LIMITE_CLAVE)
 
 
 @router.post("/perfil/correo")
@@ -236,8 +246,8 @@ def cambiar_correo(p: PeticionCorreo, peticion: Request, u: dict = Depends(usuar
 
 
 class PeticionClave(BaseModel):
-    clave_actual: str
-    clave_nueva: str = Field(min_length=config.CLAVE_MINIMA)
+    clave_actual: str = Field(max_length=LIMITE_CLAVE)
+    clave_nueva: str = Field(min_length=config.CLAVE_MINIMA, max_length=LIMITE_CLAVE)
 
 
 @router.post("/cambiar-clave")
@@ -260,10 +270,10 @@ def cambiar_clave(p: PeticionClave, peticion: Request, u: dict = Depends(usuario
 # ---------------------------------------------------------------------------
 
 class PeticionUsuario(BaseModel):
-    nombre: str
-    correo: str
-    rol: str
-    clave: str = Field(min_length=config.CLAVE_MINIMA)
+    nombre: str = Field(max_length=LIMITE_NOMBRE)
+    correo: str = Field(max_length=LIMITE_CORREO)
+    rol: str = Field(max_length=32)
+    clave: str = Field(min_length=config.CLAVE_MINIMA, max_length=LIMITE_CLAVE)
 
 
 @router.get("/usuarios")

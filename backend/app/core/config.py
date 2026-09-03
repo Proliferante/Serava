@@ -9,10 +9,7 @@ donde se ve, que a la primera petición de un usuario.
 
 Variables (ver backend/.env.example):
     DATABASE_URL      cadena de Postgres (Supabase). Obligatoria.
-    JWT_SECRET        secreto para firmar los tokens de sesión. Obligatoria
-                      en producción; en desarrollo se genera una al azar y
-                      se avisa —así nadie despliega con la de ejemplo—.
-    JWT_HORAS         duración de la sesión. Por defecto 12, que cubre una
+    SESION_HORAS      duración de la sesión. Por defecto 12, que cubre una
                       jornada sin obligar a entrar dos veces.
     CORS_ORIGINS      lista separada por comas de los dominios que pueden
                       llamar a la API. Por defecto sólo el localhost del
@@ -21,8 +18,6 @@ Variables (ver backend/.env.example):
 """
 
 import os
-import secrets
-import warnings
 
 from dotenv import load_dotenv
 
@@ -46,23 +41,12 @@ DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 
 
 # --- sesiones --------------------------------------------------------------
-JWT_ALGORITMO = "HS256"
-JWT_HORAS = int(os.environ.get("JWT_HORAS", "12"))
-
-_secreto = os.environ.get("JWT_SECRET", "").strip()
-if not _secreto:
-    # En desarrollo se genera una al azar para no obligar a configurar nada.
-    # El efecto de lado es deliberado: al reiniciar el servidor todas las
-    # sesiones caducan, que es exactamente lo que debe pasar si no hay
-    # secreto fijo. En producción hay que definirla.
-    _secreto = secrets.token_urlsafe(48)
-    warnings.warn(
-        "JWT_SECRET no está definida: se generó una al azar para esta "
-        "ejecución. Las sesiones se invalidan al reiniciar. Define "
-        "JWT_SECRET antes de desplegar.",
-        stacklevel=2,
-    )
-JWT_SECRET = _secreto
+# Ya no hay ningún secreto que configurar, y eso es la mitad del asunto: la
+# sesión es un identificador al azar cuyo estado vive en la tabla `sesiones`
+# (ver core/sesiones.py). Aquí hubo un JWT_SECRET mientras la sesión fue un
+# token firmado; al pasar a sesiones con estado, el token dejó de usarse y el
+# secreto sólo servía para avisar de que faltaba algo que ya no hacía falta.
+SESION_HORAS = int(os.environ.get("SESION_HORAS", "12"))
 
 
 # --- CORS ------------------------------------------------------------------

@@ -39,7 +39,7 @@ POR QUÉ LA ETAPA NO SE DEDUCE, SE GUARDA
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.api.auth import usuario_actual
 from app.core.database import cursor, escribir, tabla_existe
@@ -203,13 +203,26 @@ def conteos(_: dict = Depends(usuario_actual)):
 # DECISIONES
 # ---------------------------------------------------------------------------
 
+# Los topes de tamaño de aquí abajo no son burocracia: sin ellos, una
+# petición con cien mil links o con un `motivo` de diez megas la acepta
+# Pydantic tal cual y el servidor se pelea con ella hasta agotarse. Ahora
+# hace falta una sesión para llegar, así que el riesgo es de dentro, pero un
+# límite claro también evita el accidente de pegar un archivo entero en un
+# campo de texto. Los números son holgados respecto a lo que la consola manda:
+# selecciona de a lote, no de a cien mil.
+LIMITE_LINK = 600         # las URLs de los portales rondan los 120
+LIMITE_LOTE = 500         # links por decisión
+LIMITE_TEXTO = 2000       # motivo, notas
+LIMITE_NOMBRE = 120       # títulos, nombres de contacto
+
+
 class PeticionDecidir(BaseModel):
-    links: list[str]
+    links: list[str] = Field(min_length=1, max_length=LIMITE_LOTE)
     # continua        → pantalla 2: pasa a preseleccionados
     # no_continua     → pantalla 2 o 4: descartado, no vuelve a entrar
     # no_disponible   → pantalla 3: el propietario ya no lo vende
-    decision: str
-    motivo: str | None = None
+    decision: str = Field(max_length=32)
+    motivo: str | None = Field(default=None, max_length=LIMITE_TEXTO)
 
 
 @router.post("/decidir")
@@ -261,12 +274,12 @@ def decidir(p: PeticionDecidir, u: dict = Depends(usuario_actual)):
 
 
 class PeticionVisita(BaseModel):
-    link: str
-    fecha: str | None = None
-    hora: str | None = None
-    contacto_nombre: str | None = None
-    contacto_telefono: str | None = None
-    notas: str | None = None
+    link: str = Field(max_length=LIMITE_LINK)
+    fecha: str | None = Field(default=None, max_length=32)
+    hora: str | None = Field(default=None, max_length=32)
+    contacto_nombre: str | None = Field(default=None, max_length=LIMITE_NOMBRE)
+    contacto_telefono: str | None = Field(default=None, max_length=64)
+    notas: str | None = Field(default=None, max_length=LIMITE_TEXTO)
 
 
 @router.post("/visita")
@@ -313,13 +326,16 @@ def agendar_visita(p: PeticionVisita, u: dict = Depends(usuario_actual)):
 
 
 class PeticionCompletar(BaseModel):
-    link: str
-    titulo: str | None = None
-    habitaciones: int | None = None
-    banos: int | None = None
-    area_confirmada_m2: float | None = None
-    tipo_transformacion: str | None = None
-    notas_visita: str | None = None
+    link: str = Field(max_length=LIMITE_LINK)
+    titulo: str | None = Field(default=None, max_length=LIMITE_NOMBRE)
+    # Los topes de habitaciones, baños y metros no son por seguridad sino
+    # porque un dedo de más al teclear («300» baños) queda guardado y luego
+    # nadie sabe si era un error o el dato.
+    habitaciones: int | None = Field(default=None, ge=0, le=99)
+    banos: int | None = Field(default=None, ge=0, le=99)
+    area_confirmada_m2: float | None = Field(default=None, ge=0, le=100_000)
+    tipo_transformacion: str | None = Field(default=None, max_length=LIMITE_NOMBRE)
+    notas_visita: str | None = Field(default=None, max_length=LIMITE_TEXTO)
 
 
 @router.post("/completar")

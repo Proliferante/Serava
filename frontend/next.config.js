@@ -35,6 +35,35 @@ const nextConfig = {
   async headers() {
     return [
       {
+        /* Cabeceras de seguridad para TODO el sitio. Son cuatro líneas y
+           cierran cosas que de otro modo quedan abiertas por defecto:
+
+           · frame-ancestors 'self' — que nadie meta la consola ni el login en
+             un iframe dentro de su propia página para robar clics. Se deja
+             'self' y no 'none' porque las pruebas de responsive montan la
+             página en un iframe del mismo origen.
+           · nosniff — que el navegador no adivine el tipo de un archivo y
+             acabe ejecutando como script algo que se sirvió como texto.
+           · Referrer-Policy — que al salir a otro dominio no se filtre la
+             ruta completa desde la que se salió. Importa aquí: desde el flujo
+             de inmuebles se abre el anuncio del portal en otra pestaña, y esa
+             URL de origen dice en qué está trabajando el equipo.
+           · Permissions-Policy — cámara, micrófono y ubicación no se usan;
+             negarlos evita que un script de terceros los pida algún día.
+
+           No se pone una CSP completa a propósito: Next inyecta scripts en
+           línea y una CSP mal calibrada rompe el sitio en silencio. La de la
+           API sí es estricta, y ahí no hay nada que ejecutar (ver
+           `backend/app/main.py`). */
+        source: "/:path*",
+        headers: [
+          { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+      {
         // Los assets de /figma usan nombres con hash de contenido:
         // si la imagen cambia, cambia el nombre → cacheable "para siempre".
         source: "/figma/:path*",
