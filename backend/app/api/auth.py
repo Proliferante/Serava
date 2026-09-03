@@ -65,11 +65,10 @@ def usuario_actual(zq_sesion: str | None = Cookie(default=None)) -> dict:
             503, "El servidor no tiene la tabla de sesiones. Aplica database/seguridad.sql."
         )
 
-    usuario_id = sesiones.validar(zq_sesion)
-    if usuario_id is None:
-        raise sin_sesion
-
-    u = svc.por_id(usuario_id)
+    # `validar` devuelve ya el usuario: la sesión y su dueño vienen en la
+    # misma consulta, porque a un cuarto de segundo por viaje de red no vale
+    # la pena preguntar dos veces por algo que un JOIN resuelve.
+    u = sesiones.validar(zq_sesion)
     if not u:
         raise sin_sesion
     if not u["activo"]:
@@ -158,6 +157,32 @@ def salir_todas(u: dict = Depends(usuario_actual)):
 @router.get("/yo")
 def yo(u: dict = Depends(usuario_actual)):
     return {k: v for k, v in u.items() if not k.startswith("_")}
+
+
+@router.get("/politica")
+def politica():
+    """Las reglas de contraseña, para que la pantalla las diga bien.
+
+    Va sin sesión a propósito: la necesita la pantalla de cambio obligatorio,
+    que se usa antes de que nadie tenga una contraseña válida. No revela nada
+    —son las mismas reglas que el formulario tendría que explicar de todas
+    formas—.
+
+    Existe porque el mínimo estaba escrito a mano en tres sitios: aquí, en el
+    formulario de cambio y en el de crear usuario. Estaba en 12 en el backend
+    y en 8 en los dos formularios, así que la pantalla aceptaba contraseñas
+    que el servidor rechazaba con un error en inglés de Pydantic — y pasaba
+    justo en la primera entrada de cada persona nueva, que es el peor momento
+    para eso. Ahora el número vive en un solo lado.
+    """
+    return {
+        "minima": config.CLAVE_MINIMA,
+        "reglas": [
+            f"Al menos {config.CLAVE_MINIMA} caracteres.",
+            "No puede ser una contraseña común.",
+            "No puede contener tu nombre ni tu correo.",
+        ],
+    }
 
 
 @router.get("/sesiones")

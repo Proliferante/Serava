@@ -60,11 +60,15 @@ def disponible() -> bool:
 
     Aquí no se degrada a "dejar pasar", al revés que en el registro de
     intentos: una sesión que no se puede comprobar no es una sesión.
+
+    Los errores de CONEXIÓN se dejan subir a propósito. Antes se capturaba
+    todo y se devolvía False, así que una base inalcanzable se presentaba como
+    "el servidor no tiene la tabla de sesiones" — un mensaje que manda a
+    aplicar un esquema que ya estaba aplicado. Ahora la excepción llega al
+    manejador de `main.py`, que responde 503 diciendo lo que de verdad pasa:
+    que no hay conexión.
     """
-    try:
-        return tabla_existe("sesiones")
-    except Exception:
-        return False
+    return tabla_existe("sesiones")
 
 
 def crear(usuario_id: int, ip: str | None, agente: str | None) -> str:
@@ -82,8 +86,19 @@ def crear(usuario_id: int, ip: str | None, agente: str | None) -> str:
     return sid
 
 
-def validar(sid: str | None) -> int | None:
-    """Devuelve el id del usuario si la sesión sirve, o None.
+# Lo que se devuelve del usuario al validar. Coincide con `CAMPOS` de
+# auth_service, sin `clave_hash`: la sesión no necesita el hash para nada.
+_CAMPOS_USUARIO = ("u.id, u.nombre, u.correo, u.rol, u.activo, "
+                   "u.debe_cambiar_clave, u.creado_en, u.ultimo_acceso")
+
+
+def validar(sid: str | None) -> dict | None:
+    """Devuelve el usuario si la sesión sirve, o None.
+
+    UNA sola consulta, no dos. Antes se leía la sesión aquí y el usuario
+    aparte, en `auth_service.por_id`: dos viajes de ida y vuelta a Supabase
+    por cada petición, y desde aquí cada viaje cuesta un cuarto de segundo.
+    Como la sesión ya apunta al usuario, un JOIN los trae juntos.
 
     Refresca `ultima_actividad` de paso: es lo que hace que la sesión se
     mantenga mientras se trabaja y se caiga cuando no.
@@ -93,7 +108,8 @@ def validar(sid: str | None) -> int | None:
     ahora = _ahora()
     with cursor() as con:
         fila = con.execute(
-            "SELECT usuario_id, expira, ultima_actividad, revocada FROM sesiones WHERE id = ?",
+            f"SELECT s.expira, s.ultima_actividad, s.revocada, {_CAMPOS_USUARIO} "
+            "FROM sesiones s JOIN usuarios u ON u.id = s.usuario_id WHERE s.id = ?",
             (sid,),
         ).fetchone()
 
@@ -114,7 +130,8 @@ def validar(sid: str | None) -> int | None:
         except Exception as e:
             log.warning("No se pudo refrescar la sesión: %s", e)
 
-    return fila["usuario_id"]
+    return {k: v for k, v in dict(fila).items()
+            if k not in ("expira", "ultima_actividad", "revocada")}
 
 
 def revocar(sid: str) -> None:

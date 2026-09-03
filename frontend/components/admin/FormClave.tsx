@@ -22,8 +22,6 @@ import { useSesion } from "@/components/admin/sesion";
    alguien deja la pantalla abierta, que no pueda cambiarla quien pase por ahí.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const MINIMO = 8;
-
 const LINEN = "#f7f1e5";
 const CAJA_OSCURA = "h-[54px] w-full rounded-[13px] border border-solid px-[16px] text-[16px] outline-none";
 const CAJA_OSCURA_ST = { background: "rgba(247,241,229,0.06)", borderColor: "rgba(247,241,229,0.18)", color: LINEN } as const;
@@ -39,7 +37,7 @@ export default function FormClave({
   /** Se dibuja debajo del botón: el "Cerrar sesión" o el "Cancelar". */
   pie?: React.ReactNode;
 }) {
-  const { pedir, refrescar } = useSesion();
+  const { pedir, refrescar, politica } = useSesion();
   const [actual, setActual] = useState("");
   const [nueva, setNueva] = useState("");
   const [repetida, setRepetida] = useState("");
@@ -53,8 +51,8 @@ export default function FormClave({
     /* Las dos comprobaciones que se pueden hacer sin ir al servidor. El resto
        —que la actual sea correcta, que la nueva sea distinta— lo valida el
        backend, que es quien sabe. */
-    if (nueva.length < MINIMO) {
-      setError(`La contraseña nueva debe tener al menos ${MINIMO} caracteres.`);
+    if (nueva.length < politica.minima) {
+      setError(`La contraseña nueva debe tener al menos ${politica.minima} caracteres.`);
       return;
     }
     if (nueva !== repetida) {
@@ -107,8 +105,18 @@ export default function FormClave({
       {campo("cc-actual", temporal ? "Contraseña temporal" : "Contraseña actual",
              actual, setActual, "current-password", { primero: true })}
       {campo("cc-nueva", "Contraseña nueva", nueva, setNueva, "new-password",
-             { marcador: `Al menos ${MINIMO} caracteres` })}
+             { marcador: `Al menos ${politica.minima} caracteres` })}
       {campo("cc-rep", "Repítela", repetida, setRepetida, "new-password")}
+
+      {/* Las reglas se enseñan antes, no después de un error. Las tres las
+          aplica el servidor; venir de él evita que la pantalla prometa algo
+          distinto de lo que se va a aceptar. */}
+      <ul
+        className={oscuro ? "mt-[14px] list-none p-0" : "hint"}
+        style={oscuro ? { color: "rgba(247,241,229,0.5)", fontSize: 12.5, lineHeight: 1.5 } : { marginTop: 10 }}
+      >
+        {politica.reglas.map((r) => <li key={r}>· {r}</li>)}
+      </ul>
 
       {error && (
         <p role="alert"

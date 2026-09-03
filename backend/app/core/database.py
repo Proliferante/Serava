@@ -26,8 +26,14 @@ from app.services.admin import db_admin as _db
 
 @contextmanager
 def cursor():
-    """Conexión de sólo lectura. Se cierra al salir del bloque."""
-    con = _db.conectar()
+    """Conexión de sólo lectura. Se devuelve al pool al salir del bloque.
+
+    Va en autocommit (ver `db_admin.conectar`): sin eso, el SELECT abriría una
+    transacción implícita que habría que deshacer al soltar la conexión, y ese
+    rollback es otro viaje de ida y vuelta a Supabase. Con la latencia de
+    aquí, era la mitad del coste de cada lectura.
+    """
+    con = _db.conectar(solo_lectura=True)
     try:
         yield con
     finally:

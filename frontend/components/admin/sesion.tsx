@@ -42,8 +42,27 @@ export type Usuario = {
    medir. Mismo patrón que `ScaledCanvas`. */
 const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
+/** Las reglas de contraseña, tal como las manda el backend. */
+export type Politica = { minima: number; reglas: string[] };
+
+/* Sólo se usa mientras la respuesta del servidor está en camino, o si esa
+   llamada falla. Tiene que coincidir con `CLAVE_MINIMA` de
+   `backend/app/core/config.py`; si algún día no coincide, el servidor manda
+   —él es quien valida— y el formulario se corrige solo en cuanto responde
+   `/api/auth/politica`. */
+const POLITICA_POR_DEFECTO: Politica = {
+  minima: 12,
+  reglas: [
+    "Al menos 12 caracteres.",
+    "No puede ser una contraseña común.",
+    "No puede contener tu nombre ni tu correo.",
+  ],
+};
+
 type Ctx = {
   usuario: Usuario | null;
+  /** Las reglas que aplica el servidor, para no contradecirlo en pantalla. */
+  politica: Politica;
   /** `false` hasta que se preguntó a `/yo`. Evita el parpadeo. */
   listo: boolean;
   entrar: (correo: string, clave: string) => Promise<void>;
@@ -77,6 +96,7 @@ async function mensajeDeError(r: Response): Promise<string> {
 
 export function SesionProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [politica, setPolitica] = useState<Politica>(POLITICA_POR_DEFECTO);
   const [listo, setListo] = useState(false);
 
   /**
@@ -108,6 +128,13 @@ export function SesionProvider({ children }: { children: ReactNode }) {
        navegador de todo el equipo es basura con pinta de credencial. Se borra
        la primera vez que cada quien entra con la versión nueva. */
     try { window.sessionStorage.removeItem("zq:admin:token"); } catch { /* da igual */ }
+
+    /* La política se pide sin sesión, porque la necesita la pantalla de cambio
+       obligatorio: ahí el usuario está dentro pero aún no tiene contraseña
+       propia. Si falla, se queda el valor por defecto. */
+    fetch("/api/auth/politica")
+      .then(async (r) => { if (vivo && r.ok) setPolitica(await r.json()); })
+      .catch(() => { /* se queda el valor por defecto */ });
 
     fetch("/api/auth/yo", { credentials: "same-origin" })
       .then(async (r) => {
@@ -161,7 +188,7 @@ export function SesionProvider({ children }: { children: ReactNode }) {
   }, [pedir]);
 
   return (
-    <C.Provider value={{ usuario, listo, entrar, salir, pedir, refrescar }}>
+    <C.Provider value={{ usuario, politica, listo, entrar, salir, pedir, refrescar }}>
       {children}
     </C.Provider>
   );

@@ -40,7 +40,9 @@ function claveAlAzar(n = 14) {
   return Array.from(buf, (v) => ALFABETO[v % ALFABETO.length]).join("");
 }
 
-function FormCrear({ onCrear, onCancelar }: {
+function FormCrear({ minima, onCrear, onCancelar }: {
+  /** El mínimo que exige el servidor. Ver `politica` en sesion.tsx. */
+  minima: number;
   onCrear: (d: { nombre: string; correo: string; rol: Rol; clave: string }) => void;
   onCancelar: () => void;
 }) {
@@ -53,7 +55,7 @@ function FormCrear({ onCrear, onCancelar }: {
   const enviar = () => {
     if (!nombre.trim()) { setError("Escribe el nombre."); return; }
     if (!correo.includes("@")) { setError("El correo no es válido."); return; }
-    if (clave.length < 8) { setError("La contraseña temporal necesita 8 caracteres o más."); return; }
+    if (clave.length < minima) { setError(`La contraseña temporal necesita ${minima} caracteres o más.`); return; }
     setError(null);
     onCrear({ nombre: nombre.trim(), correo: correo.trim(), rol, clave });
   };
@@ -98,7 +100,7 @@ function FormCrear({ onCrear, onCancelar }: {
 
 export default function Usuarios() {
   const { modal, av } = useConsola();
-  const { pedir, usuario: yo } = useSesion();
+  const { pedir, usuario: yo, politica } = useSesion();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,6 +123,7 @@ export default function Usuarios() {
   const crear = () => {
     modal("Crear usuario interno", (cierra) => (
       <FormCrear
+        minima={politica.minima}
         onCancelar={cierra}
         onCrear={async (d) => {
           try {

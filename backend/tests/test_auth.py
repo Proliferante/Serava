@@ -114,7 +114,10 @@ def base(monkeypatch):
         return sid
 
     def validar(sid):
-        return abiertas.get(sid) if sid else None
+        """Devuelve el usuario, no su id: `validar` trae los dos en un JOIN
+        para no gastar dos viajes a la base por petición."""
+        uid = abiertas.get(sid) if sid else None
+        return por_id(uid) if uid else None
 
     def revocar(sid):
         abiertas.pop(sid, None)
