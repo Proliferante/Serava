@@ -98,8 +98,14 @@ def listar() -> list[dict]:
 
 
 def crear(nombre: str, correo: str, rol: str, clave: str,
-          debe_cambiar_clave: bool = True) -> dict:
-    """Crea un usuario interno. Sólo lo llama un admin (o el script de siembra)."""
+          debe_cambiar_clave: bool = False) -> dict:
+    """Crea un usuario interno. Sólo lo llama un admin (o el script de siembra).
+
+    La contraseña con la que nace la cuenta es la de siempre, no una de un solo
+    uso: por eso `debe_cambiar_clave` es falso por defecto. Sólo lo pone en
+    cierto `crear_usuarios.py --azar`, que reparte contraseñas generadas a
+    máquina y que sí conviene cambiar al entrar.
+    """
     correo = normalizar_correo(correo)
     nombre = (nombre or "").strip()
 
@@ -170,6 +176,66 @@ def cambiar_clave(usuario_id: int, clave_actual: str, clave_nueva: str,
             "UPDATE usuarios SET clave_hash = ?, debe_cambiar_clave = FALSE WHERE id = ?",
             (security.hashear(clave_nueva), usuario_id),
         )
+
+
+def cambiar_nombre(usuario_id: int, nombre: str) -> dict:
+    """Cambia el nombre que se muestra. No afecta a la identidad.
+
+    El nombre es sólo etiqueta —aparece en la barra y en el `responsable` de
+    cada decisión—, así que se puede cambiar sin más comprobaciones. Lo ya
+    escrito en `seguimiento_propiedades` conserva el nombre de entonces, y eso
+    es lo correcto: dice quién lo decidió, con el nombre que usaba.
+    """
+    nombre = (nombre or "").strip()
+    if len(nombre) < 2:
+        raise ErrorAuth("El nombre no puede tener menos de dos letras.")
+    if len(nombre) > 80:
+        raise ErrorAuth("El nombre es demasiado largo.")
+
+    with escribir() as con:
+        fila = con.execute(
+            f"UPDATE usuarios SET nombre = ? WHERE id = ? RETURNING {CAMPOS}",
+            (nombre, usuario_id),
+        ).fetchone()
+    if not fila:
+        raise ErrorAuth("No existe ese usuario.")
+    return dict(fila)
+
+
+def cambiar_correo(usuario_id: int, correo_nuevo: str, clave_actual: str) -> dict:
+    """Cambia el correo, que ES la identidad con la que se entra.
+
+    Por eso pide la contraseña actual, igual que el cambio de contraseña: si
+    alguien deja la consola abierta, que no pueda quedarse con la cuenta
+    cambiándole el correo de acceso.
+
+    Quien llama debe cerrar las demás sesiones después: la identidad cambió.
+    """
+    correo_nuevo = normalizar_correo(correo_nuevo)
+    if "@" not in correo_nuevo or "." not in correo_nuevo.split("@")[-1]:
+        raise ErrorAuth(f"Correo inválido: {correo_nuevo!r}")
+
+    with cursor() as con:
+        fila = con.execute(
+            "SELECT correo, clave_hash FROM usuarios WHERE id = ?", (usuario_id,)
+        ).fetchone()
+    if not fila:
+        raise ErrorAuth("No existe ese usuario.")
+    if not security.verificar(clave_actual, fila["clave_hash"]):
+        raise ErrorAuth("La contraseña no es correcta.")
+    if fila["correo"] == correo_nuevo:
+        raise ErrorAuth("Ese ya es tu correo.")
+
+    otro = por_correo(correo_nuevo)
+    if otro and otro["id"] != usuario_id:
+        raise ErrorAuth(f"Ya hay una cuenta con el correo {correo_nuevo}.")
+
+    with escribir() as con:
+        actualizada = con.execute(
+            f"UPDATE usuarios SET correo = ? WHERE id = ? RETURNING {CAMPOS}",
+            (correo_nuevo, usuario_id),
+        ).fetchone()
+    return dict(actualizada)
 
 
 def activar(usuario_id: int, activo: bool) -> dict:

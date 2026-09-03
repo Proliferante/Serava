@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { MCuerpo, MPie, useConsola } from "@/components/admin/ctx";
 import { useSesion } from "@/components/admin/sesion";
-import { CSV_SCRAPING, TRANSFORMACIONES } from "@/components/admin/data";
+import { CSV_SCRAPING, TRANSFORMACIONES, tituloDelEnlace } from "@/components/admin/data";
 import { Card, Hint, IcoCheck, IcoDown, IcoExt, MkChip, SecTitle, Tabla } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -100,9 +100,10 @@ function Vacio({ children }: { children: ReactNode }) {
 }
 
 function Info({ x }: { x: Inmueble }) {
+  const titulo = x.titulo || tituloDelEnlace(x.link);
   return (
     <>
-      <div className="pname">{x.titulo || "(sin título)"}</div>
+      <div className="pname">{titulo || "(sin título)"}</div>
       <div className="pzone">{x.zona} · {x.ciudad}</div>
     </>
   );
@@ -176,7 +177,10 @@ function FormCompletar({ x, onPublicar, onCancelar }: {
   onPublicar: (d: { titulo: string; habitaciones: string; banos: string; area: string; tipo: string; notas: string }) => void;
   onCancelar: () => void;
 }) {
-  const [titulo, setTitulo] = useState(x.titulo ?? "");
+  // Se propone el título que ya se está viendo en la tabla —el del anuncio, o
+  // el que se saca de su enlace— para no obligar a reescribirlo. Es editable:
+  // lo que quede aquí es lo que gana de aquí en adelante.
+  const [titulo, setTitulo] = useState(x.titulo || tituloDelEnlace(x.link) || "");
   const [hab, setHab] = useState(x.habitaciones != null ? String(x.habitaciones) : "");
   const [ban, setBan] = useState(x.banos != null ? String(x.banos) : "");
   const [area, setArea] = useState(
@@ -473,11 +477,11 @@ export default function FlujoInmuebles() {
                 </Hint>
               )}
 
-              <Tabla ancho="md">
+              <Tabla ancho="lg">
                 <thead>
                   <tr>
                     <th>Inmueble</th><th className="num">Precio</th><th className="num">m²</th>
-                    <th className="num">$/m²</th><th>Scraping</th>
+                    <th className="num">$/m²</th><th>Scraping</th><th>Publicación</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -497,6 +501,9 @@ export default function FlujoInmuebles() {
                         )}
                       </td>
                       <td>{(x.fecha_extraccion || "").slice(0, 10) || "—"}</td>
+                      {/* Lo primero que se quiere hacer con una fila del
+                          scraping es abrir el anuncio y mirarlo. */}
+                      <td><Url x={x} texto="Ver anuncio" /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -574,8 +581,8 @@ export default function FlujoInmuebles() {
               <Tabla ancho="lg">
                 <thead>
                   <tr>
-                    <th>Inmueble</th><th className="num">Precio</th><th>Contacto</th>
-                    <th style={{ textAlign: "right" }}>Acción</th>
+                    <th>Inmueble</th><th className="num">Precio</th><th>Publicación</th>
+                    <th>Contacto</th><th style={{ textAlign: "right" }}>Acción</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -585,6 +592,10 @@ export default function FlujoInmuebles() {
                       <tr key={x.link}>
                         <td><Info x={x} /></td>
                         <td className="num">{precio(x)}</td>
+                        {/* El anuncio original, también aquí: antes de llamar al
+                            propietario hay que poder mirar las fotos y el detalle
+                            otra vez, y volver a la pantalla 2 para eso era absurdo. */}
+                        <td><Url x={x} /></td>
                         <td>
                           <div className="tacts-wrap">
                             <button type="button" className="btn btn-wa btn-mini" onClick={() => whatsapp(x)}>
@@ -623,9 +634,12 @@ export default function FlujoInmuebles() {
         <div className="flow-panel active">
           {estado() ?? (!filas.length ? <Vacio>No hay visitas agendadas.</Vacio> : (
             <Card style={{ padding: "6px 6px 2px" }}>
-              <Tabla ancho="md">
+              <Tabla ancho="lg">
                 <thead>
-                  <tr><th>Inmueble</th><th>Visita</th><th style={{ textAlign: "right" }}>Tras la visita</th></tr>
+                  <tr>
+                    <th>Inmueble</th><th>Visita</th><th>Publicación</th>
+                    <th style={{ textAlign: "right" }}>Tras la visita</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {filas.map((x) => (
@@ -638,6 +652,9 @@ export default function FlujoInmuebles() {
                             : "Por confirmar"}
                         </span>
                       </td>
+                      {/* Para revisarlo camino a la visita, o justo antes de
+                          decidir si continúa. */}
+                      <td><Url x={x} /></td>
                       <td>
                         <div className="tacts-wrap">
                           <button type="button" className="btn btn-primary btn-mini" onClick={() => completar(x)}>
@@ -713,9 +730,14 @@ export default function FlujoInmuebles() {
                     <tr key={x.link}>
                       <td><Info x={x} /></td>
                       <td>
-                        <span className="est e-desc">
-                          {x.motivo_no_pasa || x.motivo_no_disponible || "Descartado"}
-                        </span>
+                        {/* El motivo lo escribe una persona y suele ser una frase
+                            entera: dentro del chip salía en mayúsculas, a gritos.
+                            El chip se queda para cuando no hay motivo escrito. */}
+                        {x.motivo_no_pasa || x.motivo_no_disponible
+                          ? <span style={{ fontSize: ".83rem", color: "var(--mocha)" }}>
+                              {x.motivo_no_pasa || x.motivo_no_disponible}
+                            </span>
+                          : <span className="est e-desc">Descartado</span>}
                       </td>
                       <td><Url x={x} texto="Ver" /></td>
                     </tr>

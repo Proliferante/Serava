@@ -2,8 +2,7 @@
 
 import { useMemo, useState } from "react";
 import AvisoPantalla from "@/components/responsive/AvisoPantalla";
-import FormClave from "@/components/admin/FormClave";
-import { ConsolaProvider, MCuerpo, useConsola } from "@/components/admin/ctx";
+import { ConsolaProvider } from "@/components/admin/ctx";
 import { puedeVer, useSesion } from "@/components/admin/sesion";
 import { PREDIOS_SEED, type Predio, type VistaKey } from "@/components/admin/data";
 import Arquitectura from "@/components/admin/views/Arquitectura";
@@ -16,6 +15,7 @@ import GestionPredio from "@/components/admin/views/GestionPredio";
 import NuevoPredio from "@/components/admin/views/NuevoPredio";
 import PanelGeneral from "@/components/admin/views/PanelGeneral";
 import Predios from "@/components/admin/views/Predios";
+import MiCuenta from "@/components/admin/views/MiCuenta";
 import Usuarios from "@/components/admin/views/Usuarios";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -65,6 +65,12 @@ const GRUPOS: { g: string; items: Item[] }[] = [
     g: "Administración",
     items: [{ k: "equipo", l: "Equipo & permisos", d: "M4 21c0-4 4-6 8-6s8 2 8 6", circulo: true }],
   },
+  {
+    /* Grupo propio al final: no es operación ni administración del equipo, son
+       los datos de quien está usando la consola. */
+    g: "Tu cuenta",
+    items: [{ k: "cuenta", l: "Mi cuenta", d: "M4 21c0-4 4-6 8-6s8 2 8 6", circulo: true }],
+  },
 ];
 
 /** Iniciales para el avatar de la barra: "Nati C." → "NC". */
@@ -78,38 +84,6 @@ const ROL_ETIQUETA: Record<string, string> = {
   data: "Data",
   comercial: "Comercial",
 };
-
-/**
- * "Cambiar contraseña" del pie del menú. Es un componente aparte porque tiene
- * que estar DENTRO de `ConsolaProvider` para poder abrir su modal, y
- * `AdminConsole` es quien lo declara: no puede usar su propio contexto.
- *
- * Existe porque los usuarios que siembra el script entran con contraseña
- * conocida y sin obligación de cambiarla. Sin esta entrada no tendrían por
- * dónde hacerlo: la pantalla de cambio obligatorio sólo aparece cuando la
- * contraseña es temporal.
- */
-function BotonCambiarClave() {
-  const { modal, av } = useConsola();
-
-  const abrir = () => {
-    modal("Cambiar tu contraseña", (cierra) => (
-      <MCuerpo>
-        <FormClave
-          estilo="claro"
-          onHecho={() => { cierra(); av("Contraseña cambiada"); }}
-          pie={<button type="button" className="btn btn-ghost" onClick={cierra}>Cancelar</button>}
-        />
-      </MCuerpo>
-    ));
-  };
-
-  return (
-    <button type="button" className="pnl-link" style={{ marginTop: 8, color: "var(--sand)" }} onClick={abrir}>
-      Cambiar contraseña
-    </button>
-  );
-}
 
 export default function AdminConsole() {
   const { usuario, salir } = useSesion();
@@ -173,8 +147,6 @@ export default function AdminConsole() {
 
             <div className="foot">
               ZEQUARA · v0.1 interna<br />Acceso restringido al equipo.
-              <br />
-              <BotonCambiarClave />
               <br />
               <button type="button" className="pnl-link" style={{ marginTop: 6, color: "var(--sand)" }} onClick={() => void salir()}>
                 Cerrar sesión
@@ -240,6 +212,7 @@ export default function AdminConsole() {
                   {vista === "data" && <DataScore />}
                   {vista === "comercial" && <Comercial abrirGestion={abrirGestion} />}
                   {vista === "equipo" && <Usuarios />}
+                  {vista === "cuenta" && <MiCuenta />}
                   {vista === "gestion" && <GestionPredio />}
                 </>
               )}

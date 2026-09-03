@@ -7,7 +7,7 @@ import {
   miles, muestra, postExtraer, postSeguimiento,
   type AggZona, type Fila, type Resumen, type ZonaMuestra,
 } from "@/components/admin/api";
-import { CSV_COLS, MOTIVOS_DESCARTE, type Predio } from "@/components/admin/data";
+import { CSV_COLS, MOTIVOS_DESCARTE, tituloDelEnlace, type Predio } from "@/components/admin/data";
 import { Btn, Card, Hint, IcoBack, IcoCheck, IcoDown, IcoExt, MkChip, SecTitle, Tabla, VHead } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -357,7 +357,7 @@ export default function Extraccion({ onEnviarARevision }: { onEnviarARevision: (
     setRows((rs) => rs.map((r) => filas.some((f) => f.id === r.id) ? { ...r, sent: true } : r));
     onEnviarARevision(filas.map((r) => ({
       id: "ex_" + r.id,
-      nombre: (r.titulo || "Predio sin título").slice(0, 60),
+      nombre: (r.titulo || tituloDelEnlace(r.link) || "Predio sin título").slice(0, 60),
       zona: `${r.zona} · ${r.ciudad} · desde ${r.portal}`,
       est: "bor", score: "—", inversion: fmtPrecio(r.precio, r.mon),
       area: "arq" as const,
@@ -639,7 +639,7 @@ export default function Extraccion({ onEnviarARevision }: { onEnviarARevision: (
                       ? <td className="num" title={x.prioridad || ""}><b>{x.score}</b></td>
                       : <td className="num hint">—</td>}
                     <td>
-                      <div className="pname">{x.titulo || "(sin título)"}</div>
+                      <div className="pname">{x.titulo || tituloDelEnlace(x.link) || "(sin título)"}</div>
                       <div className="pzone">{x.tipo} · {x.hab} hab · {x.ban} baños</div>
                     </td>
                     <td>

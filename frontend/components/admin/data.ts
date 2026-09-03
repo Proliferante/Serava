@@ -12,7 +12,7 @@
 
 export type VistaKey =
   | "panel" | "predios" | "extraccion" | "flujo" | "nuevo" | "comite"
-  | "arq" | "data" | "comercial" | "equipo" | "gestion";
+  | "arq" | "data" | "comercial" | "equipo" | "gestion" | "cuenta";
 
 export type AreaKey = "arq" | "data" | "com";
 
@@ -191,3 +191,23 @@ export const CSV_COLS = [
 
 /** Las cuatro ciudades con zonas monitoreadas en Data & Score. */
 export const CIUDADES_DATA = ["Bogotá", "Medellín", "Cartagena", "Ciudad de Panamá"];
+
+/* Los anuncios de encuentra24 llegan sin `titulo` —de 11.622 filas, 2.858 lo
+   traen vacío, y son justo las de la última extracción—, así que la pantalla
+   se llenaba de "(sin título)" y no se distinguía una fila de otra. El propio
+   enlace lleva la descripción del portal en la ruta:
+
+     .../venta-de-apartamento-en-marbella-con-vista-al-mar/30971715
+
+   De ahí sale el título. No se inventa nada: es el texto que el portal puso
+   en su URL. Si tampoco hay enlace del que sacarlo, se dice que no hay. */
+export function tituloDelEnlace(link?: string | null): string | null {
+  if (!link) return null;
+  const partes = link.split("?")[0].split("#")[0].split("/").filter(Boolean);
+  // El último tramo suele ser el código del anuncio (30971715): se salta.
+  const tramo = [...partes].reverse().find((t) => /[a-z]{3}/i.test(t) && t.includes("-"));
+  if (!tramo) return null;
+  const texto = decodeURIComponent(tramo).replace(/-/g, " ").replace(/\s+/g, " ").trim();
+  if (texto.length < 8) return null;
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}

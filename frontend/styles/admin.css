@@ -92,6 +92,8 @@
 .adm .kpi.alert .ic svg{stroke:var(--terra);}
 .adm .sectitle{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--caramel);font-weight:600;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
 .adm .sectitle .see{color:var(--sage-deep);cursor:pointer;}
+/* El mismo enlace cuando es un boton de verdad, para llegar con el teclado. */
+.adm .sectitle button.see{background:none;border:0;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;}
 .adm .area-chip{font-size:.62rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:6px;color:#fff;}
 .adm .a-arq{background:var(--arq);}
 .adm .a-data{background:var(--data);}

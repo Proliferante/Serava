@@ -221,6 +221,8 @@ export const PERMISOS: Record<string, Rol[]> = {
   data: ROLES_TODOS,
   comercial: ROLES_TODOS,
   gestion: ROLES_TODOS,
+  /* Su propia cuenta la ve cualquiera: son sus datos. */
+  cuenta: ROLES_TODOS,
   /* El único cerrado hoy: lo exige también el backend, así que esconderlo no
      es la protección, es no ofrecer una puerta que da 403. */
   equipo: ["admin"],

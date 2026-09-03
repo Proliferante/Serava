@@ -14,11 +14,10 @@ import { AreaChip, Card, EstLibre, Grid, IcoPlus, SecTitle, Tabla, VHead } from 
    (`Depends(solo_admin)` en /api/auth/usuarios). Esconder el módulo es
    comodidad; lo que protege es el 403 del servidor.
 
-   La contraseña que se pone al crear es TEMPORAL por definición: viaja por
-   chat o correo hasta su dueño, así que el usuario nuevo entra con ella y la
-   consola le exige cambiarla antes de dejarlo trabajar (ver CambiarClave).
-   Por eso el formulario la muestra en claro mientras se escribe —hay que
-   poder copiarla para enviarla— y por eso se avisa de que es de un solo uso.
+   La contraseña que se pone al crear es la de siempre, no una de un solo
+   uso: su dueño entra con ella, trabaja, y la cambia cuando quiera desde
+   «Mi cuenta». El formulario la muestra en claro mientras se escribe porque
+   hay que poder copiarla para enviársela.
 
    Dar de baja no borra: el rastro de quién descartó qué inmueble tiene que
    sobrevivir a la salida de la persona.
@@ -55,7 +54,7 @@ function FormCrear({ minima, onCrear, onCancelar }: {
   const enviar = () => {
     if (!nombre.trim()) { setError("Escribe el nombre."); return; }
     if (!correo.includes("@")) { setError("El correo no es válido."); return; }
-    if (clave.length < minima) { setError(`La contraseña temporal necesita ${minima} caracteres o más.`); return; }
+    if (clave.length < minima) { setError(`La contraseña necesita ${minima} caracteres o más.`); return; }
     setError(null);
     onCrear({ nombre: nombre.trim(), correo: correo.trim(), rol, clave });
   };
@@ -76,14 +75,15 @@ function FormCrear({ minima, onCrear, onCancelar }: {
           ))}
         </select>
 
-        <label htmlFor="u-clave">Contraseña temporal</label>
+        <label htmlFor="u-clave">Contraseña</label>
         <div style={{ display: "flex", gap: 8 }}>
           <input className="t" id="u-clave" value={clave} onChange={(e) => setClave(e.target.value)} style={{ fontFamily: "monospace" }} />
           <button type="button" className="btn btn-ghost btn-mini" onClick={() => setClave(claveAlAzar())}>Otra</button>
         </div>
         <div className="hint" style={{ marginTop: 8 }}>
-          Cópiala y mándasela por un canal privado. Al entrar, la consola le pedirá cambiarla
-          antes de dejarlo trabajar.
+          Se genera una al azar, pero puedes escribir la que quieras. Cópiala y mándasela por
+          un canal privado: con ella entra y trabaja, y la cambia cuando le parezca desde
+          &laquo;Mi cuenta&raquo;.
         </div>
 
         {error && (
@@ -129,7 +129,7 @@ export default function Usuarios() {
           try {
             await pedir("/api/auth/usuarios", { method: "POST", body: JSON.stringify(d) });
             cierra();
-            av(`${d.correo} creado · mándale la contraseña temporal`);
+            av(`${d.correo} creado · mándale su contraseña`);
             await cargar();
           } catch (err) {
             av((err as Error).message);
@@ -198,9 +198,13 @@ export default function Usuarios() {
                         ? <EstLibre c="e-pub">Administrador</EstLibre>
                         : <AreaChip a={u.rol === "arquitectura" ? "arq" : u.rol === "data" ? "data" : "com"} />}
                     </td>
+                    {/* "Debe cambiar clave" ya no sale al crear una cuenta desde
+                        aquí: esas nacen con contraseña normal. Queda para las que
+                        reparte `scripts/crear_usuarios.py --azar`, que sí son de un
+                        solo uso y a las que la consola exige el cambio al entrar. */}
                     <td>
                       {!u.activo ? <EstLibre c="e-desc">Desactivado</EstLibre>
-                        : u.debe_cambiar_clave ? <EstLibre c="e-nuevo">Clave temporal</EstLibre>
+                        : u.debe_cambiar_clave ? <EstLibre c="e-nuevo">Debe cambiar clave</EstLibre>
                         : <EstLibre c="e-res">Activo</EstLibre>}
                     </td>
                     <td className="pzone">

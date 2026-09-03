@@ -196,6 +196,45 @@ def mis_sesiones(u: dict = Depends(usuario_actual)):
     return {"sesiones": lista}
 
 
+class PeticionNombre(BaseModel):
+    nombre: str
+
+
+@router.post("/perfil/nombre")
+def cambiar_nombre(p: PeticionNombre, peticion: Request, u: dict = Depends(usuario_actual)):
+    """Cambia el nombre que se muestra. Sin contraseña: no es la identidad."""
+    try:
+        actualizado = svc.cambiar_nombre(u["id"], p.nombre)
+    except svc.ErrorAuth as e:
+        raise HTTPException(400, str(e)) from e
+    bitacora.anotar(u, "cambiar-nombre", actualizado["nombre"], ip=intentos.ip_de(peticion))
+    return {"ok": True, "usuario": actualizado}
+
+
+class PeticionCorreo(BaseModel):
+    correo: str
+    clave_actual: str
+
+
+@router.post("/perfil/correo")
+def cambiar_correo(p: PeticionCorreo, peticion: Request, u: dict = Depends(usuario_actual)):
+    """Cambia el correo de acceso. Pide la contraseña porque ES la identidad.
+
+    Y cierra las demás sesiones: la cuenta se entra con otro correo desde
+    ahora, así que las sesiones abiertas con el anterior no deberían seguir.
+    """
+    anterior = u["correo"]
+    try:
+        actualizado = svc.cambiar_correo(u["id"], p.correo, p.clave_actual)
+    except svc.ErrorAuth as e:
+        raise HTTPException(400, str(e)) from e
+
+    n = sesiones.revocar_todas(u["id"], excepto=u["_sesion"])
+    bitacora.anotar(u, "cambiar-correo", f"{anterior} → {actualizado['correo']}",
+                    ip=intentos.ip_de(peticion))
+    return {"ok": True, "usuario": actualizado, "sesiones_cerradas": n}
+
+
 class PeticionClave(BaseModel):
     clave_actual: str
     clave_nueva: str = Field(min_length=config.CLAVE_MINIMA)
@@ -235,9 +274,16 @@ def usuarios(_: dict = Depends(solo_admin)):
 @router.post("/usuarios")
 def crear_usuario(p: PeticionUsuario, peticion: Request, admin: dict = Depends(solo_admin)):
     try:
-        # Siempre con `debe_cambiar_clave`: la contraseña que pone el admin
-        # viaja por chat o correo, así que es temporal por definición.
-        nuevo = svc.crear(p.nombre, p.correo, p.rol, p.clave, debe_cambiar_clave=True)
+        # La cuenta nace con contraseña normal, no temporal: su dueño entra y
+        # trabaja, y la cambia cuando quiera desde «Mi cuenta». Antes se
+        # creaba con `debe_cambiar_clave` y la consola le exigía cambiarla en
+        # la primera entrada; era un paso de más para un equipo de seis
+        # personas que recibe la contraseña de un administrador de confianza.
+        #
+        # La bandera sigue existiendo en la tabla y la usa
+        # `scripts/crear_usuarios.py --azar`, que sí reparte contraseñas de un
+        # solo uso — ahí forzar el cambio es lo correcto.
+        nuevo = svc.crear(p.nombre, p.correo, p.rol, p.clave, debe_cambiar_clave=False)
     except svc.ErrorAuth as e:
         raise HTTPException(400, str(e)) from e
 
