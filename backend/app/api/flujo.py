@@ -59,7 +59,15 @@ CRITERIOS = [
 
 # Lo que necesitan las cinco pantallas de cada inmueble.
 SELECCION = """
-    c.link, c.titulo, c.zona, c.ciudad, c.pais, c.moneda, c.portal,
+    c.link,
+    -- El título que confirmó arquitectura al completar (d.titulo) gana sobre
+    -- el que traía el anuncio (c.titulo). Antes sólo se leía el del anuncio,
+    -- así que lo que se escribía en "completar" no volvía a verse nunca — y en
+    -- Panamá muchos anuncios vienen sin título, con lo que la pantalla 5
+    -- quedaba en "(sin título)" después de haberlo escrito a mano.
+    COALESCE(d.titulo, c.titulo) AS titulo,
+    c.titulo AS titulo_anuncio,
+    c.zona, c.ciudad, c.pais, c.moneda, c.portal,
     c.tipo_inmueble, c.precio_venta, c.area_m2, c.precio_m2,
     c.mediana_precio_m2_zona, c.habitaciones, c.banos,
     c.precio_m2_clasificacion, c.fecha_extraccion,

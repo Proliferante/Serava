@@ -32,6 +32,17 @@ import secrets
 import string
 import sys
 
+# La consola de Windows viene en cp1252, que no puede escribir ni "ñ" ni los
+# caracteres de dibujo. Sin esto, el script CREA los usuarios y luego revienta
+# al imprimir el resumen — con las contraseñas ya generadas y perdidas, que es
+# la peor forma posible de fallar. Se fuerza UTF-8 en la salida, y el separador
+# de abajo va en ASCII por si algún terminal tampoco lo acepta.
+for _flujo in (sys.stdout, sys.stderr):
+    try:
+        _flujo.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 from app.core import config, security
 from app.core.database import escribir, tabla_existe
 from app.services import auth_service as svc
@@ -109,10 +120,10 @@ def main() -> int:
     ancho = max(len(c) for _, c, _ in EQUIPO) + 2
     print()
     print("  CONTRASEÑAS TEMPORALES — se muestran una sola vez")
-    print("  " + "─" * (ancho + 34))
+    print("  " + "-" * (ancho + 44))
     for correo, rol, clave, nota in resultados:
-        print(f"  {correo:<{ancho}} {rol:<13} {clave or '—':<15} {nota}")
-    print("  " + "─" * (ancho + 34))
+        print(f"  {correo:<{ancho}} {rol:<13} {clave or '-':<15} {nota}")
+    print("  " + "-" * (ancho + 44))
     print("  Repártelas por un canal privado. Al entrar, cada quien tiene que")
     print("  cambiarla antes de poder trabajar.")
     print()

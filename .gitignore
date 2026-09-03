@@ -10,6 +10,10 @@ dist/
 .env
 .env.local
 
+# Salida de scripts/crear_usuarios.py: contraseñas temporales en claro.
+# Se reparten y se borra el archivo.
+claves-temporales*.txt
+
 # --- Python ----------------------------------------------------------------
 .venv/
 venv/
