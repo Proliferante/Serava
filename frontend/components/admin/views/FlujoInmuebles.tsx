@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { MCuerpo, MPie, useConsola } from "@/components/admin/ctx";
 import { useSesion } from "@/components/admin/sesion";
 import { CSV_SCRAPING, TRANSFORMACIONES } from "@/components/admin/data";
-import { Card, Hint, IcoCheck, IcoDown, IcoExt, SecTitle, Tabla } from "@/components/admin/ui";
+import { Card, Hint, IcoCheck, IcoDown, IcoExt, MkChip, SecTitle, Tabla } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FLUJO DE INMUEBLES — del scraping a la publicación.
@@ -256,6 +256,8 @@ export default function FlujoInmuebles() {
 
   const [panel, setPanel] = useState<PanelKey>("p1");
   const [filas, setFilas] = useState<Inmueble[]>([]);
+  /** Cuántos hay en la etapa, que no es lo mismo que cuántos se trajeron. */
+  const [total, setTotal] = useState(0);
   const [conteos, setConteos] = useState<Record<Etapa, number> | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -267,10 +269,11 @@ export default function FlujoInmuebles() {
     setError(null);
     try {
       const [lista, n] = await Promise.all([
-        pedir<{ filas: Inmueble[] }>(`/api/admin/flujo?etapa=${e}`),
+        pedir<{ filas: Inmueble[]; total: number }>(`/api/admin/flujo?etapa=${e}`),
         pedir<Record<Etapa, number>>("/api/admin/flujo/conteos"),
       ]);
       setFilas(lista.filas);
+      setTotal(lista.total ?? lista.filas.length);
       setConteos(n);
     } catch (err) {
       setFilas([]);
@@ -453,13 +456,22 @@ export default function FlujoInmuebles() {
               </SecTitle>
 
               <div className="flow-sum">
-                <div className="it"><div className="k">Inmuebles</div><div className="v">{filas.length}</div></div>
+                <div className="it">
+                  <div className="k">Inmuebles</div>
+                  <div className="v">{total.toLocaleString("es-CO")}</div>
+                </div>
                 <div className="it">
                   <div className="k">$/m² medio</div>
                   <div className="v">{medio != null ? pm2(medio, filas[0].moneda) : "—"}</div>
                 </div>
                 <div className="it"><div className="k">Ciudades</div><div className="v">{ciudades}</div></div>
               </div>
+              {filas.length < total && (
+                <Hint style={{ marginTop: 0, marginBottom: 12 }}>
+                  Se muestran los <b>{filas.length}</b> más recientes de <b>{total.toLocaleString("es-CO")}</b>.
+                  El $/m² medio y las ciudades son de lo que se ve; la descarga en CSV, también.
+                </Hint>
+              )}
 
               <Tabla ancho="md">
                 <thead>
@@ -474,7 +486,16 @@ export default function FlujoInmuebles() {
                       <td><Info x={x} /></td>
                       <td className="num">{precio(x)}</td>
                       <td className="num">{x.area_m2 ?? "—"}</td>
-                      <td className="num">{pm2(x.precio_m2, x.moneda)}</td>
+                      <td className="num">
+                        {pm2(x.precio_m2, x.moneda)}
+                        {/* El anuncio con el precio mal escrito es frecuente:
+                            hay registros a US$5/m² donde la mediana es 1.692.
+                            El pipeline los marca y aquí se ven, para que nadie
+                            los tome por una ganga. */}
+                        {(x.precio_m2_clasificacion || "").startsWith("atipico") && (
+                          <> <MkChip t="atip">Atípico</MkChip></>
+                        )}
+                      </td>
                       <td>{(x.fecha_extraccion || "").slice(0, 10) || "—"}</td>
                     </tr>
                   ))}

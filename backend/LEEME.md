@@ -32,7 +32,7 @@ python -m venv .venv
 # source .venv/bin/activate && pip install -r requirements.txt  (macOS/Linux)
 ```
 
-## 3. Esquema y usuarios
+## 3. Esquema, seguridad y usuarios
 
 El esquema está en `database/schema.sql` y es **idempotente**: se puede correr
 sobre la base que ya está viva sin borrar nada. Aplícalo de una de las dos
@@ -45,15 +45,32 @@ Crea `usuarios` e `inmueble_detalle`, y le añade la columna `etapa` a
 `seguimiento_propiedades`. Las tablas del pipeline (`raw_listings`,
 `clean_listings`) no las toca.
 
+**Después, `database/seguridad.sql`, por el mismo camino.** No es opcional:
+quita a los roles públicos de Supabase (`anon`, `authenticated`) los permisos
+que traían sobre `usuarios` e `inmueble_detalle` —incluidos DELETE y
+TRUNCATE—, activa RLS en las cinco tablas y crea `intentos_acceso`, que es lo
+que frena la fuerza bruta en el login. El archivo explica por qué en detalle.
+
+Para comprobar que quedó bien, esta consulta no debe devolver ninguna fila:
+
+```sql
+SELECT grantee, table_name, privilege_type
+  FROM information_schema.role_table_grants
+ WHERE grantee IN ('anon','authenticated') AND table_schema='public';
+```
+
 Después, los seis usuarios del equipo:
 
 ```bash
 .venv/Scripts/python.exe -m scripts.crear_usuarios
 ```
 
-Imprime **una sola vez** una contraseña temporal por persona. Cópialas y
-repártelas por un canal privado: al entrar, cada quien tiene que cambiarla
-antes de poder trabajar. Si se pierden, `--reiniciar` genera otras.
+Cada uno entra con la contraseña que tiene asignada en `EQUIPO`, dentro del
+propio script, y la puede cambiar cuando quiera desde el menú lateral de la
+consola. Son sencillas a propósito, porque hay que repartirlas.
+
+**Antes de que esto tenga dominio**, córrelo con `--azar`: genera una
+contraseña aleatoria por persona y obliga a cambiarla al entrar.
 
 ## 4. Arrancar
 
@@ -151,6 +168,12 @@ seguimiento, zonas_resumen, predio_analisis). No se tocaron.
 - **`CORS_ORIGINS`** — hoy por defecto es sólo `localhost:3000`. Al desplegar,
   el dominio real: `CORS_ORIGINS=https://panel.zequara.com`. Antes esto estaba
   en `["*"]`, que con credenciales es justo lo que no se debe hacer.
+- **Contraseñas** — `python -m scripts.crear_usuarios --azar --reiniciar`, y
+  repartir las nuevas. Las de `EQUIPO` son predecibles por diseño.
+- **`database/seguridad.sql` aplicado**, y la consulta de comprobación de
+  arriba devolviendo cero filas.
+- **La contraseña de la base de datos** — cámbiala en Supabase y actualiza
+  `DATABASE_URL`. Estuvo en un chat.
 - **`JWT_SECRET`** — fijo y distinto del de desarrollo.
 - **`BACKEND_URL`** en el frontend, apuntando al backend desplegado.
 - La llave de Metrocuadrado ahora se puede poner en `METROCUADRADO_API_KEY`.

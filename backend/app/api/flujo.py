@@ -146,15 +146,36 @@ def listar(
             else "s.etapa = ?")
     params: list = [] if etapa == "nuevo" else [etapa]
 
+    # Orden: lo más reciente primero. Antes iba por precio/m² ascendente, y el
+    # efecto era el contrario del buscado — los precios más bajos del universo
+    # son casi siempre errores de digitación del anuncio (hay registros a
+    # US$5/m² cuando la mediana de Panamá es 1.692), así que la pantalla
+    # "Resultado del último scraping" abría con la basura arriba y lo bueno
+    # enterrado. Por fecha, la primera página es lo que de verdad trajo la
+    # última corrida, que es lo que la pantalla dice ser.
     with cursor() as con:
         filas = con.execute(
             f"SELECT {SELECCION} {DESDE} "
             f"WHERE {' AND '.join(CRITERIOS)} AND {cond} "
-            f"ORDER BY c.precio_m2 ASC LIMIT {int(limite)}",
+            f"ORDER BY c.fecha_extraccion DESC NULLS LAST, c.precio_m2 ASC "
+            f"LIMIT {int(limite)}",
             params,
         ).fetchall()
 
-    return {"etapa": etapa, "filas": [dict(f) for f in filas]}
+        # El total de la etapa, no el de la página: sin esto la pantalla decía
+        # "500 inmuebles" cuando hay 5.444, que es el tope de la consulta
+        # haciéndose pasar por un dato.
+        total = con.execute(
+            f"SELECT count(*) AS n {DESDE} WHERE {' AND '.join(CRITERIOS)} AND {cond}",
+            params,
+        ).fetchone()["n"]
+
+    return {
+        "etapa": etapa,
+        "filas": [dict(f) for f in filas],
+        "total": total,
+        "truncado": total > len(filas),
+    }
 
 
 @router.get("/conteos")

@@ -28,10 +28,10 @@ SOBRE LOS ROLES, HOY
     endpoint, sin tocar la lógica.
 """
 
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from app.core import config, security
+from app.core import config, intentos, security
 from app.services import auth_service as svc
 
 router = APIRouter()
@@ -86,13 +86,26 @@ class PeticionLogin(BaseModel):
 
 
 @router.post("/login")
-def login(p: PeticionLogin):
+def login(p: PeticionLogin, peticion: Request):
+    ip = intentos.ip_de(peticion)
+
+    # El freno va ANTES de comprobar la contraseña: si no, cada intento
+    # bloqueado seguiría costando un bcrypt, que es caro a propósito, y el
+    # propio freno se convertiría en la forma de tumbar el servidor.
+    motivo = intentos.bloqueado(p.correo, ip)
+    if motivo:
+        intentos.registrar(p.correo, ip, False, "bloqueado")
+        # 429: no son credenciales malas, es que hay que esperar.
+        raise HTTPException(429, motivo)
+
     try:
         u = svc.autenticar(p.correo, p.clave)
     except svc.ErrorAuth as e:
+        intentos.registrar(p.correo, ip, False, str(e))
         # 401 y no 400: son credenciales, no un formulario mal armado.
         raise HTTPException(401, str(e)) from e
 
+    intentos.registrar(p.correo, ip, True)
     return {
         "token": security.crear_token(u["id"], u["correo"], u["rol"]),
         "horas": config.JWT_HORAS,
