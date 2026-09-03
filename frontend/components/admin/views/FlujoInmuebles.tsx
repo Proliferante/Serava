@@ -172,6 +172,57 @@ function FormVisita({ x, onGuardar, onCancelar }: {
   );
 }
 
+/**
+ * Guardar a quién llamar, sin agendar todavía.
+ *
+ * El teléfono no viene del scraping —está en el anuncio— y hasta ahora sólo
+ * se podía guardar dentro del formulario de la visita. Eso ponía el proceso
+ * del revés: el correo pide contactar primero y decidir después, con lo que
+ * salga de esa llamada.
+ *
+ * El placeholder del teléfono cambia con el país del inmueble porque el
+ * formato no es el mismo, y equivocarse aquí significa llamar a un número que
+ * no existe.
+ */
+function FormContacto({ x, onGuardar, onCancelar }: {
+  x: Inmueble;
+  onGuardar: (d: { contacto_nombre: string; contacto_telefono: string }) => void;
+  onCancelar: () => void;
+}) {
+  const [nombre, setNombre] = useState(x.contacto_nombre ?? "");
+  const [tel, setTel] = useState(x.contacto_telefono ?? "");
+  const ejemplo = x.pais === "Panamá" ? "6123 4567" : "300 123 4567";
+  return (
+    <>
+      <MCuerpo>
+        <p style={{ fontSize: ".86rem", color: "var(--mocha)", marginBottom: 14 }}>
+          Ábrelo en <b>Ver publicación</b>, copia el teléfono del anuncio y guárdalo aquí.
+          Desde ese momento el botón de WhatsApp y el de llamar funcionan, y queda
+          guardado para cuando se agende la visita.
+        </p>
+        <label htmlFor="ct-nombre">Contacto (nombre)</label>
+        <input className="t" id="ct-nombre" placeholder="Propietario / inmobiliaria"
+               value={nombre} onChange={(e) => setNombre(e.target.value)} />
+        <label htmlFor="ct-tel">Teléfono</label>
+        <input className="t" id="ct-tel" placeholder={ejemplo}
+               value={tel} onChange={(e) => setTel(e.target.value)} />
+        <Hint style={{ marginBottom: 0 }}>
+          Sin indicativo: se le pone el del país del inmueble
+          ({x.pais === "Panamá" ? "+507" : "+57"}). Si lo escribes con el indicativo,
+          se respeta el que pongas.
+        </Hint>
+      </MCuerpo>
+      <MPie>
+        <button type="button" className="btn btn-ghost" onClick={onCancelar}>Cancelar</button>
+        <button type="button" className="btn btn-primary"
+                onClick={() => onGuardar({ contacto_nombre: nombre.trim(), contacto_telefono: tel.trim() })}>
+          Guardar contacto
+        </button>
+      </MPie>
+    </>
+  );
+}
+
 function FormCompletar({ x, onPublicar, onCancelar }: {
   x: Inmueble;
   onPublicar: (d: { titulo: string; habitaciones: string; banos: string; area: string; tipo: string; notas: string }) => void;
@@ -319,14 +370,52 @@ export default function FlujoInmuebles() {
 
   const soloDigitos = (t: string | null) => (t || "").replace(/\D/g, "");
 
+  /* El indicativo sale del país del inmueble, no de una constante.
+     Estaba fijo en 57 (Colombia) mientras todo el inventario del scraping es
+     de Panamá: cada "WhatsApp" y cada "Llamar" habría marcado un número
+     colombiano inexistente. Si el teléfono ya viene con su indicativo (+507…,
+     o 507…), se respeta el que trae. */
+  const INDICATIVO: Record<string, string> = { "Panamá": "507", "Colombia": "57" };
+
+  const conIndicativo = (x: Inmueble) => {
+    const crudo = (x.contacto_telefono || "").trim();
+    const digitos = soloDigitos(crudo);
+    if (!digitos) return "";
+    const ind = INDICATIVO[x.pais || ""] ?? "";
+    if (crudo.startsWith("+") || (ind && digitos.startsWith(ind))) return digitos;
+    return ind + digitos;
+  };
+
   const whatsapp = (x: Inmueble) => {
-    const tel = soloDigitos(x.contacto_telefono);
-    if (!tel) {
-      av("Este inmueble no tiene teléfono guardado. Agrégalo al agendar la visita.");
-      return;
-    }
+    const tel = conIndicativo(x);
+    if (!tel) { contactar(x); return; }
     const texto = `Hola, le contacto de ZEQUARA por el inmueble en ${x.zona}, ${x.ciudad}.`;
-    window.open(`https://wa.me/57${tel}?text=${encodeURIComponent(texto)}`, "_blank", "noopener");
+    window.open(`https://wa.me/${tel}?text=${encodeURIComponent(texto)}`, "_blank", "noopener");
+  };
+
+  /* Guardar el contacto sin agendar nada. El teléfono no lo trae el scraping:
+     está en el anuncio, y hay que copiarlo antes de poder llamar. Hasta ahora
+     el único sitio donde se podía guardar era el formulario de la visita, que
+     obliga a agendar una cita que todavía no se sabe si va a existir. */
+  const contactar = (x: Inmueble) => {
+    modal("Contacto · " + x.zona, (cierra) => (
+      <FormContacto
+        x={x} onCancelar={cierra}
+        onGuardar={async (d) => {
+          try {
+            await pedir("/api/admin/flujo/contacto", {
+              method: "POST",
+              body: JSON.stringify({ link: x.link, ...d }),
+            });
+            cierra();
+            av("Contacto guardado");
+            await cargar(etapa);
+          } catch (e) {
+            av((e as Error).message);
+          }
+        }}
+      />
+    ));
   };
 
   const agendar = (x: Inmueble) => {
@@ -612,7 +701,7 @@ export default function FlujoInmuebles() {
                 </thead>
                 <tbody>
                   {filas.map((x) => {
-                    const tel = soloDigitos(x.contacto_telefono);
+                    const tel = conIndicativo(x);
                     return (
                       <tr key={x.link}>
                         <td><Info x={x} /></td>
@@ -627,9 +716,14 @@ export default function FlujoInmuebles() {
                               <IcoWa />WhatsApp
                             </button>
                             {tel
-                              ? <a className="btn btn-ghost btn-mini" href={`tel:+57${tel}`}><IcoTel />Llamar</a>
-                              : <span className="pzone">Sin teléfono</span>}
+                              ? <a className="btn btn-ghost btn-mini" href={`tel:+${tel}`}><IcoTel />Llamar</a>
+                              : (
+                                <button type="button" className="btn btn-ghost btn-mini" onClick={() => contactar(x)}>
+                                  + Teléfono
+                                </button>
+                              )}
                           </div>
+                          {x.contacto_nombre && <div className="pzone">{x.contacto_nombre}</div>}
                         </td>
                         <td>
                           <div className="tacts-wrap">

@@ -420,6 +420,53 @@ def agendar_visita(p: PeticionVisita, u: dict = Depends(usuario_actual)):
     return {"ok": True, "etapa": "visita"}
 
 
+class PeticionContacto(BaseModel):
+    link: str = Field(max_length=LIMITE_LINK)
+    contacto_nombre: str | None = Field(default=None, max_length=LIMITE_NOMBRE)
+    contacto_telefono: str | None = Field(default=None, max_length=64)
+
+
+@router.post("/contacto")
+def guardar_contacto(p: PeticionContacto, u: dict = Depends(usuario_actual)):
+    """Guarda el teléfono de quien vende, SIN mover el inmueble de etapa.
+
+    Falta porque el dato de contacto no lo trae el scraping: hay que abrir el
+    anuncio y copiarlo. El único sitio donde se podía guardar era el
+    formulario de agendar visita, y eso obligaba a agendar una cita que
+    todavía no existe sólo para poder llamar. El correo pide justo lo
+    contrario —primero se contacta, y de esa llamada sale si hay visita o si
+    el inmueble ya no está—.
+
+    Escribe en `inmueble_detalle`, que es de donde lo leerá cualquier
+    automatización del contacto: la tabla es la misma con o sin persona
+    delante, y por eso la pantalla no es el único camino.
+    """
+    _exige_pipeline()
+    if p.link not in _existe_y_cumple([p.link]):
+        raise HTTPException(400, "Ese inmueble ya no está en el listado.")
+
+    ahora = datetime.now(timezone.utc)
+    responsable = f"{u['nombre']} ({u['rol']})"
+    with escribir() as con:
+        _asegura_seguimiento(con, p.link)
+        con.execute(
+            """INSERT INTO inmueble_detalle
+                   (url_inmueble, contacto_nombre, contacto_telefono,
+                    actualizado_en, actualizado_por)
+               VALUES (?, ?, ?, ?, ?)
+               ON CONFLICT (url_inmueble) DO UPDATE SET
+                   contacto_nombre   = COALESCE(EXCLUDED.contacto_nombre,
+                                                inmueble_detalle.contacto_nombre),
+                   contacto_telefono = COALESCE(EXCLUDED.contacto_telefono,
+                                                inmueble_detalle.contacto_telefono),
+                   actualizado_en    = EXCLUDED.actualizado_en,
+                   actualizado_por   = EXCLUDED.actualizado_por""",
+            (p.link, (p.contacto_nombre or "").strip() or None,
+             (p.contacto_telefono or "").strip() or None, ahora, responsable),
+        )
+    return {"ok": True}
+
+
 class PeticionCompletar(BaseModel):
     link: str = Field(max_length=LIMITE_LINK)
     titulo: str | None = Field(default=None, max_length=LIMITE_NOMBRE)
