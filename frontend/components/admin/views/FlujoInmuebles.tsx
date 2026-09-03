@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { MCuerpo, MPie, useConsola } from "@/components/admin/ctx";
 import { useSesion } from "@/components/admin/sesion";
-import { CSV_SCRAPING, TRANSFORMACIONES, tituloDelEnlace } from "@/components/admin/data";
+import { TRANSFORMACIONES, tituloDelEnlace } from "@/components/admin/data";
 import { Card, Hint, IcoCheck, IcoDown, IcoExt, MkChip, SecTitle, Tabla } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -264,6 +264,8 @@ export default function FlujoInmuebles() {
   const [total, setTotal] = useState(0);
   const [conteos, setConteos] = useState<Record<Etapa, number> | null>(null);
   const [cargando, setCargando] = useState(true);
+  /** Mientras el servidor arma el CSV: son 5.444 filas, no es instantáneo. */
+  const [bajando, setBajando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const etapa = FUENTE[panel];
@@ -382,22 +384,43 @@ export default function FlujoInmuebles() {
     ));
   };
 
-  /** CSV de lo que trajo el scraping — pantalla 1 del correo. */
-  const descargar = () => {
-    if (!filas.length) { av("No hay inmuebles para descargar"); return; }
-    const cita = (v: unknown) => '"' + String(v ?? "").replace(/"/g, '""') + '"';
-    const lineas = [CSV_SCRAPING.join(",")].concat(
-      filas.map((r) => [
-        r.titulo, r.zona, r.ciudad, r.precio_venta, r.area_m2, r.precio_m2, r.link,
-      ].map(cita).join(",")),
-    );
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob(["﻿" + lineas.join("\n")], { type: "text/csv;charset=utf-8;" }));
-    a.download = "zequara_scraping_" + new Date().toISOString().slice(0, 10) + ".csv";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    av(`Listado descargado (${filas.length} inmuebles)`);
+  /** CSV de lo que trajo el scraping — pantalla 1 del correo.
+   *
+   * Lo arma el servidor, no esta pantalla. Antes se construía aquí con
+   * `filas`, que son las 500 que se cargan para pintar la tabla: el archivo
+   * decía ser "el listado general" y traía el 9% de los 5.444 que pasan los
+   * filtros. Ahora se pide a `/api/admin/flujo/csv`, que no tiene tope.
+   *
+   * Se baja con `fetch` y no con un enlace directo para poder avisar del
+   * fallo: un `<a href>` que devuelve 401 deja al navegador descargando una
+   * página de error sin que nadie se entere.
+   */
+  const descargar = async () => {
+    if (bajando) return;
+    setBajando(true);
+    try {
+      const r = await fetch(`/api/admin/flujo/csv?etapa=${etapa}`, { credentials: "same-origin" });
+      if (!r.ok) throw new Error(`el servidor respondió ${r.status}`);
+      const texto = await r.text();
+      const url = URL.createObjectURL(new Blob([texto], { type: "text/csv;charset=utf-8;" }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `zequara_scraping_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      // Se suelta el objeto de URL: si no, el archivo entero se queda en
+      // memoria hasta que se recargue la pestaña.
+      URL.revokeObjectURL(url);
+      // La cuenta la manda el servidor en una cabecera; si no llegara, se
+      // cuentan las líneas menos la de cabecera.
+      const n = Number(r.headers.get("X-Filas") ?? texto.trim().split("\n").length - 1);
+      av(`Listado descargado (${n.toLocaleString("es-CO")} inmuebles)`);
+    } catch (e) {
+      av(`No se pudo descargar: ${(e as Error).message}`);
+    } finally {
+      setBajando(false);
+    }
   };
 
   /* Resumen de la pestaña 1, calculado sobre lo que se está viendo. */
@@ -454,8 +477,9 @@ export default function FlujoInmuebles() {
             <Card>
               <SecTitle style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 Resultado del último scraping
-                <button type="button" className="btn btn-primary btn-mini" onClick={descargar}>
-                  <IcoDown />Descargar listado (CSV)
+                <button type="button" className="btn btn-primary btn-mini"
+                        onClick={() => void descargar()} disabled={bajando}>
+                  <IcoDown />{bajando ? "Preparando…" : "Descargar listado (CSV)"}
                 </button>
               </SecTitle>
 
@@ -473,7 +497,8 @@ export default function FlujoInmuebles() {
               {filas.length < total && (
                 <Hint style={{ marginTop: 0, marginBottom: 12 }}>
                   Se muestran los <b>{filas.length}</b> más recientes de <b>{total.toLocaleString("es-CO")}</b>.
-                  El $/m² medio y las ciudades son de lo que se ve; la descarga en CSV, también.
+                  El $/m² medio y las ciudades son de lo que se ve; la descarga en CSV trae
+                  los <b>{total.toLocaleString("es-CO")}</b>.
                 </Hint>
               )}
 

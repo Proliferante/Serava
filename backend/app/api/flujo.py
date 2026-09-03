@@ -36,9 +36,14 @@ POR QUÉ LA ETAPA NO SE DEDUCE, SE GUARDA
     y el "no vuelve a entrar". La etapa es el resumen, no el sustituto.
 """
 
+import csv
+import io
+import re
 from datetime import datetime, timezone
+from urllib.parse import unquote
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 from app.api.auth import usuario_actual
@@ -89,6 +94,25 @@ DESDE = """
 """
 
 
+def _titulo_del_enlace(link: str | None) -> str | None:
+    """El título que el portal dejó en la ruta del enlace.
+
+    Muchos anuncios de encuentra24 llegan sin `titulo`, y la ruta lleva su
+    descripción: `.../venta-de-apartamento-en-marbella/30971715`. Mismo
+    criterio que `tituloDelEnlace` en el frontend, para que el CSV y la
+    pantalla digan lo mismo.
+    """
+    if not link:
+        return None
+    tramos = [t for t in link.split("?")[0].split("#")[0].split("/") if t]
+    for tramo in reversed(tramos):
+        if "-" in tramo and re.search(r"[a-zA-Z]{3}", tramo):
+            texto = unquote(tramo).replace("-", " ").strip()
+            if len(texto) >= 8:
+                return texto[0].upper() + texto[1:]
+    return None
+
+
 def _exige_pipeline():
     if not tabla_existe("clean_listings"):
         raise HTTPException(
@@ -131,20 +155,23 @@ def _existe_y_cumple(links: list[str]) -> set[str]:
 # LECTURA
 # ---------------------------------------------------------------------------
 
+def _condicion_de_etapa(etapa: str) -> tuple[str, list]:
+    """El WHERE de una etapa. 'nuevo' incluye lo que nunca tuvo seguimiento."""
+    if etapa not in ETAPAS:
+        raise HTTPException(400, f"Etapa inválida. Válidas: {', '.join(ETAPAS)}")
+    if etapa == "nuevo":
+        return "(s.etapa IS NULL OR s.etapa = 'nuevo')", []
+    return "s.etapa = ?", [etapa]
+
+
 @router.get("")
 def listar(
     etapa: str = Query("nuevo", description="nuevo|preseleccion|visita|publicado|descartado"),
-    limite: int = Query(500, le=2000),
+    limite: int = Query(500, ge=1, le=2000),
     _: dict = Depends(usuario_actual),
 ):
-    if etapa not in ETAPAS:
-        raise HTTPException(400, f"Etapa inválida. Válidas: {', '.join(ETAPAS)}")
     _exige_pipeline()
-
-    # 'nuevo' incluye lo que nunca tuvo fila de seguimiento.
-    cond = ("(s.etapa IS NULL OR s.etapa = 'nuevo')" if etapa == "nuevo"
-            else "s.etapa = ?")
-    params: list = [] if etapa == "nuevo" else [etapa]
+    cond, params = _condicion_de_etapa(etapa)
 
     # Orden: lo más reciente primero. Antes iba por precio/m² ascendente, y el
     # efecto era el contrario del buscado — los precios más bajos del universo
@@ -176,6 +203,74 @@ def listar(
         "total": total,
         "truncado": total > len(filas),
     }
+
+
+# Las columnas del CSV, en el orden en que salen. Son las que el correo pide
+# para revisar el listado por fuera: identificar el inmueble, su precio y su
+# enlace. Nada de estado interno.
+CSV_CABECERA = ("Titulo", "Zona", "Ciudad", "Precio", "Area m2",
+                "Precio m2", "Publicacion")
+
+
+@router.get("/csv")
+def csv_de_etapa(
+    etapa: str = Query("nuevo", description="nuevo|preseleccion|visita|publicado|descartado"),
+    _: dict = Depends(usuario_actual),
+):
+    """El listado COMPLETO de una etapa, en CSV.
+
+    Existe porque la descarga se hacía en el navegador con lo que la pantalla
+    ya tenía cargado —500 filas— y el correo pide "el listado general": son
+    5.444. Un CSV que dice ser el listado y trae el 9% es peor que no tenerlo.
+
+    Aquí no hay LIMIT. Se puede porque un CSV de todo el universo son unos
+    cientos de miles de bytes —siete columnas de texto, no las cuarenta del
+    JSON— y porque se pide a mano, no en cada carga de pantalla.
+
+    El título se resuelve igual que en pantalla: el del anuncio, y si viene
+    vacío, el que se saca de la ruta del enlace (ver `tituloDelEnlace` en el
+    frontend). Aquí se hace en Python para que el archivo no salga con una
+    columna de "(sin titulo)".
+    """
+    _exige_pipeline()
+    cond, params = _condicion_de_etapa(etapa)
+
+    with cursor() as con:
+        filas = con.execute(
+            f"SELECT {SELECCION} {DESDE} "
+            f"WHERE {' AND '.join(CRITERIOS)} AND {cond} "
+            f"ORDER BY c.fecha_extraccion DESC NULLS LAST, c.precio_m2 ASC",
+            params,
+        ).fetchall()
+
+    salida = io.StringIO()
+    # `lineterminator` explícito: el csv de Python termina las líneas con
+    # CRLF por defecto, y eso dentro de una respuesta HTTP deja una línea en
+    # blanco entre filas al abrirlo en Excel.
+    escritor = csv.writer(salida, lineterminator="\n")
+    escritor.writerow(CSV_CABECERA)
+    for f in filas:
+        escritor.writerow([
+            f["titulo"] or _titulo_del_enlace(f["link"]) or "",
+            f["zona"] or "", f["ciudad"] or "",
+            f["precio_venta"] if f["precio_venta"] is not None else "",
+            f["area_m2"] if f["area_m2"] is not None else "",
+            f["precio_m2"] if f["precio_m2"] is not None else "",
+            f["link"] or "",
+        ])
+
+    nombre = f"zequara_{etapa}.csv"
+    return Response(
+        # El BOM va a propósito: sin él, Excel en Windows abre el archivo en
+        # su codificación local y los acentos salen rotos.
+        content="\ufeff" + salida.getvalue(),
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{nombre}"',
+            # Cuántos van, para que la consola pueda decirlo sin contar líneas.
+            "X-Filas": str(len(filas)),
+        },
+    )
 
 
 @router.get("/conteos")
