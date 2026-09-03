@@ -116,7 +116,72 @@ REVOKE ALL ON SEQUENCE intentos_acceso_id_seq FROM anon, authenticated;
 
 
 -- ───────────────────────────────────────────────────────────────────────────
--- 4. COMPROBACIÓN
+-- 4. SESIONES
+-- ───────────────────────────────────────────────────────────────────────────
+--
+-- La sesión vive aquí y no dentro de un JWT. Un JWT firmado es cómodo —no hay
+-- que consultar nada para validarlo— pero no se puede retirar: mientras no
+-- caduque, sirve. Para un panel administrativo eso está mal en tres casos que
+-- ocurren de verdad:
+--
+--   · alguien cierra sesión y espera que su sesión muera de verdad;
+--   · alguien cambia su contraseña porque cree que se la vieron, y las
+--     sesiones abiertas con la contraseña vieja deberían caerse;
+--   · un administrador da de baja a una persona y quiere que salga ya.
+--
+-- Con la sesión en tabla, retirarla es un UPDATE. El coste es una consulta por
+-- petición, que para seis personas no es nada.
+--
+-- Lo que viaja en la cookie es `id`: 32 bytes al azar, no un identificador
+-- adivinable. De la cookie NO se puede deducir quién es ni qué rol tiene.
+
+CREATE TABLE IF NOT EXISTS sesiones (
+    id                TEXT PRIMARY KEY,
+    usuario_id        INTEGER     NOT NULL REFERENCES usuarios (id) ON DELETE CASCADE,
+    creada            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    -- Se refresca en cada petición: de aquí sale el cierre por inactividad.
+    ultima_actividad  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    -- Tope absoluto: por mucho que se use, una sesión no dura más que esto.
+    expira            TIMESTAMPTZ NOT NULL,
+    revocada          TIMESTAMPTZ,
+    ip                TEXT,
+    agente            TEXT
+);
+
+CREATE INDEX IF NOT EXISTS sesiones_usuario_idx ON sesiones (usuario_id);
+CREATE INDEX IF NOT EXISTS sesiones_expira_idx  ON sesiones (expira);
+
+ALTER TABLE sesiones ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON TABLE sesiones FROM anon, authenticated;
+
+
+-- ───────────────────────────────────────────────────────────────────────────
+-- 5. BITÁCORA DE ACCIONES SENSIBLES
+-- ───────────────────────────────────────────────────────────────────────────
+--
+-- Quién creó o desactivó a quién, quién cambió una contraseña, quién cerró
+-- todas las sesiones. No es para vigilar al equipo: es para poder reconstruir
+-- qué pasó cuando algo salga raro, que es cuando nadie recuerda nada.
+
+CREATE TABLE IF NOT EXISTS bitacora (
+    id         BIGSERIAL PRIMARY KEY,
+    usuario_id INTEGER REFERENCES usuarios (id) ON DELETE SET NULL,
+    correo     TEXT,
+    accion     TEXT NOT NULL,
+    detalle    TEXT,
+    ip         TEXT,
+    momento    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS bitacora_momento_idx ON bitacora (momento DESC);
+
+ALTER TABLE bitacora ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON TABLE bitacora FROM anon, authenticated;
+REVOKE ALL ON SEQUENCE bitacora_id_seq FROM anon, authenticated;
+
+
+-- ───────────────────────────────────────────────────────────────────────────
+-- 6. COMPROBACIÓN
 -- ───────────────────────────────────────────────────────────────────────────
 -- Después de correr esto, esta consulta no debe devolver ninguna fila:
 --

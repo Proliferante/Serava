@@ -176,7 +176,7 @@ export default function AdminConsole() {
               <br />
               <BotonCambiarClave />
               <br />
-              <button type="button" className="pnl-link" style={{ marginTop: 6, color: "var(--sand)" }} onClick={salir}>
+              <button type="button" className="pnl-link" style={{ marginTop: 6, color: "var(--sand)" }} onClick={() => void salir()}>
                 Cerrar sesión
               </button>
             </div>

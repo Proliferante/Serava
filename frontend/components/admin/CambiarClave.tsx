@@ -62,7 +62,7 @@ export default function CambiarClave() {
               estilo="oscuro" temporal
               pie={
                 <button
-                  type="button" onClick={salir}
+                  type="button" onClick={() => void salir()}
                   className="ix-nav mt-[18px] block w-full text-center text-[13px] font-medium"
                   style={{ background: "none", border: 0, color: "rgba(247,241,229,0.5)", cursor: "pointer" }}
                 >

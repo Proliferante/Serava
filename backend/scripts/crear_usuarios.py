@@ -52,13 +52,21 @@ from app.services import auth_service as svc
 # Los seis del equipo, con el rol acordado. Los correos van en minúsculas
 # porque así se guardan y así se comparan al entrar: da igual cómo se
 # escriban al teclear.
+# Las contraseñas cumplen la política de `app/core/config.py`: doce
+# caracteres o más, no están en la lista de obvias y no contienen el nombre ni
+# el correo de su dueño —por eso NO son "ZqChristian26" y parecidas, que la
+# validación rechaza justamente por llevar el nombre dentro—.
+#
+# Son frases cortas y fáciles de dictar, no cadenas al azar: hay que
+# repartirlas por chat y que cada quien las teclee sin equivocarse. Para el
+# día que esto tenga dominio está `--azar`.
 EQUIPO = [
-    ("Christian Mejía", "christian.mejia@zequara.com", "arquitectura", "ZqChristian26"),
-    ("Laura P.",        "laurap@proliferante.com",     "comercial",    "ZqLaura26"),
-    ("David C.",        "davidc@proliferante.com",     "data",         "ZqDavid26"),
-    ("Paola A.",        "paola.a@proliferante.com",    "admin",        "ZqPaola26"),
-    ("Nati C.",         "nati.c@proliferante.com",     "admin",        "ZqNati26"),
-    ("Jesús A.",        "jesus.a@proliferante.com",    "admin",        "ZqJesus26"),
+    ("Christian Mejía", "christian.mejia@zequara.com", "arquitectura", "ObraLimpia-472"),
+    ("Laura P.",        "laurap@proliferante.com",     "comercial",    "TratoJusto-915"),
+    ("David C.",        "davidc@proliferante.com",     "data",         "CifraExacta-268"),
+    ("Paola A.",        "paola.a@proliferante.com",    "admin",        "LlaveMaestra-731"),
+    ("Nati C.",         "nati.c@proliferante.com",     "admin",        "RumboFirme-584"),
+    ("Jesús A.",        "jesus.a@proliferante.com",    "admin",        "PuertaAncha-390"),
 ]
 
 # Sin caracteres ambiguos (l, I, 1, O, 0): estas contraseñas se leen en voz

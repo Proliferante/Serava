@@ -76,6 +76,16 @@ CORS_ORIGINS = [
 ]
 
 
+# --- cookie de sesión ------------------------------------------------------
+# `Secure` hace que el navegador sólo mande la cookie por HTTPS. En localhost
+# hay que dejarlo apagado o no se puede entrar: la página va por http y el
+# navegador se guardaría la cookie sin mandarla nunca.
+#
+# AL DESPLEGAR: COOKIE_SEGURA=1. Sin eso, la sesión viaja en claro y cualquiera
+# en la misma red puede quedársela.
+COOKIE_SEGURA = os.environ.get("COOKIE_SEGURA", "").strip() in ("1", "true", "sí", "si")
+
+
 # --- scraping --------------------------------------------------------------
 METROCUADRADO_API_KEY = os.environ.get("METROCUADRADO_API_KEY", "").strip()
 
@@ -83,3 +93,24 @@ METROCUADRADO_API_KEY = os.environ.get("METROCUADRADO_API_KEY", "").strip()
 # --- roles -----------------------------------------------------------------
 # Los cuatro del equipo. `admin` es el único que crea usuarios.
 ROLES = ("admin", "arquitectura", "data", "comercial")
+
+
+# --- política de contraseñas -----------------------------------------------
+# Doce y no ocho. Ocho caracteres es el mínimo que se repite por costumbre
+# desde hace treinta años y hoy no aguanta nada; para seis cuentas que dan
+# acceso a toda la operación, doce cuesta lo mismo de escribir.
+#
+# No se exige "una mayúscula, un número y un símbolo": esa regla produce
+# `Password1!` y poco más. Lo que sí se comprueba (ver auth_service) es que la
+# contraseña no sea una de las obvias ni contenga el propio correo o nombre,
+# que es de donde salen de verdad las contraseñas que se adivinan.
+CLAVE_MINIMA = 12
+
+# Las que no se aceptan por evidentes. Lista corta a propósito: no pretende
+# ser un diccionario, sólo atajar lo que alguien escribiría con prisa.
+CLAVES_PROHIBIDAS = {
+    "contrasena", "contraseña", "password", "passw0rd", "123456", "12345678",
+    "123456789", "1234567890", "qwerty", "abc123", "iloveyou", "admin",
+    "administrador", "zequara", "zequora", "proliferante", "bienvenido",
+    "welcome", "cambiame", "temporal", "secreto", "letmein",
+}

@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
 from app.api.flujo import router as flujo_router
-from app.core import config
+from app.core import config, sesiones
 
 log = logging.getLogger("zequora")
 
@@ -57,6 +57,66 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def _cabeceras_y_origen(peticion: Request, siguiente):
+    """Dos cosas en una pasada: comprobar el origen y poner las cabeceras.
+
+    COMPROBACIÓN DE ORIGEN
+        La cookie de sesión va con `SameSite=Strict`, así que el navegador no
+        la manda en peticiones que nazcan en otro sitio: eso ya cierra el CSRF.
+        Esto es el segundo cerrojo, para el caso de un navegador viejo o de una
+        configuración rara: si una petición que escribe trae un `Origin` que no
+        está en la lista permitida, se rechaza sin llegar al endpoint.
+
+        Sólo se mira en los métodos que escriben. Un GET no cambia nada, y
+        exigir `Origin` en las lecturas rompería `curl` y la documentación
+        interactiva de /docs.
+
+    CABECERAS
+        `X-Frame-Options` impide que la consola se cargue dentro de un iframe
+        ajeno, que es como se monta un clickjacking: la víctima cree que pulsa
+        un botón inocente y en realidad pulsa "Desactivar usuario".
+        `X-Content-Type-Options` evita que el navegador adivine el tipo de una
+        respuesta y acabe ejecutando como script algo que no lo es.
+        `Referrer-Policy` impide que la URL de la consola viaje a sitios
+        externos.
+        HSTS sólo se manda si la cookie va en modo seguro: mandarla en
+        localhost dejaría el dominio marcado como "sólo HTTPS" en el navegador
+        del equipo, y a partir de ahí `http://localhost` deja de funcionar.
+    """
+    if peticion.method in ("POST", "PUT", "PATCH", "DELETE"):
+        origen = peticion.headers.get("origin")
+        if origen and origen not in config.CORS_ORIGINS:
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "Origen no permitido."},
+            )
+
+    r = await siguiente(peticion)
+    r.headers["X-Frame-Options"] = "DENY"
+    r.headers["X-Content-Type-Options"] = "nosniff"
+    r.headers["Referrer-Policy"] = "same-origin"
+    r.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+    # La API sólo devuelve JSON: nada que ejecutar, así que la política puede
+    # ser la más estricta posible.
+    r.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'"
+    if config.COOKIE_SEGURA:
+        r.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return r
+
+
+@app.on_event("startup")
+def _al_arrancar():
+    """Barre las sesiones muertas. No hay tarea programada ni hace falta:
+    con reiniciar de vez en cuando, la tabla no crece sin control."""
+    try:
+        n = sesiones.limpiar()
+        if n:
+            log.info("Sesiones vencidas borradas: %s", n)
+    except Exception as e:
+        log.warning("No se pudieron limpiar las sesiones: %s", e)
+
 
 # Sesión y usuarios internos.
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])

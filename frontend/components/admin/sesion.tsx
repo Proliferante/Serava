@@ -6,21 +6,22 @@ import {
 } from "react";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SESIÓN DE LA CONSOLA — quién entró, con qué rol, y el token para llamar.
+   SESIÓN DE LA CONSOLA — quién entró y con qué rol.
 
-   El token vive en `sessionStorage`, no en `localStorage`: una consola de
-   operación no debe quedar abierta para siempre en el navegador de nadie. Al
-   cerrar la pestaña hay que volver a entrar.
+   AQUÍ NO HAY NINGÚN TOKEN, Y ESO ES EL PUNTO.
 
-   Nada de esto es la seguridad: la seguridad está en el backend, que valida
-   el token en cada petición y comprueba contra la base que el usuario siga
-   activo. Lo de aquí es comodidad —no enseñar módulos que van a dar 403— y
-   la conveniencia de no volver a teclear la contraseña en cada recarga.
+   La sesión viaja en una cookie `HttpOnly` que pone el backend y que este
+   código no puede leer ni escribir. Antes se guardaba un token en
+   `sessionStorage`, y lo que guarda JavaScript lo lee JavaScript: cualquier
+   script inyectado podía llevárselo y usar la sesión desde otro sitio y otro
+   día. Con la cookie, un XSS podría hacer peticiones mientras la pestaña está
+   abierta, pero no robar la sesión para después.
 
-   `pedir()` es la única forma de llamar a la API: pone el encabezado
-   `Authorization` y, si el servidor responde 401, cierra la sesión sola. Sin
-   eso, un token vencido dejaría la consola llena de errores silenciosos
-   hasta que alguien recargara.
+   Lo único que se guarda aquí es quién eres, en memoria, para no enseñar
+   módulos que van a dar 403. Al recargar se vuelve a preguntar a `/yo`.
+
+   `pedir()` es la única forma de llamar a la API: manda la cookie y, si el
+   servidor responde 401, olvida al usuario y la consola vuelve al acceso.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export type Rol = "admin" | "arquitectura" | "data" | "comercial";
@@ -37,18 +38,16 @@ export type Usuario = {
   creado_en?: string | null;
 };
 
-const CLAVE_TOKEN = "zq:admin:token";
-
 /* `useLayoutEffect` avisa si se ejecuta en el servidor, donde no hay nada que
    medir. Mismo patrón que `ScaledCanvas`. */
 const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 type Ctx = {
   usuario: Usuario | null;
-  /** `false` hasta que se comprobó el token guardado. Evita el parpadeo. */
+  /** `false` hasta que se preguntó a `/yo`. Evita el parpadeo. */
   listo: boolean;
   entrar: (correo: string, clave: string) => Promise<void>;
-  salir: () => void;
+  salir: () => Promise<void>;
   /** Llamada autenticada a la API. Lanza `Error` con el mensaje del servidor. */
   pedir: <T>(ruta: string, init?: RequestInit) => Promise<T>;
   /** Refresca el usuario desde el servidor (tras cambiar la contraseña). */
@@ -78,84 +77,88 @@ async function mensajeDeError(r: Response): Promise<string> {
 
 export function SesionProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [listo, setListo] = useState(false);
 
-  const salir = useCallback(() => {
-    try { window.sessionStorage.removeItem(CLAVE_TOKEN); } catch { /* da igual */ }
-    setToken(null);
+  /**
+   * Le pide al servidor que retire la sesión, y olvida al usuario.
+   *
+   * La llamada va primero: sin ella la cookie seguiría viva y volver atrás en
+   * el navegador dejaría entrar. Si falla porque no hay red, se olvida al
+   * usuario igual — al menos esta pestaña deja de estar dentro.
+   */
+  const salir = useCallback(async () => {
+    try {
+      await fetch("/api/auth/salir", { method: "POST", credentials: "same-origin" });
+    } catch { /* sin red, se cierra en local igual */ }
     setUsuario(null);
   }, []);
 
-  /* Al montar: si hay token guardado se pregunta al servidor quién es. No se
-     confía en nada que estuviera guardado junto al token —un usuario o un rol
-     en sessionStorage se puede editar a mano desde el navegador—: la única
-     fuente del rol es la respuesta de /yo.
+  /* Al montar se pregunta a `/yo`. No se puede saber de antemano si hay
+     sesión —la cookie es HttpOnly, este código no la ve—, así que siempre hay
+     una consulta. Es una sola, al cargar, y devuelve 401 enseguida cuando no
+     hay nada.
 
-     Va en `useLayoutEffect` y no en `useEffect` para el caso sin token, que
-     es el de quien entra por primera vez: ahí `listo` pasa a true antes de
-     que el navegador pinte, así que se ve el formulario de acceso
-     directamente y no un hueco oscuro un fotograma. Cuando SÍ hay token no
-     se puede evitar ese hueco —hay que preguntarle al servidor—, y es lo
-     correcto: mejor un instante en blanco que un destello del formulario a
-     quien ya tenía sesión. */
+     La única fuente del usuario y del rol es esa respuesta: nada de lo que
+     hubiera guardado el navegador serviría, porque se puede editar a mano. */
   useIsoLayoutEffect(() => {
     let vivo = true;
-    let guardado: string | null = null;
-    try { guardado = window.sessionStorage.getItem(CLAVE_TOKEN); } catch { /* nada */ }
 
-    if (!guardado) { setListo(true); return; }
+    /* Restos de la versión anterior, que guardaba el token aquí. Ya no sirve
+       para nada —el backend no acepta ese formato—, pero dejarlo en el
+       navegador de todo el equipo es basura con pinta de credencial. Se borra
+       la primera vez que cada quien entra con la versión nueva. */
+    try { window.sessionStorage.removeItem("zq:admin:token"); } catch { /* da igual */ }
 
-    fetch("/api/auth/yo", { headers: { Authorization: `Bearer ${guardado}` } })
+    fetch("/api/auth/yo", { credentials: "same-origin" })
       .then(async (r) => {
         if (!vivo) return;
-        if (!r.ok) throw new Error("sesión inválida");
-        setUsuario(await r.json());
-        setToken(guardado);
+        if (r.ok) setUsuario(await r.json());
       })
-      .catch(() => { if (vivo) salir(); })
+      .catch(() => { /* sin sesión, o sin backend: se enseña el acceso */ })
       .finally(() => { if (vivo) setListo(true); });
-
     return () => { vivo = false; };
-  }, [salir]);
+  }, []);
 
   const entrar = useCallback(async (correo: string, clave: string) => {
     const r = await fetch("/api/auth/login", {
       method: "POST",
+      credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ correo, clave }),
     });
     if (!r.ok) throw new Error(await mensajeDeError(r));
 
+    /* La respuesta trae el usuario, no la sesión: esa la puso el servidor en
+       una cookie que este código no puede leer, y así debe ser. */
     const d = await r.json();
-    try { window.sessionStorage.setItem(CLAVE_TOKEN, d.token); } catch { /* da igual */ }
-    setToken(d.token);
     setUsuario(d.usuario);
   }, []);
 
   const pedir = useCallback(async <T,>(ruta: string, init: RequestInit = {}): Promise<T> => {
     const r = await fetch(ruta, {
       ...init,
+      credentials: "same-origin",
       headers: {
         ...(init.body ? { "Content-Type": "application/json" } : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(init.headers || {}),
       },
     });
     if (r.status === 401) {
-      salir();
+      /* Vencida, o retirada desde otro sitio. Se olvida al usuario y la
+         consola vuelve al acceso sola. No se llama a `salir()`: no hay sesión
+         que cerrar y ese POST daría otro 401. */
+      setUsuario(null);
       throw new Error("Tu sesión venció. Entra de nuevo.");
     }
     if (!r.ok) throw new Error(await mensajeDeError(r));
     return r.json() as Promise<T>;
-  }, [token, salir]);
+  }, []);
 
   const refrescar = useCallback(async () => {
-    if (!token) return;
     try {
       setUsuario(await pedir<Usuario>("/api/auth/yo"));
-    } catch { /* si falla, `pedir` ya cerró la sesión cuando tocaba */ }
-  }, [token, pedir]);
+    } catch { /* si falla, `pedir` ya devolvió al acceso cuando tocaba */ }
+  }, [pedir]);
 
   return (
     <C.Provider value={{ usuario, listo, entrar, salir, pedir, refrescar }}>

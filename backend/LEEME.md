@@ -112,17 +112,59 @@ curl http://localhost:3000/api/salud          # lo mismo, por el proxy
 
 | | |
 |---|---|
-| `POST /login` | entrar; devuelve token y usuario |
-| `GET /yo` | quién soy; valida el token en cada llamada |
+| `POST /login` | entrar; pone la cookie de sesión |
+| `POST /salir` | cerrar la sesión actual, de verdad |
+| `POST /salir-todas` | cerrar las demás sesiones |
+| `GET /yo` | quién soy |
+| `GET /sesiones` | mis sesiones abiertas |
 | `POST /cambiar-clave` | cambiar la propia contraseña |
 | `GET /usuarios` | listar (sólo admin) |
 | `POST /usuarios` | crear (sólo admin) |
 | `POST /usuarios/{id}/activo` | dar de baja o alta (sólo admin) |
 
-Contraseñas con bcrypt; sesión con JWT de 12 horas. El rol viaja dentro del
-token, así que autorizar no consulta la base — pero `activo` **sí** se
-comprueba en cada petición: desactivar a alguien lo echa en la petición
-siguiente, no cuando caduque su token.
+### Cómo está montada la sesión
+
+Contraseñas con **bcrypt**. La sesión viaja en una cookie **`HttpOnly`,
+`SameSite=Strict`** y —en producción— **`Secure`**, y su estado vive en la
+tabla `sesiones`.
+
+Las tres decisiones y por qué:
+
+- **Cookie y no `sessionStorage`.** Lo que guarda JavaScript lo lee
+  JavaScript, y por tanto lo lee cualquier script inyectado. Con `HttpOnly`,
+  un XSS podría hacer peticiones mientras la pestaña está abierta, pero no
+  llevarse la sesión para usarla desde otro sitio y otro día.
+- **`SameSite=Strict`.** El navegador no manda la cookie en peticiones que
+  nazcan en otro sitio: eso cierra el CSRF de raíz. Como segundo cerrojo, el
+  servidor rechaza toda escritura que traiga un `Origin` que no esté en
+  `CORS_ORIGINS`.
+- **Estado en tabla y no JWT.** Un JWT firmado no se puede retirar. Con la
+  sesión en la base, cerrar sesión la mata de verdad, cambiar la contraseña
+  cierra las demás, y dar de baja a alguien lo saca al momento.
+
+Dos relojes: **12 horas** de tope absoluto y **2 horas** de inactividad. Y
+`activo` se comprueba contra la base en cada petición.
+
+### Freno a la fuerza bruta
+
+5 fallos por correo en 15 minutos bloquean esa cuenta; 20 por IP bloquean esa
+conexión. Va antes de comprobar la contraseña, para que un intento bloqueado
+no cueste un bcrypt. Queda en `intentos_acceso`; la contraseña probada no se
+guarda nunca.
+
+### Política de contraseñas
+
+Mínimo **12 caracteres**, no puede ser una de las obvias (ni con año pegado
+detrás: `Zequara2026!` se rechaza), y no puede contener el nombre ni el correo
+de su dueño. No se exige "una mayúscula y un símbolo": esa regla produce
+`Password1!` y da sensación de seguridad sin darla.
+
+### Cabeceras y bitácora
+
+`X-Frame-Options: DENY` (contra el clickjacking), `nosniff`, `Referrer-Policy`
+y una CSP que no permite nada —la API sólo devuelve JSON—. HSTS sólo cuando
+`COOKIE_SEGURA=1`. Las acciones sensibles (entrar, salir, crear o desactivar
+usuarios, cambiar contraseña) quedan en `bitacora`.
 
 **Los cuatro roles:** `admin`, `arquitectura`, `data`, `comercial`. Hoy están
 abiertos salvo la pantalla de usuarios, que es sólo de admin — como se acordó
@@ -174,6 +216,9 @@ seguimiento, zonas_resumen, predio_analisis). No se tocaron.
   arriba devolviendo cero filas.
 - **La contraseña de la base de datos** — cámbiala en Supabase y actualiza
   `DATABASE_URL`. Estuvo en un chat.
+- **`COOKIE_SEGURA=1`** — sin esto la cookie de sesión viaja en claro y
+  cualquiera en la misma red puede quedársela. Es la más importante de esta
+  lista.
 - **`JWT_SECRET`** — fijo y distinto del de desarrollo.
 - **`BACKEND_URL`** en el frontend, apuntando al backend desplegado.
 - La llave de Metrocuadrado ahora se puede poner en `METROCUADRADO_API_KEY`.

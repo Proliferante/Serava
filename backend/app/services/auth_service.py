@@ -13,6 +13,7 @@ al entrar: es la misma persona. El índice único de la tabla va sobre
 lower(correo), así que la base lo garantiza aunque este módulo se equivoque.
 """
 
+import unicodedata
 from datetime import datetime, timezone
 
 from app.core import config, security
@@ -25,6 +26,45 @@ CAMPOS = "id, nombre, correo, rol, activo, debe_cambiar_clave, creado_en, ultimo
 
 class ErrorAuth(Exception):
     """Fallo esperado (correo repetido, rol inválido…), no un error de programa."""
+
+
+def _sin_tildes(t: str) -> str:
+    """Para comparar contra la lista de prohibidas sin que una tilde la esquive."""
+    return "".join(c for c in unicodedata.normalize("NFD", t.lower())
+                   if unicodedata.category(c) != "Mn")
+
+
+def validar_clave(clave: str, correo: str = "", nombre: str = "") -> None:
+    """Comprueba que la contraseña valga. Lanza `ErrorAuth` con el motivo.
+
+    Se comprueban tres cosas, y ninguna es la regla clásica de "una mayúscula,
+    un número y un símbolo": esa produce `Password1!` y da sensación de
+    seguridad sin darla.
+
+      1. Longitud. Es lo único que de verdad correlaciona con la dificultad de
+         adivinarla.
+      2. Que no sea una de las obvias, ni con números pegados detrás:
+         `zequara2026` se adivina igual que `zequara`.
+      3. Que no contenga el propio nombre ni la parte local del correo. Es de
+         donde sale la mitad de las contraseñas que alguien acierta a mano.
+    """
+    clave = clave or ""
+    if len(clave) < config.CLAVE_MINIMA:
+        raise ErrorAuth(f"La contraseña debe tener al menos {config.CLAVE_MINIMA} caracteres.")
+
+    plana = _sin_tildes(clave)
+    # Quita dígitos y signos del final: `Zequara2026!` cuenta como `zequara`.
+    raiz = plana.rstrip("0123456789!.*-_#$@ ")
+    for prohibida in config.CLAVES_PROHIBIDAS:
+        p = _sin_tildes(prohibida)
+        if plana == p or raiz == p:
+            raise ErrorAuth("Esa contraseña es demasiado común. Elige otra.")
+
+    partes = [p for p in (correo or "").split("@")[0].replace(".", " ").split() if len(p) >= 4]
+    partes += [p for p in (nombre or "").lower().split() if len(p) >= 4]
+    for p in partes:
+        if _sin_tildes(p) in plana:
+            raise ErrorAuth("La contraseña no puede contener tu nombre ni tu correo.")
 
 
 def normalizar_correo(correo: str) -> str:
@@ -69,8 +109,7 @@ def crear(nombre: str, correo: str, rol: str, clave: str,
         raise ErrorAuth(f"Correo inválido: {correo!r}")
     if rol not in config.ROLES:
         raise ErrorAuth(f"Rol inválido: {rol!r}. Válidos: {', '.join(config.ROLES)}")
-    if len(clave or "") < 8:
-        raise ErrorAuth("La contraseña debe tener al menos 8 caracteres.")
+    validar_clave(clave, correo, nombre)
     if por_correo(correo):
         raise ErrorAuth(f"Ya existe un usuario con el correo {correo}.")
 
@@ -108,14 +147,14 @@ def autenticar(correo: str, clave: str) -> dict:
     return u
 
 
-def cambiar_clave(usuario_id: int, clave_actual: str, clave_nueva: str) -> None:
+def cambiar_clave(usuario_id: int, clave_actual: str, clave_nueva: str,
+                  correo: str = "", nombre: str = "") -> None:
     """Cambia la contraseña del propio usuario, verificando la anterior.
 
     Al cambiarla se apaga `debe_cambiar_clave`: es justo lo que la bandera
     estaba esperando.
     """
-    if len(clave_nueva or "") < 8:
-        raise ErrorAuth("La contraseña nueva debe tener al menos 8 caracteres.")
+    validar_clave(clave_nueva, correo, nombre)
     if clave_nueva == clave_actual:
         raise ErrorAuth("La contraseña nueva debe ser distinta de la actual.")
 
