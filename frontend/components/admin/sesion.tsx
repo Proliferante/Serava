@@ -81,15 +81,30 @@ export function useSesion() {
   return c;
 }
 
-/** Saca el mensaje que manda FastAPI en `detail`, sea texto o lista. */
+/**
+ * Saca el mensaje que manda FastAPI en `detail`, sea texto o lista.
+ *
+ * Y si el cuerpo no es JSON, dice qué significa eso en vez de un "Error 404"
+ * pelado. Un 404 con HTML dentro no viene del backend: viene de quien sirve
+ * el frontend, porque `/api/*` no está reescrito hacia ningún backend y Next
+ * atiende la ruta él mismo. Pasó al desplegar en Vercel sin `BACKEND_URL`, y
+ * el mensaje que salía en pantalla no daba ninguna pista de por dónde buscar.
+ */
 async function mensajeDeError(r: Response): Promise<string> {
+  const texto = await r.text().catch(() => "");
   try {
-    const cuerpo = await r.json();
-    const d = cuerpo?.detail;
+    const d = JSON.parse(texto)?.detail;
     if (typeof d === "string") return d;
     if (Array.isArray(d) && d.length) return d[0]?.msg || JSON.stringify(d[0]);
     return `Error ${r.status}`;
   } catch {
+    if (r.status === 404) {
+      return "No hay backend detrás de /api: la web respondió por él (404). "
+        + "Revisa BACKEND_URL en el despliegue, o que el servidor esté corriendo.";
+    }
+    if (r.status >= 502 && r.status <= 504) {
+      return "El servidor no responde ahora mismo. Inténtalo de nuevo en un momento.";
+    }
     return `Error ${r.status}`;
   }
 }
