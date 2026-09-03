@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import AvisoPantalla from "@/components/responsive/AvisoPantalla";
-import { ConsolaProvider } from "@/components/admin/ctx";
+import FormClave from "@/components/admin/FormClave";
+import { ConsolaProvider, MCuerpo, useConsola } from "@/components/admin/ctx";
 import { puedeVer, useSesion } from "@/components/admin/sesion";
 import { PREDIOS_SEED, type Predio, type VistaKey } from "@/components/admin/data";
 import Arquitectura from "@/components/admin/views/Arquitectura";
@@ -78,6 +79,38 @@ const ROL_ETIQUETA: Record<string, string> = {
   comercial: "Comercial",
 };
 
+/**
+ * "Cambiar contraseña" del pie del menú. Es un componente aparte porque tiene
+ * que estar DENTRO de `ConsolaProvider` para poder abrir su modal, y
+ * `AdminConsole` es quien lo declara: no puede usar su propio contexto.
+ *
+ * Existe porque los usuarios que siembra el script entran con contraseña
+ * conocida y sin obligación de cambiarla. Sin esta entrada no tendrían por
+ * dónde hacerlo: la pantalla de cambio obligatorio sólo aparece cuando la
+ * contraseña es temporal.
+ */
+function BotonCambiarClave() {
+  const { modal, av } = useConsola();
+
+  const abrir = () => {
+    modal("Cambiar tu contraseña", (cierra) => (
+      <MCuerpo>
+        <FormClave
+          estilo="claro"
+          onHecho={() => { cierra(); av("Contraseña cambiada"); }}
+          pie={<button type="button" className="btn btn-ghost" onClick={cierra}>Cancelar</button>}
+        />
+      </MCuerpo>
+    ));
+  };
+
+  return (
+    <button type="button" className="pnl-link" style={{ marginTop: 8, color: "var(--sand)" }} onClick={abrir}>
+      Cambiar contraseña
+    </button>
+  );
+}
+
 export default function AdminConsole() {
   const { usuario, salir } = useSesion();
   const [vista, setVista] = useState<VistaKey>("flujo");
@@ -141,7 +174,9 @@ export default function AdminConsole() {
             <div className="foot">
               ZEQUARA · v0.1 interna<br />Acceso restringido al equipo.
               <br />
-              <button type="button" className="pnl-link" style={{ marginTop: 8, color: "var(--sand)" }} onClick={salir}>
+              <BotonCambiarClave />
+              <br />
+              <button type="button" className="pnl-link" style={{ marginTop: 6, color: "var(--sand)" }} onClick={salir}>
                 Cerrar sesión
               </button>
             </div>
