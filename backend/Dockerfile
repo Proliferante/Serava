@@ -39,6 +39,14 @@ ENV PORT=8000
 EXPOSE 8000
 
 # `sh -c` y no la forma exec porque hay que expandir $PORT.
+#
 # Un solo worker a propósito: la caché de tablas y el pool de conexiones son
 # por proceso, y con varios cada uno abriría su propio pool contra Supabase.
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1 --proxy-headers --forwarded-allow-ips '*'"]
+#
+# `--forwarded-allow-ips` con los rangos privados y no con `*`: con el comodín,
+# uvicorn se cree la PRIMERA entrada de `X-Forwarded-For`, que la escribe quien
+# llama. El borde de Railway reescribe el encabezado y ahí no se puede
+# falsificar (comprobado), pero el comodín deja esa puerta abierta para
+# cualquier otro sitio donde se despliegue esto. `IPS_DE_CONFIANZA` permite
+# cambiarlos sin tocar la imagen si el proveedor sale de esos rangos.
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1 --proxy-headers --forwarded-allow-ips \"${IPS_DE_CONFIANZA:-127.0.0.1,10.0.0.0/8,100.64.0.0/10,172.16.0.0/12,192.168.0.0/16}\""]

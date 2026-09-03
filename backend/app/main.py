@@ -12,7 +12,15 @@ from app.core import config, sesiones
 
 log = logging.getLogger("zequara")
 
-app = FastAPI(title="Zequara API")
+# Sin documentación interactiva a menos que DOCS_ABIERTAS lo pida: ver la nota
+# en `core/config.py`. `openapi_url=None` también, o `/openapi.json` seguiría
+# sirviendo el esquema entero aunque `/docs` no lo pinte.
+app = FastAPI(
+    title="Zequara API",
+    docs_url="/docs" if config.DOCS_ABIERTAS else None,
+    redoc_url="/redoc" if config.DOCS_ABIERTAS else None,
+    openapi_url="/openapi.json" if config.DOCS_ABIERTAS else None,
+)
 
 
 # Sin base de datos, cualquier endpoint acababa en un 500 pelado —

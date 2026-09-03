@@ -135,6 +135,13 @@ def ip_de(peticion) -> str | None:
     OJO al desplegar: este encabezado lo puede poner cualquiera si el backend
     queda expuesto directamente. Sólo es de fiar detrás de un proxy que lo
     reescriba (Vercel, Nginx, Cloud Run lo hacen).
+
+    Comprobado en Railway el 3 de septiembre de 2026: una petición con
+    `X-Forwarded-For: 203.0.113.77` inventado quedó registrada con la IP real
+    del cliente, así que su borde reescribe el encabezado y no lo añade. Por
+    eso el tope por IP se sostiene ahí. Si el backend se mueve a un sitio que
+    lo deje pasar, el tope por IP se vuelve esquivable —el de por correo, que
+    es el que de verdad protege una cuenta concreta, no—.
     """
     reenviada = (peticion.headers.get("x-forwarded-for") or "").split(",")[0].strip()
     if reenviada:

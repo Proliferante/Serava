@@ -86,6 +86,17 @@ CORS_ORIGINS = [
 COOKIE_SEGURA = os.environ.get("COOKIE_SEGURA", "").strip() in ("1", "true", "sí", "si")
 
 
+# --- documentación interactiva ---------------------------------------------
+# `/docs`, `/redoc` y `/openapi.json` son cómodos mientras se desarrolla y un
+# regalo para quien husmee en producción: publican las 24 rutas, qué recibe
+# cada una y con qué forma. No filtran credenciales, pero entregan el mapa
+# completo de una API que sólo usa el equipo.
+#
+# Cerradas salvo que se pidan a propósito. En local se pone DOCS_ABIERTAS=1
+# en backend/.env; en el proveedor, no se pone.
+DOCS_ABIERTAS = os.environ.get("DOCS_ABIERTAS", "").strip() in ("1", "true", "sí", "si")
+
+
 # --- scraping --------------------------------------------------------------
 METROCUADRADO_API_KEY = os.environ.get("METROCUADRADO_API_KEY", "").strip()
 
