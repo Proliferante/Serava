@@ -1,7 +1,7 @@
 import AdminGate from "@/components/admin/AdminGate";
 import "@/styles/admin.css";
 
-export const metadata = { title: "Zequora · Consola interna" };
+export const metadata = { title: "Zequara · Consola interna" };
 
 /**
  * CONSOLA INTERNA DEL EQUIPO — embudo de predios, extracción, comité,

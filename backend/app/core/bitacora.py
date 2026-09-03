@@ -20,7 +20,7 @@ import logging
 
 from app.core.database import escribir, tabla_existe
 
-log = logging.getLogger("zequora.bitacora")
+log = logging.getLogger("zequara.bitacora")
 
 _avisado = False
 

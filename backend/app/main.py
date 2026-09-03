@@ -10,9 +10,9 @@ from app.api.auth import router as auth_router
 from app.api.flujo import router as flujo_router
 from app.core import config, sesiones
 
-log = logging.getLogger("zequora")
+log = logging.getLogger("zequara")
 
-app = FastAPI(title="Zequora API")
+app = FastAPI(title="Zequara API")
 
 
 # Sin base de datos, cualquier endpoint acababa en un 500 pelado —

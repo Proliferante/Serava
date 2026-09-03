@@ -42,7 +42,7 @@ from datetime import datetime, timedelta, timezone
 from app.core import config
 from app.core.database import cursor, escribir, tabla_existe
 
-log = logging.getLogger("zequora.sesiones")
+log = logging.getLogger("zequara.sesiones")
 
 COOKIE = "zq_sesion"
 

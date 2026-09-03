@@ -1,7 +1,7 @@
 """
 api/admin.py
 ============
-Consola interna de Zequora (embudo, seguimiento, add-value) montada como
+Consola interna de Zequara (embudo, seguimiento, add-value) montada como
 router de FastAPI en /api/admin, dentro del mismo backend oficial.
 
 Es la versión "router" de api_zequora.py (repo local del pipeline, ver
@@ -641,7 +641,7 @@ def _score_predio_detalle(f: dict, precios_zona, areas_zona, zona_info):
         "valor": score,
         "prioridad": _prioridad_predio(score),
         "componentes": componentes,
-        "nota": "Índice propio de Zequora para priorizar revisión — no reemplaza el criterio del arquitecto ni el Score de Zonas oficial.",
+        "nota": "Índice propio de Zequara para priorizar revisión — no reemplaza el criterio del arquitecto ni el Score de Zonas oficial.",
     }, av, pct_precio, pct_area
 
 

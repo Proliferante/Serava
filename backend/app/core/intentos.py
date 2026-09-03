@@ -40,7 +40,7 @@ from datetime import datetime, timedelta, timezone
 
 from app.core.database import cursor, escribir, tabla_existe
 
-log = logging.getLogger("zequora.intentos")
+log = logging.getLogger("zequara.intentos")
 
 # Ventana en la que se cuentan los fallos, y los topes de cada vía.
 VENTANA = timedelta(minutes=15)
