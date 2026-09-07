@@ -277,13 +277,49 @@ scrapeado nada.
 
 Tres cosas mas de esa funcion, y ninguna es opcional:
 
+- **Un nulo no es un False.** Las columnas de marca se escriben con el dtype
+  `boolean` **nullable** de pandas, no con `bool`. `dentro_poligono_real =
+  NULL` significa "no se pudo evaluar porque el anuncio no trae coordenadas"
+  --medio Panama-- y la regla del proyecto es que eso NO excluye a nadie:
+  esta en los propios criterios (`OR dentro_poligono_real IS NULL`). Un
+  `fillna(False)` convirtio 3.257 nulos en False y dejo 1.232 predios fuera
+  de la consola sin un solo error. `astype(bool)` a secas hace lo contrario
+  y tambien esta mal: con un NaN dentro, el nulo pasa a True.
 - **Los tipos se fijan antes y se comprueban despues** (`_tipos_estables`,
   `_comprobar_tipos`). `to_sql` deduce el tipo de cada columna del dtype del
   dataframe: una columna de marcas sale `boolean`, pero si una corrida la
   deja con algun NaN sale `double precision`, y entonces todas las consultas
   de la consola --que preguntan `IS TRUE`-- revientan con 500. Si la
   comprobacion salta, la corrida falla ahi y se ve en la bitacora, en vez de
-  descubrirse cuando el equipo abra la consola.
+  descubrirse cuando el equipo abra la consola. La comprobacion mira dos
+  cosas: que el tipo sea `boolean`, y que la tabla tenga **tantos nulos como
+  el dataframe** -- lo segundo es lo que atrapa el fallo del punto anterior,
+  que no da ningun error por si mismo.
+
+## Un precio por m2 nunca es cero
+
+`precio_por_m2()` en `script_extract_serava.py` devuelve `None` --no cero--
+cuando no se puede calcular, y exige que el area este entre 5 y 100.000 m2.
+
+La corrida del 7 de septiembre trajo un anuncio de El Cangrejo con
+`area_m2 = 14.314.321.900` y otro de Bella Vista con 600.143: errores del
+portal, una cifra pegada mal en el campo del area. `round(214000 /
+14314321900)` da **cero**, y un cero ahi hacia dos destrozos:
+
+1. `math.log(0)` lanza «ValueError: math domain error» y tumbaba la corrida
+   COMPLETA: 10.850 registros extraidos y ni uno llego a `clean_listings`.
+2. Y si no la tumbara, seria el precio por metro mas bajo de su zona: entraba
+   en la mediana arrastrandola hacia abajo --o sea corrompiendo el criterio
+   con el que se eligen los predios-- y salia marcado `bajo_media_zona =
+   TRUE`, o sea como la mejor oportunidad del listado.
+
+Por eso la defensa esta en tres sitios y no en uno: el extract no los
+produce, `marcar_precios_atipicos` los marca `atipico_bajo /
+precio_no_positivo` antes de cualquier logaritmo, y
+`recalcular_bajo_media_zona` los deja fuera de la mediana y de la marca. Los
+dos ultimos hacen falta igual, porque la limpieza corre sobre **todo el
+historico** de `raw_listings` y los registros viejos siguen ahi. El
+`area_m2` original no se toca: se conserva para poder auditarlo.
 - **Los indices se recrean** (`INDICES`). La tabla se reconstruye en cada
   corrida, asi que sus indices se van con ella. Estuvo sin ninguno: cada
   consulta del flujo y de la extraccion recorria las once mil filas.

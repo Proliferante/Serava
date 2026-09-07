@@ -356,9 +356,7 @@ def parsear_resultados_metrocuadrado(data_json: dict, zona_cfg: dict) -> list[di
             "tipo_inmueble": (item.get("mtipoinmueble") or {}).get("nombre", "Apartamento"),
             "precio_venta": precio,
             "area_m2": area,
-            "precio_m2": (
-                round(precio / area) if precio and area and area > 0 else None
-            ),
+            "precio_m2": precio_por_m2(precio, area),
             "habitaciones": item.get("mnrocuartos"),
             "banos": item.get("mnrobanos"),
             "parqueaderos": item.get("mnrogarajes"),
@@ -557,9 +555,7 @@ def parsear_resultados_encuentra24(html: str, zona_cfg: dict) -> list[dict]:
             "tipo_inmueble": "Apartamento",
             "precio_venta": precio_num,
             "area_m2": area_num,
-            "precio_m2": (
-                round(precio_num / area_num) if precio_num and area_num and area_num > 0 else None
-            ),
+            "precio_m2": precio_por_m2(precio_num, area_num),
             "habitaciones": habitaciones_texto,
             "banos": banos_texto,
             "parqueaderos": None,
@@ -626,6 +622,47 @@ COLUMNAS_TABLA = [
     "antiguedad_texto", "latitud", "longitud", "en_scope_zona",
     "bajo_media_zona", "fecha_extraccion",
 ]
+
+
+# Rango de area con el que se puede calcular un precio por m2.
+#
+# El tope no es celo: la corrida del 7 de septiembre trajo un anuncio de El
+# Cangrejo con area_m2 = 14.314.321.900 (catorce mil millones de metros
+# cuadrados) y otro de Bella Vista con 600.143. Son errores del anuncio -- una
+# cifra pegada mal, o el precio metido en el campo del area.
+#
+# El problema no es tenerlos: es que `round(214000 / 14314321900)` da CERO, y
+# un precio_m2 de cero no es "no se sabe", es un numero que:
+#   - revienta la limpieza, porque `math.log(0)` lanza «math domain error» y
+#     tumba la corrida entera (paso: 10.850 registros extraidos y ni uno
+#     llego a clean_listings);
+#   - y si no la reventara, seria el precio por metro mas bajo del universo,
+#     o sea el primero que el equipo veria como chollo.
+#
+# Con un area fuera de rango, `precio_m2` queda en None: "no se puede
+# calcular". El `area_m2` original NO se toca y se guarda tal cual -- misma
+# regla que en todo el pipeline: no se borra nada, se deja de derivar.
+AREA_M2_MINIMA = 5          # por debajo no es una vivienda
+AREA_M2_MAXIMA = 100_000    # mismo tope que el formulario del flujo
+
+
+def precio_por_m2(precio, area):
+    """El precio por m2, o None si no se puede calcular de forma creible.
+
+    Devuelve None cuando falta el precio o el area, cuando el area esta
+    fuera del rango plausible, o cuando la division da cero o menos: un
+    cero aqui es siempre un artefacto del redondeo, nunca un dato.
+    """
+    if not precio or not area:
+        return None
+    try:
+        precio, area = float(precio), float(area)
+    except (TypeError, ValueError):
+        return None
+    if not (AREA_M2_MINIMA <= area <= AREA_M2_MAXIMA):
+        return None
+    valor = round(precio / area)
+    return valor if valor > 0 else None
 
 
 def init_db(db_path: str = DB_PATH) -> db._Conexion:

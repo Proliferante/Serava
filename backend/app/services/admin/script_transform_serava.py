@@ -219,7 +219,22 @@ def marcar_precios_atipicos(df: pd.DataFrame) -> pd.DataFrame:
     df["metodo_atipico"] = None
 
     for (zona, moneda), grupo in df.groupby(["zona", "moneda"]):
+        # `> 0` y no solo `dropna()`. Un precio_m2 de cero o negativo no es un
+        # dato con el que calcular nada: es lo que sale de dividir por un area
+        # absurda del anuncio. Metido en el grupo hacia dos destrozos:
+        #
+        #   1. `math.log(0)` lanza «ValueError: math domain error» y tumbaba
+        #      la corrida COMPLETA. Paso el 7 de septiembre: 10.850 registros
+        #      extraidos de los diez barrios, dos anuncios con precio_m2 = 0,
+        #      y ni una fila llego a clean_listings.
+        #   2. arrastraba la mediana y los cuartiles de su zona hacia abajo,
+        #      o sea corrompia el criterio con el que se eligen los predios.
+        #
+        # El extract ya no los produce (ver `precio_por_m2`), pero los que hay
+        # en `raw_listings` de corridas anteriores siguen ahi, y esta funcion
+        # tiene que aguantarlos: la limpieza se corre sobre todo el historico.
         precios_validos = grupo["precio_m2"].dropna()
+        precios_validos = precios_validos[precios_validos > 0]
         if len(precios_validos) < 4:
             # Muestra muy chica (ej. Getsemani) para que un calculo de
             # cuartiles o de MAD tenga sentido estadistico; se deja todo
@@ -245,6 +260,13 @@ def marcar_precios_atipicos(df: pd.DataFrame) -> pd.DataFrame:
         ):
             if precio_m2 is None or pd.isna(precio_m2):
                 return "sin_dato", None
+            # Cero o negativo se marca como atipico bajo y se sale ANTES de
+            # cualquier logaritmo. Atipico y no "sin_dato" a proposito: es un
+            # numero que esta en la fila y que sin marca seria el precio por
+            # metro mas bajo del listado, el primero que alguien miraria como
+            # oportunidad. Marcado, la consola le pone su etiqueta roja.
+            if precio_m2 <= 0:
+                return "atipico_bajo", "precio_no_positivo"
             if precio_m2 < piso:
                 return "atipico_bajo", "piso_absoluto"
 
@@ -375,16 +397,39 @@ def eliminar_duplicados_confirmados(df: pd.DataFrame) -> pd.DataFrame:
 # sobre datos crudos, sin esas correcciones todavia aplicadas.
 
 def recalcular_bajo_media_zona(df: pd.DataFrame) -> pd.DataFrame:
+    """La mediana de precio/m2 por zona y la marca de estar por debajo.
+
+    ES EL CRITERIO CON EL QUE SE ELIGEN LOS PREDIOS, asi que los precios no
+    positivos se quedan fuera por los dos lados:
+
+      - De la MEDIANA, porque la arrastran hacia abajo. Dos anuncios con
+        precio_m2 = 0 en El Cangrejo mueven el umbral de toda la zona, y con
+        el umbral se mueve la lista de lo que el equipo va a revisar. No es
+        un adorno estadistico: es que el criterio queda mal calculado.
+      - De la MARCA, porque `0 < mediana` es verdadero. Sin esto, un anuncio
+        cuyo area viene mal en el portal entra al listado como el predio con
+        el precio por metro mas bajo de su zona, o sea como la mejor
+        oportunidad disponible.
+
+    Los no positivos quedan con `bajo_media_zona = NA`: no se puede evaluar.
+    Es lo mismo que hace la marca para un precio ausente, y la consola los
+    deja fuera del listado porque sus criterios exigen `IS TRUE`.
+    """
     df = df.copy()
+    positivo = df["precio_m2"].notna() & (df["precio_m2"] > 0)
+
     medianas = {}
     for zona, grupo in df.groupby("zona"):
-        precios = grupo.loc[grupo["posible_duplicado"] == False, "precio_m2"].dropna()  # noqa: E712
+        precios = grupo.loc[
+            (grupo["posible_duplicado"] == False) & (grupo["precio_m2"] > 0),  # noqa: E712
+            "precio_m2",
+        ].dropna()
         if len(precios) > 0:
             medianas[zona] = statistics.median(precios)
 
     df["mediana_precio_m2_zona"] = df["zona"].map(medianas)
     df["bajo_media_zona"] = (df["precio_m2"] < df["mediana_precio_m2_zona"]).astype("boolean")
-    df.loc[df["precio_m2"].isna() | df["mediana_precio_m2_zona"].isna(), "bajo_media_zona"] = pd.NA
+    df.loc[~positivo | df["mediana_precio_m2_zona"].isna(), "bajo_media_zona"] = pd.NA
     return df
 
 
@@ -492,23 +537,62 @@ INDICES = [
 
 def _tipos_estables(df: pd.DataFrame) -> pd.DataFrame:
     """Fija el dtype de las columnas de marca para que el tipo en Postgres
-    no cambie de una corrida a otra. Ver COLUMNAS_MARCA."""
+    no cambie de una corrida a otra, CONSERVANDO los nulos.
+
+    El dtype es `boolean` de pandas (nullable), no el `bool` de Python. La
+    diferencia no es un detalle: en este proyecto un nulo es un tercer valor
+    con significado propio, y el criterio con el que se eligen los predios
+    depende de el.
+
+      dentro_poligono_real = NULL  ->  "no se pudo evaluar porque el anuncio
+                                        no trae coordenadas" (medio Panama)
+
+    La regla del proyecto es que eso NO excluye a nadie, y esta escrita en
+    los propios criterios de la consola:
+
+      (dentro_poligono_real IS TRUE OR similar_a_zona IS TRUE
+       OR dentro_poligono_real IS NULL)
+
+    Con `fillna(False)` esos nulos se volvian False, dejaban de cumplir el
+    criterio y desaparecian de la consola: 3.257 nulos a cero y `habilitados`
+    de 5.457 a 4.225 en una corrida, sin un error por ninguna parte. Es el
+    fallo que esta funcion existia para evitar, cometido dentro de ella.
+
+    `astype(bool)` a secas tampoco vale, que era la razon del `fillna`: con
+    un NaN dentro convierte el nulo en True, o sea "no se sabe" pasaria a
+    "si". `astype("boolean")` no hace ninguna de las dos cosas.
+    """
     df = df.copy()
     for col in COLUMNAS_MARCA:
-        if col in df.columns:
-            # `fillna(False)` y no `astype(bool)` a secas: con un NaN dentro,
-            # `astype(bool)` lo convierte en True —"no se sabe" pasaria a
-            # "si"— y eso cambiaria el criterio del arquitecto en silencio.
-            df[col] = df[col].fillna(False).astype(bool)
+        if col not in df.columns:
+            continue
+        columna = df[col]
+        if columna.dtype.kind == "f":
+            # Columna de flotantes (1.0 / 0.0 / NaN): pandas no la convierte
+            # a `boolean` de un salto, hay que pasar por enteros nullable.
+            columna = columna.astype("Int64")
+        df[col] = columna.astype("boolean")
     return df
 
 
-def _comprobar_tipos(conn):
-    """Aborta si alguna columna de marca no acabo siendo boolean.
+def _comprobar_tipos(conn, df: pd.DataFrame):
+    """Aborta si la tabla publicada no coincide con lo que se quiso escribir.
 
-    Es una comprobacion y no un arreglo a proposito: si esto salta, el
-    dataframe traia algo que `_tipos_estables` no previo, y conviene verlo
-    en la bitacora de la corrida antes de que la consola empiece a dar 500.
+    Dos comprobaciones, y cada una atrapa un fallo que ya ocurrio:
+
+      1. TIPO. Que las columnas de marca sean `boolean`. Si salen numericas,
+         las consultas de la consola —que preguntan `IS TRUE`— revientan con
+         500 en /predios y en las cinco pantallas del flujo.
+      2. NULOS. Que la tabla tenga tantos nulos como el dataframe. Un nulo
+         aqui significa "no se pudo evaluar" y el criterio del arquitecto lo
+         admite a proposito; convertirlo en False esconde predios sin que
+         nada falle. Paso: 3.257 nulos de `dentro_poligono_real` a cero, y
+         1.232 predios fuera de la consola en silencio.
+
+    Son comprobaciones y no arreglos a proposito: si saltan, el dataframe
+    traia algo que `_tipos_estables` no previo, y hay que verlo en la
+    bitacora de la corrida — no descubrirlo semanas despues por un numero
+    que no cuadra.
     """
     filas = conn.execute(
         "SELECT column_name, data_type FROM information_schema.columns "
@@ -520,6 +604,25 @@ def _comprobar_tipos(conn):
         raise RuntimeError(
             "clean_listings quedo con columnas de marca que no son boolean: "
             f"{malas}. La consola daria 500 en /predios y en el flujo. "
+            "Revisa _tipos_estables en script_transform_serava.py."
+        )
+
+    presentes = [c for c in COLUMNAS_MARCA if c in df.columns and c in tipos]
+    if not presentes:
+        return
+    conteos = ", ".join(f"count(*) FILTER (WHERE {c} IS NULL) AS {c}" for c in presentes)
+    escritos = dict(conn.execute(f"SELECT {conteos} FROM clean_listings").fetchone())
+    perdidos = {
+        c: (int(df[c].isna().sum()), int(escritos[c]))
+        for c in presentes
+        if int(df[c].isna().sum()) != int(escritos[c])
+    }
+    if perdidos:
+        raise RuntimeError(
+            "clean_listings no conservo los nulos de las columnas de marca "
+            f"(columna: esperados vs escritos) {perdidos}. Un nulo es "
+            "'no se pudo evaluar' y el criterio del arquitecto lo admite: "
+            "convertirlo en False esconde predios de la consola. "
             "Revisa _tipos_estables en script_transform_serava.py."
         )
 
@@ -558,7 +661,7 @@ def guardar(df_final: pd.DataFrame):
         conn.execute("ALTER TABLE clean_listings_nueva RENAME TO clean_listings")
         conn.commit()
 
-        _comprobar_tipos(conn)
+        _comprobar_tipos(conn, df_final)
 
         # La tabla anterior se suelta ANTES de crear los indices, y el orden
         # importa: en Postgres el nombre de un indice es unico en el esquema,
