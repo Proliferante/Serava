@@ -52,6 +52,11 @@ from app.services import auth_service as svc
 # Los seis del equipo, con el rol acordado. Los correos van en minúsculas
 # porque así se guardan y así se comparan al entrar: da igual cómo se
 # escriban al teclear.
+#
+# El patrón es `nombre.inicial@dominio` — paola.a, nati.c, david.c. Laura y
+# David estaban sin el punto (`laurap`, `davidc`) y eran los dos únicos: un
+# correo que no sigue el patrón del resto se teclea mal la primera vez, y
+# aquí el correo ES la identidad para entrar.
 # Las contraseñas cumplen la política de `app/core/config.py`: doce
 # caracteres o más, no están en la lista de obvias y no contienen el nombre ni
 # el correo de su dueño —por eso NO son "ZqChristian26" y parecidas, que la
@@ -62,8 +67,8 @@ from app.services import auth_service as svc
 # día que esto tenga dominio está `--azar`.
 EQUIPO = [
     ("Christian Mejía", "christian.mejia@zequara.com", "arquitectura", "ObraLimpia-472"),
-    ("Laura P.",        "laurap@proliferante.com",     "comercial",    "TratoJusto-915"),
-    ("David C.",        "davidc@proliferante.com",     "data",         "CifraExacta-268"),
+    ("Laura P.",        "laura.p@proliferante.com",    "comercial",    "TratoJusto-915"),
+    ("David C.",        "david.c@proliferante.com",     "data",         "CifraExacta-268"),
     ("Paola A.",        "paola.a@proliferante.com",    "admin",        "LlaveMaestra-731"),
     ("Nati C.",         "nati.c@proliferante.com",     "admin",        "RumboFirme-584"),
     ("Jesús A.",        "jesus.a@proliferante.com",    "admin",        "PuertaAncha-390"),
