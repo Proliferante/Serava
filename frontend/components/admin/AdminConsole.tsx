@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { MARK } from "@/components/brand";
 import AvisoPantalla from "@/components/responsive/AvisoPantalla";
 import { ConsolaProvider } from "@/components/admin/ctx";
 import { puedeVer, useSesion } from "@/components/admin/sesion";
@@ -137,11 +138,18 @@ export default function AdminConsole() {
         <div className="app">
           {/* ══════════ MENÚ LATERAL ══════════ */}
           <aside className={`side${cajon ? " open" : ""}`}>
+            {/* El monograma de verdad. Aquí había una casita genérica dibujada
+                a mano en un cuadro con borde: la ranura del icono de la
+                maqueta, de cuando el logotipo aún no existía. El resto de la
+                aplicación —nav público, panel del inversionista, modales— ya
+                usaba `MARK`; la consola era la única que no.
+
+                El `alt` va vacío a propósito: el nombre lo dice el texto de
+                al lado, y con los dos un lector de pantalla anunciaría
+                "Zequara Zequara". */}
             <div className="brand">
               <div className="mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7}>
-                  <path d="M4 20V9l8-5 8 5v11M9 20v-6h6v6" />
-                </svg>
+                <img src={MARK} alt="" decoding="async" />
               </div>
               <span className="name">ZEQUARA</span>
             </div>

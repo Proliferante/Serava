@@ -26,7 +26,8 @@ zona SI aparece en el texto de barrio que trae el propio portal
 por zona para que la limitacion quede visible, no escondida.
 
 QUE HACE ESTE SCRIPT:
-1. Lee raw_listings desde serava_raw.db, filtrando a en_scope_zona = 1.
+1. Lee raw_listings, filtrando a en_scope_zona verdadero (la columna es
+   texto y guarda '1' o 'true' segun la epoca de la corrida).
 2. Convierte los campos de texto a sus tipos numericos reales.
 3. Asigna la moneda correspondiente segun el pais (Colombia -> COP,
    Panama -> USD) - IMPORTANTE para no comparar ni graficar precios de
@@ -115,7 +116,20 @@ UMBRAL_Z_ROBUSTO = 3.5
 # ---------------------------------------------------------------------------
 
 def cargar_datos_crudos(db_path: str = RAW_DB_PATH) -> pd.DataFrame:
-    df = pd.read_sql("SELECT * FROM raw_listings WHERE en_scope_zona = '1'", db.engine())
+    # OJO: `en_scope_zona` es texto y la tabla tiene DOS formatos. Las filas
+    # de la epoca de sqlite traen '1'/'0'; las que escribe Postgres traian
+    # 'true'/'false' (psycopg2 adapta el bool de Python). Filtrando solo por
+    # '1' esta consulta se dejaba fuera todo lo que trajo cada corrida desde
+    # la migracion: la limpieza terminaba con exito y clean_listings se
+    # quedaba con los datos de la ultima corrida de sqlite.
+    #
+    # El extract ya normaliza a '1'/'0' (ver _texto_de_marca), pero las filas
+    # viejas siguen ahi, asi que aqui se aceptan las dos formas.
+    df = pd.read_sql(
+        "SELECT * FROM raw_listings "
+        "WHERE lower(en_scope_zona) IN ('1', 'true', 't')",
+        db.engine(),
+    )
     return df
 
 
@@ -453,7 +467,8 @@ def main():
 
     print("\nRegistros excluidos por zona (en_scope_zona = 0) - LIMITACION CONOCIDA:")
     excluidos = pd.read_sql(
-        "SELECT zona, COUNT(*) as excluidos FROM raw_listings WHERE en_scope_zona = '0' GROUP BY zona",
+        "SELECT zona, COUNT(*) as excluidos FROM raw_listings "
+        "WHERE lower(en_scope_zona) IN ('0', 'false', 'f') GROUP BY zona",
         db.engine(),
     )
     if len(excluidos) > 0:

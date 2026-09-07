@@ -659,9 +659,29 @@ def init_db(db_path: str = DB_PATH) -> db._Conexion:
     return conn
 
 
+# `en_scope_zona` es una columna de TEXTO y las dos funciones que arman los
+# registros le ponen un bool de Python. En sqlite eso se guardaba como 1/0;
+# en Postgres, psycopg2 lo adapta a `true`/`false`. Resultado: la tabla
+# quedó con los dos formatos y la limpieza, que filtra por `= '1'`, se
+# dejaba fuera TODO lo que trajo cada corrida desde la migración a Postgres
+# — 500 anuncios de La Cabrera el 4 de septiembre, por ejemplo. El scraping
+# funcionaba y no llegaba nada a la consola.
+#
+# Se normaliza aquí, en el único sitio por el que pasan todas las
+# escrituras, para que no dependa de que las dos (o tres) funciones que
+# arman registros se acuerden. Los lectores además toleran las dos formas,
+# porque las filas viejas siguen en la tabla.
+def _texto_de_marca(valor) -> str | None:
+    """Un bool a la forma en que esta columna de texto guarda las marcas."""
+    if valor is None:
+        return None
+    return "1" if valor else "0"
+
+
 def guardar_registro(conn: "db._Conexion", url_inmueble: str, registro: dict):
     columnas = ["url_inmueble"] + COLUMNAS_TABLA
     valores = [url_inmueble] + [registro.get(c) for c in COLUMNAS_TABLA]
+    valores[columnas.index("en_scope_zona")] = _texto_de_marca(registro.get("en_scope_zona"))
     placeholders = ", ".join(["?"] * len(columnas))
     columnas_sql = ", ".join(columnas)
     actualizaciones = ", ".join(f"{c} = EXCLUDED.{c}" for c in COLUMNAS_TABLA)
