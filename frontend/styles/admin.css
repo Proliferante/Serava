@@ -414,6 +414,15 @@
 .adm .e-nuevo{background:rgba(200,145,63,.16);color:var(--amber);}
 .adm .e-pre{background:rgba(94,122,138,.16);color:var(--blue);}
 .adm .e-vis{background:rgba(165,122,78,.18);color:var(--caramel);}
+/* El aviso de las pantallas de muestra. Ambar y no azul como `.auto-note`:
+   el azul de esta consola es informacion, y esto es una advertencia — hay que
+   distinguirlo de un pie de ayuda a la primera ojeada. */
+.adm .maqueta-note{display:flex;gap:11px;align-items:flex-start;background:rgba(200,145,63,.12);border:1px solid rgba(200,145,63,.42);border-radius:12px;padding:13px 15px;margin-bottom:18px;}
+.adm .maqueta-note svg{width:19px;height:19px;stroke:var(--amber);fill:none;stroke-width:1.9;flex-shrink:0;margin-top:1px;}
+.adm .maqueta-note p{font-size:.83rem;color:var(--coffee);font-weight:300;line-height:1.55;}
+.adm .maqueta-note b{font-weight:600;}
+/* La etiqueta del menu lateral. */
+.adm .nav-item .muestra{margin-left:auto;font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);background:rgba(200,145,63,.16);border:1px solid rgba(200,145,63,.34);border-radius:999px;padding:2px 7px;}
 .adm .auto-note{display:flex;gap:11px;align-items:flex-start;background:rgba(94,122,138,.1);border:1px solid rgba(94,122,138,.3);border-radius:12px;padding:13px 15px;margin-bottom:16px;}
 .adm .auto-note svg{width:18px;height:18px;stroke:var(--blue);fill:none;stroke-width:1.9;flex-shrink:0;margin-top:1px;}
 .adm .auto-note p{font-size:.83rem;color:var(--coffee);font-weight:300;}

@@ -190,3 +190,36 @@ export function BtnLink({ href, target, tono = "ghost", children }: {
 export function MkChip({ t, title, children }: { t: "in" | "na" | "atip" | "desc"; title?: string; children: ReactNode }) {
   return <span className={`mk-chip mk-${t}`} title={title}>{children}</span>;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   AVISO DE MAQUETA — para las pantallas que todavía no tienen backend.
+
+   Siete de las doce pantallas de la consola enseñan datos escritos en el
+   código (`PREDIOS_SEED` y constantes dentro de cada vista) y no hacen ni una
+   llamada al servidor. Sin decirlo, son indistinguibles de las que sí son
+   reales: el Panel general abría con "7 publicados" cuando en la base hay
+   cero, y "Nuevo predio" deja crear un inmueble que desaparece al recargar.
+
+   Con un equipo empezando a usar la consola eso no es un detalle pendiente,
+   es información falsa presentada como buena. El aviso va ARRIBA de la
+   pantalla, antes de los números, y dice tres cosas: que es un ejemplo, que
+   no se guarda, y dónde está lo que sí funciona.
+
+   Se quita en cuanto la pantalla tenga sus endpoints — es una línea por
+   vista.
+   ═══════════════════════════════════════════════════════════════════════════ */
+export function AvisoMaqueta({ children }: { children?: ReactNode }) {
+  return (
+    <div className="maqueta-note">
+      <svg viewBox="0 0 24 24" {...trazo}>
+        <path d="M12 9v4M12 17h.01" />
+        <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+      </svg>
+      <p>
+        <b>Pantalla de muestra.</b> Los datos que ves son un ejemplo escrito en el código, no
+        salen de la base, y lo que hagas aquí <b>no se guarda</b>.
+        {children ? <> {children}</> : null}
+      </p>
+    </div>
+  );
+}

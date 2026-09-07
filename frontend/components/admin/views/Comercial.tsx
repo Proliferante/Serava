@@ -6,7 +6,7 @@ import {
   AGENDA_SEED, LEADS_SEED, RESERVAS_SEED, STAGES, STAGE_EST,
   type Lead, type Reserva, type Sesion,
 } from "@/components/admin/data";
-import { Card, EstLibre, FStage, Grid, SecTitle, Tabla, Task, VHead } from "@/components/admin/ui";
+import { AvisoMaqueta, Card, EstLibre, FStage, Grid, SecTitle, Tabla, Task, VHead } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    COMERCIAL — leads del formulario de acceso, reservas e inversionistas.
@@ -126,6 +126,7 @@ export default function Comercial({ abrirGestion }: { abrirGestion: () => void }
 
   return (
     <section className="view active">
+      <AvisoMaqueta>Reservas y clientes todavía no están construidos en el backend.</AvisoMaqueta>
       <VHead
         fuerte="Comercial"
         acciones={

@@ -1,7 +1,7 @@
 "use client";
 
 import { useConsola } from "@/components/admin/ctx";
-import { Card, Frow, Grid, Kpi, SecTitle, Task, VHead } from "@/components/admin/ui";
+import { AvisoMaqueta, Card, Frow, Grid, Kpi, SecTitle, Task, VHead } from "@/components/admin/ui";
 
 /* ARQUITECTURA — dossier técnico, obra en curso y evaluaciones pendientes. */
 
@@ -26,6 +26,7 @@ export default function Arquitectura({ abrirGestion }: { abrirGestion: () => voi
 
   return (
     <section className="view active">
+      <AvisoMaqueta>El trabajo real de arquitectura se hace hoy en <b>Flujo de inmuebles</b>: revisión general, contacto, visita y publicación.</AvisoMaqueta>
       <VHead fuerte="Arquitectura">
         Evaluación técnica, alcance de remodelación a costo cerrado, cronograma y obra en curso.
       </VHead>

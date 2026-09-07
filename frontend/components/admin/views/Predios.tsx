@@ -3,9 +3,7 @@
 import { useMemo, useState } from "react";
 import { useConsola } from "@/components/admin/ctx";
 import { EST, type Predio } from "@/components/admin/data";
-import {
-  AreaChip, Card, Est, IcoDown, IcoEdit, IcoEye, IcoPlus, Tabla, Tgl, VHead,
-} from "@/components/admin/ui";
+import { AreaChip, AvisoMaqueta, Card, Est, IcoDown, IcoEdit, IcoEye, IcoPlus, Tabla, Tgl, VHead } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PREDIOS — el listado maestro. Publicar aquí controla lo que se ve en el
@@ -40,6 +38,7 @@ export default function Predios({
 
   return (
     <section className="view active">
+      <AvisoMaqueta>El listado real de inmuebles es <b>Flujo de inmuebles</b>, en Captación.</AvisoMaqueta>
       <VHead
         titulo="Gestión de" fuerte="predios"
         acciones={

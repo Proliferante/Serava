@@ -42,15 +42,27 @@ import Usuarios from "@/components/admin/views/Usuarios";
    Flujo de inmuebles (donde se revisa, se contacta, se visita y se
    publica). "Gestión" es todo lo que viene después.
 
-   QUÉ ESTÁ CONTRA LA BASE Y QUÉ ES MAQUETA
-   Reales: extracción, flujo de inmuebles y usuarios. Maqueta todavía —la
-   parte que el correo dejó "en espera"—: el listado de Predios, el comité,
-   arquitectura, data y comercial. Los datos de esas cuatro salen de
-   `PREDIOS_SEED`, no de la base, y por eso no se les cuelga ningún
-   contador: un número inventado en el menú es peor que ninguno.
+   QUÉ ESTÁ CONTRA LA BASE Y QUÉ ES MUESTRA
+   Reales: Panel general (sus cinco cifras), Extracción de predios, Flujo de
+   inmuebles, Data & Score, Equipo & permisos y Mi cuenta.
+
+   De muestra, y marcadas como tales en el menú y dentro de la pantalla:
+   Predios, Nuevo predio, Comité, Arquitectura y Comercial. Sus datos salen
+   de `PREDIOS_SEED` y de constantes dentro de cada vista; no hacen ni una
+   llamada al servidor y nada de lo que se haga en ellas se guarda.
+
+   La etiqueta no es cosmética. Sin ella son indistinguibles de las que sí
+   funcionan: alguien de arquitectura entra a la pantalla que se llama
+   "Arquitectura", ve cuatro predios con su score y se pone a trabajar sobre
+   un ejemplo. Se quita en cuanto cada una tenga sus endpoints.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-type Item = { k: VistaKey; l: string; d: string; d2?: string; badge?: number; circulo?: boolean };
+type Item = {
+  k: VistaKey; l: string; d: string; d2?: string;
+  badge?: number; circulo?: boolean;
+  /** Pantalla de muestra: sin backend, con datos escritos en el código. */
+  muestra?: boolean;
+};
 
 const GRUPOS: { g: string; items: Item[] }[] = [
   {
@@ -75,15 +87,15 @@ const GRUPOS: { g: string; items: Item[] }[] = [
        captación es diaria, esto es por predio. */
     g: "Gestión",
     items: [
-      { k: "predios", l: "Predios", d: "M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" },
-      { k: "nuevo", l: "Nuevo predio", d: "M12 5v14M5 12h14" },
+      { k: "predios", l: "Predios", d: "M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" , muestra: true },
+      { k: "nuevo", l: "Nuevo predio", d: "M12 5v14M5 12h14" , muestra: true },
       /* Sin badge: el "3" de antes era un número escrito a mano en el
          menú, no una cuenta de nada. Vuelve cuando el comité tenga
          endpoint y pueda decir cuántos hay de verdad. */
-      { k: "comite", l: "Comité de aprobación", d: "M9 12l2 2 4-4", d2: "M21 12c0 5-9 9-9 9s-9-4-9-9a9 9 0 0 1 18 0z" },
-      { k: "arq", l: "Arquitectura", d: "M12 3l9 6-9 6-9-6z", d2: "M3 15l9 6 9-6" },
+      { k: "comite", l: "Comité de aprobación", d: "M9 12l2 2 4-4", d2: "M21 12c0 5-9 9-9 9s-9-4-9-9a9 9 0 0 1 18 0z" , muestra: true },
+      { k: "arq", l: "Arquitectura", d: "M12 3l9 6-9 6-9-6z", d2: "M3 15l9 6 9-6" , muestra: true },
       { k: "data", l: "Data & Score", d: "M3 12l4-4 4 4 4-6 6 8", d2: "M3 20h18" },
-      { k: "comercial", l: "Comercial", d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" },
+      { k: "comercial", l: "Comercial", d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" , muestra: true },
     ],
   },
   {
@@ -171,6 +183,10 @@ export default function AdminConsole() {
                       {i.d2 && <path d={i.d2} />}
                     </svg>
                     {i.l}
+                    {/* La etiqueta va en el menú y no sólo dentro de la
+                        pantalla: así se sabe qué es real ANTES de entrar y de
+                        ponerse a trabajar sobre datos de ejemplo. */}
+                    {i.muestra && <span className="muestra">muestra</span>}
                     {i.badge != null && <span className="badge">{i.badge}</span>}
                   </button>
                 ))}

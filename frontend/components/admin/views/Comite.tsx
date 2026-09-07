@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useConsola } from "@/components/admin/ctx";
 import { AREAS, COMITE_SEED, type AreaKey, type CasoComite } from "@/components/admin/data";
-import { AreaChip, Est, IcoCheck, IcoEye, VHead } from "@/components/admin/ui";
+import { AreaChip, AvisoMaqueta, Est, IcoCheck, IcoEye, VHead } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    COMITÉ DE APROBACIÓN — un predio se publica solo con el visto bueno de las
@@ -40,6 +40,7 @@ export default function Comite() {
 
   return (
     <section className="view active">
+      <AvisoMaqueta>El comité todavía no tiene endpoints: estas tarjetas son un ejemplo del diseño acordado.</AvisoMaqueta>
       <VHead titulo="Comité de" fuerte="aprobación">
         Un predio se publica solo con el visto bueno de las tres áreas: Arquitectura, Data y Comercial.
       </VHead>

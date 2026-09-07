@@ -3,9 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { useConsola } from "@/components/admin/ctx";
 import { ESTADOS } from "@/components/admin/data";
-import {
-  Card, Frow, Grid, Hint, IcoEye, IcoPlus, IcoTrash, Ring, SecTitle, Tabla,
-} from "@/components/admin/ui";
+import { AvisoMaqueta, Card, Frow, Grid, Hint, IcoEye, IcoPlus, IcoTrash, Ring, SecTitle, Tabla } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    GESTIÓN DE PREDIO — la ficha interna, con sus siete pestañas.
@@ -156,6 +154,7 @@ export default function GestionPredio() {
 
   return (
     <section className="view active">
+      <AvisoMaqueta>La ficha de gestión de un predio todavía no lee de la base.</AvisoMaqueta>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
         <div className="crumb">
           <button type="button" className="pnl-link" onClick={() => go("predios")}>

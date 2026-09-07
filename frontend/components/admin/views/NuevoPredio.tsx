@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useConsola } from "@/components/admin/ctx";
 import type { Predio } from "@/components/admin/data";
-import { Card, Grid, Hint, IcoPlus, SecTitle, Tabla } from "@/components/admin/ui";
+import { AvisoMaqueta, Card, Grid, Hint, IcoPlus, SecTitle, Tabla } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    NUEVO PREDIO — registro de un activo.
@@ -55,6 +55,7 @@ export default function NuevoPredio({ onCrear }: { onCrear: (p: Predio) => void 
 
   return (
     <section className="view active">
+      <AvisoMaqueta>Un inmueble creado aquí <b>desaparece al recargar la página</b>. Para meter uno de verdad en el circuito, córrelo en <b>Extracción de predios</b> y acéptalo.</AvisoMaqueta>
       <div className="vhead">
         <div>
           <h1>Nuevo <b>predio</b></h1>
