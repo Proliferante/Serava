@@ -7,20 +7,26 @@ import { TRANSFORMACIONES, tituloDelEnlace } from "@/components/admin/data";
 import { Card, Hint, IcoCheck, IcoDown, IcoExt, MkChip, SecTitle, Tabla } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FLUJO DE INMUEBLES — del scraping a la publicación.
+   FLUJO DE INMUEBLES — de la revisión general a la publicación.
 
-   Seis pestañas que son una sola bandeja vista por etapas. El dato tiene
-   cinco estados, no seis: las pestañas 1 y 2 miran las dos la etapa `nuevo`,
-   porque son dos lecturas de lo mismo —lo que trajo el scraping, y lo que
-   hay que decidir uno por uno—. Los contadores de esas dos coinciden a
-   propósito.
+   DÓNDE EMPIEZA, Y DÓNDE NO
+   No empieza en el scraping. El scraping se corre en "Extracción de predios"
+   y deja miles de anuncios en la base; el equipo los mira ahí, marca los que
+   valen la pena y los acepta. ESO —y sólo eso— entra aquí, a Revisión
+   general, que es la primera pestaña.
 
-   El recorrido: nuevo → preselección (continúa) → visita (agendada) →
-   publicado (completado tras la visita). En cualquier punto se puede
-   descartar, y el descarte queda con su motivo en la pestaña de registro.
-   Eso es lo que hace que un inmueble descartado no vuelva a entrar en los
-   scrapings siguientes: el estado vive en `seguimiento_propiedades`, que el
-   pipeline lee pero nunca reconstruye.
+   Antes la pestaña 1 era "Del scraping" y enseñaba la etapa `nuevo`, o sea
+   los 5.236 anuncios que nadie ha mirado todavía: no es una bandeja de
+   trabajo, es el universo. Y el paso de aceptar en Extracción no llegaba
+   nunca porque no escribía la etapa. Ahora sí: aceptar deja el inmueble en
+   `revision`, que es lo que se ve en la primera pestaña.
+
+   El recorrido: revisión general → preselección (continúa) → visita
+   (agendada) → publicado (completado tras la visita). En cualquier punto se
+   puede descartar, y el descarte queda con su motivo en la pestaña de
+   registro. Eso es lo que hace que un inmueble descartado no vuelva a
+   aparecer —ni aquí ni en la extracción—: el estado vive en
+   `seguimiento_propiedades`, que el pipeline lee pero nunca reconstruye.
 
    DE DÓNDE SALEN LOS DATOS
    Del backend: `GET /api/admin/flujo?etapa=` para el listado y
@@ -32,22 +38,25 @@ import { Card, Hint, IcoCheck, IcoDown, IcoExt, MkChip, SecTitle, Tabla } from "
    antes de saberlo.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-type PanelKey = "p1" | "p2" | "p3" | "p4" | "p5" | "p6";
-type Etapa = "nuevo" | "preseleccion" | "visita" | "publicado" | "descartado";
+type PanelKey = "p1" | "p2" | "p3" | "p4" | "p5";
+type Etapa = "nuevo" | "revision" | "preseleccion" | "visita" | "publicado" | "descartado";
 
-/** Qué etapa del dato alimenta cada pestaña. */
+/** Qué etapa del dato alimenta cada pestaña.
+ *
+ * `nuevo` no está: es lo que el scraping trajo y nadie ha mirado, y eso se
+ * trabaja en Extracción de predios. Aquí cada pestaña es una etapa distinta
+ * y su contador es el de esa etapa, sin repeticiones. */
 const FUENTE: Record<PanelKey, Etapa> = {
-  p1: "nuevo", p2: "nuevo", p3: "preseleccion",
-  p4: "visita", p5: "publicado", p6: "descartado",
+  p1: "revision", p2: "preseleccion", p3: "visita",
+  p4: "publicado", p5: "descartado",
 };
 
 const PESTANAS: { k: PanelKey; l: string }[] = [
-  { k: "p1", l: "1 · Del scraping" },
-  { k: "p2", l: "2 · Revisión inicial" },
-  { k: "p3", l: "3 · Preseleccionados" },
-  { k: "p4", l: "4 · Visita agendada" },
-  { k: "p5", l: "5 · Publicados" },
-  { k: "p6", l: "Descartados" },
+  { k: "p1", l: "1 · Revisión general" },
+  { k: "p2", l: "2 · Preseleccionados" },
+  { k: "p3", l: "3 · Visita agendada" },
+  { k: "p4", l: "4 · Publicados" },
+  { k: "p5", l: "Descartados" },
 ];
 
 /** Un inmueble como lo devuelve el backend (clean_listings + estado). */
@@ -306,7 +315,7 @@ function FormDescartar({ x, etiqueta, onConfirmar, onCancelar }: {
 /* ── Vista ───────────────────────────────────────────────────────────────── */
 
 export default function FlujoInmuebles() {
-  const { av, modal } = useConsola();
+  const { av, go, modal } = useConsola();
   const { pedir } = useSesion();
 
   const [panel, setPanel] = useState<PanelKey>("p1");
@@ -424,7 +433,7 @@ export default function FlujoInmuebles() {
         x={x} onCancelar={cierra}
         onGuardar={async (d) => {
           cierra();
-          await accion("/api/admin/flujo/visita", { link: x.link, ...d }, "Visita agendada", "p4");
+          await accion("/api/admin/flujo/visita", { link: x.link, ...d }, "Visita agendada", "p3");
         }}
       />
     ));
@@ -444,7 +453,7 @@ export default function FlujoInmuebles() {
             area_confirmada_m2: d.area ? Number(d.area) : null,
             tipo_transformacion: d.tipo,
             notas_visita: d.notas || null,
-          }, "Inmueble publicado", "p5");
+          }, "Inmueble publicado", "p4");
         }}
       />
     ));
@@ -473,11 +482,11 @@ export default function FlujoInmuebles() {
     ));
   };
 
-  /** CSV de lo que trajo el scraping — pantalla 1 del correo.
+  /** CSV del listado de la etapa que se está viendo.
    *
    * Lo arma el servidor, no esta pantalla. Antes se construía aquí con
    * `filas`, que son las 500 que se cargan para pintar la tabla: el archivo
-   * decía ser "el listado general" y traía el 9% de los 5.444 que pasan los
+   * decía ser "el listado general" y traía el 9% de los que pasan los
    * filtros. Ahora se pide a `/api/admin/flujo/csv`, que no tiene tope.
    *
    * Se baja con `fetch` y no con un enlace directo para poder avisar del
@@ -494,7 +503,7 @@ export default function FlujoInmuebles() {
       const url = URL.createObjectURL(new Blob([texto], { type: "text/csv;charset=utf-8;" }));
       const a = document.createElement("a");
       a.href = url;
-      a.download = `zequara_scraping_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `zequara_${etapa}_${new Date().toISOString().slice(0, 10)}.csv`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -512,7 +521,7 @@ export default function FlujoInmuebles() {
     }
   };
 
-  /* Resumen de la pestaña 1, calculado sobre lo que se está viendo. */
+  /* Resumen de la revisión general, calculado sobre lo que se está viendo. */
   const conPm2 = filas.filter((x) => x.precio_m2 != null);
   const medio = conPm2.length
     ? conPm2.reduce((a, x) => a + (x.precio_m2 as number), 0) / conPm2.length
@@ -541,8 +550,9 @@ export default function FlujoInmuebles() {
         <div>
           <h1>Flujo de <b>inmuebles</b></h1>
           <p>
-            Del scraping a la publicación. Cada inmueble avanza por etapas; lo que se descarta queda
-            registrado para no reingresar en futuros scrapings.
+            De la revisión general a la publicación. Entran los que se aceptan en Extracción de
+            predios; cada uno avanza por etapas, y lo que se descarta queda registrado con su
+            motivo para no volver a aparecer en las corridas siguientes.
           </p>
         </div>
       </div>
@@ -559,13 +569,46 @@ export default function FlujoInmuebles() {
         ))}
       </div>
 
-      {/* ══════════ 1 · DEL SCRAPING ══════════ */}
+      {/* ══════════ 1 · REVISIÓN GENERAL ══════════ */}
+      {/* La primera pantalla del flujo. Aquí sólo hay lo que alguien aceptó
+          en Extracción de predios, así que la tabla trae de una vez los
+          números con los que se decide —precio, área, precio/m² y su marca
+          de atípico— y no sólo el enlace: antes esos datos estaban en la
+          pestaña "Del scraping" y había que saltar entre las dos. */}
       {panel === "p1" && (
         <div className="flow-panel active">
-          {estado() ?? (!filas.length ? <Vacio>No hay inmuebles nuevos del scraping.</Vacio> : (
+          <Nota ico={<IcoInfo />}>
+            Estos inmuebles entraron porque se aceptaron en{" "}
+            <button
+              type="button" className="pnl-link"
+              style={{ color: "var(--blue)", fontWeight: 600 }}
+              onClick={() => go("extraccion")}
+            >
+              Extracción de predios
+            </button>. Abre la publicación original para revisar las variables y decide. Lo que
+            marques como <b>No continúa</b> queda registrado con su motivo y no volverá a
+            aparecer: ni aquí, ni en las corridas siguientes del scraping.
+          </Nota>
+
+          {estado() ?? (!filas.length ? (
+            <Vacio>
+              <b style={{ color: "var(--coffee)" }}>No hay inmuebles en revisión general.</b>
+              <br />
+              Se corre el scraping en <b>Extracción de predios</b>, se marcan los que valen la
+              pena y se aceptan: ahí aparecen aquí.
+              <br />
+              <button
+                type="button" className="pnl-link"
+                style={{ marginTop: 10, color: "var(--blue)", fontWeight: 600 }}
+                onClick={() => go("extraccion")}
+              >
+                Ir a Extracción de predios
+              </button>
+            </Vacio>
+          ) : (
             <Card>
               <SecTitle style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                Resultado del último scraping
+                En revisión general
                 <button type="button" className="btn btn-primary btn-mini"
                         onClick={() => void descargar()} disabled={bajando}>
                   <IcoDown />{bajando ? "Preparando…" : "Descargar listado (CSV)"}
@@ -595,7 +638,8 @@ export default function FlujoInmuebles() {
                 <thead>
                   <tr>
                     <th>Inmueble</th><th className="num">Precio</th><th className="num">m²</th>
-                    <th className="num">$/m²</th><th>Scraping</th><th>Publicación</th>
+                    <th className="num">$/m²</th><th>Publicación</th>
+                    <th style={{ textAlign: "right" }}>Decisión</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -614,42 +658,7 @@ export default function FlujoInmuebles() {
                           <> <MkChip t="atip">Atípico</MkChip></>
                         )}
                       </td>
-                      <td>{(x.fecha_extraccion || "").slice(0, 10) || "—"}</td>
-                      {/* Lo primero que se quiere hacer con una fila del
-                          scraping es abrir el anuncio y mirarlo. */}
                       <td><Url x={x} texto="Ver anuncio" /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Tabla>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* ══════════ 2 · REVISIÓN INICIAL ══════════ */}
-      {panel === "p2" && (
-        <div className="flow-panel active">
-          <Nota ico={<IcoInfo />}>
-            Abre la publicación original para revisar las variables y decide. Lo que marques como{" "}
-            <b>No continúa</b> queda registrado para no reingresar en futuros scrapings.
-          </Nota>
-
-          {estado() ?? (!filas.length ? <Vacio>Nada por revisar.</Vacio> : (
-            <Card style={{ padding: "6px 6px 2px" }}>
-              <Tabla ancho="md">
-                <thead>
-                  <tr>
-                    <th>Inmueble</th><th className="num">$/m²</th><th>Publicación</th>
-                    <th style={{ textAlign: "right" }}>Decisión</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filas.map((x) => (
-                    <tr key={x.link}>
-                      <td><Info x={x} /></td>
-                      <td className="num">{pm2(x.precio_m2, x.moneda)}</td>
-                      <td><Url x={x} /></td>
                       <td>
                         <div className="tacts-wrap">
                           <button
@@ -660,7 +669,7 @@ export default function FlujoInmuebles() {
                           </button>
                           <button
                             type="button" className="btn btn-ghost btn-mini"
-                            onClick={() => descartar(x, "no_continua", "No continúa en revisión inicial", "Registrar descarte")}
+                            onClick={() => descartar(x, "no_continua", "No continúa en revisión general", "Registrar descarte")}
                           >
                             No continúa
                           </button>
@@ -675,8 +684,8 @@ export default function FlujoInmuebles() {
         </div>
       )}
 
-      {/* ══════════ 3 · PRESELECCIONADOS ══════════ */}
-      {panel === "p3" && (
+      {/* ══════════ 2 · PRESELECCIONADOS ══════════ */}
+      {panel === "p2" && (
         <div className="flow-panel active">
           <Nota ico={<IcoReloj />}>
             Contacta por WhatsApp o teléfono y agenda la visita.{" "}
@@ -748,8 +757,8 @@ export default function FlujoInmuebles() {
         </div>
       )}
 
-      {/* ══════════ 4 · VISITA AGENDADA ══════════ */}
-      {panel === "p4" && (
+      {/* ══════════ 3 · VISITA AGENDADA ══════════ */}
+      {panel === "p3" && (
         <div className="flow-panel active">
           {estado() ?? (!filas.length ? <Vacio>No hay visitas agendadas.</Vacio> : (
             <Card style={{ padding: "6px 6px 2px" }}>
@@ -796,8 +805,8 @@ export default function FlujoInmuebles() {
         </div>
       )}
 
-      {/* ══════════ 5 · PUBLICADOS ══════════ */}
-      {panel === "p5" && (
+      {/* ══════════ 4 · PUBLICADOS ══════════ */}
+      {panel === "p4" && (
         <div className="flow-panel active">
           {estado() ?? (!filas.length ? <Vacio>Aún no hay inmuebles publicados.</Vacio> : (
             <Card style={{ padding: "6px 6px 2px" }}>
@@ -832,7 +841,7 @@ export default function FlujoInmuebles() {
       )}
 
       {/* ══════════ DESCARTADOS ══════════ */}
-      {panel === "p6" && (
+      {panel === "p5" && (
         <div className="flow-panel active">
           <Nota ico={<IcoVisto />}>
             Registro de descartados. Estos inmuebles <b>no volverán a aparecer</b> en futuros scrapings.

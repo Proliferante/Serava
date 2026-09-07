@@ -111,31 +111,58 @@ CREATE TABLE IF NOT EXISTS seguimiento_propiedades (
     fecha_actualizacion   TEXT
 );
 
--- Las cinco pantallas del flujo necesitan saber en qué etapa va cada
--- inmueble sin tener que deducirlo de tres campos a la vez. `etapa` es esa
--- respuesta directa, y es lo que consulta GET /api/admin/flujo.
+-- Las pantallas del flujo necesitan saber en qué etapa va cada inmueble sin
+-- tener que deducirlo de tres campos a la vez. `etapa` es esa respuesta
+-- directa, y es lo que consulta GET /api/admin/flujo.
 --
--- Se deriva de los otros campos, no los reemplaza: 'nuevo' mientras nadie
--- decida, 'preseleccion' al pasar el primer filtro, 'visita' al agendar,
--- 'publicado' al completar tras la visita, 'descartado' en cualquier punto.
+-- El recorrido completo, en orden:
+--   nuevo         lo trajo el scraping y nadie lo ha mirado todavía. Vive en
+--                 la pantalla de Extracción de predios; NO está en el flujo.
+--   revision      alguien lo aceptó en Extracción. Ahí entra al flujo, por su
+--                 primera pantalla: Revisión general.
+--   preseleccion  pasó la revisión general; toca contactar y agendar.
+--   visita        hay cita.
+--   publicado     se completó tras la visita.
+--   descartado    salió en cualquier punto, siempre con motivo escrito.
+--
+-- 'nuevo' y 'revision' son estados distintos a propósito. El flujo no es la
+-- bandeja de salida del scraping —serían los 11.000 anuncios de la última
+-- corrida—: es lo que el equipo decidió mirar uno por uno.
 ALTER TABLE seguimiento_propiedades
     ADD COLUMN IF NOT EXISTS etapa TEXT DEFAULT 'nuevo';
 
--- `ADD CONSTRAINT` no acepta IF NOT EXISTS en Postgres, así que va envuelto:
--- si el archivo se corre dos veces, la segunda no falla.
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint WHERE conname = 'seguimiento_etapa_valida'
-    ) THEN
-        ALTER TABLE seguimiento_propiedades
-            ADD CONSTRAINT seguimiento_etapa_valida
-            CHECK (etapa IN ('nuevo', 'preseleccion', 'visita', 'publicado', 'descartado'));
-    END IF;
-END $$;
+-- La restricción se rehace en vez de crearse sólo si falta: 'revision' se
+-- añadió después, y una base que ya tenga la versión anterior rechazaría la
+-- etapa nueva sin decir por qué. Con DROP + ADD el archivo sigue siendo
+-- idempotente y además migra las bases que ya existen.
+ALTER TABLE seguimiento_propiedades
+    DROP CONSTRAINT IF EXISTS seguimiento_etapa_valida;
+
+ALTER TABLE seguimiento_propiedades
+    ADD CONSTRAINT seguimiento_etapa_valida
+    CHECK (etapa IN ('nuevo', 'revision', 'preseleccion', 'visita',
+                     'publicado', 'descartado'));
 
 CREATE INDEX IF NOT EXISTS seguimiento_etapa_idx
     ON seguimiento_propiedades (etapa);
+
+-- Arregla las filas que decidió la pantalla de Extracción antes de que ésta
+-- escribiera `etapa`: guardaba el veredicto sólo en `filtro_arquitectonico` y
+-- la fila se quedaba en 'nuevo'. El efecto era que un predio aceptado no
+-- aparecía en ninguna pantalla del flujo —ni en Revisión general, ni en
+-- ninguna otra— y un descartado seguía contándose como nuevo.
+--
+-- Las dos sentencias son repetibles: en cuanto la fila deja de estar en
+-- 'nuevo', el WHERE ya no la encuentra.
+UPDATE seguimiento_propiedades
+   SET etapa = 'descartado'
+ WHERE etapa = 'nuevo'
+   AND (filtro_arquitectonico = 'no_pasa' OR disponible = 'no_disponible');
+
+UPDATE seguimiento_propiedades
+   SET etapa = 'revision'
+ WHERE etapa = 'nuevo'
+   AND filtro_arquitectonico = 'pasa';
 
 
 -- ───────────────────────────────────────────────────────────────────────────

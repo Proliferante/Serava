@@ -24,21 +24,28 @@ LO IMPORTANTE DE ESTE ARCHIVO (por que no es solo "agregar columnas"):
     aparece con estado "pendiente"; un predio que ya se habia marcado
     conserva su estado tal como quedo.
 
-    "Descartado no se vuelve a traer": en la practica, un predio
-    marcado no_pasa o no_disponible SIGUE apareciendo en los datos (nunca
-    se borra nada, mismo principio de siempre - alguien podria querer
-    auditar por que se descarto), pero queda marcado con
-    requiere_revision = False apenas el arquitecto toma CUALQUIER decision
-    (pasa o no_pasa) sobre el filtro arquitectonico - asi el tablero y el
-    equipo de arquitectura pueden filtrar facilmente a "solo lo que todavia
-    necesita que alguien lo mire" (corregido el 05/08: antes solo se
-    apagaba con "no_pasa", asi que un predio ya APROBADO seguia
-    apareciendo como pendiente para siempre).
+    "Descartado no se vuelve a traer": el registro NUNCA se borra -- mismo
+    principio de siempre, alguien podria querer auditar por que se
+    descarto -- pero el predio deja de ofrecerse para trabajar. Un predio
+    con etapa 'descartado' (o con no_pasa / no_disponible) ya no sale en la
+    pantalla de Extraccion: GET /api/admin/predios lo excluye leyendo esta
+    tabla EN VIVO. Solo queda visible en la pestana Descartados del flujo,
+    con su motivo.
 
-    Importante: el scraping en si SI vuelve a traer estos predios de los
-    portales en cada corrida (no hay forma de saber de antemano que URLs va
-    a devolver una zona antes de pedirla) - lo que cambia es que ya no se
-    le vuelven a MOSTRAR al equipo como pendientes de revision.
+    Ojo con el matiz tecnico: el scraping en si SI vuelve a bajar estos
+    predios de los portales en cada corrida (no hay forma de saber que URLs
+    va a devolver una zona antes de pedirla). Lo que no vuelve a pasar es
+    que se le MUESTREN al equipo.
+
+    Por que en vivo y no por la copia que el pipeline deja en
+    clean_listings: esa copia es una foto del momento de la corrida, asi
+    que una decision tomada hoy no aparecia ahi hasta la corrida siguiente
+    -- y hasta entonces el predio descartado volvia a la tabla como si
+    nadie lo hubiera mirado.
+
+    `requiere_revision` se sigue calculando igual (False apenas hay
+    CUALQUIER decision sobre el filtro arquitectonico) para lo que ya lo
+    usaba: los conteos del pipeline.
 
 USO EN EL PIPELINE (ya integrado en script_transform_serava.py):
     from seguimiento import cruzar_seguimiento
@@ -65,6 +72,16 @@ SEGUIMIENTO_DB_PATH = "seguimiento.db"
 VALORES_VALIDOS_FILTRO = {"pendiente", "pasa", "no_pasa"}
 VALORES_VALIDOS_DISPONIBLE = {"pendiente", "disponible", "no_disponible"}
 
+# En que etapa del flujo va el predio. Es la misma lista que el CHECK de
+# database/schema.sql y que ETAPAS en api/flujo.py: si se agrega una etapa,
+# se agrega en los tres sitios o la base rechaza la escritura.
+#
+#   nuevo -> lo trajo el scraping, nadie lo ha mirado (no esta en el flujo)
+#   revision -> aceptado en Extraccion: entra al flujo por Revision general
+VALORES_VALIDOS_ETAPA = {
+    "nuevo", "revision", "preseleccion", "visita", "publicado", "descartado",
+}
+
 
 def _conectar():
     conn = db.conectar(SEGUIMIENTO_DB_PATH)
@@ -78,7 +95,8 @@ def _conectar():
             motivo_no_disponible TEXT,
             estado_seguimiento TEXT,
             responsable TEXT,
-            fecha_actualizacion TEXT
+            fecha_actualizacion TEXT,
+            etapa TEXT DEFAULT 'nuevo'
         )
         """
     )
@@ -94,20 +112,30 @@ def actualizar_seguimiento(
     motivo_no_disponible: str = None,
     estado_seguimiento: str = None,
     responsable: str = None,
+    etapa: str = None,
 ):
     """
     Crea o actualiza el registro de seguimiento de UN predio. Solo cambia
     los campos que se le pasan (los que se dejan en None no se tocan).
-    Valida que filtro_arquitectonico/disponible sean uno de los valores
-    esperados, y que si se marca 'no_pasa' o 'no_disponible' venga
+    Valida que filtro_arquitectonico/disponible/etapa sean uno de los
+    valores esperados, y que si se marca 'no_pasa' o 'no_disponible' venga
     acompanado de un motivo (mismo principio que embudo_propiedades en el
     diseno de arquitectura: nunca un descarte sin explicar por que).
+
+    `etapa` es en que pantalla del flujo queda el predio. Quien decide
+    desde Extraccion la manda explicitamente ('revision' al aceptar,
+    'descartado' al descartar): sin ella, el predio guardaba el veredicto
+    pero se quedaba en 'nuevo', o sea fuera de todas las pantallas del
+    flujo. Si no se pasa, la etapa que ya tenia no se toca.
     """
     if filtro_arquitectonico is not None:
         if filtro_arquitectonico not in VALORES_VALIDOS_FILTRO:
             raise ValueError(f"filtro_arquitectonico debe ser uno de {VALORES_VALIDOS_FILTRO}")
         if filtro_arquitectonico == "no_pasa" and not motivo_no_pasa:
             raise ValueError("Si filtro_arquitectonico='no_pasa', hay que indicar motivo_no_pasa")
+
+    if etapa is not None and etapa not in VALORES_VALIDOS_ETAPA:
+        raise ValueError(f"etapa debe ser una de {VALORES_VALIDOS_ETAPA}")
 
     if disponible is not None:
         if disponible not in VALORES_VALIDOS_DISPONIBLE:
@@ -124,6 +152,7 @@ def actualizar_seguimiento(
         "filtro_arquitectonico": "pendiente", "motivo_no_pasa": None,
         "disponible": "pendiente", "motivo_no_disponible": None,
         "estado_seguimiento": None, "responsable": None,
+        "etapa": "nuevo",
     }
     if existente:
         valores_actuales = dict(existente)
@@ -135,6 +164,7 @@ def actualizar_seguimiento(
         "motivo_no_disponible": motivo_no_disponible if motivo_no_disponible is not None else valores_actuales["motivo_no_disponible"],
         "estado_seguimiento": estado_seguimiento if estado_seguimiento is not None else valores_actuales["estado_seguimiento"],
         "responsable": responsable if responsable is not None else valores_actuales["responsable"],
+        "etapa": etapa if etapa is not None else (valores_actuales.get("etapa") or "nuevo"),
         "fecha_actualizacion": datetime.now().isoformat(timespec="seconds"),
     }
 
@@ -142,8 +172,9 @@ def actualizar_seguimiento(
         """
         INSERT INTO seguimiento_propiedades
             (url_inmueble, filtro_arquitectonico, motivo_no_pasa, disponible,
-             motivo_no_disponible, estado_seguimiento, responsable, fecha_actualizacion)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+             motivo_no_disponible, estado_seguimiento, responsable, fecha_actualizacion,
+             etapa)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(url_inmueble) DO UPDATE SET
             filtro_arquitectonico = excluded.filtro_arquitectonico,
             motivo_no_pasa = excluded.motivo_no_pasa,
@@ -151,13 +182,14 @@ def actualizar_seguimiento(
             motivo_no_disponible = excluded.motivo_no_disponible,
             estado_seguimiento = excluded.estado_seguimiento,
             responsable = excluded.responsable,
-            fecha_actualizacion = excluded.fecha_actualizacion
+            fecha_actualizacion = excluded.fecha_actualizacion,
+            etapa = excluded.etapa
         """,
         (
             url_inmueble, nuevos_valores["filtro_arquitectonico"], nuevos_valores["motivo_no_pasa"],
             nuevos_valores["disponible"], nuevos_valores["motivo_no_disponible"],
             nuevos_valores["estado_seguimiento"], nuevos_valores["responsable"],
-            nuevos_valores["fecha_actualizacion"],
+            nuevos_valores["fecha_actualizacion"], nuevos_valores["etapa"],
         ),
     )
     conn.commit()

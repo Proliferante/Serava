@@ -35,10 +35,18 @@ import Usuarios from "@/components/admin/views/Usuarios";
    permisos por módulo están en un solo sitio (`PERMISOS`, en sesion.tsx)
    para cerrarlos cuando toque.
 
-   EL LISTADO DE PREDIOS
-   Sigue siendo de maqueta: es la parte de la consola que el correo dejó "en
-   espera" (remodelación, administración, data y comercial). Lo que sí está
-   contra la base es el flujo de inmuebles y los usuarios.
+   EL ORDEN DEL MENÚ ES EL DEL PROCESO
+   "Captación" son las dos pantallas por las que pasa un inmueble para
+   entrar: Extracción de predios (donde se corre el scraping y se elige) y
+   Flujo de inmuebles (donde se revisa, se contacta, se visita y se
+   publica). "Gestión" es todo lo que viene después.
+
+   QUÉ ESTÁ CONTRA LA BASE Y QUÉ ES MAQUETA
+   Reales: extracción, flujo de inmuebles y usuarios. Maqueta todavía —la
+   parte que el correo dejó "en espera"—: el listado de Predios, el comité,
+   arquitectura, data y comercial. Los datos de esas cuatro salen de
+   `PREDIOS_SEED`, no de la base, y por eso no se les cuelga ningún
+   contador: un número inventado en el menú es peor que ninguno.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 type Item = { k: VistaKey; l: string; d: string; d2?: string; badge?: number; circulo?: boolean };
@@ -49,13 +57,29 @@ const GRUPOS: { g: string; items: Item[] }[] = [
     items: [{ k: "panel", l: "Panel general", d: "M3 12l9-8 9 8M5 10v10h14V10" }],
   },
   {
-    g: "Operación",
+    /* EL ORDEN ES EL DEL PROCESO, no el de cuándo se escribió cada pantalla.
+       Se hace scraping en Extracción, lo que se acepta ahí entra al Flujo
+       por Revisión general, y de ahí sale a Predios. Estaban al revés —el
+       flujo antes de la extracción que lo alimenta— y el menú no dejaba
+       adivinar por dónde se empieza. */
+    g: "Captación",
     items: [
-      { k: "flujo", l: "Flujo de inmuebles", d: "M3 6h18M7 12h10M11 18h2" },
-      { k: "predios", l: "Predios", d: "M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" },
       { k: "extraccion", l: "Extracción de predios", d: "M12 3v12M8 11l4 4 4-4", d2: "M4 17v3h16v-3" },
+      { k: "flujo", l: "Flujo de inmuebles", d: "M3 6h18M7 12h10M11 18h2" },
+    ],
+  },
+  {
+    /* Lo que pasa DESPUÉS de que un inmueble se publica en el flujo. Grupo
+       aparte porque no es la misma tarea ni la hace la misma persona: la
+       captación es diaria, esto es por predio. */
+    g: "Gestión",
+    items: [
+      { k: "predios", l: "Predios", d: "M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" },
       { k: "nuevo", l: "Nuevo predio", d: "M12 5v14M5 12h14" },
-      { k: "comite", l: "Comité de aprobación", d: "M9 12l2 2 4-4", d2: "M21 12c0 5-9 9-9 9s-9-4-9-9a9 9 0 0 1 18 0z", badge: 3 },
+      /* Sin badge: el "3" de antes era un número escrito a mano en el
+         menú, no una cuenta de nada. Vuelve cuando el comité tenga
+         endpoint y pueda decir cuántos hay de verdad. */
+      { k: "comite", l: "Comité de aprobación", d: "M9 12l2 2 4-4", d2: "M21 12c0 5-9 9-9 9s-9-4-9-9a9 9 0 0 1 18 0z" },
       { k: "arq", l: "Arquitectura", d: "M12 3l9 6-9 6-9-6z", d2: "M3 15l9 6 9-6" },
       { k: "data", l: "Data & Score", d: "M3 12l4-4 4 4 4-6 6 8", d2: "M3 20h18" },
       { k: "comercial", l: "Comercial", d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" },
@@ -203,9 +227,7 @@ export default function AdminConsole() {
                       onPublicar={(id) => setPredios((ps) => ps.map((p) => p.id === id ? { ...p, publicado: !p.publicado } : p))}
                     />
                   )}
-                  {vista === "extraccion" && (
-                    <Extraccion onEnviarARevision={(nuevos) => setPredios((ps) => [...nuevos, ...ps])} />
-                  )}
+                  {vista === "extraccion" && <Extraccion />}
                   {vista === "nuevo" && <NuevoPredio onCrear={(p) => setPredios((ps) => [p, ...ps])} />}
                   {vista === "comite" && <Comite />}
                   {vista === "arq" && <Arquitectura abrirGestion={abrirGestion} />}

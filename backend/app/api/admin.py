@@ -39,8 +39,10 @@ import threading
 import contextlib
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
+
+from app.api.auth import usuario_actual
 
 # --- el pipeline real -------------------------------------------------------
 from app.services.admin import db_admin as db
@@ -149,12 +151,34 @@ def _ultima_corrida():
 # 3. LECTURA DE PREDIOS
 # ---------------------------------------------------------------------------
 
-COLUMNAS = """pais, ciudad, zona, moneda, portal, link, tipo_inmueble, titulo,
-    precio_venta, area_m2, precio_m2, precio_m2_clasificacion, metodo_atipico,
-    mediana_precio_m2_zona, bajo_media_zona, habitaciones, banos,
-    posible_duplicado, modelo_repetido_edificio_nuevo, dentro_poligono_real,
-    similar_a_zona, filtro_arquitectonico, motivo_no_pasa, disponible,
-    requiere_revision"""
+# Las columnas del anuncio salen de `clean_listings` (alias `c`). Las de
+# ESTADO HUMANO —filtro, motivo, disponibilidad, etapa— no: se leen en vivo de
+# `seguimiento_propiedades` (alias `s`).
+#
+# POR QUE EN VIVO, Y NO DE clean_listings
+# clean_listings tiene copia de esas columnas: el pipeline las cruza al
+# limpiar (ver services/admin/seguimiento.py, cruzar_seguimiento). Pero es una
+# FOTO del momento de la corrida. Leyendo la copia, una decision tomada hoy no
+# aparecia hasta la corrida siguiente, y el efecto era el contrario del que
+# pide el flujo: se descartaba un predio, se recargaba la pantalla, y volvia a
+# la tabla como si nadie lo hubiera mirado — otra vez seleccionable.
+COLUMNAS = """c.pais, c.ciudad, c.zona, c.moneda, c.portal, c.link,
+    c.tipo_inmueble, c.titulo, c.precio_venta, c.area_m2, c.precio_m2,
+    c.precio_m2_clasificacion, c.metodo_atipico, c.mediana_precio_m2_zona,
+    c.bajo_media_zona, c.habitaciones, c.banos, c.posible_duplicado,
+    c.modelo_repetido_edificio_nuevo, c.dentro_poligono_real, c.similar_a_zona,
+    COALESCE(s.filtro_arquitectonico, 'pendiente') AS filtro_arquitectonico,
+    s.motivo_no_pasa,
+    COALESCE(s.disponible, 'pendiente')            AS disponible,
+    COALESCE(s.etapa, 'nuevo')                     AS etapa,
+    (COALESCE(s.filtro_arquitectonico, 'pendiente') = 'pendiente')
+        AS requiere_revision"""
+
+# El JOIN con el estado. Es LEFT porque un predio que el scraping trae por
+# primera vez no tiene fila de seguimiento todavia: eso es justamente ser
+# 'nuevo'.
+DESDE = """FROM clean_listings c
+    LEFT JOIN seguimiento_propiedades s ON s.url_inmueble = c.link"""
 
 # EL ARQUITECTO SOLO VE Y GUARDA DECISIÓN SOBRE LO QUE YA PASÓ ESTOS DOS
 # FILTROS. Van aquí, no en la pantalla, y se aplican siempre (no hay "ver
@@ -171,9 +195,37 @@ COLUMNAS = """pais, ciudad, zona, moneda, portal, link, tipo_inmueble, titulo,
 # deja 1 solo representante por grupo chico) — verificado contra la base
 # real: ninguno de los grupos marcados posible_duplicado=1 tiene más de 1
 # fila en clean_listings.
+# OJO CON EL TIPO: en Postgres estas cinco columnas son `boolean`, no 0/1.
+# Las escribe pandas (`to_sql`) desde el dataframe de la limpieza, y una
+# columna de bools de pandas se convierte en `boolean`. Comparar un boolean
+# con 1 no es "falso": es un error de Postgres —«operator does not exist:
+# boolean = integer»— que devuelve 500 y deja la pantalla vacía. Por eso van
+# con IS TRUE / IS FALSE / IS NULL, que además distinguen los tres casos que
+# pide la regla: dentro del polígono, fuera pero similar, o sin evaluar.
 CRITERIOS_ARQUITECTO = [
-    "(dentro_poligono_real = 1 OR similar_a_zona = 1 OR dentro_poligono_real IS NULL)",
-    "bajo_media_zona = 1",
+    "(c.dentro_poligono_real IS TRUE OR c.similar_a_zona IS TRUE OR c.dentro_poligono_real IS NULL)",
+    "c.bajo_media_zona IS TRUE",
+]
+
+# UN PREDIO DESCARTADO NO VUELVE A SALIR EN LA EXTRACCION.
+#
+# Es la regla del proyecto —"descartado no se vuelve a traer"— aplicada donde
+# de verdad se nota: la pantalla donde se corre el scraping y se elige. Antes
+# el descarte solo pintaba una etiqueta roja en la fila, asi que el equipo
+# volvia a leer los mismos anuncios en cada corrida.
+#
+# Las tres condiciones son la misma decision escrita por tres caminos
+# distintos: `etapa` la escribe el flujo y la extraccion desde hoy; las otras
+# dos son como se guardaba antes (y como podria guardarlo un script que llame
+# a actualizar_seguimiento sin etapa). Se comprueban las tres para que un
+# descarte no se cuele por el camino viejo.
+#
+# Lo descartado no desaparece de la base ni de la consola: sigue en la
+# pestana Descartados del flujo, con su motivo y quien lo descarto.
+SIN_DESCARTADOS = [
+    "COALESCE(s.etapa, 'nuevo') <> 'descartado'",
+    "COALESCE(s.filtro_arquitectonico, 'pendiente') <> 'no_pasa'",
+    "COALESCE(s.disponible, 'pendiente') <> 'no_disponible'",
 ]
 
 
@@ -190,17 +242,19 @@ def predios(
     if not db.tabla_existe("clean_listings"):
         raise HTTPException(404, "Todavía no existe clean_listings. Corre una extracción primero.")
 
+    # Los filtros geograficos van con el alias `c.` porque las tres consultas
+    # de aqui abajo dan ese alias a su tabla (clean_listings en dos de ellas,
+    # raw_listings en la del embudo).
     where, params = [], []
     for campo, valor in (("pais", paises), ("ciudad", ciudades), ("zona", zonas)):
         vals = [v for v in valor.split(",") if v.strip()]
         if vals:
-            where.append(f"{campo} IN ({','.join('?' * len(vals))})")
+            where.append(f"c.{campo} IN ({','.join('?' * len(vals))})")
             params.extend(vals)
 
-    sql = f"SELECT {COLUMNAS} FROM clean_listings"
-    sql_where = where + CRITERIOS_ARQUITECTO
-    if sql_where:
-        sql += " WHERE " + " AND ".join(sql_where)
+    sql = f"SELECT {COLUMNAS} {DESDE}"
+    sql_where = where + CRITERIOS_ARQUITECTO + SIN_DESCARTADOS
+    sql += " WHERE " + " AND ".join(sql_where)
     # Sin ORDER BY ni LIMIT en el SQL: hay que tener TODAS las filas que
     # cumplen el filtro antes de calcular el Score Zequara y ordenar por él
     # — si se limitara antes, "las mejores" saldrían de un recorte
@@ -238,16 +292,26 @@ def predios(
     cond = f" WHERE {' AND '.join(where)}" if where else ""
     geo_params = params
 
+    criterios = " AND ".join(CRITERIOS_ARQUITECTO)
+    sin_desc = " AND ".join(SIN_DESCARTADOS)
     resumen = dict(
         con.execute(
+            # `COUNT(*) FILTER` y no `SUM(columna)`: sumar una columna
+            # boolean tampoco existe en Postgres.
             f"""SELECT COUNT(*) clean,
-                       SUM(bajo_media_zona) bajo,
-                       SUM(CASE WHEN {' AND '.join(CRITERIOS_ARQUITECTO)} THEN 1 ELSE 0 END) habilitados,
-                       SUM(CASE WHEN precio_m2_clasificacion LIKE 'atipico%' THEN 1 ELSE 0 END) atipicos,
-                       SUM(CASE WHEN dentro_poligono_real=0 THEN 1 ELSE 0 END) fuera,
-                       SUM(CASE WHEN dentro_poligono_real IS NULL THEN 1 ELSE 0 END) sin_evaluar,
-                       SUM(CASE WHEN similar_a_zona=1 THEN 1 ELSE 0 END) similares
-                FROM clean_listings{cond}""",
+                       COUNT(*) FILTER (WHERE c.bajo_media_zona IS TRUE) bajo,
+                       COUNT(*) FILTER (WHERE {criterios} AND {sin_desc}) habilitados,
+                       -- Cuántos de los que cumplen los criterios están
+                       -- descartados a mano. Va aparte para que el último
+                       -- escalón del embudo pueda decir por qué bajó el
+                       -- número: no es lo mismo "no cumple la validación
+                       -- geográfica" que "alguien lo descartó".
+                       COUNT(*) FILTER (WHERE {criterios} AND NOT ({sin_desc})) descartados,
+                       COUNT(*) FILTER (WHERE c.precio_m2_clasificacion LIKE 'atipico%') atipicos,
+                       COUNT(*) FILTER (WHERE c.dentro_poligono_real IS FALSE) fuera,
+                       COUNT(*) FILTER (WHERE c.dentro_poligono_real IS NULL) sin_evaluar,
+                       COUNT(*) FILTER (WHERE c.similar_a_zona IS TRUE) similares
+                {DESDE}{cond}""",
             geo_params,
         ).fetchone()
         or {}
@@ -258,7 +322,15 @@ def predios(
     # solo existen en la base cruda: clean_listings ya viene filtrada.
     if db.tabla_existe("raw_listings"):
         rc = db.conectar()
-        rsql = "SELECT COUNT(*) extraidos, SUM(CASE WHEN en_scope_zona='1' THEN 1 ELSE 0 END) en_scope FROM raw_listings"
+        # `en_scope_zona` es TEXTO en raw_listings, y no guarda un solo
+        # formato: hay '1'/'0' de unas corridas y 'true'/'false' de otras
+        # (pandas escribe la marca según el dtype con que salga del extract).
+        # Comparando sólo con '1' el embudo se dejaba fuera las filas
+        # 'true' — 500 anuncios que sí estaban en su zona contados como si
+        # no.
+        rsql = ("SELECT COUNT(*) extraidos, "
+                "COUNT(*) FILTER (WHERE lower(c.en_scope_zona) IN ('1','true','t')) en_scope "
+                "FROM raw_listings c")
         if where:
             rsql += " WHERE " + " AND ".join(where)
         r = dict(rc.execute(rsql, geo_params).fetchone())
@@ -377,34 +449,65 @@ class PeticionSeguimiento(BaseModel):
 
 def _links_que_cumplen_criterio(links: list[str]) -> set[str]:
     """Vuelve a preguntarle a la base, no a la pantalla, cuáles de estos
-    links cumplen hoy los dos filtros del arquitecto. No basta con que el
-    HTML no ofrezca el botón: si alguien manda el link a mano (o la
-    pantalla quedó con datos viejos en caché), el servidor es quien manda."""
+    links se pueden decidir hoy: cumplen los dos filtros del arquitecto y
+    no están ya descartados. No basta con que el HTML no ofrezca el botón:
+    si alguien manda el link a mano (o la pantalla quedó con datos viejos
+    en caché), el servidor es quien manda.
+
+    Que un descartado no pase por aquí es la otra mitad de "no vuelve a
+    salir": ni se muestra, ni se puede volver a decidir desde esta
+    pantalla. Si hay que revivirlo, se hace desde el flujo, que es donde
+    queda registrado con su motivo."""
     if not links or not db.tabla_existe("clean_listings"):
         return set()
     con = db.conectar()
     try:
         marcadores = ",".join("?" * len(links))
         sql = (
-            f"SELECT link FROM clean_listings WHERE link IN ({marcadores}) "
-            f"AND {' AND '.join(CRITERIOS_ARQUITECTO)}"
+            f"SELECT c.link {DESDE} WHERE c.link IN ({marcadores}) "
+            f"AND {' AND '.join(CRITERIOS_ARQUITECTO)} "
+            f"AND {' AND '.join(SIN_DESCARTADOS)}"
         )
         return {r["link"] for r in con.execute(sql, links).fetchall()}
     finally:
         con.close()
 
 
+# En qué etapa del flujo queda el predio según lo que se decidió en la
+# pantalla de Extracción. Es EL paso que faltaba: antes se guardaba el
+# veredicto en `filtro_arquitectonico` y la fila se quedaba en 'nuevo', así
+# que un predio aceptado no aparecía en ninguna pantalla del flujo — ni en
+# Revisión general, que es donde el equipo lo esperaba.
+ETAPA_DE_LA_DECISION = {"pasa": "revision", "no_pasa": "descartado"}
+
+# El texto corto de seguimiento, para que la fila diga en qué va sin tener
+# que cruzar tres columnas.
+ESTADO_DE_LA_DECISION = {"pasa": "en revisión general", "no_pasa": "descartado"}
+
+
 @router.post("/seguimiento")
-def guardar_seguimiento(p: PeticionSeguimiento):
-    """Escribe en seguimiento_propiedades usando el módulo real, que ya
-    valida que un 'no_pasa' venga con motivo. Esta tabla es persistente:
-    nunca se reconstruye con las corridas del pipeline."""
+def guardar_seguimiento(p: PeticionSeguimiento, u: dict = Depends(usuario_actual)):
+    """La decisión de la pantalla de Extracción: aceptar o descartar.
+
+    Aceptar mete el predio en el flujo por su primera pantalla, Revisión
+    general (etapa 'revision'). Descartar lo saca del circuito: queda en la
+    pestaña Descartados con su motivo y ya no vuelve a salir en la
+    extracción (ver SIN_DESCARTADOS arriba).
+
+    Escribe con el módulo real, que ya valida que un 'no_pasa' venga con
+    motivo. Esta tabla es persistente: nunca se reconstruye con las
+    corridas del pipeline."""
     if p.decision not in ("pasa", "no_pasa"):
         raise HTTPException(400, "decision debe ser 'pasa' o 'no_pasa'")
     if p.decision == "no_pasa" and not (p.motivo or "").strip():
         raise HTTPException(400, "Un descarte necesita motivo.")
 
     cumplen = _links_que_cumplen_criterio(p.links)
+    # Quién decidió sale de la sesión, no del cuerpo de la petición: es el
+    # rastro de auditoría de un descarte, y un campo que manda el cliente
+    # puede decir cualquier cosa. `p.responsable` se sigue aceptando para no
+    # romper a quien llame el endpoint a mano, pero la sesión gana.
+    responsable = f"{u['nombre']} ({u['rol']})" if u else p.responsable
     guardados, errores = 0, []
     for link in p.links:
         if link not in cumplen:
@@ -419,7 +522,9 @@ def guardar_seguimiento(p: PeticionSeguimiento):
                 url_inmueble=link,
                 filtro_arquitectonico=p.decision,
                 motivo_no_pasa=p.motivo if p.decision == "no_pasa" else None,
-                responsable=p.responsable,
+                etapa=ETAPA_DE_LA_DECISION[p.decision],
+                estado_seguimiento=ESTADO_DE_LA_DECISION[p.decision],
+                responsable=responsable,
             )
             guardados += 1
         except Exception as e:  # noqa: BLE001

@@ -7,11 +7,26 @@ import {
   miles, muestra, postExtraer, postSeguimiento,
   type AggZona, type Fila, type Resumen, type ZonaMuestra,
 } from "@/components/admin/api";
-import { CSV_COLS, MOTIVOS_DESCARTE, tituloDelEnlace, type Predio } from "@/components/admin/data";
+import { CSV_COLS, MOTIVOS_DESCARTE, tituloDelEnlace } from "@/components/admin/data";
 import { Btn, Card, Hint, IcoBack, IcoCheck, IcoDown, IcoExt, MkChip, SecTitle, Tabla, VHead } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   EXTRACCIÓN DE PREDIOS — conectada al pipeline real.
+   EXTRACCIÓN DE PREDIOS — conectada al pipeline real. Donde nace el flujo.
+
+   EL PASO QUE ESTA PANTALLA DA
+   Aquí se corre el scraping y se mira lo que trajo. Lo que se marca y se
+   acepta entra al Flujo de inmuebles por su primera pantalla, Revisión
+   general (etapa `revision` en `seguimiento_propiedades`). Lo que se
+   descarta sale del circuito: desaparece de esta tabla y no vuelve en las
+   corridas siguientes, pero queda en la pestaña Descartados del flujo con
+   su motivo y quién lo descartó.
+
+   Antes esto no pasaba. Aceptar guardaba `filtro_arquitectonico='pasa'` y
+   nada más, así que el inmueble se quedaba en la etapa `nuevo` —fuera de
+   todas las pantallas del flujo— y a cambio se inyectaba una tarjeta de
+   "borrador" en la maqueta de Predios, que no era el mismo dato ni vivía en
+   la base. Y descartar sólo pintaba una etiqueta roja en la fila: a la
+   corrida siguiente el anuncio estaba otra vez ahí para volver a leerlo.
 
    Funciona en dos modos, y lo dice en pantalla:
 
@@ -41,7 +56,12 @@ const CRITERIOS_FIJOS = [
 
 type Linea = { t?: string; m: string; n?: string };
 
-/** Modal de descarte: el motivo es obligatorio y queda en `seguimiento.db`. */
+/** Modal de descarte: el motivo es obligatorio y queda en la base.
+ *
+ * Descartar aquí es definitivo para esta pantalla: el predio deja de salir en
+ * la extracción, hoy y en las corridas siguientes. Por eso el motivo no es
+ * opcional — es lo único que explica, dentro de tres meses, por qué ese
+ * anuncio no está. */
 function FormDescartar({ n, onConfirmar, onCancelar }: {
   n: number; onConfirmar: (motivo: string) => void; onCancelar: () => void;
 }) {
@@ -57,7 +77,7 @@ function FormDescartar({ n, onConfirmar, onCancelar }: {
         <label htmlFor="ex-nota">Nota</label>
         <textarea
           className="t" id="ex-nota" value={nota} onChange={(e) => setNota(e.target.value)}
-          placeholder="Queda registrada junto al descarte en seguimiento.db"
+          placeholder="Queda registrada junto al descarte, en la pestaña Descartados del flujo"
         />
       </MCuerpo>
       <MPie>
@@ -70,7 +90,7 @@ function FormDescartar({ n, onConfirmar, onCancelar }: {
   );
 }
 
-export default function Extraccion({ onEnviarARevision }: { onEnviarARevision: (p: Predio[]) => void }) {
+export default function Extraccion() {
   const { go, av, modal } = useConsola();
 
   /* ── conexión y catálogo de zonas ─────────────────────────────────────── */
@@ -349,23 +369,18 @@ export default function Extraccion({ onEnviarARevision }: { onEnviarARevision: (
     }
   };
 
+  /* Aceptar: el predio entra al flujo por Revisión general.
+     La fila se queda en la tabla marcada "En revisión general" —sirve para
+     no volver a mandarla y para saber qué se lleva la corrida de hoy— pero
+     el dato de verdad ya está en la base, en su etapa. */
   const enviar = async () => {
     const filas = seleccionados;
     if (!filas.length) { av("No has seleccionado ningún predio"); return; }
     const { ok, nota } = await guardarDecision(filas, "pasa", null);
     if (!ok) { av("No se guardó: " + nota); return; }
     setRows((rs) => rs.map((r) => filas.some((f) => f.id === r.id) ? { ...r, sent: true } : r));
-    onEnviarARevision(filas.map((r) => ({
-      id: "ex_" + r.id,
-      nombre: (r.titulo || tituloDelEnlace(r.link) || "Predio sin título").slice(0, 60),
-      zona: `${r.zona} · ${r.ciudad} · desde ${r.portal}`,
-      est: "bor", score: "—", inversion: fmtPrecio(r.precio, r.mon),
-      area: "arq" as const,
-      city: r.ciudad === "Ciudad de Panamá" ? "Panamá" : r.ciudad,
-      publicado: false, link: r.link,
-    })));
     setSel({});
-    av(`${filas.length} predio(s) enviado(s) a revisión como Borrador ${nota}`);
+    av(`${filas.length} predio(s) en revisión general · Flujo de inmuebles ${nota}`);
   };
 
   const descartar = () => {
@@ -377,12 +392,20 @@ export default function Extraccion({ onEnviarARevision }: { onEnviarARevision: (
         onConfirmar={async (motivo) => {
           const { ok, nota } = await guardarDecision(filas, "no_pasa", motivo);
           if (!ok) { av("No se guardó: " + nota); return; }
-          /* No se toca `bajo`: "estaba por debajo de la mediana" es un hecho
-             del dato, no una opinión. El descarte se registra aparte. */
-          setRows((rs) => rs.map((r) => filas.some((f) => f.id === r.id) ? { ...r, desc: "manual", motivo } : r));
+          /* El descartado SALE de la tabla. Es lo que significa "no vuelve
+             a aparecer": el servidor ya no lo devuelve en /predios, así
+             que dejarlo pintado con una etiqueta roja sería enseñar algo
+             que se va a ir solo al recargar. Queda en la pestaña
+             Descartados del flujo, con su motivo.
+
+             Sin servidor no se guardó nada, así que ahí sí se marca en vez
+             de quitarse: al recargar volvería, y esconderlo sería mentir. */
+          setRows((rs) => api
+            ? rs.filter((r) => !filas.some((f) => f.id === r.id))
+            : rs.map((r) => filas.some((f) => f.id === r.id) ? { ...r, desc: "manual", motivo } : r));
           setSel({});
           cierra();
-          av(`${filas.length} predio(s) descartado(s) ${nota}`);
+          av(`${filas.length} predio(s) descartado(s) · no volverán a salir ${nota}`);
         }}
       />
     ));
@@ -418,7 +441,17 @@ export default function Extraccion({ onEnviarARevision }: { onEnviarARevision: (
     /* `habilitados` solo lo calcula el servidor. Sin él va un guion, no un
        cero: un cero al lado de los otros cuatro números se lee como "ninguno
        pasó", que es falso. */
-    { n: r.habilitados != null ? miles(r.habilitados) : "—", l: "Habilitados para el arquitecto", s: r.habilitados != null ? `−${miles(r.bajo - r.habilitados)} descartados a mano` : "solo con servidor", hi: true },
+    /* El último escalón dice DOS cosas distintas y por eso las separa: lo que
+       se cae por la validación geográfica (dato) y lo que alguien descartó a
+       mano (decisión). Antes las sumaba y llamaba "descartados a mano" al
+       total, que era casi todo validación geográfica. */
+    {
+      n: r.habilitados != null ? miles(r.habilitados) : "—",
+      l: "Habilitados para el arquitecto",
+      s: r.habilitados == null ? "solo con servidor"
+        : `−${miles(r.descartados ?? 0)} descartados a mano · −${miles(r.bajo - r.habilitados - (r.descartados ?? 0))} sin validación geográfica`,
+      hi: true,
+    },
   ] : [];
 
   const atipVis = rows.filter((x) => x.atip).length;
@@ -431,7 +464,8 @@ export default function Extraccion({ onEnviarARevision }: { onEnviarARevision: (
       >
         Trae desde los portales públicos los inmuebles en venta de las zonas activas cuyo precio por m²
         está por debajo de la mediana de su zona. Desde aquí no se publica nada: lo que se acepta entra
-        a Predios como borrador.
+        al <b>Flujo de inmuebles</b>, a Revisión general; lo que se descarta no vuelve a salir en las
+        corridas siguientes.
       </VHead>
 
       <div className={`conn ${api === null ? "" : api ? "on" : "off"}`}>
@@ -555,9 +589,11 @@ export default function Extraccion({ onEnviarARevision }: { onEnviarARevision: (
               y solo muestra los predios <b style={{ color: "var(--coffee)" }}>habilitados para gestión
               manual</b>: precio/m² bajo la mediana de su zona, con validación geográfica a favor
               (dentro del polígono, similar estadístico MCD, o sin evaluar por falta de coordenadas).
-              Las únicas marcas visibles por predio son si tiene coordenadas evaluadas y si su
-              precio/m² es atípico para su zona; los totales del embudo arriba sí reflejan el universo
-              completo. El listado se ordena de mayor a menor Score Zequara — con miles de predios
+              Los descartados a mano no están en el listado —eso es lo que significa que un
+              descarte no vuelve a entrar—: siguen en la base y se consultan en la pestaña
+              Descartados del flujo, con su motivo. Las únicas marcas visibles por predio son si
+              tiene coordenadas evaluadas y si su precio/m² es atípico para su zona; los totales
+              del embudo arriba sí reflejan el universo completo. El listado se ordena de mayor a menor Score Zequara — con miles de predios
               habilitados, así se ve primero cuáles conviene revisar antes.
             </Hint>
           </Card>
@@ -591,10 +627,13 @@ export default function Extraccion({ onEnviarARevision }: { onEnviarARevision: (
 
           <div className="bulkbar">
             <span className="c">Seleccionados: <b>{nSel}</b></span>
-            <Btn tono="primary" onClick={enviar}><IcoCheck />Enviar a revisión arquitectónica</Btn>
+            <Btn tono="primary" onClick={enviar}><IcoCheck />Aceptar · pasar a revisión general</Btn>
             <Btn onClick={descartar}>Descartar con motivo</Btn>
+            {/* El sitio donde acaban los que se aceptan, a un clic: sin esto
+                la pantalla los manda a un lugar que no se ve desde aquí. */}
+            <Btn onClick={() => go("flujo")}>Ver el flujo</Btn>
             <span className="c" style={{ marginLeft: "auto", fontWeight: 300, fontSize: ".78rem", opacity: .75 }}>
-              La decisión queda en <b>seguimiento.db</b> y sobrevive a las corridas siguientes.
+              La decisión queda en <b>seguimiento_propiedades</b> y sobrevive a las corridas siguientes.
             </span>
           </div>
 
@@ -665,7 +704,7 @@ export default function Extraccion({ onEnviarARevision }: { onEnviarARevision: (
                             Descartado · {(x.motivo || "sin motivo").slice(0, 26)}
                           </MkChip>
                         )}
-                        {x.sent && <MkChip t="in">Enviado a revisión</MkChip>}
+                        {x.sent && <MkChip t="in">En revisión general</MkChip>}
                       </div>
                     </td>
                     <td style={{ textAlign: "right" }}>

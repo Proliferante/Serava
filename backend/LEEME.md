@@ -176,7 +176,7 @@ comentario.
 
 ## Flujo de inmuebles — `/api/admin/flujo`
 
-Las cinco pantallas del correo, contra la base:
+Las pantallas del correo, contra la base:
 
 | | |
 |---|---|
@@ -185,6 +185,27 @@ Las cinco pantallas del correo, contra la base:
 | `POST /decidir` | continúa · no continúa · no disponible |
 | `POST /visita` | agendar |
 | `POST /completar` | completar tras la visita y publicar |
+
+**Dónde empieza el flujo.** No en el scraping. El scraping se corre en
+Extracción de predios (`/api/admin`) y deja miles de anuncios en
+`clean_listings` con etapa `nuevo`. Lo que alguien **acepta** ahí
+—`POST /api/admin/seguimiento` con `decision: "pasa"`— pasa a la etapa
+`revision`, que es la primera pantalla del flujo: Revisión general. Descartar
+lleva a `descartado`.
+
+Las seis etapas, en orden: `nuevo` (lo trajo el scraping, nadie lo ha
+mirado; no se pinta en el flujo) → `revision` → `preseleccion` → `visita` →
+`publicado`, y `descartado` desde cualquier punto. La lista está escrita en
+tres sitios que tienen que coincidir: el `CHECK` de `database/schema.sql`,
+`ETAPAS` en `api/flujo.py` y `VALORES_VALIDOS_ETAPA` en
+`services/admin/seguimiento.py`.
+
+**Descartado no vuelve a salir.** `GET /api/admin/predios` —la tabla de la
+extracción— excluye lo descartado leyendo `seguimiento_propiedades` **en
+vivo**, no la copia que el pipeline deja en `clean_listings`: esa copia es
+una foto del momento de la corrida, así que un descarte de hoy no aparecía
+hasta la corrida siguiente y hasta entonces el anuncio volvía a la tabla
+como si nadie lo hubiera mirado.
 
 **Cómo se guarda el estado, y por qué así.** El inmueble vive en
 `clean_listings`, que el pipeline **reconstruye en cada corrida**. Su estado
@@ -200,8 +221,21 @@ siguiente.
 
 ## Consola del pipeline — `/api/admin`
 
-Los siete endpoints que ya existían (config, predios, extraer, estado,
-seguimiento, zonas_resumen, predio_analisis). No se tocaron.
+Los siete endpoints de siempre (config, predios, extraer, estado,
+seguimiento, zonas_resumen, predio_analisis).
+
+Dos cosas de `predios` y `seguimiento` que conviene saber:
+
+- **Los booleanos son booleanos.** `dentro_poligono_real`, `similar_a_zona`,
+  `bajo_media_zona`, `posible_duplicado` y
+  `modelo_repetido_edificio_nuevo` son `boolean` en Postgres (los escribe
+  pandas desde el dataframe de la limpieza). Compararlos con `= 1` no
+  devuelve falso: revienta con «operator does not exist: boolean =
+  integer», o sea 500 y pantalla vacía. Van con `IS TRUE` / `IS FALSE` /
+  `IS NULL`, y para contarlos `COUNT(*) FILTER`, no `SUM(columna)`.
+- **`en_scope_zona` es texto y no tiene un solo formato**: hay `'1'`/`'0'`
+  de unas corridas y `'true'`/`'false'` de otras. Se compara contra las
+  dos formas o el embudo se deja filas fuera.
 
 ---
 

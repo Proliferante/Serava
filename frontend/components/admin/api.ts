@@ -67,7 +67,7 @@ export type Fila = {
   /** `manual` cuando alguien lo descartó desde la consola. */
   desc: string;
   motivo: string;
-  /** Ya enviado a revisión arquitectónica. */
+  /** Ya está en el flujo de inmuebles (revisión general o más adelante). */
   sent: boolean;
   score: number | null;
   prioridad?: string;
@@ -75,7 +75,10 @@ export type Fila = {
 
 export type Resumen = {
   extraidos: number; en_scope: number; clean: number; bajo: number;
-  habilitados?: number; atipicos: number; fuera: number; sin_evaluar: number; similares: number;
+  habilitados?: number;
+  /** Cuántos de los que cumplen los criterios están descartados a mano. */
+  descartados?: number;
+  atipicos: number; fuera: number; sin_evaluar: number; similares: number;
 };
 
 export type Config = {
@@ -103,12 +106,22 @@ export function filaLocal(a: (number | string)[], zonas: ZonaMuestra[], agg: Rec
   };
 }
 
-/** Traduce una fila del endpoint `/predios` a la forma de la tabla. */
+/** Traduce una fila del endpoint `/predios` a la forma de la tabla.
+ *
+ * Las marcas del pipeline llegan como `boolean` (así están en Postgres: las
+ * escribe pandas desde el dataframe de la limpieza), no como 0/1. Se aceptan
+ * las dos formas porque la muestra local sí trae 0/1 y las dos alimentan esta
+ * misma tabla. Leyendo sólo `=== 1`, todo salía en falso: cada anuncio se
+ * pintaba "sin coordenadas evaluadas" y su precio/m² en rojo, como si
+ * ninguno estuviera bajo la mediana de su zona.
+ */
 export function filaApi(f: Record<string, unknown>): Fila {
   const s = (k: string) => (f[k] == null ? "" : String(f[k]));
   const n = (k: string) => (f[k] == null ? 0 : Number(f[k]));
   const clas = s("precio_m2_clasificacion");
-  const tri = (k: string) => (f[k] === 1 ? 1 : f[k] === 0 ? 0 : -1);
+  /** Verdadero / falso / sin evaluar → 1 / 0 / −1. */
+  const tri = (k: string) => (f[k] === true || f[k] === 1 ? 1 : f[k] === false || f[k] === 0 ? 0 : -1);
+  const bool = (k: string) => f[k] === true || f[k] === 1;
   return {
     id: "a" + s("link").slice(-18),
     zona: s("zona"), ciudad: s("ciudad"), pais: s("pais"), mon: s("moneda"),
@@ -117,13 +130,16 @@ export function filaApi(f: Record<string, unknown>): Fila {
     hab: n("habitaciones"), ban: n("banos"),
     atip: clas.indexOf("atipico") === 0,
     po: tri("dentro_poligono_real"), si: tri("similar_a_zona"),
-    dup: f["posible_duplicado"] === 1,
-    modelo: f["modelo_repetido_edificio_nuevo"] === 1,
-    bajo: f["bajo_media_zona"] === 1,
+    dup: bool("posible_duplicado"),
+    modelo: bool("modelo_repetido_edificio_nuevo"),
+    bajo: bool("bajo_media_zona"),
     med: n("mediana_precio_m2_zona"),
-    desc: s("filtro_arquitectonico") === "no_pasa" ? "manual" : "",
+    /* El estado ya no se deduce del filtro arquitectónico: lo dice `etapa`,
+       que es lo que el flujo escribe y lee. Un predio "en revisión general"
+       es exactamente el que está en la etapa `revision`. */
+    desc: s("etapa") === "descartado" ? "manual" : "",
     motivo: s("motivo_no_pasa"),
-    sent: s("filtro_arquitectonico") === "pasa",
+    sent: s("etapa") !== "nuevo" && s("etapa") !== "descartado",
     score: f["score_zequara"] == null ? null : Number(f["score_zequara"]),
     prioridad: s("prioridad_revision"),
   };

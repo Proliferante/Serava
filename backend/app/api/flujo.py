@@ -1,13 +1,25 @@
 """
 api/flujo.py
 ============
-Las cinco pantallas del flujo de inmuebles, montado en /api/admin/flujo.
+Las pantallas del flujo de inmuebles, montado en /api/admin/flujo.
 
-    GET  /api/admin/flujo?etapa=nuevo       listado de una etapa
+    GET  /api/admin/flujo?etapa=revision    listado de una etapa
     GET  /api/admin/flujo/conteos           cuántos hay en cada etapa
     POST /api/admin/flujo/decidir           continúa / no continúa / no disponible
     POST /api/admin/flujo/visita            agendar visita
     POST /api/admin/flujo/completar         completar tras la visita y publicar
+
+DÓNDE EMPIEZA EL FLUJO
+    No en el scraping: en la revisión general. El scraping deja miles de
+    anuncios en `clean_listings` y ésos se miran en la pantalla de
+    Extracción de predios, que es donde se corre. Lo que alguien acepta
+    ahí —y sólo eso— entra al flujo con etapa 'revision'.
+
+    Por eso la etapa 'nuevo' existe pero ninguna pantalla del flujo la
+    muestra: 'nuevo' es "lo trajo el scraping y nadie lo ha mirado", que
+    son 11.000 filas y no una bandeja de trabajo. El recorrido del flujo
+    es revisión general → preselección → visita → publicado, y en
+    cualquier punto se puede descartar.
 
 DE DÓNDE SALEN LOS DATOS
     El inmueble vive en `clean_listings`, que el pipeline reconstruye en
@@ -22,7 +34,8 @@ DE DÓNDE SALEN LOS DATOS
     Un inmueble que el scraping trae por primera vez no tiene fila en
     seguimiento: se considera etapa 'nuevo'. Por eso la consulta de la
     etapa 'nuevo' es un LEFT JOIN con `etapa IS NULL OR etapa = 'nuevo'`, y
-    no un filtro sobre seguimiento.
+    no un filtro sobre seguimiento. Las demás etapas sí son filas escritas
+    por alguien, con nombre y fecha.
 
 POR QUÉ LA ETAPA NO SE DEDUCE, SE GUARDA
     Se podría inferir de los otros campos (filtro_arquitectonico, disponible,
@@ -51,15 +64,27 @@ from app.core.database import cursor, escribir, tabla_existe
 
 router = APIRouter()
 
-ETAPAS = ("nuevo", "preseleccion", "visita", "publicado", "descartado")
+# Misma lista que el CHECK de database/schema.sql y que VALORES_VALIDOS_ETAPA
+# en services/admin/seguimiento.py. Si se agrega una etapa, va en los tres.
+#
+# 'nuevo' se puede consultar (el CSV del universo lo usa) pero no es una
+# pantalla del flujo: ver la cabecera del archivo.
+ETAPAS = ("nuevo", "revision", "preseleccion", "visita", "publicado", "descartado")
 
 # Los dos filtros del arquitecto: el flujo sólo trabaja sobre inmuebles que
 # ya los cumplen, igual que el resto de la consola (ver admin.py). Están
 # aquí repetidos y no importados para que este módulo no dependa del otro:
 # si mañana el flujo tiene su propio criterio, se cambia sólo aquí.
+# OJO CON EL TIPO: en Postgres estas cinco columnas son `boolean`, no 0/1.
+# Las escribe pandas (`to_sql`) desde el dataframe de la limpieza, y una
+# columna de bools de pandas se convierte en `boolean`. Comparar un boolean
+# con 1 no es "falso": es un error de Postgres —«operator does not exist:
+# boolean = integer»— que devuelve 500 y deja la pantalla vacía. Por eso van
+# con IS TRUE / IS FALSE / IS NULL, que además distinguen los tres casos que
+# pide la regla: dentro del polígono, fuera pero similar, o sin evaluar.
 CRITERIOS = [
-    "(c.dentro_poligono_real = 1 OR c.similar_a_zona = 1 OR c.dentro_poligono_real IS NULL)",
-    "c.bajo_media_zona = 1",
+    "(c.dentro_poligono_real IS TRUE OR c.similar_a_zona IS TRUE OR c.dentro_poligono_real IS NULL)",
+    "c.bajo_media_zona IS TRUE",
 ]
 
 # Lo que necesitan las cinco pantallas de cada inmueble.
@@ -166,7 +191,7 @@ def _condicion_de_etapa(etapa: str) -> tuple[str, list]:
 
 @router.get("")
 def listar(
-    etapa: str = Query("nuevo", description="nuevo|preseleccion|visita|publicado|descartado"),
+    etapa: str = Query("revision", description="revision|preseleccion|visita|publicado|descartado|nuevo"),
     limite: int = Query(500, ge=1, le=2000),
     _: dict = Depends(usuario_actual),
 ):
@@ -214,7 +239,7 @@ CSV_CABECERA = ("Titulo", "Zona", "Ciudad", "Precio", "Area m2",
 
 @router.get("/csv")
 def csv_de_etapa(
-    etapa: str = Query("nuevo", description="nuevo|preseleccion|visita|publicado|descartado"),
+    etapa: str = Query("revision", description="revision|preseleccion|visita|publicado|descartado|nuevo"),
     _: dict = Depends(usuario_actual),
 ):
     """El listado COMPLETO de una etapa, en CSV.
@@ -277,9 +302,9 @@ def csv_de_etapa(
 def conteos(_: dict = Depends(usuario_actual)):
     """Los números de las pestañas, en una sola consulta.
 
-    Las pantallas 1 y 2 miran las dos la etapa 'nuevo' —lo que llegó y lo
-    que hay que decidir son la misma bandeja—, así que el frontend usa el
-    mismo conteo para ambas.
+    Devuelve las seis etapas, incluida 'nuevo': el flujo no la pinta, pero
+    es el contador de "lo que el scraping trajo y nadie ha mirado", que es
+    dato útil para la pantalla de Extracción.
     """
     _exige_pipeline()
     with cursor() as con:
@@ -313,9 +338,10 @@ LIMITE_NOMBRE = 120       # títulos, nombres de contacto
 
 class PeticionDecidir(BaseModel):
     links: list[str] = Field(min_length=1, max_length=LIMITE_LOTE)
-    # continua        → pantalla 2: pasa a preseleccionados
-    # no_continua     → pantalla 2 o 4: descartado, no vuelve a entrar
-    # no_disponible   → pantalla 3: el propietario ya no lo vende
+    # continua        → revisión general: pasa a preseleccionados
+    # no_continua     → revisión general o tras la visita: descartado, y no
+    #                   vuelve a salir ni en el flujo ni en la extracción
+    # no_disponible   → preseleccionados: el propietario ya no lo vende
     decision: str = Field(max_length=32)
     motivo: str | None = Field(default=None, max_length=LIMITE_TEXTO)
 
@@ -379,7 +405,7 @@ class PeticionVisita(BaseModel):
 
 @router.post("/visita")
 def agendar_visita(p: PeticionVisita, u: dict = Depends(usuario_actual)):
-    """Pantalla 3 → 4. Guarda la cita y mueve el inmueble a 'visita'."""
+    """Preseleccionados → visita. Guarda la cita y mueve la etapa."""
     _exige_pipeline()
     if p.link not in _existe_y_cumple([p.link]):
         raise HTTPException(400, "Ese inmueble no está disponible para agendar.")
@@ -482,7 +508,7 @@ class PeticionCompletar(BaseModel):
 
 @router.post("/completar")
 def completar(p: PeticionCompletar, u: dict = Depends(usuario_actual)):
-    """Pantalla 4 → 5. Guarda lo que confirmó arquitectura y publica."""
+    """Visita → publicado. Guarda lo que confirmó arquitectura y publica."""
     _exige_pipeline()
     if p.link not in _existe_y_cumple([p.link]):
         raise HTTPException(400, "Ese inmueble no está disponible para completar.")
