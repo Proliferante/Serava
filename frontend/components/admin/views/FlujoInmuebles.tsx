@@ -108,12 +108,25 @@ function Vacio({ children }: { children: ReactNode }) {
   return <Card><div className="empty">{children}</div></Card>;
 }
 
+/* El identificador del inmueble en la tabla.
+ *
+ * `zona` y `ciudad` pueden venir vacías, y no es un error: un inmueble que
+ * está en el flujo se lee de `seguimiento_propiedades`, y su anuncio puede
+ * haber salido de la tabla limpia —lo retiraron del portal, o la
+ * deduplicación se quedó con otra publicación del mismo inmueble—. La fila
+ * sigue ahí con lo que decidió el equipo, y lo honesto es decir que del
+ * anuncio ya no hay datos, no pintar " · " y dejar que parezca un fallo. */
 function Info({ x }: { x: Inmueble }) {
   const titulo = x.titulo || tituloDelEnlace(x.link);
+  const ubicacion = [x.zona, x.ciudad].filter(Boolean).join(" · ");
   return (
     <>
       <div className="pname">{titulo || "(sin título)"}</div>
-      <div className="pzone">{x.zona} · {x.ciudad}</div>
+      {ubicacion
+        ? <div className="pzone">{ubicacion}</div>
+        : <div className="pzone" style={{ fontStyle: "italic" }}>
+            El anuncio ya no está en el listado · se conserva lo registrado
+          </div>}
     </>
   );
 }
@@ -526,7 +539,12 @@ export default function FlujoInmuebles() {
   const medio = conPm2.length
     ? conPm2.reduce((a, x) => a + (x.precio_m2 as number), 0) / conPm2.length
     : null;
-  const ciudades = new Set(filas.map((x) => x.ciudad)).size;
+  /* La moneda sale de una fila que SÍ tenga precio/m². Antes se cogía de
+     `filas[0]`, y si esa primera fila era un inmueble cuyo anuncio ya no
+     está en el listado, su moneda viene vacía y la media de pesos se
+     imprimía en dólares. */
+  const moneda = conPm2[0]?.moneda || "";
+  const ciudades = new Set(filas.map((x) => x.ciudad).filter(Boolean)).size;
 
   /** Cabecera de estado compartida por las seis pestañas. */
   const estado = () => {
@@ -622,7 +640,7 @@ export default function FlujoInmuebles() {
                 </div>
                 <div className="it">
                   <div className="k">$/m² medio</div>
-                  <div className="v">{medio != null ? pm2(medio, filas[0].moneda) : "—"}</div>
+                  <div className="v">{medio != null ? pm2(medio, moneda) : "—"}</div>
                 </div>
                 <div className="it"><div className="k">Ciudades</div><div className="v">{ciudades}</div></div>
               </div>

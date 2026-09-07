@@ -200,6 +200,33 @@ tres sitios que tienen que coincidir: el `CHECK` de `database/schema.sql`,
 `ETAPAS` en `api/flujo.py` y `VALORES_VALIDOS_ETAPA` en
 `services/admin/seguimiento.py`.
 
+**Una decision humana no depende del pipeline.** Las pestanas del flujo se
+leen de `seguimiento_propiedades` y **sin aplicar los criterios del
+arquitecto**; solo `nuevo` se lee de `clean_listings` con los criterios
+puestos, porque es la bandeja de candidatos.
+
+El motivo es que la mediana de precio/m2 de cada zona **se recalcula en cada
+corrida**. Con el flujo leyendose de `clean_listings` con los criterios, un
+inmueble que alguien preselecciono el martes podia quedar por encima de la
+mediana el viernes y desaparecer de su pestana --con su visita agendada y su
+telefono dentro--, ademas de que el servidor rechazaba cualquier accion sobre
+el ("no esta disponible para agendar"), incluso descartarlo. Lo mismo si la
+deduplicacion se quedaba con otra publicacion del mismo inmueble.
+
+Los criterios deciden que se le **ofrece** al equipo. Una vez alguien dice
+"este si", el inmueble es del flujo hasta que otra persona lo mueva. Si su
+anuncio ya no esta en la tabla limpia, la fila sale con lo que se guardo
+--titulo, contacto, cita-- y las columnas del anuncio vacias, y la pantalla lo
+dice: *"El anuncio ya no esta en el listado"*.
+
+**Cada movimiento queda en `bitacora`.** Con quien, cuando y sobre que
+inmueble (`flujo-continua`, `flujo-no_continua`, `flujo-visita`,
+`flujo-contacto`, `flujo-publicar`, `extraccion-pasa`, `extraccion-no_pasa`,
+`extraccion-corrida`). La fila de seguimiento solo guarda la **ultima** mano;
+la bitacora, el recorrido. Hizo falta el dia que se pregunto quien habia
+metido unos predios en el flujo y no habia respuesta. El telefono del
+contacto no se anota: es el dato de una persona ajena al equipo.
+
 **Descartado no vuelve a salir.** `GET /api/admin/predios` —la tabla de la
 extracción— excluye lo descartado leyendo `seguimiento_propiedades` **en
 vivo**, no la copia que el pipeline deja en `clean_listings`: esa copia es
@@ -236,6 +263,35 @@ Dos cosas de `predios` y `seguimiento` que conviene saber:
 - **`en_scope_zona` es texto y no tiene un solo formato**: hay `'1'`/`'0'`
   de unas corridas y `'true'`/`'false'` de otras. Se compara contra las
   dos formas o el embudo se deja filas fuera.
+
+## La limpieza publica la tabla sin dejarla a medias
+
+`guardar()` en `script_transform_serava.py` no hace
+`to_sql(if_exists="replace")` sobre `clean_listings`. Escribe a
+`clean_listings_nueva` y cambia los nombres en una transaccion, porque
+`replace` borra la tabla y la reescribe: entre lo uno y lo otro **no
+existe**, y si el proceso muere ahi --se queda sin memoria, que es facil con
+pandas, scipy, sklearn y shapely sobre quince mil filas-- la consola arranca
+diciendo "Todavia no existe clean_listings", como si nunca se hubiera
+scrapeado nada.
+
+Tres cosas mas de esa funcion, y ninguna es opcional:
+
+- **Los tipos se fijan antes y se comprueban despues** (`_tipos_estables`,
+  `_comprobar_tipos`). `to_sql` deduce el tipo de cada columna del dtype del
+  dataframe: una columna de marcas sale `boolean`, pero si una corrida la
+  deja con algun NaN sale `double precision`, y entonces todas las consultas
+  de la consola --que preguntan `IS TRUE`-- revientan con 500. Si la
+  comprobacion salta, la corrida falla ahi y se ve en la bitacora, en vez de
+  descubrirse cuando el equipo abra la consola.
+- **Los indices se recrean** (`INDICES`). La tabla se reconstruye en cada
+  corrida, asi que sus indices se van con ella. Estuvo sin ninguno: cada
+  consulta del flujo y de la extraccion recorria las once mil filas.
+- **La tabla anterior se suelta ANTES de crear los indices.** En Postgres el
+  nombre de un indice es unico en el esquema, no por tabla: al renombrar la
+  vieja, sus indices se van con ella conservando el nombre, asi que un
+  `CREATE INDEX IF NOT EXISTS` los encontraria "ya existentes" y no haria
+  nada. La tabla nueva se quedaria sin indices, en silencio.
 
 ---
 

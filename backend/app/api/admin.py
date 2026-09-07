@@ -43,6 +43,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from app.api.auth import usuario_actual
+from app.core import bitacora
 
 # --- el pipeline real -------------------------------------------------------
 from app.services.admin import db_admin as db
@@ -402,7 +403,7 @@ def _correr(zonas_pedidas: list[str], solo_transformar: bool):
 
 
 @router.post("/extraer")
-def extraer(p: PeticionExtraer):
+def extraer(p: PeticionExtraer, u: dict = Depends(usuario_actual)):
     with _LOCK:
         if ESTADO["corriendo"]:
             raise HTTPException(409, "Ya hay una corrida en curso.")
@@ -415,6 +416,14 @@ def extraer(p: PeticionExtraer):
         _log("Solo limpieza: no se contacta ningún portal.")
     else:
         _log("Verificando robots.txt con sesión y user-agent propios…")
+    # Quién lanzó la corrida. Una extracción completa sale a los portales
+    # durante decenas de minutos y reconstruye la tabla limpia: es la acción
+    # más pesada de la consola y hasta ahora no dejaba rastro de quién la
+    # había disparado.
+    bitacora.anotar(
+        u, "extraccion-solo-limpieza" if p.solo_transformar else "extraccion-corrida",
+        f"{len(ESTADO['zonas'])} zona(s): " + ", ".join(ESTADO["zonas"]),
+    )
     threading.Thread(target=_correr, args=(p.zonas, p.solo_transformar), daemon=True).start()
     return {"ok": True, "zonas": ESTADO["zonas"]}
 
@@ -525,6 +534,15 @@ def guardar_seguimiento(p: PeticionSeguimiento, u: dict = Depends(usuario_actual
                 etapa=ETAPA_DE_LA_DECISION[p.decision],
                 estado_seguimiento=ESTADO_DE_LA_DECISION[p.decision],
                 responsable=responsable,
+            )
+            # Queda en la bitácora además del `responsable` de la fila: la
+            # fila guarda la última mano, la bitácora el recorrido. Aceptar
+            # un predio es lo que lo mete en el flujo, y era justo el paso
+            # que no dejaba rastro de quién lo había dado.
+            bitacora.anotar(
+                u, f"extraccion-{p.decision}",
+                f"{ETAPA_DE_LA_DECISION[p.decision]} · {link}"
+                + (f" · {p.motivo}" if p.decision == "no_pasa" and p.motivo else ""),
             )
             guardados += 1
         except Exception as e:  # noqa: BLE001

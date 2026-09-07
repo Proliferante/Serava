@@ -451,8 +451,132 @@ def construir_tabla_final(df: pd.DataFrame) -> pd.DataFrame:
 # 8. GUARDADO
 # ---------------------------------------------------------------------------
 
+# Las columnas que la consola trata como marcas de si/no. Se fuerzan a
+# `boolean` ANTES de escribir y se comprueban DESPUES, y no es celo: es el
+# fallo que ya tumbo la consola entera.
+#
+# `to_sql` decide el tipo de cada columna a partir del dtype del dataframe.
+# Una columna de bools sale `boolean`; la misma columna, si una corrida la
+# deja toda vacia o con algun NaN, sale `double precision` o `text`. Y las
+# consultas de la consola preguntan `IS TRUE`, que contra un numero es un
+# error de Postgres —no un falso—: 500 en /api/admin/predios y en las cinco
+# pantallas del flujo, con la pantalla en blanco y sin pista de por que.
+#
+# Paso lo mismo al reves: durante meses el SQL comparaba `= 1` contra estas
+# columnas booleanas y todo respondia 500. El tipo de esta tabla no puede
+# depender de que salga en los datos de una corrida.
+COLUMNAS_MARCA = [
+    "bajo_media_zona",
+    "dentro_poligono_real",
+    "similar_a_zona",
+    "posible_duplicado",
+    "modelo_repetido_edificio_nuevo",
+    "requiere_revision",
+]
+
+# Los indices que necesita la consola. `to_sql` recrea la tabla en cada
+# corrida, asi que los indices se van con ella: hay que volver a crearlos o
+# cada consulta del flujo y de la extraccion vuelve a ser un recorrido
+# completo de las once mil filas.
+INDICES = [
+    # El join con seguimiento_propiedades y con inmueble_detalle, que es la
+    # consulta de todas las pantallas del flujo.
+    ("clean_listings_link_idx", "link"),
+    # Los filtros de la pantalla de extraccion.
+    ("clean_listings_zona_idx", "zona"),
+    ("clean_listings_ciudad_idx", "ciudad"),
+    # El orden de la pantalla 1 del flujo.
+    ("clean_listings_fecha_idx", "fecha_extraccion"),
+]
+
+
+def _tipos_estables(df: pd.DataFrame) -> pd.DataFrame:
+    """Fija el dtype de las columnas de marca para que el tipo en Postgres
+    no cambie de una corrida a otra. Ver COLUMNAS_MARCA."""
+    df = df.copy()
+    for col in COLUMNAS_MARCA:
+        if col in df.columns:
+            # `fillna(False)` y no `astype(bool)` a secas: con un NaN dentro,
+            # `astype(bool)` lo convierte en True —"no se sabe" pasaria a
+            # "si"— y eso cambiaria el criterio del arquitecto en silencio.
+            df[col] = df[col].fillna(False).astype(bool)
+    return df
+
+
+def _comprobar_tipos(conn):
+    """Aborta si alguna columna de marca no acabo siendo boolean.
+
+    Es una comprobacion y no un arreglo a proposito: si esto salta, el
+    dataframe traia algo que `_tipos_estables` no previo, y conviene verlo
+    en la bitacora de la corrida antes de que la consola empiece a dar 500.
+    """
+    filas = conn.execute(
+        "SELECT column_name, data_type FROM information_schema.columns "
+        "WHERE table_name = 'clean_listings'"
+    ).fetchall()
+    tipos = {f["column_name"]: f["data_type"] for f in filas}
+    malas = {c: tipos[c] for c in COLUMNAS_MARCA if tipos.get(c) not in (None, "boolean")}
+    if malas:
+        raise RuntimeError(
+            "clean_listings quedo con columnas de marca que no son boolean: "
+            f"{malas}. La consola daria 500 en /predios y en el flujo. "
+            "Revisa _tipos_estables en script_transform_serava.py."
+        )
+
+
 def guardar(df_final: pd.DataFrame):
-    df_final.to_sql("clean_listings", db.engine(), if_exists="replace", index=False)
+    """Publica la tabla limpia SIN dejarla nunca a medias.
+
+    POR QUE NO `to_sql(if_exists="replace")` DIRECTO
+    Ese modo borra `clean_listings` y la reescribe. Entre lo uno y lo otro la
+    tabla NO EXISTE: si el proceso muere ahi —y muere, porque esta corrida
+    carga pandas, scipy, sklearn y shapely sobre quince mil filas y la
+    maquina se queda sin memoria— la consola arranca diciendo "Todavia no
+    existe clean_listings. Corre una extraccion primero", como si nunca se
+    hubiera scrapeado nada. El dato crudo sigue entero, pero eso no lo sabe
+    quien esta mirando la pantalla.
+
+    Aqui se escribe a una tabla aparte y se cambia el nombre dentro de una
+    transaccion: mientras se construye la nueva, la consola sigue sirviendo
+    la anterior, y el cambio es instantaneo. Si algo falla a mitad, la tabla
+    buena no se ha tocado y solo queda una tabla de trabajo que la corrida
+    siguiente reemplaza.
+    """
+    df_final = _tipos_estables(df_final)
+    df_final.to_sql("clean_listings_nueva", db.engine(), if_exists="replace", index=False)
+
+    conn = db.conectar()
+    try:
+        # Los dos cambios de nombre van juntos y sin `BEGIN` explicito:
+        # psycopg2 no es autocommit, asi que ya hay una transaccion abierta y
+        # el DDL de Postgres es transaccional. Con un solo `commit()` al
+        # final, los dos renombres aterrizan a la vez o ninguno: no hay
+        # ningun instante en que `clean_listings` no exista para quien la
+        # consulte.
+        conn.execute("DROP TABLE IF EXISTS clean_listings_anterior")
+        conn.execute("ALTER TABLE IF EXISTS clean_listings RENAME TO clean_listings_anterior")
+        conn.execute("ALTER TABLE clean_listings_nueva RENAME TO clean_listings")
+        conn.commit()
+
+        _comprobar_tipos(conn)
+
+        # La tabla anterior se suelta ANTES de crear los indices, y el orden
+        # importa: en Postgres el nombre de un indice es unico en el esquema,
+        # no por tabla. Al renombrar la tabla vieja, SUS indices se van con
+        # ella conservando el nombre — asi que un `CREATE INDEX IF NOT
+        # EXISTS clean_listings_link_idx` los encontraria "ya existentes" y
+        # no haria nada. La tabla nueva se quedaria sin ningun indice, en
+        # silencio, y a partir de la segunda corrida cada consulta del flujo
+        # volveria a recorrer las once mil filas enteras.
+        conn.execute("DROP TABLE IF EXISTS clean_listings_anterior")
+        conn.commit()
+
+        for nombre, columna in INDICES:
+            conn.execute(f"CREATE INDEX IF NOT EXISTS {nombre} ON clean_listings ({columna})")
+        conn.commit()
+    finally:
+        conn.close()
+
     df_final.to_csv(CLEAN_CSV_PATH, index=False, encoding="utf-8-sig")
 
 
