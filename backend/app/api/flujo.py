@@ -3,23 +3,30 @@ api/flujo.py
 ============
 Las pantallas del flujo de inmuebles, montado en /api/admin/flujo.
 
-    GET  /api/admin/flujo?etapa=revision    listado de una etapa
+    GET  /api/admin/flujo?etapa=preseleccion  listado de una etapa
     GET  /api/admin/flujo/conteos           cuántos hay en cada etapa
     POST /api/admin/flujo/decidir           continúa / no continúa / no disponible
     POST /api/admin/flujo/visita            agendar visita
     POST /api/admin/flujo/completar         completar tras la visita y publicar
 
 DÓNDE EMPIEZA EL FLUJO
-    No en el scraping: en la revisión general. El scraping deja miles de
+    No en el scraping: en la preselección. El scraping deja miles de
     anuncios en `clean_listings` y ésos se miran en la pantalla de
     Extracción de predios, que es donde se corre. Lo que alguien acepta
-    ahí —y sólo eso— entra al flujo con etapa 'revision'.
+    ahí —y sólo eso— entra al flujo con etapa 'preseleccion'.
 
     Por eso la etapa 'nuevo' existe pero ninguna pantalla del flujo la
     muestra: 'nuevo' es "lo trajo el scraping y nadie lo ha mirado", que
-    son 11.000 filas y no una bandeja de trabajo. El recorrido del flujo
-    es revisión general → preselección → visita → publicado, y en
-    cualquier punto se puede descartar.
+    son miles de filas y no una bandeja de trabajo. El recorrido del flujo
+    es preselección → visita → publicado, y en cualquier punto se puede
+    descartar.
+
+    Hubo una etapa 'revision' entre el scraping y la preselección, con su
+    propia pestaña: aceptar en Extracción dejaba el inmueble ahí y alguien
+    volvía a decidir "continúa / no continúa" antes de contactar. Se quitó
+    porque era decidir dos veces lo mismo. El descarte arquitectónico vive
+    ahora sólo en Extracción; desde el flujo, un preseleccionado se saca
+    con "no disponible".
 
 DE DÓNDE SALEN LOS DATOS
     El inmueble vive en `clean_listings`, que el pipeline reconstruye en
@@ -43,10 +50,10 @@ QUÉ QUEDA REGISTRADO
 
     Hace falta porque la fila sólo guarda la ÚLTIMA mano: dice quién dejó el
     inmueble como está, no el recorrido. Preguntar "¿quién metió esto en el
-    flujo?" no tenía respuesta —y se preguntó—: había tres inmuebles en
-    revisión general sin autor, aceptados desde la extracción cuando ese
-    endpoint no lo guardaba, y la única forma de saberlo habría sido un
-    registro de las decisiones. Ahora existe.
+    flujo?" no tenía respuesta —y se preguntó—: había tres inmuebles en el
+    flujo sin autor, aceptados desde la extracción cuando ese endpoint no lo
+    guardaba, y la única forma de saberlo habría sido un registro de las
+    decisiones. Ahora existe.
 
 POR QUÉ LA ETAPA NO SE DEDUCE, SE GUARDA
     Se podría inferir de los otros campos (filtro_arquitectonico, disponible,
@@ -81,7 +88,7 @@ router = APIRouter()
 #
 # 'nuevo' se puede consultar (el CSV del universo lo usa) pero no es una
 # pantalla del flujo: ver la cabecera del archivo.
-ETAPAS = ("nuevo", "revision", "preseleccion", "visita", "publicado", "descartado")
+ETAPAS = ("nuevo", "preseleccion", "visita", "publicado", "descartado")
 
 # Los dos filtros del arquitecto: el flujo sólo trabaja sobre inmuebles que
 # ya los cumplen, igual que el resto de la consola (ver admin.py). Están
@@ -277,7 +284,7 @@ def _consulta_de_etapa(etapa: str) -> tuple[str, str, list]:
 
 @router.get("")
 def listar(
-    etapa: str = Query("revision", description="revision|preseleccion|visita|publicado|descartado|nuevo"),
+    etapa: str = Query("preseleccion", description="preseleccion|visita|publicado|descartado|nuevo"),
     limite: int = Query(500, ge=1, le=2000),
     _: dict = Depends(usuario_actual),
 ):
@@ -337,7 +344,7 @@ CSV_CABECERA = ("Titulo", "Zona", "Ciudad", "Precio", "Area m2",
 
 @router.get("/csv")
 def csv_de_etapa(
-    etapa: str = Query("revision", description="revision|preseleccion|visita|publicado|descartado|nuevo"),
+    etapa: str = Query("preseleccion", description="preseleccion|visita|publicado|descartado|nuevo"),
     _: dict = Depends(usuario_actual),
 ):
     """El listado COMPLETO de una etapa, en CSV.
@@ -402,7 +409,7 @@ def csv_de_etapa(
 def conteos(_: dict = Depends(usuario_actual)):
     """Los números de las pestañas.
 
-    Devuelve las seis etapas, incluida 'nuevo': el flujo no la pinta, pero
+    Devuelve las cinco etapas, incluida 'nuevo': el flujo no la pinta, pero
     es el contador de "lo que el scraping trajo y nadie ha mirado", que es
     dato útil para la pantalla de Extracción.
 
@@ -456,10 +463,11 @@ LIMITE_NOMBRE = 120       # títulos, nombres de contacto
 
 class PeticionDecidir(BaseModel):
     links: list[str] = Field(min_length=1, max_length=LIMITE_LOTE)
-    # continua        → revisión general: pasa a preseleccionados
-    # no_continua     → revisión general o tras la visita: descartado, y no
-    #                   vuelve a salir ni en el flujo ni en la extracción
-    # no_disponible   → preseleccionados: el propietario ya no lo vende
+    # continua        → vuelve a preseleccionados (se usa para reponer un
+    #                   inmueble que ya estaba en el flujo)
+    # no_continua     → tras la visita: descartado, y no vuelve a salir ni en
+    #                   el flujo ni en la extracción
+    # no_disponible   → preseleccionados: se llamó y ya no se vende
     decision: str = Field(max_length=32)
     motivo: str | None = Field(default=None, max_length=LIMITE_TEXTO)
 

@@ -7,26 +7,35 @@ import { TRANSFORMACIONES, tituloDelEnlace } from "@/components/admin/data";
 import { Card, Hint, IcoCheck, IcoDown, IcoExt, MkChip, SecTitle, Tabla } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FLUJO DE INMUEBLES — de la revisión general a la publicación.
+   FLUJO DE INMUEBLES — de la preselección a la publicación.
 
    DÓNDE EMPIEZA, Y DÓNDE NO
    No empieza en el scraping. El scraping se corre en "Extracción de predios"
    y deja miles de anuncios en la base; el equipo los mira ahí, marca los que
-   valen la pena y los acepta. ESO —y sólo eso— entra aquí, a Revisión
-   general, que es la primera pestaña.
+   valen la pena y los acepta. ESO —y sólo eso— entra aquí, directo a
+   Preseleccionados, que es la primera pestaña.
 
-   Antes la pestaña 1 era "Del scraping" y enseñaba la etapa `nuevo`, o sea
-   los 5.236 anuncios que nadie ha mirado todavía: no es una bandeja de
-   trabajo, es el universo. Y el paso de aceptar en Extracción no llegaba
-   nunca porque no escribía la etapa. Ahora sí: aceptar deja el inmueble en
-   `revision`, que es lo que se ve en la primera pestaña.
+   La etapa `nuevo` existe pero ninguna pestaña la enseña: son los miles de
+   anuncios que nadie ha mirado, o sea el universo, y eso se trabaja en
+   Extracción.
 
-   El recorrido: revisión general → preselección (continúa) → visita
-   (agendada) → publicado (completado tras la visita). En cualquier punto se
-   puede descartar, y el descarte queda con su motivo en la pestaña de
-   registro. Eso es lo que hace que un inmueble descartado no vuelva a
-   aparecer —ni aquí ni en la extracción—: el estado vive en
-   `seguimiento_propiedades`, que el pipeline lee pero nunca reconstruye.
+   El recorrido: preselección → visita (agendada) → publicado (completado
+   tras la visita). En cualquier punto se puede descartar, y el descarte
+   queda con su motivo en la pestaña de registro. Eso es lo que hace que un
+   inmueble descartado no vuelva a aparecer —ni aquí ni en la extracción—: el
+   estado vive en `seguimiento_propiedades`, que el pipeline lee pero nunca
+   reconstruye.
+
+   HUBO UNA PESTAÑA "REVISIÓN GENERAL" DELANTE, Y SE QUITÓ
+   Era un paso intermedio: aceptar en Extracción dejaba el inmueble ahí y
+   alguien volvía a decidir "continúa / no continúa" antes de contactar. Se
+   pidió quitarla porque era decidir dos veces lo mismo: quien acepta en
+   Extracción ya ha mirado el anuncio. Ahora aceptar deja el inmueble
+   directamente en `preseleccion` y lo siguiente es llamar.
+
+   El descarte arquitectónico vive por tanto sólo en Extracción ("Descartar
+   con motivo"). Desde el flujo, un preseleccionado se saca con "No
+   disponible", que es el caso real de esta etapa: se llamó y ya no se vende.
 
    DE DÓNDE SALEN LOS DATOS
    Del backend: `GET /api/admin/flujo?etapa=` para el listado y
@@ -38,8 +47,8 @@ import { Card, Hint, IcoCheck, IcoDown, IcoExt, MkChip, SecTitle, Tabla } from "
    antes de saberlo.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-type PanelKey = "p1" | "p2" | "p3" | "p4" | "p5";
-type Etapa = "nuevo" | "revision" | "preseleccion" | "visita" | "publicado" | "descartado";
+type PanelKey = "p1" | "p2" | "p3" | "p4";
+type Etapa = "nuevo" | "preseleccion" | "visita" | "publicado" | "descartado";
 
 /** Qué etapa del dato alimenta cada pestaña.
  *
@@ -47,16 +56,14 @@ type Etapa = "nuevo" | "revision" | "preseleccion" | "visita" | "publicado" | "d
  * trabaja en Extracción de predios. Aquí cada pestaña es una etapa distinta
  * y su contador es el de esa etapa, sin repeticiones. */
 const FUENTE: Record<PanelKey, Etapa> = {
-  p1: "revision", p2: "preseleccion", p3: "visita",
-  p4: "publicado", p5: "descartado",
+  p1: "preseleccion", p2: "visita", p3: "publicado", p4: "descartado",
 };
 
 const PESTANAS: { k: PanelKey; l: string }[] = [
-  { k: "p1", l: "1 · Revisión general" },
-  { k: "p2", l: "2 · Preseleccionados" },
-  { k: "p3", l: "3 · Visita agendada" },
-  { k: "p4", l: "4 · Publicados" },
-  { k: "p5", l: "Descartados" },
+  { k: "p1", l: "1 · Preseleccionados" },
+  { k: "p2", l: "2 · Visita agendada" },
+  { k: "p3", l: "3 · Publicados" },
+  { k: "p4", l: "Descartados" },
 ];
 
 /** Un inmueble como lo devuelve el backend (clean_listings + estado). */
@@ -446,7 +453,7 @@ export default function FlujoInmuebles() {
         x={x} onCancelar={cierra}
         onGuardar={async (d) => {
           cierra();
-          await accion("/api/admin/flujo/visita", { link: x.link, ...d }, "Visita agendada", "p3");
+          await accion("/api/admin/flujo/visita", { link: x.link, ...d }, "Visita agendada", "p2");
         }}
       />
     ));
@@ -466,7 +473,7 @@ export default function FlujoInmuebles() {
             area_confirmada_m2: d.area ? Number(d.area) : null,
             tipo_transformacion: d.tipo,
             notas_visita: d.notas || null,
-          }, "Inmueble publicado", "p4");
+          }, "Inmueble publicado", "p3");
         }}
       />
     ));
@@ -534,7 +541,7 @@ export default function FlujoInmuebles() {
     }
   };
 
-  /* Resumen de la revisión general, calculado sobre lo que se está viendo. */
+  /* Resumen de la etapa que se está viendo, sobre las filas cargadas. */
   const conPm2 = filas.filter((x) => x.precio_m2 != null);
   const medio = conPm2.length
     ? conPm2.reduce((a, x) => a + (x.precio_m2 as number), 0) / conPm2.length
@@ -568,7 +575,7 @@ export default function FlujoInmuebles() {
         <div>
           <h1>Flujo de <b>inmuebles</b></h1>
           <p>
-            De la revisión general a la publicación. Entran los que se aceptan en Extracción de
+            De la preselección a la publicación. Entran los que se aceptan en Extracción de
             predios; cada uno avanza por etapas, y lo que se descarta queda registrado con su
             motivo para no volver a aparecer en las corridas siguientes.
           </p>
@@ -587,30 +594,35 @@ export default function FlujoInmuebles() {
         ))}
       </div>
 
-      {/* ══════════ 1 · REVISIÓN GENERAL ══════════ */}
-      {/* La primera pantalla del flujo. Aquí sólo hay lo que alguien aceptó
-          en Extracción de predios, así que la tabla trae de una vez los
-          números con los que se decide —precio, área, precio/m² y su marca
-          de atípico— y no sólo el enlace: antes esos datos estaban en la
-          pestaña "Del scraping" y había que saltar entre las dos. */}
+      {/* ══════════ 1 · PRESELECCIONADOS ══════════ */}
+      {/* Primera pantalla del flujo: aquí cae lo que se acepta en Extracción.
+          Lleva el resumen y la descarga en CSV que estaban en la pestaña de
+          revisión general, porque son de la bandeja de entrada del flujo y esa
+          bandeja es ahora ésta. */}
       {panel === "p1" && (
         <div className="flow-panel active">
-          <Nota ico={<IcoInfo />}>
-            Estos inmuebles entraron porque se aceptaron en{" "}
+          <Nota ico={<IcoReloj />}>
+            Aquí entra lo que se acepta en{" "}
             <button
               type="button" className="pnl-link"
               style={{ color: "var(--blue)", fontWeight: 600 }}
               onClick={() => go("extraccion")}
             >
               Extracción de predios
-            </button>. Abre la publicación original para revisar las variables y decide. Lo que
-            marques como <b>No continúa</b> queda registrado con su motivo y no volverá a
-            aparecer: ni aquí, ni en las corridas siguientes del scraping.
+            </button>. Contacta por WhatsApp o teléfono y agenda la visita.{" "}
+            <b>Este contacto y validación se automatizará;</b> por ahora es manual.{" "}
+            <button
+              type="button" className="pnl-link"
+              style={{ color: "var(--blue)", fontWeight: 600 }}
+              onClick={automatizar}
+            >
+              Ver automatización
+            </button>
           </Nota>
 
           {estado() ?? (!filas.length ? (
             <Vacio>
-              <b style={{ color: "var(--coffee)" }}>No hay inmuebles en revisión general.</b>
+              <b style={{ color: "var(--coffee)" }}>No hay inmuebles preseleccionados.</b>
               <br />
               Se corre el scraping en <b>Extracción de predios</b>, se marcan los que valen la
               pena y se aceptan: ahí aparecen aquí.
@@ -626,7 +638,7 @@ export default function FlujoInmuebles() {
           ) : (
             <Card>
               <SecTitle style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                En revisión general
+                Preseleccionados
                 <button type="button" className="btn btn-primary btn-mini"
                         onClick={() => void descargar()} disabled={bajando}>
                   <IcoDown />{bajando ? "Preparando…" : "Descargar listado (CSV)"}
@@ -657,72 +669,6 @@ export default function FlujoInmuebles() {
                   <tr>
                     <th>Inmueble</th><th className="num">Precio</th><th className="num">m²</th>
                     <th className="num">$/m²</th><th>Publicación</th>
-                    <th style={{ textAlign: "right" }}>Decisión</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filas.map((x) => (
-                    <tr key={x.link}>
-                      <td><Info x={x} /></td>
-                      <td className="num">{precio(x)}</td>
-                      <td className="num">{x.area_m2 ?? "—"}</td>
-                      <td className="num">
-                        {pm2(x.precio_m2, x.moneda)}
-                        {/* El anuncio con el precio mal escrito es frecuente:
-                            hay registros a US$5/m² donde la mediana es 1.692.
-                            El pipeline los marca y aquí se ven, para que nadie
-                            los tome por una ganga. */}
-                        {(x.precio_m2_clasificacion || "").startsWith("atipico") && (
-                          <> <MkChip t="atip">Atípico</MkChip></>
-                        )}
-                      </td>
-                      <td><Url x={x} texto="Ver anuncio" /></td>
-                      <td>
-                        <div className="tacts-wrap">
-                          <button
-                            type="button" className="btn btn-primary btn-mini"
-                            onClick={() => decidir(x, "continua", null, "Pasa a preseleccionados")}
-                          >
-                            <IcoCheck />Continúa
-                          </button>
-                          <button
-                            type="button" className="btn btn-ghost btn-mini"
-                            onClick={() => descartar(x, "no_continua", "No continúa en revisión general", "Registrar descarte")}
-                          >
-                            No continúa
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Tabla>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* ══════════ 2 · PRESELECCIONADOS ══════════ */}
-      {panel === "p2" && (
-        <div className="flow-panel active">
-          <Nota ico={<IcoReloj />}>
-            Contacta por WhatsApp o teléfono y agenda la visita.{" "}
-            <b>Este contacto y validación se automatizará;</b> por ahora es manual.{" "}
-            <button
-              type="button" className="pnl-link"
-              style={{ color: "var(--blue)", fontWeight: 600 }}
-              onClick={automatizar}
-            >
-              Ver automatización
-            </button>
-          </Nota>
-
-          {estado() ?? (!filas.length ? <Vacio>No hay inmuebles preseleccionados.</Vacio> : (
-            <Card style={{ padding: "6px 6px 2px" }}>
-              <Tabla ancho="lg">
-                <thead>
-                  <tr>
-                    <th>Inmueble</th><th className="num">Precio</th><th>Publicación</th>
                     <th>Contacto</th><th style={{ textAlign: "right" }}>Acción</th>
                   </tr>
                 </thead>
@@ -733,9 +679,19 @@ export default function FlujoInmuebles() {
                       <tr key={x.link}>
                         <td><Info x={x} /></td>
                         <td className="num">{precio(x)}</td>
-                        {/* El anuncio original, también aquí: antes de llamar al
-                            propietario hay que poder mirar las fotos y el detalle
-                            otra vez, y volver a la pantalla 2 para eso era absurdo. */}
+                        <td className="num">{x.area_m2 ?? "—"}</td>
+                        <td className="num">
+                          {pm2(x.precio_m2, x.moneda)}
+                          {/* El anuncio con el precio mal escrito es frecuente: hay
+                              registros a US$5/m² donde la mediana es 1.692. El
+                              pipeline los marca y aquí se ven, para que nadie llame
+                              por una ganga que no existe. */}
+                          {(x.precio_m2_clasificacion || "").startsWith("atipico") && (
+                            <> <MkChip t="atip">Atípico</MkChip></>
+                          )}
+                        </td>
+                        {/* El anuncio original: antes de llamar al propietario hay
+                            que poder mirar las fotos y el detalle otra vez. */}
                         <td><Url x={x} /></td>
                         <td>
                           <div className="tacts-wrap">
@@ -775,8 +731,8 @@ export default function FlujoInmuebles() {
         </div>
       )}
 
-      {/* ══════════ 3 · VISITA AGENDADA ══════════ */}
-      {panel === "p3" && (
+      {/* ══════════ 2 · VISITA AGENDADA ══════════ */}
+      {panel === "p2" && (
         <div className="flow-panel active">
           {estado() ?? (!filas.length ? <Vacio>No hay visitas agendadas.</Vacio> : (
             <Card style={{ padding: "6px 6px 2px" }}>
@@ -823,8 +779,8 @@ export default function FlujoInmuebles() {
         </div>
       )}
 
-      {/* ══════════ 4 · PUBLICADOS ══════════ */}
-      {panel === "p4" && (
+      {/* ══════════ 3 · PUBLICADOS ══════════ */}
+      {panel === "p3" && (
         <div className="flow-panel active">
           {estado() ?? (!filas.length ? <Vacio>Aún no hay inmuebles publicados.</Vacio> : (
             <Card style={{ padding: "6px 6px 2px" }}>
@@ -859,7 +815,7 @@ export default function FlujoInmuebles() {
       )}
 
       {/* ══════════ DESCARTADOS ══════════ */}
-      {panel === "p5" && (
+      {panel === "p4" && (
         <div className="flow-panel active">
           <Nota ico={<IcoVisto />}>
             Registro de descartados. Estos inmuebles <b>no volverán a aparecer</b> en futuros scrapings.

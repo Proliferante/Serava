@@ -77,9 +77,12 @@ VALORES_VALIDOS_DISPONIBLE = {"pendiente", "disponible", "no_disponible"}
 # se agrega en los tres sitios o la base rechaza la escritura.
 #
 #   nuevo -> lo trajo el scraping, nadie lo ha mirado (no esta en el flujo)
-#   revision -> aceptado en Extraccion: entra al flujo por Revision general
+#   preseleccion -> aceptado en Extraccion: entra al flujo listo para llamar
+#
+# Hubo una etapa 'revision' entre las dos y se quito: era decidir dos veces
+# lo mismo. Si aparece una fila con ese valor es de antes de la migracion.
 VALORES_VALIDOS_ETAPA = {
-    "nuevo", "revision", "preseleccion", "visita", "publicado", "descartado",
+    "nuevo", "preseleccion", "visita", "publicado", "descartado",
 }
 
 
@@ -123,7 +126,7 @@ def actualizar_seguimiento(
     diseno de arquitectura: nunca un descarte sin explicar por que).
 
     `etapa` es en que pantalla del flujo queda el predio. Quien decide
-    desde Extraccion la manda explicitamente ('revision' al aceptar,
+    desde Extraccion la manda explicitamente ('preseleccion' al aceptar,
     'descartado' al descartar): sin ella, el predio guardaba el veredicto
     pero se quedaba en 'nuevo', o sea fuera de todas las pantallas del
     flujo. Si no se pasa, la etapa que ya tenia no se toca.

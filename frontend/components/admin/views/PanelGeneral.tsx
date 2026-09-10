@@ -29,7 +29,7 @@ import {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 type Conteos = {
-  nuevo: number; revision: number; preseleccion: number;
+  nuevo: number; preseleccion: number;
   visita: number; publicado: number; descartado: number;
 };
 
@@ -44,7 +44,7 @@ const EMBUDO_MUESTRA = [
 
 const ICO = {
   candidatos: "M12 3v12M8 11l4 4 4-4",
-  revision: "M9 12l2 2 4-4",
+  descartado: "M18 6L6 18M6 6l12 12",
   contacto: "M22 16.9v3a2 2 0 0 1-2.2 2 19 19 0 0 1-8.3-3 18.7 18.7 0 0 1-5.7-5.7 19 19 0 0 1-3-8.4A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z",
   visita: "M3 9h18M8 2v4M16 2v4",
   publicado: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z",
@@ -73,10 +73,10 @@ export default function PanelGeneral() {
 
   const KPIS = [
     { lbl: "Candidatos del scraping", v: n(c?.nuevo), h: "sin revisar todavía", d: ICO.candidatos, ir: "extraccion" as const },
-    { lbl: "En revisión general", v: n(c?.revision), h: "aceptados, por decidir", d: ICO.revision, ir: "flujo" as const, alert: !!c?.revision },
-    { lbl: "Preseleccionados", v: n(c?.preseleccion), h: "por contactar y agendar", d: ICO.contacto, ir: "flujo" as const },
+    { lbl: "Preseleccionados", v: n(c?.preseleccion), h: "por contactar y agendar", d: ICO.contacto, ir: "flujo" as const, alert: !!c?.preseleccion },
     { lbl: "Visitas agendadas", v: n(c?.visita), h: "con cita puesta", d: ICO.visita, ir: "flujo" as const },
     { lbl: "Publicados", v: n(c?.publicado), h: "completados tras la visita", d: ICO.publicado, ir: "flujo" as const, punto: true },
+    { lbl: "Descartados", v: n(c?.descartado), h: "no vuelven a entrar", d: ICO.descartado, ir: "flujo" as const },
   ];
 
   return (

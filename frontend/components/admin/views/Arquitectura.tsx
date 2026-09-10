@@ -26,7 +26,7 @@ export default function Arquitectura({ abrirGestion }: { abrirGestion: () => voi
 
   return (
     <section className="view active">
-      <AvisoMaqueta>El trabajo real de arquitectura se hace hoy en <b>Flujo de inmuebles</b>: revisión general, contacto, visita y publicación.</AvisoMaqueta>
+      <AvisoMaqueta>El trabajo real de arquitectura se hace hoy en <b>Flujo de inmuebles</b>: preselección, contacto, visita y publicación.</AvisoMaqueta>
       <VHead fuerte="Arquitectura">
         Evaluación técnica, alcance de remodelación a costo cerrado, cronograma y obra en curso.
       </VHead>

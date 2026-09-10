@@ -483,25 +483,30 @@ def _links_que_cumplen_criterio(links: list[str]) -> set[str]:
 
 
 # En qué etapa del flujo queda el predio según lo que se decidió en la
-# pantalla de Extracción. Es EL paso que faltaba: antes se guardaba el
-# veredicto en `filtro_arquitectonico` y la fila se quedaba en 'nuevo', así
-# que un predio aceptado no aparecía en ninguna pantalla del flujo — ni en
-# Revisión general, que es donde el equipo lo esperaba.
-ETAPA_DE_LA_DECISION = {"pasa": "revision", "no_pasa": "descartado"}
+# pantalla de Extracción.
+#
+# Aceptar lo deja PRESELECCIONADO, que es la primera pestaña del flujo y
+# donde toca llamar. Hubo una etapa 'revision' en medio —aceptar aquí lo
+# dejaba en una bandeja donde alguien volvía a decidir "continúa / no
+# continúa" antes de contactar— y se quitó porque era decidir dos veces lo
+# mismo: quien acepta en esta pantalla ya ha abierto el anuncio y lo ha
+# mirado.
+ETAPA_DE_LA_DECISION = {"pasa": "preseleccion", "no_pasa": "descartado"}
 
 # El texto corto de seguimiento, para que la fila diga en qué va sin tener
 # que cruzar tres columnas.
-ESTADO_DE_LA_DECISION = {"pasa": "en revisión general", "no_pasa": "descartado"}
+ESTADO_DE_LA_DECISION = {"pasa": "preseleccionado", "no_pasa": "descartado"}
 
 
 @router.post("/seguimiento")
 def guardar_seguimiento(p: PeticionSeguimiento, u: dict = Depends(usuario_actual)):
     """La decisión de la pantalla de Extracción: aceptar o descartar.
 
-    Aceptar mete el predio en el flujo por su primera pantalla, Revisión
-    general (etapa 'revision'). Descartar lo saca del circuito: queda en la
-    pestaña Descartados con su motivo y ya no vuelve a salir en la
-    extracción (ver SIN_DESCARTADOS arriba).
+    Aceptar mete el predio en el flujo por su primera pantalla,
+    Preseleccionados (etapa 'preseleccion'), listo para contactar.
+    Descartar lo saca del circuito: queda en la pestaña Descartados con su
+    motivo y ya no vuelve a salir en la extracción (ver SIN_DESCARTADOS
+    arriba).
 
     Escribe con el módulo real, que ya valida que un 'no_pasa' venga con
     motivo. Esta tabla es persistente: nunca se reconstruye con las

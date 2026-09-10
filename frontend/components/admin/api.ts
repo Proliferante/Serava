@@ -67,7 +67,7 @@ export type Fila = {
   /** `manual` cuando alguien lo descartó desde la consola. */
   desc: string;
   motivo: string;
-  /** Ya está en el flujo de inmuebles (revisión general o más adelante). */
+  /** Ya está en el flujo de inmuebles (preseleccionado o más adelante). */
   sent: boolean;
   score: number | null;
   prioridad?: string;
@@ -135,8 +135,8 @@ export function filaApi(f: Record<string, unknown>): Fila {
     bajo: bool("bajo_media_zona"),
     med: n("mediana_precio_m2_zona"),
     /* El estado ya no se deduce del filtro arquitectónico: lo dice `etapa`,
-       que es lo que el flujo escribe y lee. Un predio "en revisión general"
-       es exactamente el que está en la etapa `revision`. */
+       que es lo que el flujo escribe y lee. Un predio "preseleccionado" es
+       exactamente el que está en la etapa `preseleccion`. */
     desc: s("etapa") === "descartado" ? "manual" : "",
     motivo: s("motivo_no_pasa"),
     sent: s("etapa") !== "nuevo" && s("etapa") !== "descartado",

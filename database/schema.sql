@@ -118,16 +118,20 @@ CREATE TABLE IF NOT EXISTS seguimiento_propiedades (
 -- El recorrido completo, en orden:
 --   nuevo         lo trajo el scraping y nadie lo ha mirado todavía. Vive en
 --                 la pantalla de Extracción de predios; NO está en el flujo.
---   revision      alguien lo aceptó en Extracción. Ahí entra al flujo, por su
---                 primera pantalla: Revisión general.
---   preseleccion  pasó la revisión general; toca contactar y agendar.
+--   preseleccion  alguien lo aceptó en Extracción. Ahí entra al flujo, por su
+--                 primera pantalla, listo para contactar y agendar.
 --   visita        hay cita.
 --   publicado     se completó tras la visita.
 --   descartado    salió en cualquier punto, siempre con motivo escrito.
 --
--- 'nuevo' y 'revision' son estados distintos a propósito. El flujo no es la
--- bandeja de salida del scraping —serían los 11.000 anuncios de la última
--- corrida—: es lo que el equipo decidió mirar uno por uno.
+-- 'nuevo' y 'preseleccion' son estados distintos a propósito. El flujo no es
+-- la bandeja de salida del scraping —serían los miles de anuncios de la
+-- última corrida—: es lo que el equipo decidió trabajar.
+--
+-- Hubo una etapa 'revision' entre las dos, con su propia pestaña: aceptar en
+-- Extracción dejaba el inmueble ahí y alguien volvía a decidir "continúa / no
+-- continúa" antes de llamar. Se quitó porque era decidir dos veces lo mismo,
+-- y las filas que estaban en ella se migraron a 'preseleccion' (ver abajo).
 ALTER TABLE seguimiento_propiedades
     ADD COLUMN IF NOT EXISTS etapa TEXT DEFAULT 'nuevo';
 
@@ -138,9 +142,17 @@ ALTER TABLE seguimiento_propiedades
 ALTER TABLE seguimiento_propiedades
     DROP CONSTRAINT IF EXISTS seguimiento_etapa_valida;
 
+-- La migración va ANTES de la restricción: si quedara una fila en 'revision'
+-- —la etapa que se quitó— el CHECK nuevo la rechazaría y el archivo entero
+-- fallaría al aplicarse.
+UPDATE seguimiento_propiedades
+   SET etapa = 'preseleccion',
+       estado_seguimiento = COALESCE(estado_seguimiento, 'preseleccionado')
+ WHERE etapa = 'revision';
+
 ALTER TABLE seguimiento_propiedades
     ADD CONSTRAINT seguimiento_etapa_valida
-    CHECK (etapa IN ('nuevo', 'revision', 'preseleccion', 'visita',
+    CHECK (etapa IN ('nuevo', 'preseleccion', 'visita',
                      'publicado', 'descartado'));
 
 CREATE INDEX IF NOT EXISTS seguimiento_etapa_idx
@@ -160,7 +172,7 @@ UPDATE seguimiento_propiedades
    AND (filtro_arquitectonico = 'no_pasa' OR disponible = 'no_disponible');
 
 UPDATE seguimiento_propiedades
-   SET etapa = 'revision'
+   SET etapa = 'preseleccion'
  WHERE etapa = 'nuevo'
    AND filtro_arquitectonico = 'pasa';
 

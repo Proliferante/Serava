@@ -15,8 +15,9 @@ import { Btn, Card, Hint, IcoBack, IcoCheck, IcoDown, IcoExt, MkChip, SecTitle, 
 
    EL PASO QUE ESTA PANTALLA DA
    Aquí se corre el scraping y se mira lo que trajo. Lo que se marca y se
-   acepta entra al Flujo de inmuebles por su primera pantalla, Revisión
-   general (etapa `revision` en `seguimiento_propiedades`). Lo que se
+   acepta entra al Flujo de inmuebles por su primera pantalla,
+   Preseleccionados (etapa `preseleccion` en `seguimiento_propiedades`),
+   listo para llamar. Lo que se
    descarta sale del circuito: desaparece de esta tabla y no vuelve en las
    corridas siguientes, pero queda en la pestaña Descartados del flujo con
    su motivo y quién lo descartó.
@@ -370,7 +371,7 @@ export default function Extraccion() {
   };
 
   /* Aceptar: el predio entra al flujo por Revisión general.
-     La fila se queda en la tabla marcada "En revisión general" —sirve para
+     La fila se queda en la tabla marcada "Preseleccionado" —sirve para
      no volver a mandarla y para saber qué se lleva la corrida de hoy— pero
      el dato de verdad ya está en la base, en su etapa. */
   const enviar = async () => {
@@ -380,7 +381,7 @@ export default function Extraccion() {
     if (!ok) { av("No se guardó: " + nota); return; }
     setRows((rs) => rs.map((r) => filas.some((f) => f.id === r.id) ? { ...r, sent: true } : r));
     setSel({});
-    av(`${filas.length} predio(s) en revisión general · Flujo de inmuebles ${nota}`);
+    av(`${filas.length} predio(s) preseleccionado(s) · Flujo de inmuebles ${nota}`);
   };
 
   const descartar = () => {
@@ -464,7 +465,7 @@ export default function Extraccion() {
       >
         Trae desde los portales públicos los inmuebles en venta de las zonas activas cuyo precio por m²
         está por debajo de la mediana de su zona. Desde aquí no se publica nada: lo que se acepta entra
-        al <b>Flujo de inmuebles</b>, a Revisión general; lo que se descarta no vuelve a salir en las
+        al <b>Flujo de inmuebles</b> como preseleccionado; lo que se descarta no vuelve a salir en las
         corridas siguientes.
       </VHead>
 
@@ -627,7 +628,7 @@ export default function Extraccion() {
 
           <div className="bulkbar">
             <span className="c">Seleccionados: <b>{nSel}</b></span>
-            <Btn tono="primary" onClick={enviar}><IcoCheck />Aceptar · pasar a revisión general</Btn>
+            <Btn tono="primary" onClick={enviar}><IcoCheck />Aceptar · pasar a preselección</Btn>
             <Btn onClick={descartar}>Descartar con motivo</Btn>
             {/* El sitio donde acaban los que se aceptan, a un clic: sin esto
                 la pantalla los manda a un lugar que no se ve desde aquí. */}
@@ -704,7 +705,7 @@ export default function Extraccion() {
                             Descartado · {(x.motivo || "sin motivo").slice(0, 26)}
                           </MkChip>
                         )}
-                        {x.sent && <MkChip t="in">En revisión general</MkChip>}
+                        {x.sent && <MkChip t="in">Preseleccionado</MkChip>}
                       </div>
                     </td>
                     <td style={{ textAlign: "right" }}>
