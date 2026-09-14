@@ -2,7 +2,7 @@
 
 import { In, WRAP } from "@/components/responsive/kit";
 import {
-  Arrow, IcArrowRight, IcCalendar, IcCheck13, IcPin,
+  Arrow, Barre, Cifra, Crece, IcArrowRight, IcCalendar, IcCheck13, IcPin,
 } from "@/components/predios/ficha/kit";
 import { BARS, LEGEND, PASOS, POIS, STACK, SUPUESTOS, TCARDS, WHY } from "@/components/predios/ficha/Oportunidad";
 import {
@@ -85,7 +85,7 @@ export default function OportunidadCompact() {
             </div>
 
             {/* Sin rótulos dentro: los cuatro números viven en la leyenda. */}
-            <div className="relative mt-[18px] h-[44px] overflow-hidden rounded-[12px]">
+            <Barre className="relative mt-[18px] h-[44px] overflow-hidden rounded-[12px]" delay={0.12}>
               {STACK.map((s, i) => (
                 <span
                   key={s.from}
@@ -99,7 +99,7 @@ export default function OportunidadCompact() {
                   }}
                 />
               ))}
-            </div>
+            </Barre>
 
             <div className="mt-[16px] grid grid-cols-2 gap-x-[14px] gap-y-[12px] border-t border-solid pt-[16px]" style={{ borderColor: HAIRLINE }}>
               {LEGEND.map((g) => (
@@ -107,7 +107,7 @@ export default function OportunidadCompact() {
                   <span className="block size-[12px] shrink-0 rounded-[4px]" style={{ backgroundColor: g.c }} />
                   <span className="min-w-0">
                     <span className="block truncate text-[11.5px]" style={{ color: MILL }}>{g.l || "Precio de compra"}</span>
-                    <span className="block text-[17px] font-semibold leading-[1.25]" style={{ color: g.vc }}>{g.v}</span>
+                    <Cifra v={g.v} className="block text-[17px] font-semibold leading-[1.25]" style={{ color: g.vc }} />
                   </span>
                 </span>
               ))}
@@ -121,8 +121,8 @@ export default function OportunidadCompact() {
           {/* Valor creado hoy */}
           <Card className="mt-[12px]" delay={0.06} style={{ backgroundColor: "#f6ecd9" }}>
             <span className="block text-[10.9px] font-semibold uppercase tracking-[1.3px]" style={{ color: VERD }}>Valor creado hoy</span>
-            <span className="mt-[6px] block text-[clamp(2.6rem,13vw,3.6rem)] font-bold leading-[1]" style={{ color: "#4a5730" }}>+$326M</span>
-            <span className="mt-[2px] block text-[clamp(1.2rem,5vw,1.7rem)] font-semibold" style={{ color: VERD }}>+9%</span>
+            <Cifra v="+$326M" className="mt-[6px] block text-[clamp(2.6rem,13vw,3.6rem)] font-bold leading-[1]" style={{ color: "#4a5730" }} />
+            <Cifra v="+9%" className="mt-[2px] block text-[clamp(1.2rem,5vw,1.7rem)] font-semibold" style={{ color: VERD }} />
             <p className="m-0 mt-[10px] text-[clamp(0.95rem,3.9vw,1.15rem)] font-light leading-[1.35]" style={{ color: "#4a5730" }}>
               Compras por debajo de lo que el mercado remodelado comparable ya paga en la microzona. Ese diferencial es tu margen patrimonial desde el día uno.
             </p>
@@ -138,10 +138,10 @@ export default function OportunidadCompact() {
             <span className="ml-[8px] text-[11.5px]" style={{ color: "#94836b" }}>precio por m²</span>
 
             <div className="mt-[16px] flex items-end gap-[8px]">
-              {BARS.map((b) => (
+              {BARS.map((b, i) => (
                 <span key={b.v} className="flex flex-1 flex-col items-center">
-                  <span className="text-[clamp(0.8rem,3.4vw,1rem)] font-semibold" style={{ color: BROWN }}>{b.v}</span>
-                  <span className="mt-[6px] h-[92px] w-full rounded-t-[8px]" style={{ backgroundImage: `linear-gradient(180deg, ${b.from} 0%, ${b.to} 100%)` }} />
+                  <Cifra v={b.v} className="text-[clamp(0.8rem,3.4vw,1rem)] font-semibold" style={{ color: BROWN }} />
+                  <Crece delay={0.05 * i} className="mt-[6px] h-[92px] w-full rounded-t-[8px]" style={{ backgroundImage: `linear-gradient(180deg, ${b.from} 0%, ${b.to} 100%)` }} />
                   {/* Alto fijo: el primer pie ocupa tres renglones y sin él las cuatro
                       columnas quedaban a distinta altura. */}
                   <span className="mt-[8px] block h-[40px] text-center text-[10px] leading-[1.3]" style={{ color: MILL }}>{b.c[0]}<br />{b.c[1]}</span>

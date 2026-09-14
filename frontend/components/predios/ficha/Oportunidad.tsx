@@ -2,10 +2,11 @@
 
 import CanvasImage from "@/components/CanvasImage";
 import Footer from "@/components/sections/Footer";
+import { motion } from "framer-motion";
 import {
-  Arrow, Band, BROWN, CREAM, HAIRLINE, HeroFicha, IcArrowRight, IcCalendar, IcChat, IcCheck13,
-  IcCheck18, IcDoc, IcHome18, IcHome22, IcPhone, IcPin, IcStar, IcTrend, IcUsers, Reveal,
-  STRIPES,
+  Arrow, Band, Barre, BROWN, Cifra, Crece, CREAM, EASE, Entra, HAIRLINE, HeroFicha, IcArrowRight,
+  IcCalendar, IcChat, IcCheck13, IcCheck18, IcDoc, IcHome18, IcHome22, IcPhone, IcPin, IcStar,
+  IcTrend, IcUsers, Reveal, STRIPES,
 } from "./kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -116,9 +117,16 @@ function Seg({ i }: { i: number }) {
 }
 
 /** Fila de la tabla "Supuestos del análisis". */
-function SupRow({ r }: { r: (typeof SUPUESTOS)[number] }) {
+function SupRow({ r, i }: { r: (typeof SUPUESTOS)[number]; i: number }) {
   return (
-    <div className="absolute left-0 right-0" style={{ top: r.top, height: r.h, borderBottom: "1px solid #7f8b57" }}>
+    <motion.div
+      className="absolute left-0 right-0"
+      style={{ top: r.top, height: r.h, borderBottom: "1px solid #7f8b57" }}
+      initial={{ opacity: 0, x: 18 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, amount: 0.6 }}
+      transition={{ duration: 0.45, delay: 0.04 + i * 0.05, ease: EASE }}
+    >
       <div className="absolute" style={{ left: 118.49, top: r.h === 44 ? 11 : r.l.length > 1 ? 10.695 : 20.69 }}>
         {r.l.map((line) => (
           <p key={line} className="whitespace-nowrap" style={{ fontSize: 18, lineHeight: "20.4px", color: "#6b5b47" }}>{line}</p>
@@ -129,7 +137,7 @@ function SupRow({ r }: { r: (typeof SUPUESTOS)[number] }) {
           <p key={line} className="whitespace-nowrap font-medium" style={{ fontSize: 18, lineHeight: "20.4px", color: "#7f8b57" }}>{line}</p>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -185,21 +193,30 @@ export default function Oportunidad() {
             {/* Extremos */}
             <div className="absolute flex flex-col gap-[2px]" style={{ left: 29, top: 24, width: 147 }}>
               <span className="whitespace-nowrap font-semibold uppercase" style={{ fontSize: 10.6, lineHeight: "15.84px", letterSpacing: 0.95, color: "#94836b" }}>Tu All-in Cost</span>
-              <span className="whitespace-nowrap font-semibold" style={{ paddingTop: 3, fontSize: 33.6, lineHeight: "33.6px", color: "#7f8b57" }}>$3.450M</span>
+              <Cifra v="$3.450M" className="whitespace-nowrap font-semibold" style={{ paddingTop: 3, fontSize: 33.6, lineHeight: "33.6px", color: "#7f8b57" }} />
               <span className="whitespace-nowrap" style={{ fontSize: 11.5, lineHeight: "17.28px", color: "#94836b" }}>$10,8M / m²</span>
             </div>
-            <div className="absolute" style={{ left: 354, top: 39.91 }}><Arrow /></div>
+            <motion.div
+              className="absolute"
+              style={{ left: 354, top: 39.91 }}
+              initial={{ opacity: 0, x: -26 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.7, delay: 0.3, ease: EASE }}
+            >
+              <Arrow />
+            </motion.div>
             <div className="absolute text-right" style={{ left: 548, top: 23, width: 207 }}>
               <span className="absolute right-0 whitespace-nowrap font-semibold uppercase" style={{ top: 0, fontSize: 10.6, lineHeight: "15.84px", letterSpacing: 0.95, color: "#94836b" }}>Valor de mercado remodelado</span>
-              <span className="absolute right-0 whitespace-nowrap font-semibold" style={{ top: 21, fontSize: 33.6, lineHeight: "33.6px", color: "#7f8b57" }}>$3.776M</span>
+              <Cifra v="$3.776M" className="absolute right-0 whitespace-nowrap font-semibold" style={{ top: 21, fontSize: 33.6, lineHeight: "33.6px", color: "#7f8b57" }} />
               <span className="absolute right-0 whitespace-nowrap" style={{ top: 57, fontSize: 11.5, lineHeight: "17.28px", color: "#94836b" }}>$11,8M / m²</span>
             </div>
 
             {/* Barra apilada */}
-            <div className="absolute overflow-hidden" style={{ left: 24, top: 120, width: 753.22, height: 62, borderRadius: 12 }}>
+            <Barre className="absolute overflow-hidden" style={{ left: 24, top: 120, width: 753.22, height: 62, borderRadius: 12 }} delay={0.18}>
               {STACK.map((_, i) => <Seg key={i} i={i} />)}
               <span className="absolute whitespace-nowrap font-semibold text-white" style={{ left: "calc(50% + 167.39px)", top: 22, fontSize: 11.8, lineHeight: "17.76px" }}>$50 M</span>
-            </div>
+            </Barre>
 
             <p className="absolute" style={{ left: 24, top: 194.35, width: 753.22, fontSize: 15, lineHeight: "19.68px", color: "#6b5b47" }}>
               Tu inversión llega a <span style={{ color: "#3d2c1e" }}>$3.450M</span>; el mercado remodelado paga <span style={{ color: "#3d2c1e" }}>$3.776M</span>. Ese <span style={{ color: "#5f6b3e" }}>+$326M (+9%) </span>es valor patrimonial que no pagas.
@@ -223,8 +240,8 @@ export default function Oportunidad() {
         <Reveal left={980} top={334} width={709} height={335} delay={0.1}>
           <div className="relative size-full overflow-hidden" style={{ backgroundColor: "#f6ecd9", borderRadius: 16 }}>
             <span className="absolute whitespace-nowrap font-semibold uppercase" style={{ left: 30, top: 33.21, fontSize: 10.9, lineHeight: "16.32px", letterSpacing: 1.306, color: "#5f6b3e" }}>Valor creado hoy</span>
-            <span className="absolute font-bold" style={{ left: 30, top: 59.18, fontSize: 57.6, lineHeight: "57.6px", color: "#4a5730" }}>+$326M</span>
-            <span className="absolute font-semibold" style={{ left: 30, top: 118.88, fontSize: 27.2, lineHeight: "40.8px", color: "#5f6b3e" }}>+9%</span>
+            <Cifra v="+$326M" className="absolute font-bold" style={{ left: 30, top: 59.18, fontSize: 57.6, lineHeight: "57.6px", color: "#4a5730" }} />
+            <Cifra v="+9%" className="absolute font-semibold" style={{ left: 30, top: 118.88, fontSize: 27.2, lineHeight: "40.8px", color: "#5f6b3e" }} />
             <p className="absolute font-light" style={{ left: 30, top: 174.09, width: 648.78, fontSize: 23, lineHeight: "25px", color: "#4a5730" }}>
               Compras por debajo de lo que el mercado remodelado comparable ya paga en la microzona. Ese diferencial es tu margen patrimonial desde el día uno.
             </p>
@@ -245,10 +262,10 @@ export default function Oportunidad() {
             <span className="absolute" style={{ left: 358.72, top: 10.36, fontSize: 11.5, lineHeight: "17.28px", color: "#94836b" }}>precio por m²</span>
 
             <div className="absolute flex gap-[16px]" style={{ left: 25, top: 65.39, width: 750, height: 206, paddingTop: 16 }}>
-              {BARS.map((b) => (
+              {BARS.map((b, i) => (
                 <div key={b.v} className="flex flex-col items-center" style={{ width: 175.5 }}>
-                  <span className="flex items-center justify-center whitespace-nowrap font-semibold" style={{ height: 35.61, fontSize: 16, lineHeight: "27.6px", color: BROWN }}>{b.v}</span>
-                  <span className="w-full" style={{ height: 117.03, borderTopLeftRadius: 8, borderTopRightRadius: 8, backgroundImage: `linear-gradient(180deg, ${b.from} 0%, ${b.to} 100%)` }} />
+                  <Cifra v={b.v} className="flex items-center justify-center whitespace-nowrap font-semibold" style={{ height: 35.61, fontSize: 16, lineHeight: "27.6px", color: BROWN }} />
+                  <Crece className="w-full" delay={0.06 * i} style={{ height: 117.03, borderTopLeftRadius: 8, borderTopRightRadius: 8, backgroundImage: `linear-gradient(180deg, ${b.from} 0%, ${b.to} 100%)` }} />
                   <span className="block text-center" style={{ paddingTop: 9.36, fontSize: 10.6, lineHeight: "13.73px", color: "#6b5b47" }}>
                     {b.c[0]}<br />{b.c[1]}
                   </span>
@@ -270,7 +287,7 @@ export default function Oportunidad() {
           <div className="relative size-full" style={{ backgroundColor: "#f6ecd9", border: `1px solid ${HAIRLINE}`, borderRadius: 16 }}>
             <span className="absolute whitespace-nowrap" style={{ left: 24, top: 23, fontSize: 21.6, lineHeight: "32.4px", color: "#3d2c1e" }}>Supuestos del análisis</span>
             <div className="absolute" style={{ left: 24, top: 23.39, width: 662.48, height: 470.56 }}>
-              {SUPUESTOS.map((r) => <SupRow key={r.l[0]} r={r} />)}
+              {SUPUESTOS.map((r, i) => <SupRow key={r.l[0]} r={r} i={i} />)}
             </div>
           </div>
         </Reveal>
@@ -286,7 +303,7 @@ export default function Oportunidad() {
 
         <div className="absolute flex gap-[14px]" style={{ left: 89, top: 259, width: 1747 }}>
           {TCARDS.map((c, i) => (
-            <div key={c.t} className="ix-lift relative overflow-hidden" style={{ width: 426.25, height: 336.88, borderRadius: 14, backgroundColor: BROWN, backgroundImage: STRIPES }}>
+            <Entra key={c.t} delay={0.04 + i * 0.08} className="ix-lift relative overflow-hidden" style={{ width: 426.25, height: 336.88, borderRadius: 14, backgroundColor: BROWN, backgroundImage: STRIPES }}>
               <div className="flex size-full flex-col items-start justify-end" style={{ padding: 18, backgroundImage: "linear-gradient(180deg, rgba(18,12,8,0) 38%, rgba(18,12,8,0.86) 100%)" }}>
                 <span className="mb-[12px] flex items-center justify-center" style={{ width: 34, height: 34, borderRadius: 9, backgroundColor: "rgba(247,241,229,0.16)", color: "#efe6d5" }}>
                   <IcHome18 />
@@ -295,7 +312,7 @@ export default function Oportunidad() {
                 <span className="mt-[5px] block" style={{ fontSize: 20, lineHeight: "30px", color: "rgba(247,241,229,0.82)" }}>{c.d[0]}<br />{c.d[1]}</span>
               </div>
               <span className="sr-only">Foto {i + 1} pendiente</span>
-            </div>
+            </Entra>
           ))}
         </div>
       </Band>
@@ -306,10 +323,14 @@ export default function Oportunidad() {
         <p className="absolute whitespace-nowrap font-light" style={{ left: 166, top: 225.12, fontSize: 25, lineHeight: "37.5px", color: CREAM }}>De la oportunidad a un activo transformado.</p>
 
         {PASOS.map((p, i) => (
-          <div
+          <motion.div
             key={p.n}
             className="absolute flex flex-col gap-[6px]"
             style={{ left: [89, 541, 994, 1446][i], top: 288, width: [413, 414, 413, 413][i], height: 199, padding: 22, borderRadius: 14, backgroundColor: CREAM, border: `1px solid ${HAIRLINE}` }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.04 + i * 0.09, ease: EASE }}
           >
             <div className="flex items-center gap-[12px]">
               <span className="whitespace-nowrap font-bold" style={{ fontFamily: "var(--font-cormorant), Georgia, serif", fontSize: 27.2, lineHeight: "27.2px", color: "#a57a4e" }}>{p.n}</span>
@@ -319,7 +340,7 @@ export default function Oportunidad() {
             </div>
             <p className="font-semibold" style={{ paddingTop: 6, fontSize: 25, lineHeight: "37.5px", color: BROWN }}>{p.t}</p>
             <p style={{ fontSize: 20, lineHeight: "30px", color: BROWN }}>{p.d[0]}<br />{p.d[1]}</p>
-          </div>
+          </motion.div>
         ))}
 
         <a href="/modelo" className="ix-nav absolute whitespace-nowrap font-semibold" style={{ left: 174, top: 523, fontSize: 20, lineHeight: "30px", color: "#a57a4e" }}>Conoce cómo funciona →</a>
@@ -340,13 +361,21 @@ export default function Oportunidad() {
 
             <ul className="absolute" style={{ left: 351.44, top: 138.12, width: 247.56 }}>
               {POIS.map(([name, min], i) => (
-                <li key={name} className="flex items-center justify-between" style={{ paddingTop: 11, paddingBottom: 11, borderBottom: i < POIS.length - 1 ? `1px solid ${HAIRLINE}` : undefined }}>
+                <motion.li
+                  key={name}
+                  className="flex items-center justify-between"
+                  style={{ paddingTop: 11, paddingBottom: 11, borderBottom: i < POIS.length - 1 ? `1px solid ${HAIRLINE}` : undefined }}
+                  initial={{ opacity: 0, x: 16 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{ duration: 0.45, delay: 0.12 + i * 0.07, ease: EASE }}
+                >
                   <span className="flex items-center gap-[9px]">
                     <IcPin className="shrink-0" style={{ color: "#a57a4e" }} />
                     <span className="whitespace-nowrap" style={{ fontSize: 13.8, color: "#6b5b47" }}>{name}</span>
                   </span>
                   <span className="whitespace-nowrap font-semibold" style={{ fontSize: 13.8, color: "#2a241c" }}>{min}</span>
-                </li>
+                </motion.li>
               ))}
             </ul>
           </div>

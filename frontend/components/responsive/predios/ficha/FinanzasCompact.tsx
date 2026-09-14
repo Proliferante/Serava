@@ -1,7 +1,7 @@
 "use client";
 
 import { In, WRAP } from "@/components/responsive/kit";
-import { IcArrowRight, StrokeIcon } from "@/components/predios/ficha/kit";
+import { Cifra, IcArrowRight, StrokeIcon } from "@/components/predios/ficha/kit";
 import { KPIS, LEVERS, Proyeccion, SAYS } from "@/components/predios/ficha/Finanzas";
 import {
   Band, BROWN, Card, H2, HAIRLINE, HeroCompact, HeroFoto,
@@ -54,7 +54,7 @@ export default function FinanzasCompact() {
                   <StrokeIcon vb={40} d={k.d} w={1.125} s={36} />
                 </span>
                 <span className="mt-[12px] text-[17px] font-bold leading-[1.2]" style={{ color: OLIVE }}>{k.title.join(" ")}</span>
-                <span className="mt-[6px] text-[clamp(1.7rem,7vw,2.1rem)] font-semibold leading-[1.1]" style={{ color: "#dfc59f" }}>{k.value}</span>
+                <Cifra v={k.value} className="mt-[6px] text-[clamp(1.7rem,7vw,2.1rem)] font-semibold leading-[1.1]" style={{ color: "#dfc59f" }} />
                 <span className="mt-[4px] text-[13px] leading-[1.35]" style={{ color: LINEN }}>{k.note}</span>
                 {k.delta && (
                   <span className="mt-[10px] rounded-[7px] px-[9px] py-[3px] text-[12.5px] font-semibold" style={{ backgroundColor: "#e4e8d5", color: VERD }}>{k.delta}</span>
@@ -163,7 +163,7 @@ export default function FinanzasCompact() {
                 ].map((s) => (
                   <span key={s.l} className="min-w-0">
                     <span className="block text-[clamp(1.3rem,5.6vw,1.9rem)] font-semibold leading-[1.1]" style={{ color: "#efe6d5" }}>
-                      {s.v}{s.suf && <span className="font-light" style={{ fontSize: "0.66em" }}>{s.suf}</span>}
+                      <Cifra v={s.v} />{s.suf && <span className="font-light" style={{ fontSize: "0.66em" }}>{s.suf}</span>}
                     </span>
                     <span className="mt-[4px] block text-[12px] leading-[1.3]" style={{ color: "rgba(247,241,229,0.65)" }}>{s.l}</span>
                   </span>

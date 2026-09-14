@@ -2,7 +2,8 @@
 
 import type { CSSProperties } from "react";
 import Footer from "@/components/sections/Footer";
-import { Band, BROWN, CREAM, HAIRLINE, HeroFicha, Reveal, STRIPES } from "./kit";
+import { motion } from "framer-motion";
+import { Band, BROWN, Crece, CREAM, EASE, Entra, HAIRLINE, HeroFicha, Reveal, STRIPES, Traza } from "./kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA PREDIO · TRANSFORMACIÓN — frame 752:2869 de Figma (1920 × 2705).
@@ -98,18 +99,41 @@ function AntesDespues() {
           Después — render referencial
         </span>
       </div>
-      {/* Antes, recortado por el tirador */}
-      <div className="absolute inset-0" style={{ clipPath: "inset(0 48.14% 0 0)", backgroundImage: "linear-gradient(149.98deg, rgb(141,133,122) 0%, rgb(92,85,76) 100%)" }}>
+      {/* Antes, recortado por el tirador. Al entrar en pantalla el recorte
+          empieza tapando el render y se abre hasta el 51.86 % del frame: la
+          comparación se hace sola, que es justo lo que la tarjeta cuenta. */}
+      <motion.div
+        className="absolute inset-0"
+        style={{ backgroundImage: "linear-gradient(149.98deg, rgb(141,133,122) 0%, rgb(92,85,76) 100%)" }}
+        initial={{ clipPath: "inset(0 0% 0 0)" }}
+        whileInView={{ clipPath: "inset(0 48.14% 0 0)" }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={{ duration: 1.1, delay: 0.5, ease: EASE }}
+      >
         <span className="absolute -translate-x-1/2 whitespace-nowrap font-semibold uppercase" style={{ left: "50%", top: 178.25, fontSize: 9.9, lineHeight: "14.88px", letterSpacing: 1.389, color: "rgba(247,241,229,0.6)" }}>
           Antes — estado actual
         </span>
-      </div>
+      </motion.div>
 
-      <span className="absolute" style={{ left: "51.86%", top: 0, bottom: 0, width: 1.79, backgroundColor: "#efe6d5" }} />
-      <div className="absolute flex items-center justify-center gap-[2px]" style={{ left: "49.03%", right: "45.04%", top: 165, height: 44, borderRadius: 22, backgroundColor: "#efe6d5", boxShadow: "0px 6px 18px -4px rgba(0,0,0,0.5)", color: BROWN }}>
+      <motion.span
+        className="absolute"
+        style={{ top: 0, bottom: 0, width: 1.79, backgroundColor: "#efe6d5" }}
+        initial={{ left: "100%" }}
+        whileInView={{ left: "51.86%" }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={{ duration: 1.1, delay: 0.5, ease: EASE }}
+      />
+      <motion.div
+        className="absolute flex items-center justify-center gap-[2px]"
+        style={{ top: 165, height: 44, borderRadius: 22, backgroundColor: "#efe6d5", boxShadow: "0px 6px 18px -4px rgba(0,0,0,0.5)", color: BROWN }}
+        initial={{ left: "97.17%", right: "-3.13%" }}
+        whileInView={{ left: "49.03%", right: "45.04%" }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={{ duration: 1.1, delay: 0.5, ease: EASE }}
+      >
         <Ic vb={13} d={D_CHEVL} w={1.3} />
         <Ic vb={13} d={D_CHEVR} w={1.3} />
-      </div>
+      </motion.div>
 
       <span className="absolute font-semibold" style={{ left: 16, bottom: 15.62, padding: "7px 15px 8.27px", borderRadius: 9, backgroundColor: "rgba(20,14,9,0.72)", fontSize: 11.5, lineHeight: "17.28px", color: "#efe6d5" }}>Antes</span>
       <span className="absolute font-semibold" style={{ right: 15.7, bottom: 15.62, padding: "7px 15px 8.27px", borderRadius: 9, backgroundColor: "rgba(20,14,9,0.72)", fontSize: 11.5, lineHeight: "17.28px", color: "#efe6d5" }}>Después (referencial)</span>
@@ -118,18 +142,21 @@ function AntesDespues() {
 }
 
 /** Plano de 224.77 de ancho: rótulo, dibujo y dos líneas de pie. */
-function Plano({ p, left }: { p: (typeof PLANOS)[number]; left: number }) {
+function Plano({ p, left, retraso = 0 }: { p: (typeof PLANOS)[number]; left: number; retraso?: number }) {
   return (
     <div className="absolute" style={{ left, top: 237.33, width: 224.77, height: 248.82 }}>
       <p className="absolute w-full whitespace-nowrap text-center font-semibold" style={{ top: 0, fontSize: 20, lineHeight: "17.28px", color: "#a57a4e" }}>{p.label}</p>
 
       <div className="absolute" style={{ left: 0, top: 40.67, width: 224.77, height: 181.82, backgroundColor: "#fbf8f1", border: `1px solid ${HAIRLINE}`, borderRadius: 12 }}>
         <div className="absolute overflow-hidden" style={{ left: 14, top: 22.99, width: 194.77, height: 142.83 }}>
+          {/* Los dos planos se dibujan solos: primero el contorno y después la
+              tabiquería, que es el orden en que se levantaría. `largo` va con
+              holgura sobre el camino real. */}
           <svg className="absolute" style={{ left: 1.62, top: 1.62 }} width={191.523} height={139.585} viewBox="0 0 191.523 139.585" fill="none" aria-hidden>
-            <path d={PLANO_MARCO} stroke="#bfae93" strokeWidth={1.94769} />
+            <Traza d={PLANO_MARCO} largo={700} dur={1} delay={retraso} stroke="#bfae93" strokeWidth={1.94769} />
           </svg>
           <svg className="absolute" style={{ left: 2.59, top: 2.6 }} width={189.576} height={137.637} viewBox="0 0 189.576 137.637" fill="none" aria-hidden>
-            <path d={p.d} stroke="#cbbb9e" strokeWidth={1.55833} />
+            <Traza d={p.d} largo={900} dur={1.1} delay={retraso + 0.45} stroke="#cbbb9e" strokeWidth={1.55833} />
           </svg>
         </div>
       </div>
@@ -171,15 +198,15 @@ export default function Transformacion() {
         </p>
 
         <div className="absolute flex gap-[16px]" style={{ left: 206, top: 363, width: 717 }}>
-          {VIC.map((v) => (
-            <div key={v.t[0]} className="flex flex-col gap-[9.2px]" style={{ width: 167.25 }}>
+          {VIC.map((v, i) => (
+            <Entra key={v.t[0]} delay={0.06 + i * 0.08} className="flex flex-col gap-[9.2px]" style={{ width: 167.25 }}>
               <span className="flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: 11, backgroundColor: "#ede7da", color: "#a57a4e" }}>
                 <Ic vb={20} d={v.d} w={1.25} />
               </span>
               <span className="font-semibold" style={{ fontSize: 13.1, lineHeight: "16.4px", color: "#2a241c" }}>
                 {v.t[0]}{v.t[1] && <><br />{v.t[1]}</>}
               </span>
-            </div>
+            </Entra>
           ))}
         </div>
 
@@ -187,11 +214,19 @@ export default function Transformacion() {
           <div className="relative size-full" style={{ backgroundColor: "#fbf8f1", border: `1px solid ${HAIRLINE}`, borderRadius: 16 }}>
             <h2 className="absolute font-semibold" style={{ left: 26, right: 26, top: 25, fontSize: 32, lineHeight: "34.56px", letterSpacing: -0.32, color: "#3d2c1e" }}>Qué transforma esta oportunidad</h2>
             <ul className="absolute" style={{ left: 26, right: 26, top: 76.55 }}>
-              {QLIST.map((t) => (
-                <li key={t} className="flex items-center gap-[12px]" style={{ paddingTop: 8, paddingBottom: 9.11 }}>
+              {QLIST.map((t, i) => (
+                <motion.li
+                  key={t}
+                  className="flex items-center gap-[12px]"
+                  style={{ paddingTop: 8, paddingBottom: 9.11 }}
+                  initial={{ opacity: 0, x: 14 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{ duration: 0.42, delay: 0.14 + i * 0.06, ease: EASE }}
+                >
                   <Ic vb={17} d={D_CHECK17} w={1.7} className="shrink-0" style={{ color: "#a57a4e" }} />
                   <span className="whitespace-nowrap" style={{ fontSize: 14.1, lineHeight: "21.12px", color: "#6b5b47" }}>{t}</span>
-                </li>
+                </motion.li>
               ))}
             </ul>
           </div>
@@ -204,10 +239,14 @@ export default function Transformacion() {
         <span className="absolute whitespace-nowrap" style={{ left: 181 + 1147, top: 173 + 0.98 + 13.11, fontSize: 12.8, lineHeight: "13.82px", color: CREAM }}>(referencial)</span>
 
         <div className="absolute" style={{ left: 181, top: 222.53, width: 1224, height: 352 }}>
-          {PGRID.map((c) => (
-            <div
+          {PGRID.map((c, i) => (
+            <motion.div
               key={c.cap}
               className="ix-lift absolute flex items-center justify-center overflow-hidden"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.55, delay: 0.04 + i * 0.08, ease: EASE }}
               style={{
                 left: c.left, top: c.top, width: c.w, height: c.h, borderRadius: 13,
                 backgroundImage: `linear-gradient(148deg, rgba(201,168,119,0.16) 0%, rgba(201,168,119,0) 100%), ${STRIPES}`,
@@ -216,7 +255,7 @@ export default function Transformacion() {
             >
               <Ic vb={22} d={D_IMG22} w={1.1875} />
               <span className="absolute whitespace-nowrap uppercase" style={{ left: 10, bottom: 8.88, padding: "4px 9px", borderRadius: 6, backgroundColor: "rgba(20,14,9,0.6)", fontSize: 9.9, lineHeight: "14.88px", letterSpacing: 0.595, color: "#efe6d5" }}>{c.cap}</span>
-            </div>
+            </motion.div>
           ))}
         </div>
 
@@ -224,10 +263,18 @@ export default function Transformacion() {
           <h2 className="font-semibold" style={{ fontSize: 25, lineHeight: "22.46px", letterSpacing: -0.208, color: CREAM }}>Alcance de la remodelación</h2>
           <ul style={{ marginTop: 14 }}>
             {ALCANCE.map((a, i) => (
-              <li key={a.t} className="relative" style={{ height: i === ALCANCE.length - 1 ? 42.64 : 43.64, borderBottom: i === ALCANCE.length - 1 ? undefined : `1px solid ${HAIRLINE}` }}>
+              <motion.li
+                key={a.t}
+                className="relative"
+                style={{ height: i === ALCANCE.length - 1 ? 42.64 : 43.64, borderBottom: i === ALCANCE.length - 1 ? undefined : `1px solid ${HAIRLINE}` }}
+                initial={{ opacity: 0, x: 18 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.6 }}
+                transition={{ duration: 0.42, delay: 0.06 + i * 0.055, ease: EASE }}
+              >
                 <Ic vb={18} d={a.d} w={1.20417} className="absolute -translate-y-1/2" style={{ left: 0, top: "50%", color: "#a57a4e" }} />
                 <span className="absolute -translate-y-1/2 whitespace-nowrap" style={{ left: a.x, top: "50%", fontSize: 20, lineHeight: "20.64px", color: CREAM }}>{a.t}</span>
-              </li>
+              </motion.li>
             ))}
           </ul>
           <div className="flex gap-[11px]" style={{ marginTop: 14, width: 346, padding: "15px 16px", borderRadius: 12, backgroundColor: "#ede7da" }}>
@@ -245,8 +292,17 @@ export default function Transformacion() {
         <span className="absolute whitespace-nowrap" style={{ left: 675, top: 181, fontSize: 12.8, lineHeight: "13.82px", color: "#6b5b47" }}>(referencial)</span>
 
         <Plano p={PLANOS[0]} left={287.94} />
-        <Ic vb={22} d={D_ARROW22} w={1.83333} className="absolute" style={{ left: 526.71, top: 347.24, color: "#a57a4e" }} />
-        <Plano p={PLANOS[1]} left={562.71} />
+        <motion.span
+          className="absolute"
+          style={{ left: 526.71, top: 347.24, color: "#a57a4e" }}
+          initial={{ opacity: 0, x: -14 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.95, ease: EASE }}
+        >
+          <Ic vb={22} d={D_ARROW22} w={1.83333} />
+        </motion.span>
+        <Plano p={PLANOS[1]} left={562.71} retraso={0.5} />
 
         <div className="absolute" style={{ left: 960, top: 203, width: 579.45 }}>
           <h2 className="font-semibold" style={{ fontSize: 32, lineHeight: "34.56px", letterSpacing: -0.32, color: "#3d2c1e" }}>Cronograma estimado</h2>
@@ -255,15 +311,23 @@ export default function Transformacion() {
           </p>
 
           <div className="relative" style={{ marginTop: 14, paddingTop: 16 }}>
-            <span className="absolute" style={{ left: 6, right: 6, top: 22, height: 2, backgroundColor: "rgba(60,45,30,0.13)" }} />
-            {PASOS.map((p) => (
-              <div key={p.dur} className="absolute" style={{ left: p.x, top: 16, width: 136.11 }}>
+            <Crece eje="x" dur={0.9} className="absolute" style={{ left: 6, right: 6, top: 22, height: 2, backgroundColor: "rgba(60,45,30,0.13)" }} />
+            {PASOS.map((p, i) => (
+              <motion.div
+                key={p.dur}
+                className="absolute"
+                style={{ left: p.x, top: 16, width: 136.11 }}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{ duration: 0.45, delay: 0.25 + i * 0.18, ease: EASE }}
+              >
                 <span className="block" style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: "#a57a4e", border: "3px solid #f3eee4" }} />
                 <span className="block font-semibold" style={{ paddingTop: p.pt, fontSize: 13.1, lineHeight: "19.68px", color: "#2a241c" }}>
                   {p.tLines[0]}{p.tLines[1] && <><br />{p.tLines[1]}</>}
                 </span>
                 <span className="block font-light" style={{ fontSize: 11.8, lineHeight: "17.76px", color: "#6b5b47" }}>{p.dur}</span>
-              </div>
+              </motion.div>
             ))}
             <div style={{ height: 99.46 }} />
           </div>

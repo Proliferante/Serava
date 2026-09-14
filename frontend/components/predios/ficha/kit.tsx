@@ -1,7 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type CSSProperties, type MouseEvent, type ReactNode } from "react";
-import { motion } from "framer-motion";
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode } from "react";
+import { animate, motion, useInView, useReducedMotion } from "framer-motion";
 import CanvasImage from "@/components/CanvasImage";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -117,6 +117,185 @@ export function Reveal({
       {children}
     </motion.div>
   );
+}
+
+/* ── Piezas que se animan al entrar en pantalla ────────────────────────────
+   El lienzo es de posiciones fijas y ninguna animación puede tocar el layout:
+   todo lo de aquí se queda en opacidad, transformaciones y el propio dibujo.
+
+   Las tres pestañas están llenas de cifras, barras y planos que el frame
+   entrega ya terminados. Contarlas, crecerlas y dibujarlas al llegar a ellas
+   es lo que separa una captura de pantalla de una página. */
+
+/**
+ * Una cifra que sube desde cero al aparecer.
+ *
+ * Acepta las cifras tal y como vienen del diseño —«+$326M», «$3.450M», «4,6%»,
+ * «96/100»— y anima sólo el número, conservando el símbolo, el separador de
+ * miles y los decimales del original. Si no encuentra ninguno, se pinta tal
+ * cual: es preferible a arriesgarse a reformatear algo que no toca.
+ */
+type Trozos = { pre: string; post: string; n: number; dec: number; miles: boolean };
+
+function despieza(v: string): Trozos | null {
+  const m = /^([^]*?)(\d[\d.,]*)([^]*)$/.exec(v);
+  if (!m) return null;
+  const [, pre, num, post] = m;
+  const coma = num.lastIndexOf(",");
+  const entera = coma === -1 ? num : num.slice(0, coma);
+  const dec = coma === -1 ? 0 : num.length - coma - 1;
+  const n = Number(entera.replace(/\./g, "") + (dec ? "." + num.slice(coma + 1) : ""));
+  if (!Number.isFinite(n)) return null;
+  return { pre, post, n, dec, miles: entera.includes(".") };
+}
+
+function reviste(n: number, t: Trozos) {
+  const fijo = n.toFixed(t.dec);
+  const [ent, frac] = fijo.split(".");
+  const conMiles = t.miles ? ent.replace(/\B(?=(\d{3})+(?!\d))/g, ".") : ent;
+  return t.pre + conMiles + (frac ? "," + frac : "") + t.post;
+}
+
+export function Cifra({ v, dur = 1.15, className, style }: { v: string; dur?: number; className?: string; style?: CSSProperties }) {
+  const caja = useRef<HTMLSpanElement>(null);
+  const num = useRef<HTMLSpanElement>(null);
+  const visto = useInView(caja, { once: true, amount: 0.6 });
+  const quieto = useReducedMotion();
+  const t = useMemo(() => despieza(v), [v]);
+
+  /**
+   * La cuenta se escribe en el nodo, no en el estado.
+   *
+   * Una ficha tiene más de veinte cifras y varias cuentan a la vez; con un
+   * `setState` por fotograma cada una, React no da abasto, el reloj de la
+   * animación se atasca y una cuenta de un segundo tarda seis. Escribiendo el
+   * texto directamente no hay ni un render de más.
+   */
+  useEffect(() => {
+    if (!t || quieto || !num.current) return;
+    /* En el HTML del servidor va la cifra final —es lo que hay que leer sin
+       JavaScript—; en cuanto hay cliente se pone a cero y espera su turno. */
+    num.current.textContent = reviste(0, t);
+  }, [t, quieto]);
+
+  useEffect(() => {
+    if (!visto || !t || quieto) return;
+    const nodo = num.current;
+    if (!nodo) return;
+    const c = animate(0, t.n, { duration: dur, ease: EASE, onUpdate: (x) => { nodo.textContent = reviste(x, t); } });
+    return () => c.stop();
+  }, [visto, t, dur, quieto]);
+
+  if (!t) return <span className={className} style={style}>{v}</span>;
+  return (
+    <span ref={caja} className={className} style={{ fontVariantNumeric: "tabular-nums", ...style }}>
+      {/* La cifra final se queda en el árbol para quien no la ve contar: un
+          lector de pantalla leería la cuenta entera si no. */}
+      <span className="sr-only">{v}</span>
+      <span ref={num} aria-hidden suppressHydrationWarning>{v}</span>
+    </span>
+  );
+}
+
+/**
+ * Barra que crece al entrar en pantalla. `eje` dice desde dónde: «x» desde la
+ * izquierda —los tramos de la barra apilada— y «y» desde abajo —las columnas
+ * de los comparables y de la proyección—.
+ */
+export function Crece({
+  eje = "y", delay = 0, dur = 0.8, className, style, children,
+}: { eje?: "x" | "y"; delay?: number; dur?: number; className?: string; style?: CSSProperties; children?: ReactNode }) {
+  return (
+    <motion.div
+      className={className}
+      style={{ ...style, transformOrigin: eje === "x" ? "left center" : "center bottom" }}
+      initial={{ scaleX: eje === "x" ? 0 : 1, scaleY: eje === "y" ? 0 : 1, opacity: 0 }}
+      whileInView={{ scaleX: 1, scaleY: 1, opacity: 1 }}
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ duration: dur, delay, ease: EASE }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/**
+ * Barrido de izquierda a derecha. Recorta en vez de escalar: una barra apilada
+ * escalada arrastra consigo los rótulos que lleva dentro, y recortada se llena
+ * como se llenaría de verdad.
+ */
+export function Barre({
+  delay = 0, dur = 0.95, className, style, children,
+}: { delay?: number; dur?: number; className?: string; style?: CSSProperties; children?: ReactNode }) {
+  return (
+    <motion.div
+      className={className}
+      style={style}
+      initial={{ clipPath: "inset(0 100% 0 0)" }}
+      whileInView={{ clipPath: "inset(0 0% 0 0)" }}
+      viewport={{ once: true, amount: 0.5 }}
+      transition={{ duration: dur, delay, ease: EASE }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/**
+ * Entrada de un bloque que sí está en el flujo —una tarjeta de una fila flex,
+ * un elemento de una rejilla—, donde `Reveal` no vale porque posiciona.
+ */
+export function Entra({
+  delay = 0, y = 24, className, style, children,
+}: { delay?: number; y?: number; className?: string; style?: CSSProperties; children?: ReactNode }) {
+  return (
+    <motion.div
+      className={className}
+      style={style}
+      initial={{ opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.6, delay, ease: EASE }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/**
+ * Trazo de SVG que se dibuja solo. Hace falta `largo`, la longitud del camino:
+ * medirla en el cliente obliga a un render de más y aquí basta con pasarse de
+ * largo, porque el sobrante sólo alarga el guion que ya no se ve.
+ */
+export function Traza({
+  d, largo, delay = 0, dur = 1.1, stroke, strokeWidth, className, style,
+}: { d: string; largo: number; delay?: number; dur?: number; stroke?: string; strokeWidth?: number; className?: string; style?: CSSProperties }) {
+  return (
+    <motion.path
+      d={d}
+      fill="none"
+      stroke={stroke}
+      strokeWidth={strokeWidth}
+      className={className}
+      style={style}
+      strokeDasharray={largo}
+      initial={{ strokeDashoffset: largo }}
+      whileInView={{ strokeDashoffset: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: dur, delay, ease: EASE }}
+    />
+  );
+}
+
+/**
+ * Caja absoluta que entra al aparecer, como `Reveal`, pero con el escalonado
+ * ya calculado: el índice dentro de la fila decide el retraso. Es lo que se
+ * repite en las rejillas de tarjetas de las tres pestañas.
+ */
+export function RevealN({
+  i, paso = 0.07, base = 0.02, ...resto
+}: { i: number; paso?: number; base?: number } & Omit<Parameters<typeof Reveal>[0], "delay">) {
+  return <Reveal {...resto} delay={base + i * paso} />;
 }
 
 /* ── Barra de pestañas ─────────────────────────────────────────────────────

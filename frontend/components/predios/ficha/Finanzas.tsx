@@ -3,7 +3,8 @@
 import type { CSSProperties } from "react";
 import CanvasImage from "@/components/CanvasImage";
 import Footer from "@/components/sections/Footer";
-import { Band, BROWN, CREAM, HAIRLINE, HeroFicha, IcArrowRight, Reveal } from "./kit";
+import { motion } from "framer-motion";
+import { Band, BROWN, Cifra, Crece, CREAM, EASE, Entra, HAIRLINE, HeroFicha, IcArrowRight, Reveal, Traza } from "./kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA PREDIO · FINANZAS — frame 729:3168 de Figma (1920 × 3947).
@@ -102,16 +103,27 @@ export const SAYS = [
 
 /* ── Piezas ────────────────────────────────────────────────────────────── */
 
-function KpiCard({ k }: { k: Kpi }) {
+function KpiCard({ k, i }: { k: Kpi; i: number }) {
+  /* Las ocho tarjetas llegan juntas —la rejilla entra de una pieza— y lo que
+     se escalona dentro es el disco del icono y la cuenta de la cifra, en el
+     orden de lectura. */
+  const retraso = 0.1 + i * 0.06;
   return (
     <div className="relative" style={{ width: 353.5, height: 202, backgroundColor: BROWN, borderRadius: 20 }}>
-      <div className="absolute flex items-center justify-center" style={{ left: 146.5, top: k.iconTop, width: 60, height: 60, borderRadius: 30, backgroundColor: "#efe9dc", color: "#a57a4e" }}>
+      <motion.div
+        className="absolute flex items-center justify-center"
+        style={{ left: 146.5, top: k.iconTop, width: 60, height: 60, borderRadius: 30, backgroundColor: "#efe9dc", color: "#a57a4e" }}
+        initial={{ scale: 0.6, opacity: 0 }}
+        whileInView={{ scale: 1, opacity: 1 }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={{ duration: 0.5, delay: retraso, ease: EASE }}
+      >
         <Ic40 d={k.d} />
-      </div>
+      </motion.div>
       <p className="absolute text-center font-bold" style={{ left: 20, right: 20, top: k.c[0] - (k.title.length > 1 ? 24 : 9.12), fontSize: 23, lineHeight: k.title.length > 1 ? "24px" : "18.24px", color: "#7f8b57" }}>
         {k.title[0]}{k.title[1] && <><br />{k.title[1]}</>}
       </p>
-      <p className="absolute text-center font-semibold" style={{ left: 20, right: 20, top: k.c[1] - 16, fontSize: 32, lineHeight: "32px", color: "#dfc59f" }}>{k.value}</p>
+      <Cifra v={k.value} dur={1} className="absolute block text-center font-semibold" style={{ left: 20, right: 20, top: k.c[1] - 16, fontSize: 32, lineHeight: "32px", color: "#dfc59f" }} />
       <p className="absolute text-center" style={{ left: 20, right: 20, top: k.c[2] - 8.64, fontSize: 13, lineHeight: "17.28px", color: "#f7f1e5" }}>{k.note}</p>
       {k.delta && (
         <span
@@ -138,22 +150,43 @@ export function Proyeccion() {
       {/* Eje */}
       <span className="absolute" style={{ left: 55.33, top: 255.91, width: 868.39, height: 1, backgroundColor: "rgba(60,45,30,0.15)" }} />
 
-      {RENTA.map((b) => (
-        <span key={b.label} className="absolute" style={{ left: b.x, top: 256 - b.h, width: b.w, height: b.h, borderRadius: 6, backgroundColor: "#7d8a54" }} />
+      {RENTA.map((b, i) => (
+        <Crece key={b.label} delay={0.1 + i * 0.08} dur={0.7} className="absolute" style={{ left: b.x, top: 256 - b.h, width: b.w, height: b.h, borderRadius: 6, backgroundColor: "#7d8a54" }} />
       ))}
-      {RENTA.map((b) => (
-        <span key={`l${b.label}`} className="absolute text-center font-bold" style={{ left: b.lx, top: b.ly, width: b.lw, fontSize: 20, lineHeight: "24px", color: BROWN }}>{b.label}</span>
+      {RENTA.map((b, i) => (
+        <Cifra key={`l${b.label}`} v={b.label} dur={0.8} className="absolute block text-center font-bold" style={{ left: b.lx, top: b.ly, width: b.lw, fontSize: 20, lineHeight: "24px", color: BROWN }} />
       ))}
 
       <svg className="pointer-events-none absolute inset-0" width={968} height={289} viewBox="0 0 968 289" fill="none" aria-hidden>
-        <polyline points={puntos} stroke="#8f6740" strokeWidth={1.73} strokeLinejoin="round" fill="none" />
-        {VALOR.map((p) => (
-          <ellipse key={p.label} cx={p.x} cy={p.y} rx={5.53} ry={4.41} fill="#8f6740" />
+        {/* La linea se traza de izquierda a derecha, y cada punto asoma cuando
+            el trazo acaba de pasar por el. 900 es holgura sobre la longitud
+            real del camino (~840); lo que sobra sólo alarga el guion oculto. */}
+        <Traza d={`M${puntos.replace(/ /g, " L")}`} largo={900} dur={1.3} delay={0.25} stroke="#8f6740" strokeWidth={1.73} />
+        {VALOR.map((p, i) => (
+          <motion.ellipse
+            key={p.label}
+            cx={p.x} cy={p.y} rx={5.53} ry={4.41} fill="#8f6740"
+            initial={{ opacity: 0, scale: 0 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.3, delay: 0.35 + i * 0.2, ease: EASE }}
+            style={{ transformOrigin: `${p.x}px ${p.y}px` }}
+          />
         ))}
       </svg>
 
-      {VALOR.map((p) => (
-        <span key={`l${p.label}`} className="absolute text-center font-bold" style={{ left: p.lx, top: p.ly, width: p.lw, fontSize: 15, lineHeight: "18px", color: "#3d2c1e" }}>{p.label}</span>
+      {VALOR.map((p, i) => (
+        <motion.span
+          key={`l${p.label}`}
+          className="absolute text-center font-bold"
+          style={{ left: p.lx, top: p.ly, width: p.lw, fontSize: 15, lineHeight: "18px", color: "#3d2c1e" }}
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.35, delay: 0.45 + i * 0.2, ease: EASE }}
+        >
+          {p.label}
+        </motion.span>
       ))}
 
       {ANIOS.map((x, i) => (
@@ -190,7 +223,7 @@ export default function Finanzas() {
         </p>
         <Reveal left={249} top={190} width={1424} height={426} delay={0.04}>
           <div className="grid size-full grid-cols-4 gap-[2px] overflow-hidden" style={{ paddingTop: 7, backgroundColor: HAIRLINE, borderRadius: 16 }}>
-            {KPIS.map((k) => <KpiCard key={k.title[0]} k={k} />)}
+            {KPIS.map((k, i) => <KpiCard key={k.title[0]} k={k} i={i} />)}
           </div>
         </Reveal>
       </Band>
@@ -206,9 +239,16 @@ export default function Finanzas() {
           <Reveal key={l.t} left={l.left} top={l.top} width={500} height={250} delay={0.04 + i * 0.06}>
             <div className="relative size-full" style={{ backgroundColor: "#f7edd9", border: `1px solid ${HAIRLINE}`, borderRadius: 16 }}>
               {/* El icono cuelga por encima del borde superior de la tarjeta. */}
-              <div className="absolute flex items-center justify-center" style={{ left: 209, top: -41, width: 80, height: 80, borderRadius: 11, backgroundColor: "#b9c69f", color: "#5f6b3e" }}>
+              <motion.div
+                className="absolute flex items-center justify-center"
+                style={{ left: 209, top: -41, width: 80, height: 80, borderRadius: 11, backgroundColor: "#b9c69f", color: "#5f6b3e" }}
+                initial={{ scale: 0.55, rotate: -12, opacity: 0 }}
+                whileInView={{ scale: 1, rotate: 0, opacity: 1 }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.18 + i * 0.06 }}
+              >
                 <Ic50 d={l.d} />
-              </div>
+              </motion.div>
               <p className="absolute -translate-x-1/2 whitespace-nowrap text-center font-semibold" style={{ left: l.tcx, top: l.tc - 10.8, fontSize: 30, lineHeight: "21.6px", letterSpacing: -0.2, color: "#2a241c" }}>{l.t}</p>
               <span
                 className="absolute flex items-center justify-center font-semibold"
@@ -250,11 +290,11 @@ export default function Finanzas() {
       <Band left={-1} width={1921} top={2556} height={511} bg={BROWN} corner="br" z={1}>
         <h2 className="absolute font-medium" style={{ left: 295, top: 163, width: 1296, fontSize: 60, lineHeight: "38px", letterSpacing: -0.352, color: CREAM }}>Qué nos dice esta evaluación</h2>
         <div className="absolute flex gap-[16px]" style={{ left: 295, top: 253, width: 1353, height: 182 }}>
-          {SAYS.map((s) => (
-            <div key={s.t} className="relative" style={{ width: 326.25, height: 182, backgroundColor: "#f7edd9", border: `1px solid ${HAIRLINE}`, borderRadius: 14 }}>
+          {SAYS.map((s, i) => (
+            <Entra key={s.t} delay={0.04 + i * 0.08} className="relative" style={{ width: 326.25, height: 182, backgroundColor: "#f7edd9", border: `1px solid ${HAIRLINE}`, borderRadius: 14 }}>
               <p className="absolute text-center font-medium" style={{ left: 20, right: 20, top: 25, fontSize: 25, lineHeight: "25px", letterSpacing: -0.176, color: "#2a241c" }}>{s.t}</p>
               <p className="absolute text-center font-light" style={{ left: 20, right: 20, top: s.pTop + 29 - 19.2, fontSize: 20, lineHeight: "19.2px", color: "#6b5b47" }}>{s.p}</p>
-            </div>
+            </Entra>
           ))}
         </div>
       </Band>
@@ -274,21 +314,22 @@ export default function Finanzas() {
 
           {/* Tres cifras separadas por filetes verticales. */}
           <img src={`${A}/ficha-ico-users.svg`} alt="" width={50} height={50} loading="lazy" decoding="async" className="absolute max-w-none" style={{ left: 27, top: 272 }} />
-          <span className="absolute whitespace-nowrap font-semibold" style={{ left: 94, top: 281, fontSize: 60, lineHeight: "36px", color: "#efe6d5" }}>3</span>
+          <Cifra v="3" dur={0.8} className="absolute whitespace-nowrap font-semibold" style={{ left: 94, top: 281, fontSize: 60, lineHeight: "36px", color: "#efe6d5" }} />
           <span className="absolute" style={{ left: 92, top: 343.6, width: 185, fontSize: 18, lineHeight: "16.8px", color: "rgba(247,241,229,0.65)" }}>inversionistas evaluando</span>
 
           <span className="absolute" style={{ left: 251, top: 267, width: 3, height: 111, backgroundColor: "#7f8b57" }} />
 
           <img src={`${A}/ficha-ico-shield.svg`} alt="" width={50} height={50} loading="lazy" decoding="async" className="absolute max-w-none" style={{ left: 288, top: 273 }} />
           <span className="absolute whitespace-nowrap font-semibold" style={{ left: 343, top: 284, fontSize: 60, lineHeight: "36px", color: "#efe6d5" }}>
-            96<span className="font-light" style={{ fontSize: 40 }}>/100</span>
+            <Cifra v="96" />
+            <span className="font-light" style={{ fontSize: 40 }}>/100</span>
           </span>
           <span className="absolute whitespace-nowrap" style={{ left: 348, top: 342.1, fontSize: 18, lineHeight: "16.8px", color: "rgba(247,241,229,0.65)" }}>Score ZEQUARA</span>
 
           <span className="absolute" style={{ left: 534, top: 267, width: 3, height: 111, backgroundColor: "#7f8b57" }} />
 
           <img src={`${A}/ficha-ico-chart.svg`} alt="" width={50} height={50} loading="lazy" decoding="async" className="absolute max-w-none" style={{ left: 555, top: 270 }} />
-          <span className="absolute whitespace-nowrap font-semibold" style={{ left: 605, top: 284, fontSize: 60, lineHeight: "36px", color: "#efe6d5" }}>+$326M</span>
+          <Cifra v="+$326M" className="absolute whitespace-nowrap font-semibold" style={{ left: 605, top: 284, fontSize: 60, lineHeight: "36px", color: "#efe6d5" }} />
           <span className="absolute whitespace-nowrap" style={{ left: 605, top: 340.1, fontSize: 18, lineHeight: "16.8px", color: "rgba(247,241,229,0.65)" }}>valor creado hoy</span>
 
           <a
