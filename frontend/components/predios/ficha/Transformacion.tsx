@@ -3,7 +3,8 @@
 import type { CSSProperties } from "react";
 import Footer from "@/components/sections/Footer";
 import { motion } from "framer-motion";
-import { Band, BROWN, Crece, CREAM, EASE, Entra, HAIRLINE, HeroFicha, Reveal, STRIPES, Traza } from "./kit";
+import PrediosNav from "@/components/predios/PrediosNav";
+import { Band, BROWN, Crece, CREAM, EASE, Entra, HAIRLINE, HeroFicha, Reveal, STRIPES, TabsFicha, Traza } from "./kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA PREDIO · TRANSFORMACIÓN — frame 752:2869 de Figma (1920 × 2705).
@@ -171,8 +172,15 @@ function Plano({ p, left, retraso = 0 }: { p: (typeof PLANOS)[number]; left: num
 
 export default function Transformacion() {
   return (
-    /* El fondo crema lo pone el shell; ver el comentario de Oportunidad. */
-    <div className="relative size-full">
+    <div className="relative size-full" style={{ backgroundColor: CREAM }}>
+      {/* ── Pestañas ── (van encima del hero en esta ficha) */}
+      <div className="absolute" style={{ left: 1, top: 45, width: 1921, height: 142, zIndex: 4 }}><TabsFicha active="transformacion" /></div>
+
+      {/* ── Nav ── */}
+      <div className="absolute left-0 top-0 w-full" style={{ height: 81.81, backgroundColor: BROWN, zIndex: 10 }}>
+        <PrediosNav active="predios" geo="ficha" />
+      </div>
+
       {/* ── Hero ── */}
       <section className="absolute left-0 w-full overflow-hidden" style={{ top: 187, height: 542, backgroundColor: BROWN, borderBottomLeftRadius: 60, zIndex: 5 }}>
         <HeroFicha

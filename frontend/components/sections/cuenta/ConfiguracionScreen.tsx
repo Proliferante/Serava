@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import PrediosNav from "@/components/predios/PrediosNav";
 import { AVISOS, CUENTA, IDIOMAS, MONEDAS } from "@/components/sections/cuenta/data";
 import {
   BROWN, Btn, Card, Field, Head, IcoCheck, IcoLock, IcoSalir, L10, LINEN, Motif,
@@ -129,6 +130,7 @@ export default function ConfiguracionScreen() {
 
       <Toast y={1529.7} visible={acuse} />
 
+      <PrediosNav active="none" geo="cuenta" cuenta="configuracion" />
     </div>
   );
 }

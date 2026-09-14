@@ -2,10 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { useContext, useId, type CSSProperties, type MouseEvent, type ReactNode } from "react";
-import type { CuentaKey } from "@/components/AccountMenu";
-import { CuentaTabsCtx, cuentaDeRuta } from "@/components/cuenta/contexto";
-import { clicSimple, GLIDE } from "@/components/pestanas";
+import { useId, type CSSProperties, type ReactNode } from "react";
 import { CUENTA_LINKS } from "@/components/sections/cuenta/data";
 import { EASE, In } from "@/components/responsive/kit";
 
@@ -59,36 +56,26 @@ const CAJA: CSSProperties = {
 
 const ETIQUETA = "m-0 block text-[10.5px] font-medium uppercase leading-[16px] tracking-[1.2px]";
 
-/**
- * Las dos pestañas de la sección. Marcan cuál estás viendo y, cuando hay
- * armazón montado, cambian de una a otra sin recargar: la píldora es una sola
- * pieza con `layoutId`, así que se desliza en vez de desaparecer aquí y
- * aparecer allá.
- */
-export function CuentaTabs({ active }: { active?: CuentaKey }) {
+/** Las dos pestañas de la sección. Marcan cuál estás viendo. */
+export function CuentaTabs() {
   const pathname = usePathname();
-  const cambia = useContext(CuentaTabsCtx);
   return (
     <nav aria-label="Tu cuenta" className="mt-[18px]">
       <div className="flex gap-[4px] rounded-full p-[5px]" style={{ background: L04, border: `1px solid ${L12}` }}>
-        {CUENTA_LINKS.map((l) => {
-          const clave = cuentaDeRuta(l.href)!;
-          const aqui = active ? active === clave : pathname === l.href;
+        {CUENTA_LINKS.map((l, i) => {
+          const aqui = pathname === l.href;
           return (
             <a
               key={l.href}
               href={l.href}
               aria-current={aqui ? "page" : undefined}
               className="ix-pill ix-pill-fluid relative flex h-[38px] flex-1 items-center justify-center whitespace-nowrap rounded-full px-[12px] text-[13px] font-medium sm:text-[13.6px]"
-              onClick={cambia ? (e: MouseEvent<HTMLAnchorElement>) => {
-                if (clicSimple(e)) { e.preventDefault(); cambia(clave); }
-              } : undefined}
             >
               {aqui && (
                 <motion.span
-                  layoutId="cuenta-pestana"
                   aria-hidden className="absolute inset-0 rounded-full" style={{ background: AVOCADO }}
-                  transition={GLIDE}
+                  initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.06 + i * 0.03, ease: EASE }}
                 />
               )}
               <span className="relative">{l.label}</span>
