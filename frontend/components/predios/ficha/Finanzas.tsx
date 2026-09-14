@@ -56,7 +56,7 @@ type Kpi = {
   c: [number, number, number]; dTop?: number; iconTop: number;
 };
 
-const KPIS: Kpi[] = [
+export const KPIS: Kpi[] = [
   { d: D_BARS, title: ["Precio base / m²"], value: "$8,1M", note: "vs. media usado $8,7M", delta: "−7% por debajo", c: [94.5, 126, 156], dTop: 168, iconTop: 14 },
   { d: D_STACK, title: ["All-in Cost / m²"], value: "$10,8M", note: "vs. media remodelado $11,8M", delta: "−8% por debajo", c: [91.3, 121, 150], dTop: 167, iconTop: 14 },
   { d: D_STAR, title: ["Spread de valor"], value: "+9%", note: "Distancia All-in vs. valor de mercado", c: [99.3, 131, 161], iconTop: 14 },
@@ -67,14 +67,14 @@ const KPIS: Kpi[] = [
   { d: D_TREND, title: ["Retorno patrimonial 5", "años"], value: "54,4%", note: "Sobre el capital invertido (All-in)", c: [99.78, 143.8, 174.2], iconTop: 13.78 },
 ];
 
-const LEVERS = [
+export const LEVERS = [
   { d: D_STAR50, left: 153, top: 298, tc: 66, tcx: 217, peso: "25%", pesoLeft: 397, pesoTop: 41, t: "Spread de valor", p: "La propiedad se adquiere por debajo del valor de mercado remodelado, generando un spread inicial de +9%." },
   { d: D_TREND50, left: 747, top: 299, tc: 67, tcx: 210.5, peso: "20%", pesoLeft: 395, pesoTop: 42, t: "Valorización a 5 años", p: "La microzona ha mostrado una apreciación sostenida que potencia el valor del activo en el mediano plazo." },
   { d: D_STACK50, left: 1341, top: 296, tc: 71, tcx: 232, peso: "10%", pesoLeft: 400, pesoTop: 41, t: "Carry / renta neta", p: "El arriendo genera una renta neta estable que actúa como carry durante el periodo de inversión." },
 ];
 
 /** Renta neta acumulada: barras verdes. `x`/`w` y alto salen del frame. */
-const RENTA = [
+export const RENTA = [
   { x: 211, w: 70, h: 27, label: "$158M", lx: 204, ly: 202, lw: 68 },
   { x: 378, w: 70, h: 53, label: "$316M", lx: 378, ly: 176, lw: 68 },
   { x: 545, w: 70, h: 80, label: "$474M", lx: 544, ly: 149, lw: 70 },
@@ -83,7 +83,7 @@ const RENTA = [
 ];
 
 /** Valor del activo: la línea y sus puntos, en coordenadas del área del gráfico. */
-const VALOR = [
+export const VALOR = [
   { x: 66.4, y: 123.43, label: "$3,776 M", lx: 32.53, ly: 96.41, lw: 69 },
   { x: 233.44, y: 106.55, label: "$3,919 M", lx: 199.57, ly: 79.53, lw: 69 },
   { x: 400.48, y: 89.02, label: "$4,068 M", lx: 364.54, ly: 61.99, lw: 72 },
@@ -94,7 +94,7 @@ const VALOR = [
 
 const ANIOS = [45.35, 212.46, 378.12, 546.47, 713.51, 880.55];
 
-const SAYS = [
+export const SAYS = [
   { t: "Funciona con el precio actual", p: "Incluso sin negociar, el retorno proyectado es atractivo.", pTop: 88 },
   { t: "Hay spread antes de negociar", p: "Se adquiere por debajo del valor remodelado, con +9% de margen.", pTop: 87 },
   { t: "El arriendo actúa como carry", p: "La renta neta aporta al retorno total durante todo el periodo.", pTop: 90 },
@@ -132,10 +132,10 @@ function KpiCard({ k }: { k: Kpi }) {
  * exportado porque Figma lo parte en veintitantas imágenes sueltas; las
  * coordenadas son las mismas del frame, sobre un área de 968 × 289.
  */
-function Proyeccion() {
+export function Proyeccion() {
   const puntos = VALOR.map((p) => `${p.x},${p.y}`).join(" ");
   return (
-    <div className="absolute overflow-hidden" style={{ left: 24, top: 51, width: 968, height: 289 }}>
+    <div className="relative overflow-hidden" style={{ width: 968, height: 289 }}>
       {/* Eje */}
       <span className="absolute" style={{ left: 55.33, top: 255.91, width: 868.39, height: 1, backgroundColor: "rgba(60,45,30,0.15)" }} />
 
@@ -246,7 +246,7 @@ export default function Finanzas() {
               <span className="absolute" style={{ left: 204, top: 3.1, width: 12, height: 12, borderRadius: 3, backgroundColor: "#6d774a" }} />
               <span className="absolute whitespace-nowrap" style={{ left: 221.41, top: 0, fontSize: 15, lineHeight: "18.24px", color: "#6b5b47" }}>Renta neta acumulada</span>
             </div>
-            <Proyeccion />
+            <div className="absolute" style={{ left: 24, top: 51 }}><Proyeccion /></div>
           </div>
         </Reveal>
 

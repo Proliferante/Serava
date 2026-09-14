@@ -33,6 +33,19 @@ export const STRIPES =
 
 type IconProps = { s?: number; className?: string; style?: CSSProperties };
 
+/**
+ * Icono de trazo suelto, para los que Figma entrega como dato y no como pieza
+ * fija —los ocho de los KPI, los de la lista de alcance—. El `viewBox` y el
+ * grosor son los del archivo original; el color lo pone quien lo usa.
+ */
+export function StrokeIcon({ vb, d, w, s, className, style }: { vb: number; d: string; w: number; s?: number; className?: string; style?: CSSProperties }) {
+  return (
+    <svg width={s ?? vb} height={s ?? vb} viewBox={`0 0 ${vb} ${vb}`} fill="none" className={className} style={style} aria-hidden>
+      <path d={d} stroke="currentColor" strokeWidth={w} />
+    </svg>
+  );
+}
+
 /** Icono de trazo. `vb` es el lado del `viewBox` original de Figma. */
 function stroke(vb: number, d: string, w: number) {
   return function Icon({ s = vb, className, style }: IconProps) {

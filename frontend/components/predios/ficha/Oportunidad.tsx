@@ -17,7 +17,7 @@ const A = "/figma";
 
 /* ── Datos ─────────────────────────────────────────────────────────────── */
 
-const WHY = [
+export const WHY = [
   { Ic: IcStar, t: "Entrada competitiva", d: "Precio por m² por debajo de la media de la microzona." },
   { Ic: IcTrend, t: "Microzona sólida", d: "Demanda estable, escasez de oferta y alta liquidez de salida." },
   { Ic: IcHome22, t: "Activo difícil de replicar", d: "320 m² con características únicas en la zona." },
@@ -25,28 +25,28 @@ const WHY = [
 ];
 
 /** Tramos de la barra apilada, en porcentaje del ancho (inset de Figma). */
-const STACK = [
+export const STACK = [
   { from: "#5b4633", to: "#463527", left: 0, right: 45.72, label: "Precio · $2.600M" },
   { from: "#a87c4e", to: "#8f6740", left: 54.28, right: 29.01, label: "Remod. $800M" },
   { from: "#c9a877", to: "#bb9662", left: 70.95, right: 21.33, label: "" },
   { from: "#84915b", to: "#5f6b3e", left: 78.67, right: 1.63, label: "+$326M" },
 ];
 
-const LEGEND = [
+export const LEGEND = [
   { c: "#463527", l: "", v: "$2.600M", vc: "#2a241c", w: 75.33 },
   { c: "#8f6740", l: "Remodelación", v: "$800M", vc: "#2a241c", w: 83.48 },
   { c: "#c9a877", l: "Otros costos", v: "$50M", vc: "#2a241c", w: 71.95 },
   { c: "#5f6b3e", l: "Valor creado", v: "+$326M", vc: "#4a5730", w: 74.52 },
 ];
 
-const BARS = [
+export const BARS = [
   { v: "$8,1M", from: "#c79a6a", to: "#a87c4e", c: ["Este activo", "(estado actual)"] },
   { v: "$8,7M", from: "#d8c6a6", to: "#c2ad86", c: ["Media usado", "microzona"] },
   { v: "$10,8M", from: "#8a9463", to: "#6d774a", c: ["All-in Cost", "ZEQUARA"] },
   { v: "$11,8M", from: "#bfae93", to: "#a8967a", c: ["Media remodelado", "microzona"] },
 ];
 
-const SUPUESTOS: { l: string[]; v: string[]; top: number; h: number }[] = [
+export const SUPUESTOS: { l: string[]; v: string[]; top: number; h: number }[] = [
   { l: ["Microzona de referencia"], v: ["La Cabrera, Bogotá"], top: 41, h: 44 },
   { l: ["Fecha del análisis"], v: ["Septiembre 2026"], top: 84, h: 44 },
   { l: ["Comparables analizados"], v: ["12 inmuebles"], top: 127, h: 44 },
@@ -58,21 +58,21 @@ const SUPUESTOS: { l: string[]; v: string[]; top: number; h: number }[] = [
   { l: ["Horizonte de referencia"], v: ["5 años"], top: 426.56, h: 44 },
 ];
 
-const TCARDS = [
+export const TCARDS = [
   { t: "Zona social", d: ["Potencial de apertura, iluminación y", "actualización."] },
   { t: "Cocina", d: ["Alto impacto en la percepción y valor", "del activo."] },
   { t: "Habitaciones", d: ["Optimización de distribución y mayor", "funcionalidad."] },
   { t: "Baños", d: ["Intervención integral para llevarlos al", "estándar premium."] },
 ];
 
-const PASOS = [
+export const PASOS = [
   { n: "01", Ic: IcPhone, t: "Llamada", d: ["Revisamos el análisis y tus", "objetivos."] },
   { n: "02", Ic: IcChat, t: "Negociación", d: ["Iniciamos el proceso de", "negociación del inmueble."] },
   { n: "03", Ic: IcDoc, t: "Propuesta", d: ["Desarrollamos la propuesta", "arquitectónica y económica."] },
   { n: "04", Ic: IcCheck18, t: "Cierre", d: ["Compra del inmueble + contrato", "de remodelación."] },
 ];
 
-const POIS = [
+export const POIS = [
   ["Parque El Virrey", "5 min"],
   ["Centro Andino", "7 min"],
   ["Zona T", "7 min"],

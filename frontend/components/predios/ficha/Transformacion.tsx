@@ -23,22 +23,22 @@ function Ic({ vb, d, s, w, className, style }: { vb: number; d: string; s?: numb
   );
 }
 
-const VIC = [
+export const VIC = [
   { t: ["Funcionalidad", "real"], d: "M10 1.66667L16.6667 5V10C16.6667 14.1667 13.75 16.6667 10 18.3333C6.25 16.6667 3.33333 14.1667 3.33333 10V5L10 1.66667ZM7.5 10L9.16667 11.6667L12.5 8.33333" },
   { t: ["Estética duradera"], d: "M10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5ZM10 5.83333V10L12.5 11.6667" },
   { t: ["Materiales de alta", "calidad"], d: "M10 1.66667L12.5 6.66667L17.5 7.33333L13.75 10.8333L14.75 15.8333L10 13.3333L5.08333 15.8333L6.08333 10.8333L2.5 7.33333L7.5 6.66667L10 1.66667Z" },
   { t: ["Espacios que", "generan valor"], d: "M2.5 17.5V5.83333L10 2.5L17.5 5.83333M17.5 5.83333V17.5M17.5 5.83333V2.5H14.1667M7.5 17.5V12.5H12.5V17.5M11.6667 2.5L17.5 8.33333" },
 ];
 
-const D_CHECK17 = "M14.1667 4.25L6.375 12.0417L2.83333 8.5";
-const D_IMG22 = "M17.4167 3.66667H4.58333C3.57081 3.66667 2.75 4.48748 2.75 5.5V16.5C2.75 17.5125 3.57081 18.3333 4.58333 18.3333H17.4167C18.4292 18.3333 19.25 17.5125 19.25 16.5V5.5C19.25 4.48748 18.4292 3.66667 17.4167 3.66667ZM2.75 13.75L6.41667 10.0833L11 14.6667";
-const D_INFO17 = "M13.4583 2.83333H3.54167C2.75926 2.83333 2.125 3.4676 2.125 4.25V13.4583C2.125 14.2407 2.75926 14.875 3.54167 14.875H13.4583C14.2407 14.875 14.875 14.2407 14.875 13.4583V4.25C14.875 3.4676 14.2407 2.83333 13.4583 2.83333ZM2.125 6.375H14.875M5.66667 1.41667V4.25M11.3333 1.41667V4.25";
-const D_ARROW22 = "M4.58333 11H17.4167M11.9167 16.5L17.4167 11L11.9167 5.5";
-const D_SEARCH17 = "M7.79167 12.75C10.5301 12.75 12.75 10.5301 12.75 7.79167C12.75 5.05325 10.5301 2.83333 7.79167 2.83333C5.05325 2.83333 2.83333 5.05325 2.83333 7.79167C2.83333 10.5301 5.05325 12.75 7.79167 12.75ZM14.875 14.875L11.8292 11.8292";
+export const D_CHECK17 = "M14.1667 4.25L6.375 12.0417L2.83333 8.5";
+export const D_IMG22 = "M17.4167 3.66667H4.58333C3.57081 3.66667 2.75 4.48748 2.75 5.5V16.5C2.75 17.5125 3.57081 18.3333 4.58333 18.3333H17.4167C18.4292 18.3333 19.25 17.5125 19.25 16.5V5.5C19.25 4.48748 18.4292 3.66667 17.4167 3.66667ZM2.75 13.75L6.41667 10.0833L11 14.6667";
+export const D_INFO17 = "M13.4583 2.83333H3.54167C2.75926 2.83333 2.125 3.4676 2.125 4.25V13.4583C2.125 14.2407 2.75926 14.875 3.54167 14.875H13.4583C14.2407 14.875 14.875 14.2407 14.875 13.4583V4.25C14.875 3.4676 14.2407 2.83333 13.4583 2.83333ZM2.125 6.375H14.875M5.66667 1.41667V4.25M11.3333 1.41667V4.25";
+export const D_ARROW22 = "M4.58333 11H17.4167M11.9167 16.5L17.4167 11L11.9167 5.5";
+export const D_SEARCH17 = "M7.79167 12.75C10.5301 12.75 12.75 10.5301 12.75 7.79167C12.75 5.05325 10.5301 2.83333 7.79167 2.83333C5.05325 2.83333 2.83333 5.05325 2.83333 7.79167C2.83333 10.5301 5.05325 12.75 7.79167 12.75ZM14.875 14.875L11.8292 11.8292";
 const D_CHEVL = "M8.125 3.25L4.875 6.5L8.125 9.75";
 const D_CHEVR = "M4.875 3.25L8.125 6.5L4.875 9.75";
 
-const QLIST = [
+export const QLIST = [
   "Zona social integrada, con mayor amplitud y luz natural.",
   "Cocina abierta, moderna y funcional.",
   "Habitaciones con mejor distribución y baños renovados.",
@@ -48,7 +48,7 @@ const QLIST = [
 ];
 
 /** Rejilla de fotos pendientes: la primera ocupa las dos filas. */
-const PGRID = [
+export const PGRID = [
   { cap: "Zona social", left: 0, top: 0, w: 494.12, h: 312 },
   { cap: "Cocina", left: 506.12, top: 0, w: 352.94, h: 150 },
   { cap: "Habitación principal", left: 871.06, top: 0, w: 352.94, h: 150 },
@@ -57,7 +57,7 @@ const PGRID = [
 ];
 
 /** Alcance: cada línea con su icono y el sangrado exacto del frame. */
-const ALCANCE = [
+export const ALCANCE = [
   { t: "Demolición y adecuaciones", x: 29, d: "M10.5 5.25L9 3.75L2.25 10.5L3.75 12M10.5 5.25L13.5 8.25L15.75 6L12.75 3L10.5 5.25ZM9 9L12 12" },
   { t: "Rediseño arquitectónico y espacial", x: 29, d: "M2.25 9L9 13.5L15.75 9M9 1.5L15.75 6L9 10.5L2.25 6L9 1.5Z" },
   { t: "Instalaciones eléctricas e hidráulicas", x: 30, d: "M9.75 1.5L2.25 10.5H7.5L6.75 16.5L14.25 7.5H9L9.75 1.5Z" },
@@ -69,7 +69,7 @@ const ALCANCE = [
 ];
 
 /** Pasos del cronograma. `tLines` reparte los que llevan dos renglones. */
-const PASOS = [
+export const PASOS = [
   { x: 2.495, tLines: ["1. Diseño"], dur: "2–3 semanas", pt: 13 },
   { x: 148.605, tLines: ["2. Licencias y", "preparación"], dur: "2–4 semanas", pt: 12.34 },
   { x: 294.715, tLines: ["3. Ejecución de obra"], dur: "4–6 meses", pt: 13 },
@@ -77,8 +77,8 @@ const PASOS = [
 ];
 
 /** Los dos planos: contorno común y tabiquería propia de cada propuesta. */
-const PLANO_MARCO = "M190.549 0.973847H0.973847V138.611H190.549V0.973847Z";
-const PLANOS = [
+export const PLANO_MARCO = "M190.549 0.973847H0.973847V138.611H190.549V0.973847Z";
+export const PLANOS = [
   { label: "Estado actual", t: "3 habitaciones + servicio", s: "Espacios compartimentados", d: "M0 49.3416H77.9078H135.04M77.9078 0V90.8924H0M135.04 0V137.637M135.04 68.8185H189.576M49.3416 90.8924V137.637" },
   { label: "Propuesta ZEQUARA", t: "3 habitaciones + servicio", s: "Zona social integrada", d: "M120.757 0V75.3109H189.576M0 90.8924H77.9078M77.9078 75.3109V137.637M140.234 75.3109V137.637" },
 ];
