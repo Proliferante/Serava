@@ -5,7 +5,8 @@ import { useContext, useEffect, useState, type CSSProperties, type MouseEvent, t
 import MobileFooter from "@/components/responsive/MobileFooter";
 import { PrediosNavCompact } from "@/components/responsive/predios/PrediosShell";
 import { In, WRAP } from "@/components/responsive/kit";
-import { FichaTabsCtx, GLIDE, IcArea, IcBath, IcBed, IcCar, type TabKey } from "@/components/predios/ficha/kit";
+import { FichaTabsCtx, IcArea, IcBath, IcBed, IcCar, type TabKey } from "@/components/predios/ficha/kit";
+import { clicSimple, GLIDE } from "@/components/pestanas";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA DE PREDIO — piezas de la vista fluida (móvil y tablet).
@@ -116,7 +117,7 @@ export function TabsCompact({ active }: { active: TabKey }) {
               className="ix-pill relative flex h-[42px] flex-1 items-center justify-center whitespace-nowrap rounded-[14px] px-[10px] text-[14px] font-medium"
               style={{ color: on ? BROWN : "#e5dccf", transition: "color 0.3s ease" }}
               onClick={cambia ? (e: MouseEvent<HTMLAnchorElement>) => {
-                if (!e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0) { e.preventDefault(); cambia(t.key); }
+                if (clicSimple(e)) { e.preventDefault(); cambia(t.key); }
               } : undefined}
             >
               {/* `layoutId` hace que la píldora sea la misma pieza en las tres

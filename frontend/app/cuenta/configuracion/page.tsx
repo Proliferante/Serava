@@ -1,7 +1,4 @@
-import ScaledCanvas from "@/components/ScaledCanvas";
-import { Compact, Desk } from "@/components/responsive/Adaptive";
-import ConfiguracionCompact from "@/components/responsive/cuenta/ConfiguracionCompact";
-import ConfiguracionScreen, { CONFIG_H } from "@/components/sections/cuenta/ConfiguracionScreen";
+import CuentaRoute from "@/components/cuenta/CuentaRoute";
 
 /**
  * CUENTA · CONFIGURACIÓN — Figma 688:4280 (1920 × 1581).
@@ -13,12 +10,7 @@ import ConfiguracionScreen, { CONFIG_H } from "@/components/sections/cuenta/Conf
 export default function ConfiguracionPage() {
   return (
     <main style={{ background: "#492100" }}>
-      <Compact><ConfiguracionCompact /></Compact>
-      <Desk>
-        <ScaledCanvas width={1920} height={CONFIG_H}>
-          <ConfiguracionScreen />
-        </ScaledCanvas>
-      </Desk>
+      <CuentaRoute tab="configuracion" />
     </main>
   );
 }

@@ -4,6 +4,7 @@ import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import ScaledCanvas from "@/components/ScaledCanvas";
 import PrediosNav from "@/components/predios/PrediosNav";
+import { urlSilenciosa } from "@/components/pestanas";
 import { Compact, Desk } from "@/components/responsive/Adaptive";
 import { BROWN, CREAM, EASE, FichaTabsCtx, TAB_HREF, TAB_INDEX, TabsFicha, TABS_H, tabDeRuta, type TabKey } from "./kit";
 import Oportunidad from "./Oportunidad";
@@ -109,35 +110,28 @@ function Capa({ children }: { children: ReactNode }) {
   return <div className="grid grid-cols-1 [&>*]:col-start-1 [&>*]:row-start-1">{children}</div>;
 }
 
-/**
- * Cambia la barra de direcciones sin avisar al router.
- *
- * Next parchea `window.history.pushState` —como propiedad propia del objeto
- * `history`, el del prototipo sigue siendo el nativo— para enterarse de los
- * cambios de URL. Pasarle una ruta distinta a la que sirvió desmonta y vuelve
- * a montar el árbol de la ruta, y con él el estado de la pestaña: la URL
- * cambiaba pero la ficha se quedaba en la de antes.
- *
- * Aquí la URL es sólo el nombre de lo que ya está en pantalla, así que se
- * escribe con el método nativo. Se conserva el `state` que tenía puesto Next
- * para que su propio manejador de `popstate` siga reconociendo la entrada y el
- * botón atrás no acabe en una recarga.
- */
 let yaMontada = false;
 
-function urlSilenciosa(href: string) {
-  History.prototype.pushState.call(window.history, window.history.state, "", href);
-}
-
 export default function FichaRoute({ tab }: { tab: TabKey }) {
-  /* Atrás y adelante sí pasan por el router de Next, que vuelve a montar este
-     árbol con la pestaña que sirvió el servidor —siempre la misma, sea cual
-     sea la entrada del historial a la que se vuelva—. Del segundo montaje en
-     adelante la pestaña buena es la de la URL, no la de la prop; leerla ya en
-     el primer render evita que se vea un fotograma de la pestaña equivocada.
-     En el primero manda la prop, que es lo que hay en el HTML del servidor. */
-  const [activa, setActiva] = useState<TabKey>(() =>
-    (yaMontada && typeof window !== "undefined" ? tabDeRuta(window.location.pathname) : null) ?? tab);
+  /**
+   * Atrás y adelante sí pasan por el router de Next, que vuelve a montar este
+   * árbol con la pestaña que sirvió el servidor —siempre la misma, sea cual
+   * sea la entrada del historial a la que se vuelva—. Del segundo montaje en
+   * adelante la pestaña buena es la de la URL, no la de la prop; leerla ya en
+   * el primer render evita que se vea un fotograma de la pestaña equivocada.
+   * En el primero manda la prop, que es lo que hay en el HTML del servidor.
+   *
+   * Va con `if` y no con un ternario encadenado a `??` a propósito: webpack ve
+   * que `typeof window` es `"undefined"` al compilar para el servidor, da la
+   * condición por falsa y, al podar la rama muerta, se lleva por delante
+   * también el lado derecho del `??`. El estado salía valiendo `0`, la pestaña
+   * no se encontraba y el render del servidor se caía —en el navegador no se
+   * notaba, porque el router volvía a pintar el árbol bueno—.
+   */
+  const [activa, setActiva] = useState<TabKey>(() => {
+    if (!yaMontada || typeof window === "undefined") return tab;
+    return tabDeRuta(window.location.pathname) ?? tab;
+  });
   const [dir, setDir] = useState(0);
   /* El estado se lee dentro de un manejador, no en el render: un ref evita
      tener que recrear `cambia` en cada cambio de pestaña. */

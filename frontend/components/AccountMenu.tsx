@@ -1,8 +1,10 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState, type MouseEvent } from "react";
 import { EASE } from "@/components/motion/Kinetics";
+import { CuentaTabsCtx } from "@/components/cuenta/contexto";
+import { clicSimple } from "@/components/pestanas";
 import { CUENTA, CUENTA_LINKS } from "@/components/sections/cuenta/data";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -45,6 +47,7 @@ export default function AccountMenu({
   align?: "right" | "left";
 }) {
   const [abierto, setAbierto] = useState(false);
+  const cambia = useContext(CuentaTabsCtx);
   const caja = useRef<HTMLDivElement>(null);
 
   /**
@@ -104,7 +107,8 @@ export default function AccountMenu({
             </p>
 
             {CUENTA_LINKS.map((l) => {
-              const aqui = activo === CLAVE[l.href];
+              const clave = CLAVE[l.href];
+              const aqui = activo === clave;
               return (
                 <a
                   key={l.href}
@@ -113,6 +117,12 @@ export default function AccountMenu({
                   aria-current={aqui ? "page" : undefined}
                   className="ix-menuitem block px-[14px] py-[9px] text-[13.5px] font-medium"
                   style={{ color: aqui ? "#c9a877" : LINEN }}
+                  /* Dentro del área de cuenta los dos destinos son pestañas de
+                     la misma pantalla y se cambia sin recargar; desde fuera son
+                     enlaces normales. */
+                  onClick={cambia ? (e: MouseEvent<HTMLAnchorElement>) => {
+                    if (clicSimple(e)) { e.preventDefault(); setAbierto(false); cambia(clave); }
+                  } : undefined}
                 >
                   {l.label}
                 </a>

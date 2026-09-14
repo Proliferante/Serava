@@ -3,7 +3,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
 import { EASE } from "@/components/motion/Kinetics";
-import PrediosNav from "@/components/predios/PrediosNav";
 import { CANALES, CUENTA, HORARIOS, PAISES, RESUMEN } from "@/components/sections/cuenta/data";
 import {
   AVATAR_BG, BROWN, Btn, Card, Field, Head, IcoCheck, L04, L06, L12, LINEN, Motif,
@@ -154,8 +153,6 @@ export default function PerfilScreen() {
 
       <Toast y={1155} visible={aviso} />
 
-      {/* El nav va al final para quedar sobre el velo, como en el diseño. */}
-      <PrediosNav active="none" geo="cuenta" cuenta="perfil" />
     </div>
   );
 }

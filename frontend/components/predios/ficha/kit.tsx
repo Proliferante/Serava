@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { animate, motion, useInView, useReducedMotion } from "framer-motion";
 import CanvasImage from "@/components/CanvasImage";
+import { clicSimple, GLIDE, urlSilenciosa } from "@/components/pestanas";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA DE PREDIO — piezas que comparten las tres pestañas.
@@ -340,14 +341,6 @@ export function tabDeRuta(pathname: string): TabKey | null {
  * enlaces siguen siendo enlaces y navegan como siempre.
  */
 export const FichaTabsCtx = createContext<((k: TabKey) => void) | null>(null);
-
-/** Muelle con el que se mueven la píldora y los rótulos. */
-export const GLIDE = { type: "spring", stiffness: 240, damping: 30, mass: 0.9 } as const;
-
-/** Un clic normal; con modificador o botón del medio manda el navegador. */
-function clicSimple(e: MouseEvent<HTMLAnchorElement>) {
-  return !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0;
-}
 
 /**
  * La barra no reparte las tres pestañas en sitios fijos: al ensancharse la
