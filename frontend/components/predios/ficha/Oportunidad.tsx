@@ -1,12 +1,11 @@
 "use client";
 
 import CanvasImage from "@/components/CanvasImage";
-import PrediosNav from "@/components/predios/PrediosNav";
 import Footer from "@/components/sections/Footer";
 import {
   Arrow, Band, BROWN, CREAM, HAIRLINE, HeroFicha, IcArrowRight, IcCalendar, IcChat, IcCheck13,
   IcCheck18, IcDoc, IcHome18, IcHome22, IcPhone, IcPin, IcStar, IcTrend, IcUsers, Reveal,
-  STRIPES, TabsFicha,
+  STRIPES,
 } from "./kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -138,19 +137,13 @@ function SupRow({ r }: { r: (typeof SUPUESTOS)[number] }) {
 
 export default function Oportunidad() {
   return (
-    <div className="relative size-full" style={{ backgroundColor: CREAM }}>
-      {/* ── Nav ── */}
-      <div className="absolute left-0 top-0 w-full" style={{ height: 81.81, backgroundColor: BROWN, zIndex: 10 }}>
-        <PrediosNav active="predios" geo="ficha" />
-      </div>
-
+    /* El fondo crema lo pone el shell: la franja de pestañas va por debajo de
+       esta capa para que el hero le tape el borde de arriba, como en el frame. */
+    <div className="relative size-full">
       {/* ── Hero ── */}
       <section className="absolute left-0 w-full overflow-hidden" style={{ top: 77, height: 540, backgroundColor: BROWN, borderBottomLeftRadius: 60, zIndex: 7 }}>
         <HeroFicha height={540} contentTop={-40} veil={{ top: 1, height: 540 }} sidebar={{ left: 1523, top: 28 }} priority />
       </section>
-
-      {/* ── Pestañas ── */}
-      <div className="absolute left-0 w-full" style={{ top: 568, zIndex: 6 }}><TabsFicha active="oportunidad" /></div>
 
       {/* ── Por qué ZEQUARA lo seleccionó ── */}
       <Band top={710} height={753} bg={CREAM} corner="br" z={5}>

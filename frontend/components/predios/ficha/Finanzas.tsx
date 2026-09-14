@@ -2,9 +2,8 @@
 
 import type { CSSProperties } from "react";
 import CanvasImage from "@/components/CanvasImage";
-import PrediosNav from "@/components/predios/PrediosNav";
 import Footer from "@/components/sections/Footer";
-import { Band, BROWN, CREAM, HAIRLINE, HeroFicha, IcArrowRight, Reveal, TabsFicha } from "./kit";
+import { Band, BROWN, CREAM, HAIRLINE, HeroFicha, IcArrowRight, Reveal } from "./kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA PREDIO · FINANZAS — frame 729:3168 de Figma (1920 × 3947).
@@ -168,13 +167,8 @@ export function Proyeccion() {
 
 export default function Finanzas() {
   return (
-    <div className="relative size-full" style={{ backgroundColor: CREAM }}>
-      {/* ── Nav ── */}
-      <div className="absolute left-0 top-0 w-full" style={{ height: 74.81, backgroundColor: BROWN, zIndex: 10 }}>
-        {/* El frame sube la barra 7 px respecto al borde de la página. */}
-        <div className="absolute left-0 w-full" style={{ top: -7 }}><PrediosNav active="predios" geo="ficha" /></div>
-      </div>
-
+    /* El fondo crema lo pone el shell; ver el comentario de Oportunidad. */
+    <div className="relative size-full">
       {/* ── Hero ── */}
       <section className="absolute overflow-hidden" style={{ left: -1, top: 73, width: 1920, height: 542, backgroundColor: BROWN, borderBottomLeftRadius: 60, zIndex: 6 }}>
         <HeroFicha
@@ -187,9 +181,6 @@ export default function Finanzas() {
           priority
         />
       </section>
-
-      {/* ── Pestañas ── */}
-      <div className="absolute left-0 w-full" style={{ top: 568, zIndex: 5 }}><TabsFicha active="finanzas" /></div>
 
       {/* ── Indicadores de valor patrimonial ── */}
       <Band left={-1} width={1921} top={710} height={683} bg={CREAM} corner="bl" z={4}>

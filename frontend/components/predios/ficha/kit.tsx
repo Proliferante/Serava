@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type CSSProperties, type MouseEvent, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import CanvasImage from "@/components/CanvasImage";
 
@@ -122,15 +122,53 @@ export function Reveal({
 /* ── Barra de pestañas ─────────────────────────────────────────────────────
    1920 × 142, verde oliva con las esquinas de abajo redondeadas. La pestaña
    activa es una píldora clara con sombra dura; las otras dos van en texto.
-   Las tres posiciones salen del frame, así que cada página sólo pasa `active`. */
+   Las tres posiciones salen del frame, así que cada página sólo pasa `active`.
 
-const TABS = [
+   La barra no vive dentro de ninguna de las tres pestañas: la monta el shell
+   una sola vez y se queda ahí mientras el contenido entra y sale. Por eso el
+   cambio no es un salto de una maqueta a otra, sino la píldora deslizándose
+   hasta su nuevo sitio con los dos rótulos apartándose para dejarle hueco. */
+
+export const TABS = [
   { key: "oportunidad" as const, label: "Oportunidad", href: "/predios/ficha" },
   { key: "finanzas" as const, label: "Finanzas", href: "/predios/ficha/finanzas" },
   { key: "transformacion" as const, label: "Transformación", href: "/predios/ficha/transformacion" },
 ];
 
 export type TabKey = (typeof TABS)[number]["key"];
+
+/** Orden de las pestañas: de él sale hacia qué lado se desliza el contenido. */
+export const TAB_INDEX: Record<TabKey, number> = { oportunidad: 0, finanzas: 1, transformacion: 2 };
+
+export const TAB_HREF: Record<TabKey, string> = {
+  oportunidad: "/predios/ficha",
+  finanzas: "/predios/ficha/finanzas",
+  transformacion: "/predios/ficha/transformacion",
+};
+
+/** Qué pestaña sirve una ruta. Lo usa el shell para responder al botón atrás. */
+export function tabDeRuta(pathname: string): TabKey | null {
+  const limpio = pathname.replace(/\/$/, "");
+  if (limpio.endsWith("/finanzas")) return "finanzas";
+  if (limpio.endsWith("/transformacion")) return "transformacion";
+  if (limpio.endsWith("/predios/ficha")) return "oportunidad";
+  return null;
+}
+
+/**
+ * Cómo cambiar de pestaña sin recargar. Lo publica el shell; cuando no hay
+ * ninguno —un render suelto de la pestaña, o el HTML antes de hidratar— los
+ * enlaces siguen siendo enlaces y navegan como siempre.
+ */
+export const FichaTabsCtx = createContext<((k: TabKey) => void) | null>(null);
+
+/** Muelle con el que se mueven la píldora y los rótulos. */
+export const GLIDE = { type: "spring", stiffness: 240, damping: 30, mass: 0.9 } as const;
+
+/** Un clic normal; con modificador o botón del medio manda el navegador. */
+function clicSimple(e: MouseEvent<HTMLAnchorElement>) {
+  return !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0;
+}
 
 /**
  * La barra no reparte las tres pestañas en sitios fijos: al ensancharse la
@@ -143,34 +181,58 @@ const TAB_LAYOUT: Record<TabKey, { pill: { x: number; y: number; w: number; h: n
   transformacion: { pill: { x: 1040, y: 70, w: 240, h: 53 }, labels: { oportunidad: 658, finanzas: 874 } },
 };
 
-export function TabsFicha({ active }: { active: TabKey }) {
+/** Dónde deja el frame cada pestaña cuando la activa es `active`. */
+function sitio(active: TabKey, key: TabKey) {
   const { pill, labels } = TAB_LAYOUT[active];
+  if (key === active) {
+    /* 26 es el centro que le da el frame dentro de la píldora; no es la
+       mitad exacta de su alto. */
+    return { left: pill.x + 23, top: pill.y + 26 - 21.6 / 2, fontSize: 25, color: BROWN };
+  }
+  return { left: labels[key] ?? 0, top: 97 - 21.6 / 2, fontSize: 23, color: "#e5dccf" };
+}
+
+/** Alto de la franja oliva. El shell lo necesita para colocarla. */
+export const TABS_H = 142;
+
+export function TabsFicha({ active }: { active: TabKey }) {
+  const cambia = useContext(FichaTabsCtx);
+  const { pill } = TAB_LAYOUT[active];
+
   return (
     <div
       className="absolute left-0 w-full overflow-hidden"
-      style={{ height: 142, backgroundColor: "#7f8b57", borderBottom: "1px solid rgba(60,45,30,0.13)", borderBottomLeftRadius: 22, borderBottomRightRadius: 22 }}
+      style={{ height: TABS_H, backgroundColor: "#7f8b57", borderBottom: "1px solid rgba(60,45,30,0.13)", borderBottomLeftRadius: 22, borderBottomRightRadius: 22 }}
     >
-      {TABS.map((t) =>
-        t.key === active ? (
-          <span
-            key={t.key}
-            aria-current="page"
-            className="absolute block"
-            style={{ left: pill.x, top: pill.y, width: pill.w, height: pill.h, borderRadius: 20, backgroundColor: "#b2bf89", filter: "drop-shadow(5px 5px 2px rgba(61,44,30,0.32))" }}
-          >
-            <span className="absolute whitespace-nowrap font-medium" style={{ left: 23, top: 26 - 21.6 / 2, fontSize: 25, lineHeight: "21.6px", color: BROWN }}>{t.label}</span>
-          </span>
-        ) : (
-          <a
+      {/* La píldora es una sola pieza que viaja, no una por pestaña: así el
+          movimiento es continuo y el ancho se estira hasta el del rótulo. */}
+      <motion.span
+        aria-hidden
+        className="absolute block"
+        style={{ borderRadius: 20, backgroundColor: "#b2bf89", filter: "drop-shadow(5px 5px 2px rgba(61,44,30,0.32))" }}
+        initial={false}
+        animate={{ left: pill.x, top: pill.y, width: pill.w, height: pill.h }}
+        transition={GLIDE}
+      />
+
+      {TABS.map((t) => {
+        const on = t.key === active;
+        return (
+          <motion.a
             key={t.key}
             href={t.href}
-            className="ix-nav absolute whitespace-nowrap font-medium"
-            style={{ left: labels[t.key], top: 97 - 21.6 / 2, fontSize: 23, lineHeight: "21.6px", color: "#e5dccf" }}
+            aria-current={on ? "page" : undefined}
+            className={`absolute whitespace-nowrap font-medium${on ? "" : " ix-nav"}`}
+            style={{ lineHeight: "21.6px" }}
+            initial={false}
+            animate={sitio(active, t.key)}
+            transition={GLIDE}
+            onClick={cambia ? (e) => { if (clicSimple(e)) { e.preventDefault(); cambia(t.key); } } : undefined}
           >
             {t.label}
-          </a>
-        ),
-      )}
+          </motion.a>
+        );
+      })}
     </div>
   );
 }

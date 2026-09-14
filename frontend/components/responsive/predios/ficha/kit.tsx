@@ -1,11 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { useContext, useEffect, useState, type CSSProperties, type MouseEvent, type ReactNode } from "react";
 import MobileFooter from "@/components/responsive/MobileFooter";
 import { PrediosNavCompact } from "@/components/responsive/predios/PrediosShell";
-import { EASE, In, WRAP } from "@/components/responsive/kit";
-import { IcArea, IcBath, IcBed, IcCar, type TabKey } from "@/components/predios/ficha/kit";
+import { In, WRAP } from "@/components/responsive/kit";
+import { FichaTabsCtx, GLIDE, IcArea, IcBath, IcBed, IcCar, type TabKey } from "@/components/predios/ficha/kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA DE PREDIO — piezas de la vista fluida (móvil y tablet).
@@ -98,6 +98,7 @@ const TABS: { key: TabKey; label: string; corto: string; href: string }[] = [
 ];
 
 export function TabsCompact({ active }: { active: TabKey }) {
+  const cambia = useContext(FichaTabsCtx);
   return (
     <nav
       aria-label="Secciones de la ficha"
@@ -105,7 +106,7 @@ export function TabsCompact({ active }: { active: TabKey }) {
       style={{ backgroundColor: OLIVE, borderBottomLeftRadius: 22, borderBottomRightRadius: 22 }}
     >
       <div className="mx-auto flex max-w-[720px] gap-[6px]">
-        {TABS.map((t, i) => {
+        {TABS.map((t) => {
           const on = t.key === active;
           return (
             <a
@@ -113,16 +114,21 @@ export function TabsCompact({ active }: { active: TabKey }) {
               href={t.href}
               aria-current={on ? "page" : undefined}
               className="ix-pill relative flex h-[42px] flex-1 items-center justify-center whitespace-nowrap rounded-[14px] px-[10px] text-[14px] font-medium"
-              style={{ color: on ? BROWN : "#e5dccf" }}
+              style={{ color: on ? BROWN : "#e5dccf", transition: "color 0.3s ease" }}
+              onClick={cambia ? (e: MouseEvent<HTMLAnchorElement>) => {
+                if (!e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0) { e.preventDefault(); cambia(t.key); }
+              } : undefined}
             >
+              {/* `layoutId` hace que la píldora sea la misma pieza en las tres
+                  pestañas: al cambiar de una a otra se desliza en vez de
+                  desaparecer aquí y aparecer allá. */}
               {on && (
                 <motion.span
+                  layoutId="ficha-pestana"
                   aria-hidden
                   className="absolute inset-0 rounded-[14px]"
                   style={{ backgroundColor: "#b2bf89", filter: "drop-shadow(3px 3px 2px rgba(61,44,30,0.28))" }}
-                  initial={{ scale: 0.72, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.4, delay: 0.05 + i * 0.03, ease: EASE }}
+                  transition={GLIDE}
                 />
               )}
               <span className="relative sm:hidden">{t.corto}</span>
@@ -301,14 +307,16 @@ export function FotoPendiente({ caption, ratio = "4 / 3", className = "" }: { ca
 }
 
 /* ── Armazón de página ────────────────────────────────────────────────────
-   Nav, pestañas, contenido, barra fija de acción y pie. */
+   Nav, contenido, barra fija de acción y pie.
 
-export function FichaShellCompact({ tab, hero, children }: { tab: TabKey; hero: ReactNode; children: ReactNode }) {
+   El nav, la barra de reservar y el pie se quedan montados mientras el hero,
+   las pestañas y el cuerpo entran y salen: si la barra de acción parpadeara en
+   cada cambio de pestaña se notaría más que la propia transición. */
+
+export function FichaShellCompact({ children }: { children: ReactNode }) {
   return (
     <div style={{ backgroundColor: CREAM }}>
       <PrediosNavCompact />
-      {hero}
-      <TabsCompact active={tab} />
       {children}
 
       {/* En una ficha larga la acción no puede quedar a diez pantallas de

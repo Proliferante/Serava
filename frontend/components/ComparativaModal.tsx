@@ -38,7 +38,7 @@ const STEPS: Step[] = [
     num: "01", title: "Elegir la zona", Icon: Pin,
     cuenta: "Semanas investigando mercados para, aun así, decidir sin certeza.",
     serava: [
-      <>Zonas validadas por nuestros <b className="font-semibold">datos y el Zequara Score</b>.</>,
+      <>Zonas validadas por nuestros <b className="font-semibold">datos y el Serava Score</b>.</>,
       "Demanda alta, oferta limitada.",
     ],
     takeaway: "Meses de investigación que te ahorras.",
@@ -63,8 +63,9 @@ const STEPS: Step[] = [
     ],
     chip: "95% cumplimiento de tiempos",
     takeaway: "Cada mes de obra que no se pierde es renta que empieza antes.",
-    foot: "Salvo imprevistos ajenos a Zequara.",
+    foot: "Salvo imprevistos ajenos a Serava.",
   },
+  
   {
     num: "04", title: "Arrendar", Icon: Key,
     cuenta: "Buscas inquilino y gestionas el contrato. Cada mes vacío es renta que no entra.",
@@ -97,7 +98,7 @@ const STEPS: Step[] = [
 /* ── Step card ─────────────────────────────────────────────────────── */
 function StepCard({ step }: { step: Step }) {
   return (
-    <div className="w-full max-w-[520px] rounded-[24px] bg-[#f7f1e5] px-[20px] pb-[24px] pt-[24px] sm:px-[28px]">
+    <div className="w-[520px] max-w-full rounded-[24px] bg-[#f7f1e5] px-[28px] pt-[24px] pb-[24px]">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
@@ -112,18 +113,17 @@ function StepCard({ step }: { step: Step }) {
         </div>
       </div>
 
-      {/* Comparison. En móvil las dos columnas se apilan: a 390 px cada una se
-          quedaba en 142 y el texto salía en palabras sueltas. */}
-      <div className="mt-[18px] flex flex-col items-stretch gap-[10px] sm:flex-row">
+      {/* Comparison */}
+      <div className="mt-[18px] flex items-stretch gap-[10px]">
         {/* Por tu cuenta */}
         <div className="flex-1 rounded-[12px] border border-solid border-[rgba(181,84,47,0.18)] bg-[rgba(181,84,47,0.06)] p-[13px]">
           <p className="font-bold text-[9px] leading-[13px] text-[#b5542f]">Por tu cuenta</p>
           <p className="mt-[8px] font-light text-[12.5px] leading-[18px] text-[#5b4332]">{step.cuenta}</p>
         </div>
-        {/* Con Zequara */}
+        {/* Con Serava */}
         <div className="flex-1 rounded-[12px] border border-solid border-[rgba(127,139,87,0.28)] bg-[rgba(127,139,87,0.09)] p-[13px]">
           <div className="flex items-center justify-between">
-            <p className="font-bold text-[9px] leading-[13px] text-[#5f6b3e]">Con Zequara</p>
+            <p className="font-bold text-[9px] leading-[13px] text-[#5f6b3e]">Con Serava</p>
             <span className="flex size-[17px] items-center justify-center rounded-full bg-[#7f8b57] p-[3.5px] text-[#f7f1e5]"><Check /></span>
           </div>
           <ul className="mt-[9px] flex flex-col gap-[7px]">
@@ -182,18 +182,14 @@ function ModalContent() {
       <p className="mt-[14px] max-w-[560px] text-[14px] leading-[20px]">
         <span className="font-light text-[#5b4332]">Invertir directo es posible. Pero cada mes que tardas en encontrar, remodelar o arrendar es </span>
         <span className="font-medium text-[#3d2c1e]">renta que no entra y capital detenido. </span>
-        <span className="font-light text-[#5b4332]">Zequara elimina ese tiempo — y lo que ese tiempo te cuesta.</span>
+        <span className="font-light text-[#5b4332]">Serava elimina ese tiempo — y lo que ese tiempo te cuesta.</span>
       </p>
 
       {/* Carousel */}
       <div className="mt-[26px] flex min-h-[360px] items-start justify-center">
         <AnimatePresence initial={false} custom={dir} mode="wait">
-          {/* `w-full`: sin ancho, esta capa se ajusta a los 520 de la tarjeta y
-              el `max-w` de dentro se mide contra ella en vez de contra el
-              panel, así que en móvil la tarjeta se salía por los dos lados. */}
           <motion.div
             key={idx}
-            className="flex w-full justify-center"
             custom={dir}
             variants={variants}
             initial="enter"
@@ -266,7 +262,7 @@ function ModalContent() {
   );
 }
 
-/** Popup: "El ciclo de tu inversión" — Por tu cuenta vs. Con Zequara, en 6 pasos. */
+/** Popup: "El ciclo de tu inversión" — Por tu cuenta vs. Con Serava, en 6 pasos. */
 export default function ComparativaModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -292,7 +288,7 @@ export default function ComparativaModal({ open, onClose }: { open: boolean; onC
           className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain"
           role="dialog"
           aria-modal="true"
-          aria-label="El ciclo de tu inversión: por tu cuenta vs. con Zequara"
+          aria-label="El ciclo de tu inversión: por tu cuenta vs. con Serava"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -302,7 +298,8 @@ export default function ComparativaModal({ open, onClose }: { open: boolean; onC
 
           <div className="relative flex min-h-full items-center justify-center p-4 sm:p-6" onClick={onClose}>
             <motion.div
-              className="relative flex max-h-[90vh] w-[min(880px,94vw)] flex-col overflow-hidden rounded-[28px] shadow-[0_40px_120px_rgba(0,0,0,0.5)]"
+              className="relative flex max-h-[90vh
+              ] w-[min(880px,94vw)] flex-col overflow-hidden rounded-[28px] shadow-[0_40px_120px_rgba(0,0,0,0.5)]"
               onClick={(e) => e.stopPropagation()}
               initial={{ opacity: 0, y: 24, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
