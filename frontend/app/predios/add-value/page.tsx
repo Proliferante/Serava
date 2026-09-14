@@ -1,18 +1,10 @@
-import ScaledCanvas from "@/components/ScaledCanvas";
-import { Compact, Desk } from "@/components/responsive/Adaptive";
-import AddValueCompact from "@/components/responsive/predios/AddValueCompact";
-import AddValue from "@/components/predios/AddValue";
+import { redirect } from "next/navigation";
 
-/** ANÁLISIS ADD VALUE — reproducción exacta del frame de Figma (1920 × 2805). */
+/**
+ * El análisis Add Value dejó de ser una página suelta: el rediseño de la ficha
+ * se lo llevó a su pestaña de Finanzas. La ruta se queda viva y redirige para
+ * no romper los enlaces que ya andan por ahí.
+ */
 export default function AddValuePage() {
-  return (
-    <main className="min-h-screen" style={{ backgroundColor: "#efe6d5" }}>
-      <Compact><AddValueCompact /></Compact>
-      <Desk>
-      <ScaledCanvas width={1920} height={2805}>
-        <AddValue />
-      </ScaledCanvas>
-      </Desk>
-    </main>
-  );
+  redirect("/predios/ficha/finanzas");
 }

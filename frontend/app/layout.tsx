@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Poppins } from "next/font/google";
+import { Cormorant_Garamond, Poppins } from "next/font/google";
 import "@/styles/globals.css";
 import PageTransition from "@/components/PageTransition";
 
@@ -7,6 +7,17 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
   variable: "--font-poppins",
+  display: "swap",
+});
+
+/**
+ * La serif sólo aparece en los números de paso de la ficha de predio ("01" a
+ * "04"), así que entra con un único grosor para no cargar de más.
+ */
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["700"],
+  variable: "--font-cormorant",
   display: "swap",
 });
 
@@ -34,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={poppins.variable}>
+    <html lang="es" className={`${poppins.variable} ${cormorant.variable}`}>
       <body className="font-sans antialiased">
         <PageTransition>{children}</PageTransition>
       </body>

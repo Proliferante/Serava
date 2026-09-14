@@ -22,10 +22,9 @@ import { EASE } from "@/components/responsive/kit";
 
 const BROWN = "#492100";
 
-/** `corto` es la etiqueta de móvil: las tres completas suman 479 px y no caben. */
+/** `corto` es la etiqueta de móvil: las completas suman 479 px y no caben. */
 const LINKS = [
   { href: "/predios", label: "Predios disponibles", corto: "Predios" },
-  { href: "/predios/add-value", label: "Análisis de valor", corto: "Análisis" },
   { href: "/predios/mis-propiedades", label: "Mis propiedades", corto: "Mis propiedades" },
 ];
 

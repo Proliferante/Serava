@@ -18,11 +18,16 @@ import { MARK, tinted, WORDMARK, wordmarkH } from "@/components/brand";
    línea gana a cualquier clase y la regla de hover no podría pisarlo.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export type NavKey = "predios" | "valor" | "propiedades";
+export type NavKey = "predios" | "propiedades";
 
+/**
+ * Eran tres. "Análisis de valor" salió del grupo cuando el rediseño de la
+ * ficha se llevó ese contenido a su pestaña de Finanzas: la página suelta ya
+ * no existe y su ruta redirige allí. Las posiciones de abajo son las del
+ * frame nuevo, que reparte las dos píldoras que quedan.
+ */
 const LABELS: { key: NavKey; label: string; href: string }[] = [
   { key: "predios", label: "Predios disponibles", href: "/predios" },
-  { key: "valor", label: "Análisis de valor", href: "/predios/add-value" },
   { key: "propiedades", label: "Mis propiedades", href: "/predios/mis-propiedades" },
 ];
 
@@ -40,21 +45,25 @@ type Geo = {
  * Geometría por frame. `predios` es 100:2349; `propiedades`, 600:3028;
  * `cuenta`, las dos pantallas del área de cuenta (688:4032 y 688:4280), que
  * corren la barra entera 60 px a la derecha y cambian el monograma por el
- * wordmark.
+ * wordmark; `ficha`, las tres pestañas de la ficha de predio (729:4084), que
+ * comparten la barra de Predios pero con el wordmark y el cuerpo a 14.1 px.
+ *
+ * Al quedarse en dos píldoras, la barra encoge lo que medía la tercera más su
+ * separación. El `x` no se mueve: el frame nuevo deja la barra donde estaba.
  */
-const GEO: Record<"predios" | "propiedades" | "cuenta", Geo> = {
+const GEO: Record<"predios" | "propiedades" | "cuenta" | "ficha", Geo> = {
   predios: {
     h: 81.81,
     logo: { x: 101, y: 22.9, w: 39.46, h: 36 },
-    menu: { x: 726.7, y: 16, w: 504, h: 49.81 },
-    pill: { y: 5, h: 39.81, fs: 13, lh: "20px", xs: [5, 185, 344], ws: [174, 153, 155] },
+    menu: { x: 726.7, y: 16, w: 345, h: 49.81 },
+    pill: { y: 5, h: 39.81, fs: 13, lh: "20px", xs: [5, 185], ws: [174, 155] },
     avatar: { x: 1492.4, y: 21.9, bg: "rgba(247,241,229,0.06)", border: "rgba(247,241,229,0.2)", fs: 12, color: "#f7f1e5" },
   },
   propiedades: {
     h: 94.39,
     logo: { x: 394, y: 31, w: 35.5, h: 32.39 },
-    menu: { x: 738.64, y: 22, w: 492, h: 50.39 },
-    pill: { y: 6, h: 38.39, fs: 13.6, lh: "20.4px", xs: [6, 181, 336], ws: [169, 149, 150] },
+    menu: { x: 738.64, y: 22, w: 337, h: 50.39 },
+    pill: { y: 6, h: 38.39, fs: 13.6, lh: "20.4px", xs: [6, 181], ws: [169, 150] },
     avatar: { x: 1488, y: 28.195, bg: "rgba(201,168,119,0.28)", border: "rgba(247,241,229,0.12)", fs: 13.1, color: "#c9a877" },
   },
   cuenta: {
@@ -62,9 +71,17 @@ const GEO: Record<"predios" | "propiedades" | "cuenta", Geo> = {
     /* El wordmark va centrado en el hueco de 32.39 px que reserva el frame
        para el logotipo: 118 de ancho son 19.3 de alto con su proporción. */
     logo: { x: 454, y: 37.55, w: 118, h: wordmarkH(118) },
-    menu: { x: 746.52, y: 22, w: 492, h: 50.39 },
-    pill: { y: 6, h: 38.39, fs: 13.6, lh: "20.4px", xs: [6, 181, 336], ws: [169, 149, 150] },
+    menu: { x: 746.52, y: 22, w: 337, h: 50.39 },
+    pill: { y: 6, h: 38.39, fs: 13.6, lh: "20.4px", xs: [6, 181], ws: [169, 150] },
     avatar: { x: 1429.12, y: 28.195, bg: "rgba(201,168,119,0.3)", border: "rgba(247,241,229,0.12)", fs: 13.1, color: "#c9a877" },
+    wordmark: true,
+  },
+  ficha: {
+    h: 81.81,
+    logo: { x: 175, y: 40.9 - wordmarkH(150) / 2, w: 150, h: wordmarkH(150) },
+    menu: { x: 726.7, y: 16, w: 345, h: 49.81 },
+    pill: { y: 5, h: 39.81, fs: 14.1, lh: "21.82px", xs: [5, 185], ws: [174, 155] },
+    avatar: { x: 1492.4, y: 21.9, bg: "rgba(201,168,119,0.25)", border: "rgba(247,241,229,0.18)", fs: 13.6, color: "#c9a877" },
     wordmark: true,
   },
 };

@@ -1,17 +1,17 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
 import { Compact, Desk } from "@/components/responsive/Adaptive";
 import FichaCompact from "@/components/responsive/predios/FichaCompact";
-import FichaPredio from "@/components/predios/FichaPredio";
+import Oportunidad from "@/components/predios/ficha/Oportunidad";
 
-/** FICHA PREDIO — reproducción exacta del frame de Figma (1920 × 2287). */
-export default function FichaPredioPage() {
+/** FICHA PREDIO · OPORTUNIDAD — frame 729:2379 de Figma (1920 × 4745). */
+export default function FichaOportunidadPage() {
   return (
     <main className="min-h-screen" style={{ backgroundColor: "#e2cdae" }}>
       <Compact><FichaCompact /></Compact>
       <Desk>
-      <ScaledCanvas width={1920} height={2287}>
-        <FichaPredio />
-      </ScaledCanvas>
+        <ScaledCanvas width={1920} height={4745}>
+          <Oportunidad />
+        </ScaledCanvas>
       </Desk>
     </main>
   );
