@@ -173,8 +173,8 @@ function Plano({ p, left, retraso = 0 }: { p: (typeof PLANOS)[number]; left: num
 export default function Transformacion() {
   return (
     <div className="relative size-full" style={{ backgroundColor: CREAM }}>
-      {/* ── Pestañas ── (van encima del hero en esta ficha) */}
-      <div className="absolute" style={{ left: 1, top: 45, width: 1921, height: 142, zIndex: 4 }}><TabsFicha active="transformacion" /></div>
+      {/* ── Pestañas ── */}
+      <div className="absolute" style={{ left: -1, top: 568, width: 1921, height: 142, zIndex: 4 }}><TabsFicha active="transformacion" /></div>
 
       {/* ── Nav ── */}
       <div className="absolute left-0 top-0 w-full" style={{ height: 81.81, backgroundColor: BROWN, zIndex: 10 }}>
@@ -182,17 +182,16 @@ export default function Transformacion() {
       </div>
 
       {/* ── Hero ── */}
-      <section className="absolute left-0 w-full overflow-hidden" style={{ top: 187, height: 542, backgroundColor: BROWN, borderBottomLeftRadius: 60, zIndex: 5 }}>
+      <section className="absolute left-0 w-full overflow-hidden" style={{ top: 82, height: 542, backgroundColor: BROWN, borderBottomLeftRadius: 60, zIndex: 5 }}>
         <HeroFicha
-          height={542}
           contentTop={-50}
           contentLeft={0}
           veil={{ top: 0, height: 552 }}
           sidebar={{ left: 1551, top: 22 }}
+          specs={{ left: 145, top: 353 }}
+          termo={{ left: 135, top: 294 }}
           photo={false}
           title={<>De un mueble usado a<br />un activo extraordinario.</>}
-          sub={{ text: "Este apartamento tiene una estructura, ubicación y área que ya son difíciles de encontrar en La Cabrera. Nuestra propuesta de transformación aprovecha ese potencial para crear un espacio contemporáneo, funcional y atemporal, alineado con la demanda actual del mercado.", top: 280.4, width: 657, fontSize: 18, lineHeight: 22.8, color: CREAM }}
-          cta={{ label: "Ver galería", href: "#galeria" }}
         >
           <AntesDespues />
         </HeroFicha>

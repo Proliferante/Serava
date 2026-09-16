@@ -1,20 +1,16 @@
-import ScaledCanvas from "@/components/ScaledCanvas";
 import { Compact, Desk } from "@/components/responsive/Adaptive";
 import FinanzasCompact from "@/components/responsive/predios/ficha/FinanzasCompact";
-import Finanzas from "@/components/predios/ficha/Finanzas";
+import FinanzasCanvas from "@/components/predios/ficha/FinanzasCanvas";
 
 /**
- * FICHA PREDIO · FINANZAS — frame 729:3168 de Figma (1920 × 3947).
+ * FICHA PREDIO · FINANZAS — frames 729:3168 (1920 × 1847) y 766:3638
+ * (1920 × 4165) de Figma: el resumen y la ficha técnica desplegada.
  */
 export default function FichaFinanzasPage() {
   return (
     <main className="min-h-screen" style={{ backgroundColor: "#e2cdae" }}>
       <Compact><FinanzasCompact /></Compact>
-      <Desk>
-        <ScaledCanvas width={1920} height={3947}>
-          <Finanzas />
-        </ScaledCanvas>
-      </Desk>
+      <Desk><FinanzasCanvas /></Desk>
     </main>
   );
 }

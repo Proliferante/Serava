@@ -5,7 +5,7 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import MobileFooter from "@/components/responsive/MobileFooter";
 import { PrediosNavCompact } from "@/components/responsive/predios/PrediosShell";
 import { EASE, In, WRAP } from "@/components/responsive/kit";
-import { IcArea, IcBath, IcBed, IcCar, type TabKey } from "@/components/predios/ficha/kit";
+import { IcArea, IcBath, IcBed, IcCar, type TabKey, Termo } from "@/components/predios/ficha/kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA DE PREDIO — piezas de la vista fluida (móvil y tablet).
@@ -148,13 +148,11 @@ const SPECS = [
 ];
 
 export function HeroCompact({
-  title, sub, media, cta, children,
+  title, media, children,
 }: {
   title: ReactNode;
-  sub?: string;
   /** Lo que va arriba: la foto del inmueble o el comparador antes/después. */
   media: ReactNode;
-  cta?: { label: string; href: string };
   /** La tarjeta de reserva, que en el lienzo va dentro del propio hero. */
   children?: ReactNode;
 }) {
@@ -166,7 +164,25 @@ export function HeroCompact({
         <In y={16}>
           <p className="m-0 text-[11.5px] font-semibold uppercase leading-[1.5] tracking-[2px]" style={{ color: "#c9a877" }}>La Cabrera, Bogotá</p>
           <h1 className="mt-[10px] text-[clamp(2rem,8.4vw,3rem)] font-light leading-[1.08] tracking-[-0.02em]" style={{ color: "#efe6d5" }}>{title}</h1>
-          {sub && <p className="m-0 mt-[14px] max-w-[520px] text-[clamp(0.95rem,3.8vw,1.1rem)] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.82)" }}>{sub}</p>}
+        </In>
+
+        {/* El termómetro de precio: el rediseño lo pone en el hero de las tres
+            pestañas, donde antes iban la bajada y el botón de galería. */}
+        <In delay={0.06} className="mt-[34px] max-w-[520px]">
+          <Termo
+            width="100%"
+            pos={15.84}
+            label="Este activo · $8,1M"
+            min="$7,5M"
+            max="Mercado remodelado $12M"
+            trackH={16}
+            mark={CREAM}
+            labelColor={CREAM}
+            labelSize={12}
+            endsColor="rgba(226,205,174,0.8)"
+            endsSize={12}
+            delay={0.2}
+          />
         </In>
 
         <div className="mt-[20px] grid grid-cols-2 gap-[10px] sm:grid-cols-4">
@@ -180,19 +196,6 @@ export function HeroCompact({
             </In>
           ))}
         </div>
-
-        {cta && (
-          <In delay={0.12}>
-            <a
-              href={cta.href}
-              className="ix-press mt-[20px] flex h-[52px] w-full max-w-[260px] items-center justify-center gap-[9px] rounded-[12px] text-[17px] font-semibold"
-              style={{ backgroundColor: OLIVE, border: "1px solid rgba(60,45,30,0.13)", color: "rgba(247,241,229,0.95)" }}
-            >
-              {cta.label}
-              <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-            </a>
-          </In>
-        )}
 
         {children && <div className="mt-[26px]">{children}</div>}
       </div>

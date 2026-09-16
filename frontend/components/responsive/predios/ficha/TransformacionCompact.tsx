@@ -73,8 +73,6 @@ export default function TransformacionCompact() {
           <HeroCompact
             media={<AntesDespues />}
             title={<>De un mueble usado a un activo extraordinario.</>}
-            sub="Este apartamento tiene una estructura, ubicación y área que ya son difíciles de encontrar en La Cabrera. Nuestra propuesta de transformación aprovecha ese potencial para crear un espacio contemporáneo, funcional y atemporal, alineado con la demanda actual del mercado."
-            cta={{ label: "Ver galería", href: "#galeria" }}
           >
             <ReservaCompact />
           </HeroCompact>

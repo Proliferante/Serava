@@ -3,9 +3,9 @@
 import { MotionConfig } from "framer-motion";
 import { In, WRAP } from "@/components/responsive/kit";
 import {
-  Arrow, Barre, Cifra, Crece, IcArrowRight, IcCalendar, IcCheck13, IcPin,
+  Barre, Cifra, IcArrowRight, IcCalendar, IcCheck13, IcPin,
 } from "@/components/predios/ficha/kit";
-import { BARS, LEGEND, PASOS, POIS, STACK, SUPUESTOS, TCARDS, WHY } from "@/components/predios/ficha/Oportunidad";
+import { LEGEND, MIRADA, PASOS, POIS, STACK, TCARDS, WHY } from "@/components/predios/ficha/Oportunidad";
 import {
   Band, BROWN, Card, CREAM, FichaShellCompact, FotoPendiente, H2, HAIRLINE, HeroCompact,
   HeroFoto, MILL, OLIVE, ReservaCompact, Sub, VERD,
@@ -18,11 +18,11 @@ import {
    sitios donde no basta con apilar:
 
    · La barra apilada de la inversión pierde sus rótulos internos: a 320 px no
-     caben cuatro cifras dentro de 62 px de alto. La barra se queda como lo que
+     caben cuatro cifras dentro de 44 px de alto. La barra se queda como lo que
      es —la proporción de un vistazo— y los números bajan a la leyenda, que
      aquí va a dos columnas en vez de en fila.
-   · La tabla de supuestos deja de ser tabla y pasa a filas de etiqueta y
-     valor, que es lo único que se lee de verdad en vertical.
+   · La fila de tres cifras del cierre se apila a una columna en móvil y el
+     enlace al análisis pasa a ocupar todo el ancho, que es donde se pulsa.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export default function OportunidadCompact() {
@@ -72,7 +72,7 @@ export default function OportunidadCompact() {
                   <span className="mt-[3px] block text-[clamp(1.5rem,7vw,2.1rem)] font-semibold leading-[1.05]" style={{ color: OLIVE }}>$3.450M</span>
                   <span className="block text-[11.5px]" style={{ color: "#94836b" }}>$10,8M / m²</span>
                 </span>
-                <span className="mb-[18px] shrink-0 origin-center scale-[0.55]" style={{ color: OLIVE }}><Arrow /></span>
+                <span className="mb-[16px] shrink-0 text-[26px] leading-none" style={{ color: "#a57a4e" }}>→</span>
                 <span className="text-right">
                   <span className="block text-[10.6px] font-semibold uppercase tracking-[0.95px]" style={{ color: "#94836b" }}>Valor de mercado</span>
                   <span className="mt-[3px] block text-[clamp(1.5rem,7vw,2.1rem)] font-semibold leading-[1.05]" style={{ color: OLIVE }}>$3.776M</span>
@@ -81,17 +81,15 @@ export default function OportunidadCompact() {
               </div>
 
               {/* Sin rótulos dentro: los cuatro números viven en la leyenda. */}
-              <Barre className="relative mt-[18px] h-[44px] overflow-hidden rounded-[12px]" delay={0.12}>
+              <Barre className="mt-[18px] flex h-[44px] overflow-hidden rounded-[12px]" delay={0.12}>
                 {STACK.map((s, i) => (
                   <span
                     key={s.from}
-                    className="absolute inset-y-0"
+                    className="block h-full shrink-0"
                     style={{
-                      left: `${s.left}%`, right: `${s.right}%`,
+                      width: `${s.w}%`,
                       backgroundImage: `linear-gradient(180deg, ${s.from} 0%, ${s.to} 100%)`,
-                      borderRight: i === STACK.length - 1 ? undefined : "2px solid #fbf8f1",
-                      borderTopRightRadius: i === STACK.length - 1 ? 15 : undefined,
-                      borderBottomRightRadius: i === STACK.length - 1 ? 15 : undefined,
+                      borderRight: i === STACK.length - 1 ? undefined : "2px solid #faf5ea",
                     }}
                   />
                 ))}
@@ -102,7 +100,7 @@ export default function OportunidadCompact() {
                   <span key={g.v} className="flex items-center gap-[9px]">
                     <span className="block size-[12px] shrink-0 rounded-[4px]" style={{ backgroundColor: g.c }} />
                     <span className="min-w-0">
-                      <span className="block truncate text-[11.5px]" style={{ color: MILL }}>{g.l || "Precio de compra"}</span>
+                      <span className="block truncate text-[11.5px]" style={{ color: MILL }}>{g.l}</span>
                       <Cifra v={g.v} className="block text-[17px] font-semibold leading-[1.25]" style={{ color: g.vc }} />
                     </span>
                   </span>
@@ -128,41 +126,37 @@ export default function OportunidadCompact() {
               </span>
             </Card>
 
-            {/* Comparables de la microzona */}
-            <Card className="mt-[12px]" delay={0.06} style={{ backgroundColor: "#f6ecd9" }}>
-              <span className="text-[18px]" style={{ color: "#3d2c1e" }}>Comparables de la microzona</span>
-              <span className="ml-[8px] text-[11.5px]" style={{ color: "#94836b" }}>precio por m²</span>
-
-              <div className="mt-[16px] flex items-end gap-[8px]">
-                {BARS.map((b, i) => (
-                  <span key={b.v} className="flex flex-1 flex-col items-center">
-                    <Cifra v={b.v} className="text-[clamp(0.8rem,3.4vw,1rem)] font-semibold" style={{ color: BROWN }} />
-                    <Crece delay={0.05 * i} className="mt-[6px] h-[92px] w-full rounded-t-[8px]" style={{ backgroundImage: `linear-gradient(180deg, ${b.from} 0%, ${b.to} 100%)` }} />
-                    {/* Alto fijo: el primer pie ocupa tres renglones y sin él las cuatro
-                        columnas quedaban a distinta altura. */}
-                    <span className="mt-[8px] block h-[40px] text-center text-[10px] leading-[1.3]" style={{ color: MILL }}>{b.c[0]}<br />{b.c[1]}</span>
+            {/* Tres cifras que enganchan y el enlace al análisis completo */}
+            <div className="mt-[12px] grid grid-cols-1 gap-[10px] sm:grid-cols-3">
+              {MIRADA.map((k, i) => (
+                <In
+                  key={k.t}
+                  delay={0.05 * i}
+                  className="rounded-[14px] border border-solid px-[18px] py-[16px]"
+                  style={{
+                    background: i === 0 ? "linear-gradient(154.392deg, rgb(95,107,62) 0%, rgb(71,83,31) 100%)" : "rgba(247,241,229,0.06)",
+                    borderColor: i === 0 ? "transparent" : "rgba(247,241,229,0.12)",
+                  }}
+                >
+                  <span className="block text-[10.9px] font-semibold uppercase tracking-[0.65px]" style={{ color: "rgba(247,241,229,0.65)" }}>{k.t}</span>
+                  <span className="mt-[4px] block text-[clamp(1.6rem,7vw,2rem)] font-semibold leading-[1.05]" style={{ color: "#e7dbc2" }}>
+                    <Cifra v={k.v} />
+                    {k.cop && <span className="ml-[6px] text-[11.5px] font-normal" style={{ color: "rgba(247,241,229,0.65)" }}>COP</span>}
                   </span>
-                ))}
-              </div>
+                </In>
+              ))}
+            </div>
 
-              <p className="m-0 mt-[16px] rounded-[12px] p-[14px] text-[14px] leading-[1.35]" style={{ backgroundColor: CREAM, color: MILL }}>
-                Nuestro All-in queda <span className="font-semibold" style={{ color: VERD }}>~8% por debajo</span> de la media remodelada comparable. Análisis basado en 12 inmuebles comparables en La Cabrera.
-                <span className="mt-[10px] block font-bold">Actualizado: septiembre 2026.</span>
-              </p>
-            </Card>
-
-            {/* Supuestos del análisis */}
-            <Card className="mt-[12px]" delay={0.06} style={{ backgroundColor: "#f6ecd9" }}>
-              <span className="text-[18px]" style={{ color: "#3d2c1e" }}>Supuestos del análisis</span>
-              <dl className="m-0 mt-[10px]">
-                {SUPUESTOS.map((r) => (
-                  <div key={r.l[0]} className="flex items-baseline justify-between gap-[16px] border-b border-solid py-[11px] last:border-b-0" style={{ borderColor: "rgba(127,139,87,0.4)" }}>
-                    <dt className="text-[14px]" style={{ color: MILL }}>{r.l.join(" ")}</dt>
-                    <dd className="m-0 shrink-0 text-right text-[14px] font-medium" style={{ color: OLIVE }}>{r.v.join(" ")}</dd>
-                  </div>
-                ))}
-              </dl>
-            </Card>
+            <In delay={0.16}>
+              <a
+                href="/predios/ficha/finanzas"
+                className="ix-press mt-[14px] flex h-[52px] w-full items-center justify-center gap-[9px] rounded-[12px] text-[16px] font-semibold"
+                style={{ backgroundColor: "#e2cdae", color: "#3d2c1e" }}
+              >
+                Ver análisis completo
+                <IcArrowRight className="shrink-0" />
+              </a>
+            </In>
           </div>
         </Band>
 

@@ -10,6 +10,11 @@ type ScaledCanvasProps = {
   width: number;
   /** Design height in px (Figma frame height). */
   height: number;
+  /**
+   * Suaviza el cambio de alto. Sólo lo usa la ficha de Finanzas, que crece al
+   * desplegar la ficha técnica: sin esto el lienzo pega un salto.
+   */
+  animaAlto?: boolean;
   children: ReactNode;
 };
 
@@ -22,7 +27,7 @@ type ScaledCanvasProps = {
  * scaled content stays invisible until measured — this removes the zoom/flash
  * that happened when the canvas first rendered at scale 1 and then snapped.
  */
-export default function ScaledCanvas({ width, height, children }: ScaledCanvasProps) {
+export default function ScaledCanvas({ width, height, animaAlto = false, children }: ScaledCanvasProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
 
@@ -46,6 +51,7 @@ export default function ScaledCanvas({ width, height, children }: ScaledCanvasPr
         width: "100%",
         aspectRatio: `${width} / ${height}`,
         overflow: "hidden",
+        transition: animaAlto ? "aspect-ratio 0.75s cubic-bezier(0.22, 1, 0.36, 1)" : undefined,
       }}
     >
       <div

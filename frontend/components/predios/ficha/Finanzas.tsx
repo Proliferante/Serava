@@ -1,77 +1,59 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import CanvasImage from "@/components/CanvasImage";
+import { motion } from "framer-motion";
 import PrediosNav from "@/components/predios/PrediosNav";
 import Footer from "@/components/sections/Footer";
-import { motion } from "framer-motion";
-import { Band, BROWN, Cifra, Crece, CREAM, EASE, Entra, HAIRLINE, HeroFicha, IcArrowRight, Reveal, TabsFicha, Traza } from "./kit";
+import { Band, BROWN, Cifra, Crece, CREAM, EASE, Entra, HAIRLINE, HeroFicha, Reveal, StrokeIcon, TabsFicha, Termo, Traza } from "./kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FICHA PREDIO · FINANZAS — frame 729:3168 de Figma (1920 × 3947).
+   FICHA PREDIO · FINANZAS — frames 729:3168 y 766:3638 de Figma.
 
-   Es la pestaña que absorbió la antigua página de Análisis Add Value. Las
-   cuatro bandas van a x = −1 y 1921 de ancho, como en el frame: sobresalen un
+   El rediseño parte la pestaña en dos. Arriba, «Lo esencial, en segundos»:
+   una cifra grande, cuatro tarjetas y el termómetro de precio, que es todo lo
+   que hace falta para decidir si la oportunidad interesa (1920 × 1847).
+   Debajo, tras el botón, la ficha técnica completa: rentabilidad detallada,
+   contexto de mercado, composición del costo, escenarios de TIR, comparación
+   con alternativas, la proyección año a año y los costos de salida
+   (1920 × 4165).
+
+   El despliegue cambia el alto del lienzo, así que el estado vive fuera, en
+   `FinanzasCanvas`: es quien puede pasarle la altura nueva a `ScaledCanvas`.
+
+   Las bandas van a x = −1 y 1921 de ancho, como en el frame: sobresalen un
    píxel por cada lado para que el redondeo de las esquinas no deje ver el
    fondo de la página en el borde.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const A = "/figma";
+/** Alto del lienzo con la ficha técnica plegada y desplegada. */
+export const ALTO_CERRADA = 1847;
+export const ALTO_ABIERTA = 4165;
 
-/* ── Iconos propios de esta pestaña ───────────────────────────────────────
-   Los ocho de los KPI y los tres de las palancas vienen a 40 y 50 px con el
-   mismo trazo fino; se pintan con `currentColor`. */
+/* Tintas que sólo se usan aquí. El resto viene del kit. */
+const HUESO = "#faf5ea";
+const ARENA = "#e7dbc2";
+const TOPO = "#9d8b70";
+const SOMBRA = "#7a6a52";
+const TINTA = "#3a2c1c";
+const VERDE = "#5f6b3e";
+const HOJA = "#4a5730";
+/** Relleno y filete de las tarjetas sobre banda marrón. */
+const VELO = "rgba(247,241,229,0.05)";
+const VELO_BORDE = "1px solid rgba(247,241,229,0.12)";
 
-function Ic40({ d, s = 40, className, style }: { d: string; s?: number; className?: string; style?: CSSProperties }) {
-  return (
-    <svg width={s} height={s} viewBox="0 0 40 40" fill="none" className={className} style={style} aria-hidden>
-      <path d={d} stroke="currentColor" strokeWidth={1.125} />
-    </svg>
-  );
-}
+/* ── Iconos ────────────────────────────────────────────────────────────── */
 
-function Ic50({ d, className, style }: { d: string; className?: string; style?: CSSProperties }) {
-  return (
-    <svg width={50} height={50} viewBox="0 0 50 50" fill="none" className={className} style={style} aria-hidden>
-      <path d={d} stroke="currentColor" strokeWidth={1.25} />
-    </svg>
-  );
-}
-
-const D_BARS = "M6.66667 33.3333V16.6667M16.6667 33.3333V6.66667M26.6667 33.3333V21.6667M36.6667 33.3333H3.33333";
-const D_STACK = "M20 15C27.3638 15 33.3333 12.7614 33.3333 10C33.3333 7.23858 27.3638 5 20 5C12.6362 5 6.66667 7.23858 6.66667 10C6.66667 12.7614 12.6362 15 20 15ZM6.66667 10V30C6.66667 32.8333 12.6667 35 20 35C27.3333 35 33.3333 32.8333 33.3333 30V10";
-const D_STAR = "M20 3.33333L24.1667 11.6667L33.3333 13L26.6667 19.5L28.3333 28.6667L20 26.3333L11.6667 30.3333L13.3333 21.1667L6.66667 14.6667L15.8333 13.3333L20 3.33333Z";
-const D_HOME = "M5 35V11.6667L20 5L35 11.6667V35M15 35V25H25V35";
-const D_TREND = "M5 28.3333L15 18.3333L21.6667 25L35 11.6667V5H28.3333";
-const D_PCT = "M31.6667 8.33333L8.33333 31.6667M13.3333 10C13.3333 10.8841 12.9821 11.7319 12.357 12.357C11.7319 12.9821 10.8841 13.3333 10 13.3333C9.11595 13.3333 8.2681 12.9821 7.64298 12.357C7.01786 11.7319 6.66667 10.8841 6.66667 10C6.66667 9.11595 7.01786 8.2681 7.64298 7.64298C8.2681 7.01786 9.11595 6.66667 10 6.66667C10.8841 6.66667 11.7319 7.01786 12.357 7.64298C12.9821 8.2681 13.3333 9.11595 13.3333 10ZM33.3333 30C33.3333 30.8841 32.9821 31.7319 32.357 32.357C31.7319 32.9821 30.8841 33.3333 30 33.3333C29.1159 33.3333 28.2681 32.9821 27.643 32.357C27.0179 31.7319 26.6667 30.8841 26.6667 30C26.6667 29.1159 27.0179 28.2681 27.643 27.643C28.2681 27.0179 29.1159 26.6667 30 26.6667C30.8841 26.6667 31.7319 27.0179 32.357 27.643C32.9821 28.2681 33.3333 29.1159 33.3333 30Z";
-
-const D_STAR50 = "M25 4.16667L30.2083 14.5833L41.6667 16.25L33.3333 24.375L35.4167 35.8333L25 32.9167L14.5833 37.9167L16.6667 26.4583L8.33333 18.3333L19.7917 16.6667L25 4.16667Z";
-const D_TREND50 = "M6.25 35.4167L18.75 22.9167L27.0833 31.25L43.75 14.5833V6.25H35.4167";
-const D_STACK50 = "M25 18.75C34.2047 18.75 41.6667 15.9518 41.6667 12.5C41.6667 9.04822 34.2047 6.25 25 6.25C15.7953 6.25 8.33333 9.04822 8.33333 12.5C8.33333 15.9518 15.7953 18.75 25 18.75ZM8.33333 12.5V37.5C8.33333 41.0417 15.8333 43.75 25 43.75C34.1667 43.75 41.6667 41.0417 41.6667 37.5V12.5";
+const IcClock14 = () => <StrokeIcon vb={14} w={1.17} d="M7 12.25C9.8995 12.25 12.25 9.8995 12.25 7C12.25 4.10051 9.8995 1.75 7 1.75C4.10051 1.75 1.75 4.10051 1.75 7C1.75 9.8995 4.10051 12.25 7 12.25ZM7 4.08333V7L8.75 8.16667" />;
+const IcInfo15 = () => <StrokeIcon vb={15} w={1.25} d="M7.5 13.75C10.9518 13.75 13.75 10.9518 13.75 7.5C13.75 4.04822 10.9518 1.25 7.5 1.25C4.04822 1.25 1.25 4.04822 1.25 7.5C1.25 10.9518 4.04822 13.75 7.5 13.75ZM7.5 10.625V7.5M7.5 4.6875H7.50625" />;
+const IcChevron16 = () => <StrokeIcon vb={16} w={1.6} d="M4 6L8 10.5L12 6" />;
 
 /* ── Datos ─────────────────────────────────────────────────────────────── */
 
-type Kpi = {
-  d: string; title: string[]; value: string; note: string; delta?: string;
-  /** Centro vertical de cada línea dentro de la tarjeta, tal cual el frame. */
-  c: [number, number, number]; dTop?: number; iconTop: number;
-};
-
-export const KPIS: Kpi[] = [
-  { d: D_BARS, title: ["Precio base / m²"], value: "$8,1M", note: "vs. media usado $8,7M", delta: "−7% por debajo", c: [94.5, 126, 156], dTop: 168, iconTop: 14 },
-  { d: D_STACK, title: ["All-in Cost / m²"], value: "$10,8M", note: "vs. media remodelado $11,8M", delta: "−8% por debajo", c: [91.3, 121, 150], dTop: 167, iconTop: 14 },
-  { d: D_STAR, title: ["Spread de valor"], value: "+9%", note: "Distancia All-in vs. valor de mercado", c: [99.3, 131, 161], iconTop: 14 },
-  { d: D_HOME, title: ["Valor estabilizado hoy"], value: "$3.776M", note: "Media remodelado en la microzona", c: [98.3, 130, 160], iconTop: 14 },
-  { d: D_TREND, title: ["Valor creado hoy"], value: "+$326M", note: "(+9% vs. All-in)", c: [101.3, 132.8, 162.8], iconTop: 13.78 },
-  { d: D_PCT, title: ["Yield neto on cost"], value: "4,6%", note: "vs. yield medio 4,1%", delta: "+0,5 pp sobre la media", c: [89.1, 120.8, 150.8], dTop: 167.78, iconTop: 13.78 },
-  { d: D_BARS, title: ["Valor patrimonial 5 años"], value: "$5.341M", note: "Estimado del patrimonio en el año 5", c: [98.1, 129.8, 159.8], iconTop: 13.78 },
-  { d: D_TREND, title: ["Retorno patrimonial 5", "años"], value: "54,4%", note: "Sobre el capital invertido (All-in)", c: [99.78, 143.8, 174.2], iconTop: 13.78 },
-];
-
-export const LEVERS = [
-  { d: D_STAR50, left: 153, top: 298, tc: 66, tcx: 217, peso: "25%", pesoLeft: 397, pesoTop: 41, t: "Spread de valor", p: "La propiedad se adquiere por debajo del valor de mercado remodelado, generando un spread inicial de +9%." },
-  { d: D_TREND50, left: 747, top: 299, tc: 67, tcx: 210.5, peso: "20%", pesoLeft: 395, pesoTop: 42, t: "Valorización a 5 años", p: "La microzona ha mostrado una apreciación sostenida que potencia el valor del activo en el mediano plazo." },
-  { d: D_STACK50, left: 1341, top: 296, tc: 71, tcx: 232, peso: "10%", pesoLeft: 400, pesoTop: 41, t: "Carry / renta neta", p: "El arriendo genera una renta neta estable que actúa como carry durante el periodo de inversión." },
+/** Las cuatro tarjetas que acompañan a la cifra grande del resumen. */
+export const ESENCIAL = [
+  { left: 405.9, top: 20, h: 112.4, t: "Renta mensual estimada", v: "$18,6M", vSize: 30.4, vLh: 31.92, vTop: 40.49, note: "arriendo remodelado de referencia", nTop: 75.41 },
+  { left: 760.95, top: 20, h: 112.4, t: "Rentabilidad anual neta", v: "4,6%", vSize: 30.4, vLh: 31.92, vTop: 40.49, note: "yield neto sobre el All-in", nTop: 75.41 },
+  { left: 405.9, top: 148.98, h: 113.22, t: "Rango de inversión", v: "$3.100M–$3.450M", vSize: 24, vLh: 25.2, vTop: 41.5, note: "monto de entrada", nTop: 69.5 },
+  { left: 760.95, top: 148.98, h: 112.41, t: "Colocación en arriendo", v: "~30 días", vSize: 30.4, vLh: 31.92, vTop: 40.5, note: "tiempo promedio en la zona", nTop: 75.42, reloj: true },
 ];
 
 /** Renta neta acumulada: barras verdes. `x`/`w` y alto salen del frame. */
@@ -95,46 +77,113 @@ export const VALOR = [
 
 const ANIOS = [45.35, 212.46, 378.12, 546.47, 713.51, 880.55];
 
-export const SAYS = [
-  { t: "Funciona con el precio actual", p: "Incluso sin negociar, el retorno proyectado es atractivo.", pTop: 88 },
-  { t: "Hay spread antes de negociar", p: "Se adquiere por debajo del valor remodelado, con +9% de margen.", pTop: 87 },
-  { t: "El arriendo actúa como carry", p: "La renta neta aporta al retorno total durante todo el periodo.", pTop: 90 },
-  { t: "El horizonte potencia el resultado", p: "Renta más valorización generan +54,4% en el patrimonio.", pTop: 90 },
+/**
+ * Cascada de la composición del costo. Todo en % del área del gráfico, como
+ * lo entrega el frame: cinco columnas, la última partida en dos para que se
+ * vea de dónde sale el valor creado.
+ */
+const COSTO = [
+  { x: 6.97, w: 11.82, top: 35.61, bottom: 14.5, c: "#5b4633", v: "$2.600M", vTop: 27.6, vx: 8.51, vw: 8.68, t: "Precio", tx: 10.53, tw: 4.79 },
+  { x: 25.15, w: 11.82, top: 20.27, bottom: 64.39, c: "#8f6740", v: "$800M", vTop: 12.25, vx: 27.43, vw: 7.08, t: "Remod.", tx: 28.18, tw: 5.85 },
+  { x: 43.33, w: 11.82, top: 19.31, bottom: 79.73, c: "#c9a877", v: "$50M", vTop: 11.3, vx: 46.36, vw: 5.85, t: "Otros", tx: 47.2, tw: 4.07 },
+  { x: 65.15, w: 11.82, top: 19.31, bottom: 14.5, c: "#3d2c1e", v: "$3.450M", vTop: 11.3, vx: 66.49, vw: 8.86, t: "All-in", tx: 69.01, tw: 4.08 },
+  { x: 84.85, w: 11.81, top: 13.05, bottom: 14.5, c: "#7d8a54", v: "", vTop: 0, vx: 0, vw: 0, t: "Mercado", tx: 87.35, tw: 6.91 },
+];
+
+/** Enlaces punteados entre el techo de una columna y el suelo de la siguiente. */
+const COSTO_LINKS = [
+  { x: 18.79, w: 6.36, top: 35.61 },
+  { x: 36.97, w: 6.36, top: 20.27 },
+  { x: 55.15, w: 10, top: 19.31 },
+];
+
+export const ESCENARIOS = [
+  { v: "9,0%", t: "Conservador", h: 106.39, from: "#c2b49b", to: "#a8967a" },
+  { v: "12,5%", t: "Base", h: 121.77, from: "#7d97a6", to: "#5e7a8a" },
+  { v: "16,0%", t: "Óptimo", h: 121.77, from: "#8a9a5f", to: VERDE },
+];
+
+export const ALTERNATIVAS: { t: string; v: string; verde?: boolean }[] = [
+  { t: "ZEQUARA · TIR base", v: "~12,5%", verde: true },
+  { t: "ZEQUARA · TIR óptimo", v: "~16,0%", verde: true },
+  { t: "CDT / renta fija vigente", v: "~10,5%" },
+];
+
+/** Proyección año a año. La última fila va resaltada, como en el frame. */
+export const TABLA = [
+  ["0", "$3.776M", "$0", "$3.776M", "—"],
+  ["1", "$3.919M", "$158M", "$4.077M", "4,6%"],
+  ["2", "$4.068M", "$316M", "$4.384M", "4,7%"],
+  ["3", "$4.223M", "$474M", "$4.697M", "4,8%"],
+  ["4", "$4.383M", "$632M", "$5.015M", "4,9%"],
+  ["5", "$4.551M", "$790M", "$5.341M", "5,0%"],
+];
+
+const TABLA_COLS = [49.25, 112.2, 104.81, 98.91, 58.39];
+export const TABLA_HEAD = ["Año", "Valor activo", "Renta acum.", "Patrimonio", "Yield"];
+
+export const LIQUIDEZ = [
+  { t: "Payback (solo renta)", v: "~22 años" },
+  { t: "Payback con valorización", v: "~5 años" },
+];
+
+export const SALIDA = [
+  { t: "Comisión de venta (~3%)", v: "~$113M", pie: "" },
+  { t: "Impuesto de venta", v: "Según ganancia", pie: "ganancia ocasional u otros aplicables" },
 ];
 
 /* ── Piezas ────────────────────────────────────────────────────────────── */
 
-function KpiCard({ k, i }: { k: Kpi; i: number }) {
-  /* Las ocho tarjetas llegan juntas —la rejilla entra de una pieza— y lo que
-     se escalona dentro es el disco del icono y la cuenta de la cifra, en el
-     orden de lectura. */
-  const retraso = 0.1 + i * 0.06;
+/** Tarjeta clara de dato suelto: rótulo, cifra y pie. La del resumen. */
+function CardClara({ c, i }: { c: (typeof ESENCIAL)[number]; i: number }) {
   return (
-    <div className="relative" style={{ width: 353.5, height: 202, backgroundColor: BROWN, borderRadius: 20 }}>
-      <motion.div
-        className="absolute flex items-center justify-center"
-        style={{ left: 146.5, top: k.iconTop, width: 60, height: 60, borderRadius: 30, backgroundColor: "#efe9dc", color: "#a57a4e" }}
-        initial={{ scale: 0.6, opacity: 0 }}
-        whileInView={{ scale: 1, opacity: 1 }}
-        viewport={{ once: true, amount: 0.4 }}
-        transition={{ duration: 0.5, delay: retraso, ease: EASE }}
+    <Reveal left={c.left} top={c.top} width={339.05} height={c.h} delay={0.1 + i * 0.07}>
+      <div className="relative size-full" style={{ backgroundColor: HUESO, border: `1px solid ${HAIRLINE}`, borderRadius: 14 }}>
+        <div className="absolute flex items-center gap-[6px]" style={{ left: 18, top: 18.5 }}>
+          {c.reloj && <span className="shrink-0" style={{ color: BROWN }}><IcClock14 /></span>}
+          <span className="whitespace-nowrap font-semibold" style={{ fontSize: 15, lineHeight: "16.8px", color: BROWN }}>{c.t}</span>
+        </div>
+        <Cifra v={c.v} dur={1} className="absolute whitespace-nowrap font-semibold" style={{ left: 18, top: c.vTop, fontSize: c.vSize, lineHeight: `${c.vLh}px`, color: "#3d2c1e" }} />
+        <span className="absolute whitespace-nowrap" style={{ left: 18, top: c.nTop, fontSize: 15, lineHeight: "17.28px", color: TOPO }}>{c.note}</span>
+      </div>
+    </Reveal>
+  );
+}
+
+/** Tarjeta de dato sobre banda marrón. Se repite en media ficha técnica. */
+function Mini({
+  left, top, width, height, t, v, pie, vc = ARENA, bg, delay = 0,
+}: {
+  left: number; top: number; width: number; height: number;
+  t: string; v: string; pie?: string; vc?: string; bg?: string; delay?: number;
+}) {
+  return (
+    <Reveal left={left} top={top} width={width} height={height} delay={delay}>
+      <div
+        className="relative size-full"
+        style={{ backgroundColor: bg ? undefined : VELO, backgroundImage: bg, border: VELO_BORDE, borderRadius: 12 }}
       >
-        <Ic40 d={k.d} />
-      </motion.div>
-      <p className="absolute text-center font-bold" style={{ left: 20, right: 20, top: k.c[0] - (k.title.length > 1 ? 24 : 9.12), fontSize: 23, lineHeight: k.title.length > 1 ? "24px" : "18.24px", color: "#7f8b57" }}>
-        {k.title[0]}{k.title[1] && <><br />{k.title[1]}</>}
-      </p>
-      <Cifra v={k.value} dur={1} className="absolute block text-center font-semibold" style={{ left: 20, right: 20, top: k.c[1] - 16, fontSize: 32, lineHeight: "32px", color: "#dfc59f" }} />
-      <p className="absolute text-center" style={{ left: 20, right: 20, top: k.c[2] - 8.64, fontSize: 13, lineHeight: "17.28px", color: "#f7f1e5" }}>{k.note}</p>
-      {k.delta && (
-        <span
-          className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap font-semibold"
-          style={{ top: k.dTop, padding: "3px 9px", borderRadius: 7, backgroundColor: "#e4e8d5", fontSize: 12.5, lineHeight: "18.72px", color: "#5f6b3e" }}
-        >
-          {k.delta}
-        </span>
-      )}
-    </div>
+        <span className="absolute" style={{ left: 20, right: 20, top: 17, fontSize: 15, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>{t}</span>
+        <Cifra v={v} dur={1} className="absolute whitespace-nowrap font-semibold" style={{ left: 20, top: 34, fontSize: 30, lineHeight: "43.2px", color: vc }} />
+        {pie && <span className="absolute" style={{ left: 20, right: 20, top: 80, fontSize: 11.5, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>{pie}</span>}
+      </div>
+    </Reveal>
+  );
+}
+
+/** Título de bloque dentro de la ficha técnica. */
+function FtTitle({ left, top, dark = false, children }: { left: number; top: number; dark?: boolean; children: React.ReactNode }) {
+  return (
+    <motion.h3
+      className="absolute whitespace-nowrap font-semibold"
+      style={{ left, top, fontSize: 40, lineHeight: "41.47px", letterSpacing: -0.384, color: dark ? BROWN : ARENA }}
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.6 }}
+      transition={{ duration: 0.55, ease: EASE }}
+    >
+      {children}
+    </motion.h3>
   );
 }
 
@@ -154,7 +203,7 @@ export function Proyeccion() {
       {RENTA.map((b, i) => (
         <Crece key={b.label} delay={0.1 + i * 0.08} dur={0.7} className="absolute" style={{ left: b.x, top: 256 - b.h, width: b.w, height: b.h, borderRadius: 6, backgroundColor: "#7d8a54" }} />
       ))}
-      {RENTA.map((b, i) => (
+      {RENTA.map((b) => (
         <Cifra key={`l${b.label}`} v={b.label} dur={0.8} className="absolute block text-center font-bold" style={{ left: b.lx, top: b.ly, width: b.lw, fontSize: 20, lineHeight: "24px", color: BROWN }} />
       ))}
 
@@ -197,163 +246,387 @@ export function Proyeccion() {
   );
 }
 
+/**
+ * Cascada de la composición del costo, sobre un área de 566,43 × 224,05.
+ * Cada columna crece desde el suelo y el enlace punteado con la siguiente se
+ * dibuja después: así se lee como una suma y no como cinco barras sueltas.
+ */
+export function Cascada({ w, h }: { w: number | string; h: number }) {
+  return (
+    <div className="relative" style={{ width: w, height: h }}>
+      <span className="absolute" style={{ left: "4.55%", right: "1.52%", top: "85.5%", height: 1, backgroundColor: "rgba(60,45,30,0.15)" }} />
+
+      {COSTO.map((c, i) => (
+        <Crece
+          key={c.t}
+          delay={0.08 + i * 0.12}
+          dur={0.6}
+          className="absolute"
+          style={{ left: `${c.x}%`, width: `${c.w}%`, top: `${c.top}%`, bottom: `${c.bottom}%`, backgroundColor: c.c, borderRadius: 3 }}
+        />
+      ))}
+      {/* El tramo de valor creado, encima de la columna de mercado. */}
+      <Crece
+        delay={0.08 + 4 * 0.12}
+        dur={0.6}
+        className="absolute"
+        style={{ left: "84.85%", width: "11.81%", top: "13.05%", bottom: "80.69%", backgroundColor: VERDE, borderTopLeftRadius: 3, borderTopRightRadius: 3 }}
+      />
+
+      {COSTO_LINKS.map((l, i) => (
+        <motion.span
+          key={l.x}
+          className="absolute"
+          style={{ left: `${l.x}%`, width: `${l.w}%`, top: `${l.top}%`, height: 1, borderTop: "1px dashed rgba(60,45,30,0.35)", transformOrigin: "left center" }}
+          initial={{ opacity: 0, scaleX: 0 }}
+          whileInView={{ opacity: 1, scaleX: 1 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.4, delay: 0.24 + i * 0.12, ease: EASE }}
+        />
+      ))}
+
+      {COSTO.filter((c) => c.v).map((c, i) => (
+        <Cifra
+          key={c.v}
+          v={c.v}
+          dur={0.8}
+          className="absolute block text-center font-bold"
+          style={{ left: `${c.vx}%`, width: `${c.vw + 8}%`, top: `${c.vTop}%`, fontSize: 11.12, lineHeight: "14px", color: TINTA }}
+        />
+      ))}
+      <Cifra v="+$326M" dur={0.8} className="absolute block text-center font-bold" style={{ left: "82.89%", width: "17%", top: "5.23%", fontSize: 10.69, lineHeight: "14px", color: HOJA }} />
+
+      {COSTO.map((c) => (
+        <span key={`t${c.t}`} className="absolute block text-center" style={{ left: `${c.tx - 3}%`, width: `${c.tw + 6}%`, top: "90.84%", fontSize: 8.55, lineHeight: "11px", color: SOMBRA }}>{c.t}</span>
+      ))}
+    </div>
+  );
+}
+
+/** Fila de tabla. `cols` da los anchos; la última fila puede ir resaltada. */
+function Fila({
+  cells, cols, top, alto, cabecera = false, resalte = false, dark = false, delay = 0,
+}: {
+  cells: string[]; cols: number[]; top: number; alto: number;
+  cabecera?: boolean; resalte?: boolean; dark?: boolean; delay?: number;
+}) {
+  const filete = dark ? "rgba(247,241,229,0.12)" : "rgba(60,45,30,0.08)";
+  const tinta = resalte ? VERDE : dark ? "rgba(247,241,229,0.85)" : TINTA;
+  let x = 0;
+  return (
+    <motion.div
+      className="absolute left-0 right-0"
+      style={{ top, height: alto, borderBottom: `1px solid ${filete}`, backgroundColor: resalte ? "#e2e7d1" : undefined }}
+      initial={{ opacity: 0, x: 14 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, amount: 0.5 }}
+      transition={{ duration: 0.4, delay, ease: EASE }}
+    >
+      {cells.map((c, i) => {
+        const left = x;
+        x += cols[i];
+        return (
+          <span
+            key={`${c}-${i}`}
+            className="absolute whitespace-nowrap"
+            style={{
+              left: left + 10, width: cols[i] - 20, top: cabecera ? 9.5 : 9.5,
+              textAlign: i === 0 ? "left" : "right",
+              fontSize: cabecera ? 10.2 : 13.6,
+              lineHeight: cabecera ? "15.36px" : "20.4px",
+              letterSpacing: cabecera ? 0.41 : undefined,
+              textTransform: cabecera ? "uppercase" : undefined,
+              fontWeight: cabecera || resalte ? 600 : 400,
+              color: cabecera ? (dark ? "rgba(247,241,229,0.85)" : TOPO) : tinta,
+            }}
+          >
+            {c}
+          </span>
+        );
+      })}
+    </motion.div>
+  );
+}
+
 /* ── Página ────────────────────────────────────────────────────────────── */
 
-export default function Finanzas() {
+export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onToggle: () => void }) {
+  /* La columna de contenido de la ficha: 1100 px centrados en el lienzo. */
+  const COL = 411;
+
   return (
     <div className="relative size-full" style={{ backgroundColor: CREAM }}>
       {/* ── Nav ── */}
-      <div className="absolute left-0 top-0 w-full" style={{ height: 74.81, backgroundColor: BROWN, zIndex: 10 }}>
+      <div className="absolute left-0 top-0 w-full" style={{ height: 74.81, backgroundColor: BROWN, zIndex: 30 }}>
         {/* El frame sube la barra 7 px respecto al borde de la página. */}
         <div className="absolute left-0 w-full" style={{ top: -7 }}><PrediosNav active="predios" geo="ficha" /></div>
       </div>
 
       {/* ── Hero ── */}
-      <section className="absolute overflow-hidden" style={{ left: -1, top: 73, width: 1920, height: 542, backgroundColor: BROWN, borderBottomLeftRadius: 60, zIndex: 6 }}>
+      <section className="absolute overflow-hidden" style={{ left: -1, top: 75, width: 1920, height: 540, backgroundColor: BROWN, borderBottomLeftRadius: 60, zIndex: 20 }}>
         <HeroFicha
-          height={542}
-          contentTop={-32}
-          veil={{ top: 0, height: 558 }}
-          sidebar={{ left: 1540, top: 22 }}
-          sub={{ text: "Ubicación privilegiada. Metraje único. Una oportunidad excepcional en la microzona más sólida de Bogotá." }}
-          cta={{ label: "Ver galería", href: "#galeria" }}
+          contentTop={-40}
+          veil={{ top: 1, height: 540 }}
+          sidebar={{ left: 1523, top: 28 }}
+          specs={{ left: 161, top: 351 }}
+          termo={{ left: 161, top: 292 }}
           priority
         />
       </section>
 
       {/* ── Pestañas ── */}
-      <div className="absolute left-0 w-full" style={{ top: 568, zIndex: 5 }}><TabsFicha active="finanzas" /></div>
+      <div className="absolute left-0 w-full" style={{ top: 568, zIndex: 19 }}><TabsFicha active="finanzas" /></div>
 
-      {/* ── Indicadores de valor patrimonial ── */}
-      <Band left={-1} width={1921} top={710} height={683} bg={CREAM} corner="bl" z={4}>
-        <h2 className="absolute font-medium" style={{ left: 249, top: 67, fontSize: 60, lineHeight: "38px", letterSpacing: -0.352, color: "#3d2c1e" }}>Indicadores de valor patrimonial</h2>
-        <p className="absolute font-light" style={{ left: 249, top: 135, width: 1483, fontSize: 25, lineHeight: "26px", color: "#6b5b47" }}>
-          Métricas clave de la oportunidad, comparadas con los promedios de su microzona. Cifras en millones de pesos (COP).
-        </p>
-        <Reveal left={249} top={190} width={1424} height={426} delay={0.04}>
-          <div className="grid size-full grid-cols-4 gap-[2px] overflow-hidden" style={{ paddingTop: 7, backgroundColor: HAIRLINE, borderRadius: 16 }}>
-            {KPIS.map((k, i) => <KpiCard key={k.title[0]} k={k} i={i} />)}
-          </div>
-        </Reveal>
-      </Band>
-
-      {/* ── Las 3 palancas de valor ── */}
-      <Band left={-1} width={1921} top={1301} height={657} bg={BROWN} corner="br" z={3}>
-        <h2 className="absolute font-medium" style={{ left: 246, top: 148, fontSize: 60, lineHeight: "38px", letterSpacing: -0.352, color: CREAM }}>Las 3 palancas de valor</h2>
-        <p className="absolute" style={{ left: 246, top: 217.14, width: 1245, fontSize: 25, lineHeight: "18.72px", color: CREAM }}>
-          Nuestra tesis de inversión se apoya en tres motores de valor, con pesos definidos en el modelo.
+      {/* ── Lo esencial, en segundos ── */}
+      <Band left={-1} width={1921} top={710} height={773} bg={CREAM} corner="bl" z={18}>
+        <h2 className="absolute font-semibold" style={{ left: COL, top: 74, fontSize: 60, lineHeight: "41.47px", letterSpacing: -0.384, color: BROWN }}>Lo esencial, en segundos</h2>
+        <p className="absolute whitespace-nowrap font-light" style={{ left: COL, top: 150, fontSize: 20, lineHeight: "22px", color: SOMBRA }}>
+          Las cifras que definen la oportunidad. Para el análisis completo, abre la ficha técnica.
         </p>
 
-        {LEVERS.map((l, i) => (
-          <Reveal key={l.t} left={l.left} top={l.top} width={500} height={250} delay={0.04 + i * 0.06}>
-            <div className="relative size-full" style={{ backgroundColor: "#f7edd9", border: `1px solid ${HAIRLINE}`, borderRadius: 16 }}>
-              {/* El icono cuelga por encima del borde superior de la tarjeta. */}
-              <motion.div
-                className="absolute flex items-center justify-center"
-                style={{ left: 209, top: -41, width: 80, height: 80, borderRadius: 11, backgroundColor: "#b9c69f", color: "#5f6b3e" }}
-                initial={{ scale: 0.55, rotate: -12, opacity: 0 }}
-                whileInView={{ scale: 1, rotate: 0, opacity: 1 }}
-                viewport={{ once: true, amount: 0.4 }}
-                transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.18 + i * 0.06 }}
+        {/* Todo lo de abajo cuelga de la columna, en coordenadas del frame. */}
+        <div className="absolute" style={{ left: COL, top: 179, width: 1100, height: 535 }}>
+          {/* La cifra que manda */}
+          <Reveal left={0} top={20} width={389.9} height={263.52} delay={0.04}>
+            <div className="relative size-full" style={{ backgroundColor: "#7f8b57", borderRadius: 16 }}>
+              <span className="absolute" style={{ left: 26, right: 26, top: 38.64, fontSize: 20, lineHeight: "19.2px", color: "rgba(247,241,229,0.8)" }}>Retorno total acumulado</span>
+              <Cifra v="54,4%" dur={1.5} className="absolute whitespace-nowrap font-bold" style={{ left: 26, top: 66.64, fontSize: 64, lineHeight: "64px", color: ARENA }} />
+              <span className="absolute" style={{ left: 26, right: 26, top: 138.64, fontSize: 20, lineHeight: "19.2px", color: "rgba(247,241,229,0.85)" }}>a 5 años · sobre el capital invertido</span>
+              <motion.span
+                className="absolute flex items-center whitespace-nowrap font-semibold"
+                style={{ left: 26, top: 191.64, height: 32.23, padding: "0 13px", borderRadius: 999, backgroundColor: "rgba(247,241,229,0.14)", fontSize: 20, lineHeight: "18.24px", color: ARENA }}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.5, delay: 0.5, ease: EASE }}
               >
-                <Ic50 d={l.d} />
-              </motion.div>
-              <p className="absolute -translate-x-1/2 whitespace-nowrap text-center font-semibold" style={{ left: l.tcx, top: l.tc - 10.8, fontSize: 30, lineHeight: "21.6px", letterSpacing: -0.2, color: "#2a241c" }}>{l.t}</p>
-              <span
-                className="absolute flex items-center justify-center font-semibold"
-                style={{ left: l.pesoLeft, top: l.pesoTop, width: 90, height: 50, borderRadius: 6, backgroundColor: "#7f8b57", fontSize: 20, letterSpacing: -0.2, color: "#f7f1e5" }}
-              >
-                {l.peso}
-              </span>
-              <p className="absolute font-light" style={{ left: 24, right: 24, top: 106.79, fontSize: 25, lineHeight: "26px", color: "#6b5b47" }}>{l.p}</p>
+                TIR ~12,5% E.A. · vs. 10,5% CDT
+              </motion.span>
             </div>
           </Reveal>
-        ))}
-      </Band>
 
-      {/* ── Proyección patrimonial a 5 años ── */}
-      <Band left={-1} width={1921} top={1923} height={721} bg={CREAM} corner="bl" z={2}>
-        <h2 className="absolute font-medium" style={{ left: 247, top: 89, fontSize: 60, lineHeight: "38px", letterSpacing: -0.352, color: "#3d2c1e" }}>Proyección patrimonial a 5 años</h2>
-        <p className="absolute" style={{ left: 247, top: 158.14, width: 1225, fontSize: 25, lineHeight: "18.72px", color: "#6b5b47" }}>
-          Evolución estimada del valor del activo y la renta neta acumulada. Cifras en millones (COP).
-        </p>
+          {ESENCIAL.map((c, i) => <CardClara key={c.t} c={c} i={i} />)}
 
-        <Reveal left={391} top={215} width={1018} height={375} delay={0.04}>
-          <div className="relative size-full" style={{ backgroundColor: "#f7edd9", border: `1px solid ${HAIRLINE}`, borderRadius: 16 }}>
-            <div className="absolute" style={{ left: 24, top: 24, height: 18.23 }}>
-              <span className="absolute" style={{ left: 29, top: 3.1, width: 12, height: 12, borderRadius: 3, backgroundColor: "#8f6740" }} />
-              <span className="absolute whitespace-nowrap" style={{ left: 46, top: 0, fontSize: 15, lineHeight: "18.24px", color: "#6b5b47" }}>Valor del activo</span>
-              <span className="absolute" style={{ left: 204, top: 3.1, width: 12, height: 12, borderRadius: 3, backgroundColor: "#6d774a" }} />
-              <span className="absolute whitespace-nowrap" style={{ left: 221.41, top: 0, fontSize: 15, lineHeight: "18.24px", color: "#6b5b47" }}>Renta neta acumulada</span>
+          {/* Posición en el rango de precios de mercado */}
+          <Reveal left={0} top={300.01} width={1100} height={150} delay={0.32}>
+            <div className="relative size-full" style={{ backgroundColor: HUESO, border: `1px solid ${HAIRLINE}`, borderRadius: 14 }}>
+              <span className="absolute" style={{ left: 18, top: 18, fontSize: 20, lineHeight: "16.8px", color: SOMBRA }}>Posición en el rango de precios de mercado ($/m²)</span>
+              <div className="absolute" style={{ left: 18, top: 67 }}>
+                <Termo width={1061.95} pos={15.86} label="Este activo · $8,1M" min="$7,5M" max="Mercado remodelado $12M" delay={0.1} />
+              </div>
+              <span className="absolute" style={{ left: 11, top: 115, fontSize: 11.5, lineHeight: "17.28px", color: TOPO }}>Entramos por debajo del mercado: margen de valorización desde la compra.</span>
             </div>
-            <div className="absolute" style={{ left: 24, top: 51 }}><Proyeccion /></div>
-          </div>
-        </Reveal>
+          </Reveal>
 
-        <p className="absolute" style={{ left: 267, top: 607, width: 1255, fontSize: 25, lineHeight: "34px", color: "#6b5b47" }}>
-          Metodología: esta evaluación utiliza los supuestos de la microzona (precios, valorización y rentas). Cifras estimadas de referencia; no constituyen garantía de retorno.
-        </p>
-      </Band>
-
-      {/* ── Qué nos dice esta evaluación ── */}
-      <Band left={-1} width={1921} top={2556} height={511} bg={BROWN} corner="br" z={1}>
-        <h2 className="absolute font-medium" style={{ left: 295, top: 163, width: 1296, fontSize: 60, lineHeight: "38px", letterSpacing: -0.352, color: CREAM }}>Qué nos dice esta evaluación</h2>
-        <div className="absolute flex gap-[16px]" style={{ left: 295, top: 253, width: 1353, height: 182 }}>
-          {SAYS.map((s, i) => (
-            <Entra key={s.t} delay={0.04 + i * 0.08} className="relative" style={{ width: 326.25, height: 182, backgroundColor: "#f7edd9", border: `1px solid ${HAIRLINE}`, borderRadius: 14 }}>
-              <p className="absolute text-center font-medium" style={{ left: 20, right: 20, top: 25, fontSize: 25, lineHeight: "25px", letterSpacing: -0.176, color: "#2a241c" }}>{s.t}</p>
-              <p className="absolute text-center font-light" style={{ left: 20, right: 20, top: s.pTop + 29 - 19.2, fontSize: 20, lineHeight: "19.2px", color: "#6b5b47" }}>{s.p}</p>
-            </Entra>
-          ))}
+          {/* El botón que despliega la ficha técnica */}
+          <Entra delay={0.4} className="absolute" style={{ left: -7, top: 486, width: 1100 }}>
+            <div className="flex w-full justify-center">
+              <button
+                type="button"
+                onClick={onToggle}
+                aria-expanded={abierta}
+                className="ix-press flex items-center gap-[9px] font-semibold"
+                style={{ height: 49, padding: "0 24px", borderRadius: 999, backgroundColor: "#3d2c1e", fontSize: 14.4, color: ARENA }}
+              >
+                {abierta ? "Ocultar la ficha técnica" : "Ver ficha técnica completa"}
+                <motion.span className="flex shrink-0" animate={{ rotate: abierta ? 180 : 0 }} transition={{ duration: 0.4, ease: EASE }}>
+                  <IcChevron16 />
+                </motion.span>
+              </button>
+            </div>
+          </Entra>
         </div>
       </Band>
 
-      {/* ── Cierre ── */}
-      <Reveal left={102} top={3114} width={1749} height={422} delay={0.04}>
-        <div className="relative size-full overflow-hidden" style={{ backgroundColor: BROWN, borderRadius: 20 }}>
-          <div className="absolute" style={{ left: 796, top: -114, width: 1116, height: 622 }}>
-            <CanvasImage src={`${A}/ficha-cta.webp`} w={1116} />
-          </div>
-          <div
-            className="pointer-events-none absolute"
-            style={{ left: 676, top: 0, width: 336, height: 422, backgroundImage: "linear-gradient(90.155deg, rgb(73,33,0) 0.169%, rgb(73,33,0) 50%, rgba(73,33,0,0.85) 74.916%, rgba(73,33,0,0) 99.831%)" }}
-          />
+      {/* ── Ficha técnica completa ──────────────────────────────────────────
+          La caja envolvente no ocupa: sólo agrupa para que todo entre junto y
+          quede por debajo de la banda del resumen y por encima de nada. */}
+      {abierta && (
+        <motion.div
+          style={{ position: "absolute", left: 0, top: 0, width: 0, height: 0, zIndex: 13 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
+        >
+          {/* ── Rentabilidad detallada + Contexto de mercado ── */}
+          <Band left={-1} width={1921} top={1405} height={510} bg={BROWN} corner="br" z={17}>
+            <FtTitle left={COL} top={128}>Rentabilidad detallada</FtTitle>
+            <Mini left={COL} top={173} width={262} height={140} t="Gastos estimados anuales" v="$14M" pie="admin., predial, seguros" delay={0.06} />
+            <Mini
+              left={COL + 278} top={173} width={262} height={140}
+              t="TIR a 5 años" v="~12,5%" pie="efectivo anual" delay={0.12}
+              bg="linear-gradient(151.696deg, rgba(127,139,87,0.4) 0%, rgba(95,107,62,0.3) 100%)"
+            />
 
-          <h2 className="absolute font-semibold" style={{ left: 52, top: 79.81, width: 872, fontSize: 60, lineHeight: "44.93px", letterSpacing: -0.416, color: "#efe6d5" }}>Las buenas oportunidades no esperan</h2>
+            <FtTitle left={COL + 560} top={128}>Contexto de mercado</FtTitle>
+            <Reveal left={COL + 560} top={173} width={540} height={254} delay={0.1}>
+              <div className="relative size-full" style={{ backgroundColor: VELO, border: VELO_BORDE, borderRadius: 16 }}>
+                <span className="absolute" style={{ left: 22, right: 22, top: 24, fontSize: 15, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>Rango de arriendo mensual (320 m²)</span>
+                {/* 70 y no 55: la marca del termómetro cuelga 26 px por encima
+                    del carril y a 55 se comía el rótulo. */}
+                <div className="absolute" style={{ left: 22, top: 70 }}>
+                  <Termo
+                    width={496} pos={51.8} label="Mediana $18,6M" min="Mín $16M" max="Máx $21M"
+                    grad="linear-gradient(90deg, #8a9a5f 0%, #c9a877 100%)"
+                    mark={ARENA} labelColor={ARENA} endsColor="rgba(247,241,229,0.6)" delay={0.14}
+                  />
+                </div>
+                <div className="absolute" style={{ left: 22, top: 122, width: 496, height: 118, backgroundColor: VELO, border: VELO_BORDE, borderRadius: 12 }}>
+                  <span className="absolute" style={{ left: 20, right: 20, top: 17, fontSize: 15, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>Tasa de vacancia estimada</span>
+                  <Cifra v="~4%" dur={1} className="absolute whitespace-nowrap font-semibold" style={{ left: 20, top: 34, fontSize: 30, lineHeight: "43.2px", color: ARENA }} />
+                  <span className="absolute" style={{ left: 20, top: 80, fontSize: 11.5, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>de la zona</span>
+                </div>
+              </div>
+            </Reveal>
+          </Band>
 
-          {/* Tres cifras separadas por filetes verticales. */}
-          <img src={`${A}/ficha-ico-users.svg`} alt="" width={50} height={50} loading="lazy" decoding="async" className="absolute max-w-none" style={{ left: 27, top: 272 }} />
-          <Cifra v="3" dur={0.8} className="absolute whitespace-nowrap font-semibold" style={{ left: 94, top: 281, fontSize: 60, lineHeight: "36px", color: "#efe6d5" }} />
-          <span className="absolute" style={{ left: 92, top: 343.6, width: 185, fontSize: 18, lineHeight: "16.8px", color: "rgba(247,241,229,0.65)" }}>inversionistas evaluando</span>
+          {/* ── Composición del costo ── */}
+          <Band left={-1} width={1921} top={1715} height={719} bg={CREAM} corner="bl" z={16}>
+            <FtTitle left={COL} top={265} dark>Composición del costo</FtTitle>
 
-          <span className="absolute" style={{ left: 251, top: 267, width: 3, height: 111, backgroundColor: "#7f8b57" }} />
+            <Reveal left={COL} top={347} width={610.43} height={287.61} delay={0.04}>
+              <div className="relative size-full" style={{ backgroundColor: HUESO, border: `1px solid ${HAIRLINE}`, borderRadius: 16 }}>
+                <div className="absolute overflow-hidden" style={{ left: 22, top: 20 }}>
+                  <Cascada w={566.43} h={224.05} />
+                </div>
+              </div>
+            </Reveal>
 
-          <img src={`${A}/ficha-ico-shield.svg`} alt="" width={50} height={50} loading="lazy" decoding="async" className="absolute max-w-none" style={{ left: 288, top: 273 }} />
-          <span className="absolute whitespace-nowrap font-semibold" style={{ left: 343, top: 284, fontSize: 60, lineHeight: "36px", color: "#efe6d5" }}>
-            <Cifra v="96" />
-            <span className="font-light" style={{ fontSize: 40 }}>/100</span>
-          </span>
-          <span className="absolute whitespace-nowrap" style={{ left: 348, top: 342.1, fontSize: 18, lineHeight: "16.8px", color: "rgba(247,241,229,0.65)" }}>Score ZEQUARA</span>
+            <div className="absolute" style={{ left: COL + 638, top: 347, width: 469.57, height: 288.69 }}>
+              {[
+                { t: "Costo total (All-in)", v: "$3.450M", badge: "$10,8M / m²", vc: "#3d2c1e" },
+                { t: "Media mercado remodelado", v: "$3.776M", badge: "$11,8M / m²", vc: "#3d2c1e" },
+              ].map((c, i) => (
+                <Reveal key={c.t} left={i * 242.8} top={0} width={226.8} height={124.26} delay={0.08 + i * 0.07}>
+                  <div className="relative size-full" style={{ backgroundColor: HUESO, border: `1px solid ${HAIRLINE}`, borderRadius: 12 }}>
+                    <span className="absolute" style={{ left: 20, right: 20, top: 17, fontSize: 15, lineHeight: "17.28px", color: SOMBRA }}>{c.t}</span>
+                    <Cifra v={c.v} dur={1} className="absolute whitespace-nowrap font-semibold" style={{ left: 20, top: 34, fontSize: 28.8, lineHeight: "43.2px", color: c.vc }} />
+                    <span className="absolute flex items-center whitespace-nowrap font-semibold" style={{ left: 20, top: 82, height: 25, padding: "0 9px", borderRadius: 6, backgroundColor: "#e2e7d1", fontSize: 11.5, lineHeight: "17.28px", color: VERDE }}>{c.badge}</span>
+                  </div>
+                </Reveal>
+              ))}
 
-          <span className="absolute" style={{ left: 534, top: 267, width: 3, height: 111, backgroundColor: "#7f8b57" }} />
+              {[
+                { t: "Spread de valor", v: "+9%", bg: undefined as string | undefined },
+                { t: "Valor creado hoy", v: "+$326M", bg: "linear-gradient(154.622deg, rgb(226,231,209) 0%, rgb(215,221,196) 100%)" },
+              ].map((c, i) => (
+                <Reveal key={c.t} left={i * 242.8} top={138.26} width={226.8} height={98.99} delay={0.2 + i * 0.07}>
+                  <div className="relative size-full" style={{ backgroundColor: c.bg ? undefined : HUESO, backgroundImage: c.bg, border: `1px solid ${HAIRLINE}`, borderRadius: 12 }}>
+                    <span className="absolute" style={{ left: 20, right: 20, top: 17, fontSize: 15, lineHeight: "17.28px", color: SOMBRA }}>{c.t}</span>
+                    <Cifra v={c.v} dur={1} className="absolute whitespace-nowrap font-semibold" style={{ left: 20, top: 34, fontSize: 28.8, lineHeight: "43.2px", color: VERDE }} />
+                  </div>
+                </Reveal>
+              ))}
 
-          <img src={`${A}/ficha-ico-chart.svg`} alt="" width={50} height={50} loading="lazy" decoding="async" className="absolute max-w-none" style={{ left: 555, top: 270 }} />
-          <Cifra v="+$326M" className="absolute whitespace-nowrap font-semibold" style={{ left: 605, top: 284, fontSize: 60, lineHeight: "36px", color: "#efe6d5" }} />
-          <span className="absolute whitespace-nowrap" style={{ left: 605, top: 340.1, fontSize: 18, lineHeight: "16.8px", color: "rgba(247,241,229,0.65)" }}>valor creado hoy</span>
+              <div className="absolute flex gap-[10px]" style={{ left: 0, top: 251.25, width: 469.57 }}>
+                <span className="shrink-0" style={{ marginTop: 2, color: "#a57a4e" }}><IcInfo15 /></span>
+                <p className="font-light" style={{ fontSize: 12.5, lineHeight: "18.72px", color: SOMBRA }}>
+                  Precio de compra $2.600M · Remodelación $800M · Otros (notariales, transacción) $50M. Cifras de referencia.
+                </p>
+              </div>
+            </div>
+          </Band>
 
-          <a
-            href="/solicitud-acceso"
-            className="ix-press absolute flex items-center justify-center gap-[9px] font-semibold text-white"
-            style={{ left: 1033, top: 311, padding: "11px 20px 12px", borderRadius: 10, backgroundColor: "#7f8b57", fontSize: 20 }}
-          >
-            Quiero conocer esta oportunidad
-            <IcArrowRight className="shrink-0" />
-          </a>
-        </div>
-      </Reveal>
+          {/* ── Escenarios de TIR + Comparación vs. alternativas ── */}
+          <Band left={-1} width={1921} top={2375} height={511} bg={BROWN} corner="br" z={15}>
+            <FtTitle left={COL} top={132}>Escenarios de TIR</FtTitle>
+            <Reveal left={COL} top={177} width={540} height={238.99} delay={0.04}>
+              <div className="relative size-full" style={{ backgroundColor: VELO, border: VELO_BORDE, borderRadius: 16 }}>
+                <div className="absolute flex items-end gap-[22px]" style={{ left: 33, top: 25.99, height: 190 }}>
+                  {ESCENARIOS.map((e, i) => (
+                    <div key={e.t} className="flex flex-col items-center justify-end" style={{ width: 143.33, height: 190 }}>
+                      <Cifra v={e.v} dur={1} className="whitespace-nowrap font-bold" style={{ paddingBottom: 8, fontSize: 25, lineHeight: "31.2px", color: CREAM }} />
+                      <Crece
+                        delay={0.1 + i * 0.1}
+                        dur={0.75}
+                        className="w-full"
+                        style={{ height: e.h, borderTopLeftRadius: 8, borderTopRightRadius: 8, backgroundImage: `linear-gradient(180deg, ${e.from} 0%, ${e.to} 100%)` }}
+                      />
+                      <span className="whitespace-nowrap font-medium" style={{ paddingTop: 9, fontSize: 15, lineHeight: "18.24px", color: CREAM }}>{e.t}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+
+            <FtTitle left={COL + 560} top={132}>Comparación vs. alternativas</FtTitle>
+            <Reveal left={COL + 560} top={177} width={540} height={241.73} delay={0.1}>
+              <div className="relative size-full" style={{ backgroundColor: VELO, border: VELO_BORDE, borderRadius: 16 }}>
+                <div className="absolute" style={{ left: 23, top: 25.99, width: 494, height: 160 }}>
+                  <Fila cells={["Alternativa", "Retorno anual"]} cols={[304.05, 189.95]} top={0} alto={35.84} cabecera dark />
+                  {ALTERNATIVAS.map((a, i) => (
+                    <Fila key={a.t} cells={[a.t, a.v]} cols={[304.05, 189.95]} top={35.84 + i * 41.39} alto={41.39} dark delay={0.1 + i * 0.07} />
+                  ))}
+                </div>
+                <div className="absolute flex gap-[10px]" style={{ left: 23, right: 23, top: 200 }}>
+                  <span className="shrink-0" style={{ marginTop: 2, color: "#a57a4e" }}><IcInfo15 /></span>
+                  <p className="font-light" style={{ fontSize: 12.5, lineHeight: "18.72px", color: "rgba(247,241,229,0.6)" }}>
+                    La TIR incluye renta y valorización; el CDT es renta fija sin activo subyacente.
+                  </p>
+                </div>
+              </div>
+            </Reveal>
+          </Band>
+
+          {/* ── Proyección patrimonial detallada ── */}
+          <Band left={-1} width={1921} top={2886} height={516} bg={CREAM} corner="bl" z={14}>
+            <FtTitle left={COL} top={69} dark>Proyección patrimonial detallada</FtTitle>
+
+            <Reveal left={COL} top={144} width={610.43} height={330.69} delay={0.04}>
+              <div className="relative size-full" style={{ backgroundColor: HUESO, border: `1px solid ${HAIRLINE}`, borderRadius: 16 }}>
+                <div className="absolute flex gap-[18px]" style={{ left: 22, top: 22, height: 17.77 }}>
+                  <span className="flex items-center gap-[7px]">
+                    <span style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: "#8f6740" }} />
+                    <span style={{ fontSize: 11.8, lineHeight: "17.76px", color: SOMBRA }}>Valor del activo</span>
+                  </span>
+                  <span className="flex items-center gap-[7px]">
+                    <span style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: "#7d8a54" }} />
+                    <span style={{ fontSize: 11.8, lineHeight: "17.76px", color: SOMBRA }}>Renta neta acumulada</span>
+                  </span>
+                </div>
+                {/* El gráfico es el mismo de siempre, a escala: el frame lo
+                    repite tal cual dentro de una tarjeta más estrecha. */}
+                <div className="absolute overflow-hidden" style={{ left: 22, top: 46, width: 566.43, height: 224.05 }}>
+                  <div style={{ width: 968, height: 289, transform: "scale(0.5851)", transformOrigin: "top left" }}>
+                    <Proyeccion />
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal left={COL + 630.43} top={144} width={469.57} height={330.18} delay={0.1}>
+              <div className="relative size-full" style={{ backgroundColor: HUESO, border: `1px solid ${HAIRLINE}`, borderRadius: 16 }}>
+                <div className="absolute" style={{ left: 22, top: 22, width: 425.57 }}>
+                  <Fila cells={TABLA_HEAD} cols={TABLA_COLS} top={0} alto={35.84} cabecera />
+                  {TABLA.map((r, i) => (
+                    <Fila key={r[0]} cells={r} cols={TABLA_COLS} top={35.84 + i * 39.78} alto={39.78} resalte={i === TABLA.length - 1} delay={0.08 + i * 0.05} />
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+          </Band>
+
+          {/* ── Liquidez + Costos de salida ── */}
+          <Band left={-1} width={1921} top={3402} height={528} bg={BROWN} corner="br" z={13}>
+            <FtTitle left={COL} top={80}>Liquidez</FtTitle>
+            {LIQUIDEZ.map((m, i) => (
+              <Mini key={m.t} left={COL + i * 277} top={173} width={263} height={98.77} t={m.t} v={m.v} delay={0.06 + i * 0.07} />
+            ))}
+
+            <FtTitle left={COL + 560} top={80}>Costos de salida</FtTitle>
+            {SALIDA.map((m, i) => (
+              <Mini key={m.t} left={COL + 560 + i * 277} top={173} width={263} height={138.3} t={m.t} v={m.v} pie={m.pie} delay={0.12 + i * 0.07} />
+            ))}
+
+            <p className="absolute font-light" style={{ left: COL, top: 339, width: 1100, fontSize: 12.5, lineHeight: "18.72px", color: "rgba(247,241,229,0.6)" }}>
+              Cifras estimadas de referencia sobre supuestos de la microzona; no constituyen garantía de retorno.
+            </p>
+          </Band>
+        </motion.div>
+      )}
 
       {/* ── Footer ── */}
-      <div className="absolute" style={{ left: 0, top: 3583, width: 1922, height: 364, zIndex: 6 }}><Footer /></div>
+      <div className="absolute" style={{ left: 0, top: abierta ? 3801 : 1483, width: 1922, height: 364, zIndex: 21 }}><Footer /></div>
     </div>
   );
 }

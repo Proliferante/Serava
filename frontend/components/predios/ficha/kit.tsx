@@ -394,22 +394,110 @@ const HERO_SPECS = [
   { Ic: IcCar, v: "4", l: "Parqueaderos", w: 76.91 },
 ];
 
-/** Bajada del hero. Cada pestaña la trae con su propio cuerpo y encuadre. */
-type HeroSub = {
-  text: string;
-  /** Desplazamiento desde la caja de contenido; 296 es donde la deja el frame. */
-  top?: number;
-  width?: number;
-  fontSize?: number;
-  lineHeight?: number;
-  color?: string;
-};
+/* ── Termómetro de precio ──────────────────────────────────────────────────
+   La franja que sitúa una cifra dentro del rango de su microzona.
+
+   El rediseño la estrena en el hero de las tres pestañas —donde ocupa el sitio
+   que tenían la bajada y el botón de galería— y la repite, más fina, dentro de
+   las tarjetas de Finanzas. De ahí que el alto, el degradado y las tintas sean
+   datos y no constantes.
+
+   `pos` va en porcentaje del ancho porque es lo que dice el diseño; la marca
+   es un filete de 2,3 px y el rótulo se centra sobre ella. */
+
+export function Termo({
+  width, pos, label, min, max,
+  trackH = 12,
+  grad = "linear-gradient(90deg, #8a9a5f 0%, #c9a877 50%, #b5542f 100%)",
+  mark = "#3a2c1c", labelColor = "#3a2c1c", labelSize = 10.6,
+  endsColor = "#9d8b70", endsSize = 10.6, gap = 8, delay = 0,
+}: {
+  /** En px en el lienzo; "100%" en la vista fluida. */
+  width: number | string;
+  /** Posición de la marca, en % del ancho. */
+  pos: number;
+  label: string;
+  min: string;
+  max: string;
+  trackH?: number;
+  grad?: string;
+  mark?: string;
+  labelColor?: string;
+  labelSize?: number;
+  endsColor?: string;
+  endsSize?: number;
+  gap?: number;
+  delay?: number;
+}) {
+  /* La marca mide 22 px pase lo que pase: sobresale del carril fino y queda a
+     ras del grueso, tal cual el frame. */
+  const markTop = (trackH - 22) / 2;
+  return (
+    <div className="relative" style={{ width, height: trackH + gap + 16 }}>
+      {/* El carril se llena de izquierda a derecha: es la lectura del dato. */}
+      <Barre delay={delay} dur={1} className="absolute" style={{ left: 0, top: 0, width, height: trackH, borderRadius: 999, backgroundImage: grad }} />
+
+      {/* La marca asoma cuando el barrido ya ha pasado por ella. */}
+      <motion.span
+        className="absolute block"
+        style={{ left: `${pos}%`, top: markTop, width: 2.3, height: 22, borderRadius: 2, backgroundColor: mark }}
+        initial={{ opacity: 0, scaleY: 0 }}
+        whileInView={{ opacity: 1, scaleY: 1 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: 0.35, delay: delay + 0.45, ease: EASE }}
+      />
+      <motion.span
+        className="absolute -translate-x-1/2 whitespace-nowrap text-center font-semibold"
+        style={{ left: `${pos}%`, top: markTop - 21, fontSize: labelSize, lineHeight: "15.84px", color: labelColor }}
+        initial={{ opacity: 0, y: 6 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: 0.4, delay: delay + 0.55, ease: EASE }}
+      >
+        {label}
+      </motion.span>
+
+      <motion.div
+        className="absolute"
+        style={{ left: 0, right: 0, top: trackH + gap, height: 16 }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: 0.5, delay: delay + 0.2, ease: EASE }}
+      >
+        <span className="absolute left-0 top-0 whitespace-nowrap" style={{ fontSize: endsSize, lineHeight: "15.84px", color: endsColor }}>{min}</span>
+        <span className="absolute right-0 top-0 whitespace-nowrap" style={{ fontSize: endsSize, lineHeight: "15.84px", color: endsColor }}>{max}</span>
+      </motion.div>
+    </div>
+  );
+}
+
+/** El termómetro tal y como va en el hero: carril grueso y todo en crema. */
+export function TermoHero({ left, top }: { left: number; top: number }) {
+  return (
+    <div className="absolute" style={{ left, top }}>
+      <Termo
+        width={543}
+        pos={15.84}
+        label="Este activo · $8,1M"
+        min="$7,5M"
+        max="Mercado remodelado $12M"
+        trackH={22}
+        mark={CREAM}
+        labelColor={CREAM}
+        labelSize={15}
+        endsColor={CREAM}
+        endsSize={15}
+        delay={0.25}
+      />
+    </div>
+  );
+}
 
 export function HeroFicha({
-  height, contentTop, contentLeft = 57, veil, sidebar, title, sub, cta,
+  contentTop, contentLeft = 57, veil, sidebar, title, specs, termo,
   photo = true, priority = false, children,
 }: {
-  height: number;
   contentTop: number;
   /** La pestaña de Transformación arranca la caja de contenido pegada al borde. */
   contentLeft?: number;
@@ -417,8 +505,10 @@ export function HeroFicha({
   veil: { top: number; height: number };
   sidebar: { left: number; top: number };
   title?: ReactNode;
-  sub?: HeroSub;
-  cta?: { label: string; href: string };
+  /** Fila de metros, habitaciones, baños y parqueaderos, en coordenadas del hero. */
+  specs: { left: number; top: number };
+  /** Termómetro de precio, en coordenadas del hero. */
+  termo: { left: number; top: number };
   /** Transformación cambia la foto por el comparador antes/después. */
   photo?: boolean;
   priority?: boolean;
@@ -442,19 +532,9 @@ export function HeroFicha({
         {title ?? <>Un clásico con gran<br />potencial de valor</>}
       </h1>
 
-      {sub && (
-        <p
-          className="absolute font-light"
-          style={{
-            left: contentLeft + 100, top: contentTop + (sub.top ?? 296), width: sub.width ?? 433.67,
-            fontSize: sub.fontSize ?? 20, lineHeight: `${sub.lineHeight ?? 24}px`, color: sub.color ?? "rgba(247,241,229,0.82)",
-          }}
-        >
-          {sub.text}
-        </p>
-      )}
+      <TermoHero left={termo.left} top={termo.top} />
 
-      <div className="absolute flex gap-[28px]" style={{ left: contentLeft + 104, top: contentTop + height / 2 + 121, height: 41.5 }}>
+      <div className="absolute flex gap-[28px]" style={{ left: specs.left, top: specs.top, height: 41.5 }}>
         {HERO_SPECS.map(({ Ic, v, l, w }) => (
           <div key={l} className="flex items-center gap-[11px]">
             <Ic className="shrink-0" style={{ color: "#c9a877" }} />
@@ -465,17 +545,6 @@ export function HeroFicha({
           </div>
         ))}
       </div>
-
-      {cta && (
-        <a
-          href={cta.href}
-          className="ix-press absolute flex items-center"
-          style={{ left: contentLeft + 100, top: contentTop + 468, width: 197, height: 55, borderRadius: 10, backgroundColor: "#7f8b57", border: "1px solid rgba(60,45,30,0.13)" }}
-        >
-          <span className="absolute font-semibold" style={{ left: 31, fontSize: 20, lineHeight: "20.4px", color: "rgba(247,241,229,0.95)" }}>{cta.label}</span>
-          <IcArrowRight className="absolute text-white" style={{ left: 168 }} />
-        </a>
-      )}
 
       {children}
 
