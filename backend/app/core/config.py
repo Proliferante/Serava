@@ -15,6 +15,9 @@ Variables (ver backend/.env.example):
                       llamar a la API. Por defecto sólo el localhost del
                       frontend en desarrollo.
     METROCUADRADO_API_KEY  llave del portal, para el scraping.
+    SUPABASE_URL, SUPABASE_SERVICE_KEY, SUPABASE_BUCKET
+                      almacén de las fotos de la ficha. Opcionales: sin ellas
+                      todo funciona menos subir fotos, que lo dice.
 """
 
 import os
@@ -83,6 +86,27 @@ DOCS_ABIERTAS = os.environ.get("DOCS_ABIERTAS", "").strip() in ("1", "true", "s�
 
 # --- scraping --------------------------------------------------------------
 METROCUADRADO_API_KEY = os.environ.get("METROCUADRADO_API_KEY", "").strip()
+
+
+# --- almacenamiento de fotos (Supabase Storage) ----------------------------
+# Las fotos de la ficha del predio. No van a la base ni al disco del
+# servidor: en Render el disco es efímero y se perderían en cada despliegue.
+#
+# SUPABASE_SERVICE_KEY es la clave `service_role`, no la `anon`: subir al
+# bucket exige saltarse las políticas de fila, y eso sólo puede hacerlo la de
+# servicio. Por lo mismo NUNCA sale de aquí hacia el navegador — el frontend
+# sube al backend y el backend a Supabase.
+#
+# Si faltan, la subida de fotos responde con un mensaje claro y el resto de la
+# consola sigue funcionando: no se tumba el arranque por esto.
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip().rstrip("/")
+SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
+SUPABASE_BUCKET = os.environ.get("SUPABASE_BUCKET", "fichas").strip()
+
+# Tope por foto. Las del hero salen de una cámara y llegan a 8-10 MB; por
+# encima de 12 casi siempre es un archivo sin comprimir que no aporta nada y
+# sí tarda un minuto en subir.
+FOTO_MAXIMA_MB = int(os.environ.get("FOTO_MAXIMA_MB", "12"))
 
 
 # --- roles -----------------------------------------------------------------

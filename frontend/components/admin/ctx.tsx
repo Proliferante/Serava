@@ -25,6 +25,17 @@ type Ctx = {
   /** Abre el modal. El nodo se dibuja dentro; `cierra` lo cierra. */
   modal: (titulo: string, contenido: (cierra: () => void) => ReactNode) => void;
   cierraModal: () => void;
+  /**
+   * Abre el armado de la ficha de un inmueble.
+   *
+   * La vista necesita saber sobre QUÉ inmueble trabaja, y `go()` sólo lleva
+   * la vista. Podría ir en la URL, pero la consola entera es una sola página
+   * sin rutas: meter una aquí obligaría a inventar el enrutado para una
+   * pantalla. El inmueble viaja por aquí y se olvida al salir.
+   */
+  abrirFicha: (link: string, titulo: string) => void;
+  /** Sobre qué inmueble está trabajando la vista de ficha. */
+  fichaAbierta: { link: string; titulo: string } | null;
 };
 
 const C = createContext<Ctx | null>(null);
@@ -54,6 +65,7 @@ export function ConsolaProvider({
 }) {
   const [aviso, setAviso] = useState<string | null>(null);
   const [modalCfg, setModalCfg] = useState<{ titulo: string; render: (c: () => void) => ReactNode } | null>(null);
+  const [fichaAbierta, setFichaAbierta] = useState<{ link: string; titulo: string } | null>(null);
   const reloj = useRef<number | null>(null);
 
   const av = useCallback((m: string) => {
@@ -66,6 +78,12 @@ export function ConsolaProvider({
 
   const go = useCallback((v: VistaKey) => {
     setVista(v);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [setVista]);
+
+  const abrirFicha = useCallback((link: string, titulo: string) => {
+    setFichaAbierta({ link, titulo });
+    setVista("ficha");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [setVista]);
 
@@ -84,7 +102,7 @@ export function ConsolaProvider({
   }, [modalCfg, cierraModal]);
 
   return (
-    <C.Provider value={{ vista, go, av, modal, cierraModal }}>
+    <C.Provider value={{ vista, go, av, modal, cierraModal, abrirFicha, fichaAbierta }}>
       {children}
 
       {modalCfg && (

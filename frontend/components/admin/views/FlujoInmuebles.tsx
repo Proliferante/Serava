@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { MCuerpo, MPie, useConsola } from "@/components/admin/ctx";
 import { useSesion } from "@/components/admin/sesion";
-import { TRANSFORMACIONES, tituloDelEnlace } from "@/components/admin/data";
+import { tituloDelEnlace } from "@/components/admin/data";
 import { Card, Hint, IcoCheck, IcoDown, IcoExt, MkChip, SecTitle, Tabla } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -21,7 +21,15 @@ import { Card, Hint, IcoCheck, IcoDown, IcoExt, MkChip, SecTitle, Tabla } from "
 
    El recorrido: preselección → visita (agendada) → publicado (completado
    tras la visita). En cualquier punto se puede descartar, y el descarte
-   queda con su motivo en la pestaña de registro. Eso es lo que hace que un
+   queda con su motivo en la pestaña de registro.
+
+   ANTES DE PUBLICAR SE ARMA LA FICHA
+   "Completar" era un modal de seis campos que cambiaba la etapa a publicado,
+   y publicar no llenaba nada: la ficha que ve el inversionista estaba escrita
+   a mano en el código del sitio. Ahora ese botón abre `ArmarFicha`, una
+   pantalla con las tres pestañas de la ficha convertidas en formulario —con
+   sus fotos— y es ella la que llama a `/completar` cuando está lo mínimo.
+   Desde Publicados se vuelve a entrar para corregir. Eso es lo que hace que un
    inmueble descartado no vuelva a aparecer —ni aquí ni en la extracción—: el
    estado vive en `seguimiento_propiedades`, que el pipeline lee pero nunca
    reconstruye.
@@ -252,54 +260,6 @@ function FormContacto({ x, onGuardar, onCancelar }: {
   );
 }
 
-function FormCompletar({ x, onPublicar, onCancelar }: {
-  x: Inmueble;
-  onPublicar: (d: { titulo: string; habitaciones: string; banos: string; area: string; tipo: string; notas: string }) => void;
-  onCancelar: () => void;
-}) {
-  // Se propone el título que ya se está viendo en la tabla —el del anuncio, o
-  // el que se saca de su enlace— para no obligar a reescribirlo. Es editable:
-  // lo que quede aquí es lo que gana de aquí en adelante.
-  const [titulo, setTitulo] = useState(x.titulo || tituloDelEnlace(x.link) || "");
-  const [hab, setHab] = useState(x.habitaciones != null ? String(x.habitaciones) : "");
-  const [ban, setBan] = useState(x.banos != null ? String(x.banos) : "");
-  const [area, setArea] = useState(
-    x.area_confirmada_m2 != null ? String(x.area_confirmada_m2)
-    : x.area_m2 != null ? String(x.area_m2) : "",
-  );
-  const [tipo, setTipo] = useState(TRANSFORMACIONES[0]);
-  const [notas, setNotas] = useState("");
-  return (
-    <>
-      <MCuerpo>
-        <label htmlFor="c-t">Título del inmueble</label>
-        <input className="t" id="c-t" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
-        <label htmlFor="c-hab">Habitaciones</label>
-        <input className="t" id="c-hab" type="number" placeholder="3" value={hab} onChange={(e) => setHab(e.target.value)} />
-        <label htmlFor="c-ban">Baños</label>
-        <input className="t" id="c-ban" type="number" placeholder="3" value={ban} onChange={(e) => setBan(e.target.value)} />
-        <label htmlFor="c-m2">Área confirmada (m²)</label>
-        <input className="t" id="c-m2" type="number" value={area} onChange={(e) => setArea(e.target.value)} />
-        <label htmlFor="c-tr">Tipo de transformación</label>
-        <select className="t" id="c-tr" value={tipo} onChange={(e) => setTipo(e.target.value)}>
-          {TRANSFORMACIONES.map((o) => <option key={o}>{o}</option>)}
-        </select>
-        <label htmlFor="c-notas">Notas de la visita</label>
-        <textarea className="t" id="c-notas" placeholder="Estado, hallazgos, potencial…" value={notas} onChange={(e) => setNotas(e.target.value)} />
-      </MCuerpo>
-      <MPie>
-        <button type="button" className="btn btn-ghost" onClick={onCancelar}>Cancelar</button>
-        <button
-          type="button" className="btn btn-primary"
-          onClick={() => onPublicar({ titulo, habitaciones: hab, banos: ban, area, tipo, notas })}
-        >
-          <IcoCheck />Publicar
-        </button>
-      </MPie>
-    </>
-  );
-}
-
 /** Modal de descarte: el motivo es obligatorio y queda en la base. */
 function FormDescartar({ x, etiqueta, onConfirmar, onCancelar }: {
   x: Inmueble; etiqueta: string;
@@ -335,7 +295,7 @@ function FormDescartar({ x, etiqueta, onConfirmar, onCancelar }: {
 /* ── Vista ───────────────────────────────────────────────────────────────── */
 
 export default function FlujoInmuebles() {
-  const { av, go, modal } = useConsola();
+  const { av, go, abrirFicha, modal } = useConsola();
   const { pedir } = useSesion();
 
   const [panel, setPanel] = useState<PanelKey>("p1");
@@ -459,25 +419,11 @@ export default function FlujoInmuebles() {
     ));
   };
 
-  const completar = (x: Inmueble) => {
-    modal("Completar información · " + x.zona, (cierra) => (
-      <FormCompletar
-        x={x} onCancelar={cierra}
-        onPublicar={async (d) => {
-          cierra();
-          await accion("/api/admin/flujo/completar", {
-            link: x.link,
-            titulo: d.titulo || null,
-            habitaciones: d.habitaciones ? Number(d.habitaciones) : null,
-            banos: d.banos ? Number(d.banos) : null,
-            area_confirmada_m2: d.area ? Number(d.area) : null,
-            tipo_transformacion: d.tipo,
-            notas_visita: d.notas || null,
-          }, "Inmueble publicado", "p3");
-        }}
-      />
-    ));
-  };
+  /* Publicar ya no es rellenar seis campos: es armar la ficha entera. Esta
+     pantalla no publica — abre la que lo hace, y es ella quien llama a
+     `/completar` cuando el contenido mínimo está escrito. */
+  const armarFicha = (x: Inmueble) =>
+    abrirFicha(x.link, x.titulo || tituloDelEnlace(x.link) || "(sin título)");
 
   const automatizar = () => {
     modal("Automatización de contacto", (cierra) => (
@@ -759,8 +705,8 @@ export default function FlujoInmuebles() {
                       <td><Url x={x} /></td>
                       <td>
                         <div className="tacts-wrap">
-                          <button type="button" className="btn btn-primary btn-mini" onClick={() => completar(x)}>
-                            <IcoCheck />Continúa · completar
+                          <button type="button" className="btn btn-primary btn-mini" onClick={() => armarFicha(x)}>
+                            <IcoCheck />Continúa · armar ficha
                           </button>
                           <button
                             type="button" className="btn btn-ghost btn-mini"
@@ -788,7 +734,7 @@ export default function FlujoInmuebles() {
                 <thead>
                   <tr>
                     <th>Inmueble</th><th className="num">Precio</th><th className="num">m²</th>
-                    <th>Estado</th><th style={{ textAlign: "right" }}>Publicación</th>
+                    <th>Estado</th><th style={{ textAlign: "right" }}>Ficha</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -798,8 +744,16 @@ export default function FlujoInmuebles() {
                       <td className="num">{precio(x)}</td>
                       <td className="num">{x.area_confirmada_m2 ?? x.area_m2 ?? "—"}</td>
                       <td><span className="est e-pub">Publicado</span></td>
-                      <td style={{ textAlign: "right" }}>
-                        <Url x={x} texto="Ver original" />
+                      <td>
+                        {/* Publicado no es definitivo: llegan fotos mejores, la
+                            valoración se revisa, el alcance cambia. Se vuelve a
+                            entrar por aquí. */}
+                        <div className="tacts-wrap" style={{ justifyContent: "flex-end" }}>
+                          <button type="button" className="btn btn-ghost btn-mini" onClick={() => armarFicha(x)}>
+                            Editar ficha
+                          </button>
+                          <Url x={x} texto="Ver original" />
+                        </div>
                       </td>
                     </tr>
                   ))}

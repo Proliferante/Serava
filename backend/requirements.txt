@@ -12,6 +12,11 @@ psycopg2-binary
 sqlalchemy
 python-dotenv
 
+# Subida de las fotos de la ficha del predio (app/api/flujo.py). FastAPI lo
+# exige para leer `multipart/form-data`: sin él, el endpoint ni siquiera se
+# registra y el arranque falla con un RuntimeError.
+python-multipart
+
 # --- sesión y usuarios internos (app/api/auth.py, app/core/security.py) ---
 # passlib con bcrypt para las contraseñas. bcrypt se fija por debajo de 4.1
 # porque a partir de ahí passlib 1.7.4 no puede leer su número de versión y

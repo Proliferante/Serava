@@ -498,3 +498,68 @@
 @media(prefers-reduced-motion:reduce){
   .adm *{transition:none!important;animation:none!important;}
 }
+
+/* ── Armar la ficha ────────────────────────────────────────────────────────
+   La pantalla del flujo donde se rellena lo que verá el inversionista. Es el
+   único formulario largo de la consola: el resto son modales de cinco campos.
+   De ahí que tenga rejilla propia —dos columnas en escritorio, una en
+   tablet— y que las fotos se vean de verdad y no como un nombre de archivo:
+   quien las sube necesita comprobar el encuadre, que es justo lo que se
+   equivoca. */
+.adm .fic-volver{background:none;border:0;padding:0;font:inherit;color:var(--mocha);cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+.adm .fic-volver:hover{color:var(--espresso2);}
+.adm .fic-volver svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;}
+.adm .fic-acciones{display:flex;gap:9px;flex-wrap:wrap;}
+
+.adm .fic-cab{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+.adm .fic-cab b{display:block;font-size:.98rem;color:var(--espresso2);}
+.adm .fic-cab .urllink{font-size:.78rem;}
+.adm .fic-avance{display:flex;align-items:center;gap:10px;font-size:.78rem;color:var(--mocha);}
+.adm .fic-avance .barra{display:block;width:160px;height:7px;border-radius:999px;background:var(--cream);overflow:hidden;}
+.adm .fic-avance .barra span{display:block;height:100%;background:var(--sage);border-radius:999px;transition:width .35s ease;}
+.adm .fic-avance .pct{font-weight:700;color:var(--sage-deep);}
+
+.adm .fic-nota{font-size:.8rem;font-weight:300;color:var(--mocha);line-height:1.5;margin:-6px 0 16px;}
+
+.adm .fic-campos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 18px;}
+.adm .fic-campo.ancho{grid-column:1/-1;}
+.adm .fic-req{font-weight:500;color:var(--terra);text-transform:none;letter-spacing:0;}
+.adm .fic-ayuda{font-size:.74rem;font-weight:300;color:var(--mocha);margin-top:5px;line-height:1.45;}
+/* La propuesta del anuncio. Va debajo del control y no dentro: dentro
+   parecería un valor ya escrito, y no lo es hasta que alguien lo acepta. */
+.adm .fic-sug{margin-top:6px;background:rgba(127,139,87,.1);border:1px solid rgba(127,139,87,.3);color:var(--sage-deep);font-family:inherit;font-size:.73rem;border-radius:7px;padding:4px 9px;cursor:pointer;transition:background .2s;}
+.adm .fic-sug:hover{background:rgba(127,139,87,.2);}
+.adm .fic-sug b{font-weight:600;}
+
+.adm .fic-lineas{display:flex;flex-direction:column;gap:7px;align-items:flex-start;}
+.adm .fic-linea{display:flex;align-items:center;gap:9px;width:100%;}
+.adm .fic-linea .n{flex:none;width:19px;text-align:right;font-size:.72rem;color:var(--caramel);font-weight:600;}
+.adm .fic-quita{flex:none;background:none;border:0;padding:5px;cursor:pointer;color:var(--mocha);opacity:.55;transition:opacity .2s,color .2s;}
+.adm .fic-quita:hover{opacity:1;color:var(--terra);}
+.adm .fic-quita svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;display:block;}
+
+.adm .fic-rejilla{display:grid;gap:6px;align-items:center;}
+.adm .fic-rejilla .th{font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;color:var(--caramel);font-weight:600;padding-bottom:2px;}
+.adm .fic-rejilla .t{padding:8px 10px;font-size:.84rem;}
+.adm .fic-rejilla-mas{grid-column:1/-1;justify-self:start;margin-top:4px;}
+
+.adm .fic-fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line);}
+.adm .fic-foto-marco{position:relative;border-radius:12px;overflow:hidden;background:var(--paper);border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;}
+.adm .fic-foto-marco img{width:100%;height:100%;object-fit:cover;display:block;}
+.adm .fic-foto-vacia{display:flex;flex-direction:column;align-items:center;gap:7px;font-size:.74rem;color:var(--mocha);font-weight:300;}
+.adm .fic-foto-vacia svg{width:26px;height:26px;stroke:var(--caramel);fill:none;stroke-width:1.6;opacity:.7;}
+.adm .fic-foto-velo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(34,24,18,.55);color:var(--ivory);font-size:.78rem;font-weight:600;}
+.adm .fic-foto-pie{margin-top:9px;}
+.adm .fic-foto-pie b{display:block;font-size:.8rem;color:var(--espresso2);font-weight:600;}
+.adm .fic-foto-pie small{display:block;font-size:.72rem;color:var(--mocha);font-weight:300;line-height:1.45;margin-top:3px;}
+.adm .fic-foto-acc{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap;}
+
+.adm .fic-falta{margin:0;padding-left:18px;font-size:.84rem;color:var(--mocha);font-weight:300;line-height:1.7;}
+.adm .fic-falta li::marker{color:var(--terra);}
+
+@media(max-width:900px){
+  .adm .fic-campos{grid-template-columns:1fr;}
+  /* La rejilla de la proyección son cinco columnas: a esta anchura se lee
+     mejor desplazándola que aplastada a treinta píxeles por celda. */
+  .adm .fic-rejilla{overflow-x:auto;}
+}

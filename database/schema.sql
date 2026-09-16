@@ -212,3 +212,43 @@ CREATE TABLE IF NOT EXISTS inmueble_detalle (
     actualizado_en      TIMESTAMPTZ NOT NULL DEFAULT now(),
     actualizado_por     TEXT
 );
+
+
+-- ───────────────────────────────────────────────────────────────────────────
+-- 5. LA FICHA DEL PREDIO — lo que se arma antes de publicar
+-- ───────────────────────────────────────────────────────────────────────────
+--
+-- Hasta aquí, "completar" guardaba seis campos y cambiaba la etapa a
+-- 'publicado'. Pero la ficha que ve el inversionista —sus tres pestañas:
+-- oportunidad, finanzas y transformación— tiene más de cien datos, y no
+-- había dónde escribirlos: el sitio los llevaba fijos en el código.
+--
+-- POR QUÉ UN JSONB Y NO CIEN COLUMNAS
+-- Porque el contenido de la ficha es del diseño, no del dominio, y el
+-- diseño se mueve: en la última revisión de Figma la pestaña de finanzas
+-- se partió en dos y la de oportunidad perdió dos tarjetas. Una columna por
+-- campo significa una migración cada vez que el diseño respira, y una
+-- pantalla que hay que volver a cablear entera.
+--
+-- Lo que SÍ sigue en columnas propias es lo que se consulta, se filtra o se
+-- ordena —título, habitaciones, baños, área—: eso es dominio y ya estaba
+-- arriba. `ficha` guarda el relleno.
+--
+-- La forma del JSON la define el esquema del frontend
+-- (components/admin/ficha/esquema.ts): un objeto plano de clave → valor,
+-- donde la clave es la del campo en el esquema. Plano a propósito: así
+-- añadir un campo es añadir una clave, y leer uno viejo que ya no está en
+-- el esquema no rompe nada.
+
+ALTER TABLE inmueble_detalle
+    ADD COLUMN IF NOT EXISTS ficha            JSONB,
+    ADD COLUMN IF NOT EXISTS ficha_fotos      JSONB,
+    ADD COLUMN IF NOT EXISTS ficha_publicada  BOOLEAN NOT NULL DEFAULT FALSE,
+    ADD COLUMN IF NOT EXISTS ficha_guardada_en  TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS ficha_guardada_por TEXT;
+
+-- `ficha_fotos` va aparte de `ficha` y no dentro porque las dos se escriben
+-- en momentos distintos: el formulario guarda el texto cuando se pulsa
+-- Guardar, y una foto se sube en cuanto se elige. Mezclarlas obligaría a
+-- reescribir todo el bloque en cada subida, y dos personas trabajando a la
+-- vez sobre el mismo inmueble se pisarían el texto del otro.

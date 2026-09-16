@@ -6,6 +6,7 @@ import AvisoPantalla from "@/components/responsive/AvisoPantalla";
 import { ConsolaProvider } from "@/components/admin/ctx";
 import { puedeVer, useSesion } from "@/components/admin/sesion";
 import { PREDIOS_SEED, type Predio, type VistaKey } from "@/components/admin/data";
+import ArmarFicha from "@/components/admin/views/ArmarFicha";
 import Arquitectura from "@/components/admin/views/Arquitectura";
 import Comercial from "@/components/admin/views/Comercial";
 import Comite from "@/components/admin/views/Comite";
@@ -260,6 +261,7 @@ export default function AdminConsole() {
                   {vista === "equipo" && <Usuarios />}
                   {vista === "cuenta" && <MiCuenta />}
                   {vista === "gestion" && <GestionPredio />}
+                  {vista === "ficha" && <ArmarFicha />}
                 </>
               )}
             </div>

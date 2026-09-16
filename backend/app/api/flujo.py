@@ -8,6 +8,10 @@ Las pantallas del flujo de inmuebles, montado en /api/admin/flujo.
     POST /api/admin/flujo/decidir           continúa / no continúa / no disponible
     POST /api/admin/flujo/visita            agendar visita
     POST /api/admin/flujo/completar         completar tras la visita y publicar
+    GET  /api/admin/flujo/ficha             la ficha que se está armando
+    POST /api/admin/flujo/ficha             guardar el borrador de la ficha
+    POST /api/admin/flujo/ficha/foto        subir una foto de la ficha
+    POST /api/admin/flujo/ficha/foto/quitar quitar una foto de la ficha
 
 DÓNDE EMPIEZA EL FLUJO
     No en el scraping: en la preselección. El scraping deja miles de
@@ -69,17 +73,19 @@ POR QUÉ LA ETAPA NO SE DEDUCE, SE GUARDA
 
 import csv
 import io
+import json
 import re
 from datetime import datetime, timezone
 from urllib.parse import unquote
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 from app.api.auth import usuario_actual
-from app.core import bitacora
+from app.core import bitacora, config
 from app.core.database import cursor, escribir, tabla_existe
+from app.services import almacenamiento
 
 router = APIRouter()
 
@@ -656,6 +662,13 @@ class PeticionCompletar(BaseModel):
     area_confirmada_m2: float | None = Field(default=None, ge=0, le=100_000)
     tipo_transformacion: str | None = Field(default=None, max_length=LIMITE_NOMBRE)
     notas_visita: str | None = Field(default=None, max_length=LIMITE_TEXTO)
+    # El contenido de las tres pestañas de la ficha, tal y como lo arma la
+    # pantalla. Viaja con el "completar" y no en una petición aparte para que
+    # publicar sea un solo movimiento: si la ficha se guardara primero y el
+    # cambio de etapa fallara después, quedaría una ficha escrita sobre un
+    # inmueble que sigue en visita, y nadie sabría si eso es un borrador o el
+    # resto de una publicación a medias.
+    ficha: dict | None = None
 
 
 @router.post("/completar")
@@ -706,6 +719,261 @@ def completar(p: PeticionCompletar, u: dict = Depends(usuario_actual)):
             (p.link, p.titulo, p.habitaciones, p.banos, p.area_confirmada_m2,
              p.tipo_transformacion, p.notas_visita, ahora, responsable),
         )
+        if p.ficha is not None:
+            _escribe_ficha(con, p.link, p.ficha, ahora, responsable, publicada=True)
     bitacora.anotar(u, "flujo-publicar",
                     f"{p.tipo_transformacion or 'sin tipo'} · {p.link}")
     return {"ok": True, "etapa": "publicado"}
+
+
+# ── La ficha del predio ───────────────────────────────────────────────────
+#
+# Lo que el equipo escribe antes de publicar: el contenido de las tres
+# pestañas que verá el inversionista. Vive en `inmueble_detalle.ficha`, un
+# JSONB plano de clave → valor cuya forma la define el esquema del frontend
+# (components/admin/ficha/esquema.ts). Ver database/schema.sql para el
+# porqué de un JSONB y no cien columnas.
+#
+# Las fotos van en `ficha_fotos`, otro JSONB, porque se escriben en otro
+# momento: el texto cuando alguien pulsa Guardar, la foto en cuanto se
+# elige. Compartir columna haría que cada subida reescribiera todo el texto,
+# y dos personas en el mismo inmueble se pisarían.
+
+# Tope del JSON de la ficha. Son ~120 campos de texto corto; 200 KB deja
+# sitio de sobra y a la vez impide que alguien pegue un libro en una nota.
+LIMITE_FICHA = 200_000
+
+
+def _escribe_ficha(con, link: str, ficha: dict, ahora, responsable: str,
+                   publicada: bool | None = None) -> None:
+    """Guarda el contenido de la ficha. No toca las fotos ni la etapa."""
+    con.execute(
+        """INSERT INTO inmueble_detalle
+               (url_inmueble, ficha, ficha_guardada_en, ficha_guardada_por,
+                ficha_publicada, actualizado_en, actualizado_por)
+           VALUES (?, ?::jsonb, ?, ?, ?, ?, ?)
+           ON CONFLICT (url_inmueble) DO UPDATE SET
+               ficha              = EXCLUDED.ficha,
+               ficha_guardada_en  = EXCLUDED.ficha_guardada_en,
+               ficha_guardada_por = EXCLUDED.ficha_guardada_por,
+               -- Guardar un borrador no despublica lo que ya estaba
+               -- publicado: sólo `completar` mueve esta bandera.
+               ficha_publicada    = COALESCE(?, inmueble_detalle.ficha_publicada),
+               actualizado_en     = EXCLUDED.actualizado_en,
+               actualizado_por    = EXCLUDED.actualizado_por""",
+        (link, json.dumps(ficha, ensure_ascii=False), ahora, responsable,
+         bool(publicada), ahora, responsable, publicada),
+    )
+
+
+def _lee_detalle(link: str) -> dict:
+    with cursor() as con:
+        fila = con.execute(
+            """SELECT d.ficha, d.ficha_fotos, d.ficha_publicada,
+                      d.ficha_guardada_en, d.ficha_guardada_por,
+                      d.titulo, d.habitaciones, d.banos, d.area_confirmada_m2,
+                      d.tipo_transformacion, d.notas_visita,
+                      c.titulo AS titulo_anuncio, c.zona, c.ciudad, c.pais,
+                      c.moneda, c.precio_venta, c.area_m2, c.precio_m2,
+                      c.habitaciones AS habitaciones_anuncio,
+                      c.banos AS banos_anuncio,
+                      c.mediana_precio_m2_zona
+                 FROM seguimiento_propiedades s
+                 LEFT JOIN inmueble_detalle d ON d.url_inmueble = s.url_inmueble
+                 LEFT JOIN clean_listings   c ON c.link = s.url_inmueble
+                WHERE s.url_inmueble = ?""",
+            (link,),
+        ).fetchone()
+    return dict(fila) if fila else {}
+
+
+def _sugeridos(d: dict) -> dict:
+    """Lo que ya se sabe del anuncio, para no empezar con la hoja en blanco.
+
+    Se devuelve aparte de `ficha` a propósito: son propuestas, no valores
+    guardados. Si se mezclaran, un campo que alguien borró a conciencia
+    volvería a aparecer relleno en la siguiente visita a la pantalla, y no
+    habría forma de dejarlo vacío.
+    """
+    def num(v):
+        return None if v is None else float(v)
+
+    ubicacion = " · ".join(x for x in (d.get("zona"), d.get("ciudad")) if x)
+    return {
+        "hero_ubicacion": ubicacion or None,
+        "hero_titulo": d.get("titulo") or d.get("titulo_anuncio") or None,
+        "spec_area": num(d.get("area_confirmada_m2")) or num(d.get("area_m2")),
+        "spec_habitaciones": d.get("habitaciones") or d.get("habitaciones_anuncio"),
+        "spec_banos": d.get("banos") or d.get("banos_anuncio"),
+        "precio_compra": num(d.get("precio_venta")),
+        "precio_m2": num(d.get("precio_m2")),
+        "mediana_zona_m2": num(d.get("mediana_precio_m2_zona")),
+        "moneda": d.get("moneda"),
+        "transformacion_tipo": d.get("tipo_transformacion"),
+    }
+
+
+@router.get("/ficha")
+def leer_ficha(link: str = Query(max_length=LIMITE_LINK),
+               u: dict = Depends(usuario_actual)):
+    """El borrador de la ficha, sus fotos y lo que se sabe del anuncio."""
+    _exige_pipeline()
+    d = _lee_detalle(link)
+    if not d:
+        # Sin fila de seguimiento el inmueble no está en el flujo: armar su
+        # ficha sería escribir sobre algo que nadie ha aceptado.
+        raise HTTPException(404, "Ese inmueble no está en el flujo.")
+
+    guardada = d.get("ficha_guardada_en")
+    return {
+        "ficha": d.get("ficha") or {},
+        "fotos": d.get("ficha_fotos") or {},
+        "publicada": bool(d.get("ficha_publicada")),
+        "guardada_en": guardada.isoformat() if guardada else None,
+        "guardada_por": d.get("ficha_guardada_por"),
+        "sugeridos": _sugeridos(d),
+        "almacen_listo": almacenamiento.disponible(),
+    }
+
+
+class PeticionFicha(BaseModel):
+    link: str = Field(max_length=LIMITE_LINK)
+    ficha: dict
+
+
+@router.post("/ficha")
+def guardar_ficha(p: PeticionFicha, u: dict = Depends(usuario_actual)):
+    """Guarda el borrador SIN publicar.
+
+    Existe aparte de `completar` porque armar una ficha no se hace de una
+    sentada: son tres pestañas, y parte del contenido —las cifras de Data,
+    el alcance de Arquitectura— lo escriben personas distintas en días
+    distintos. Obligar a publicar para no perder lo escrito sería publicar a
+    medias.
+    """
+    _exige_pipeline()
+    if p.link not in _accionables([p.link]):
+        raise HTTPException(400, "Ese inmueble ya no está en el listado.")
+    if len(json.dumps(p.ficha, ensure_ascii=False)) > LIMITE_FICHA:
+        raise HTTPException(413, "La ficha es demasiado grande.")
+
+    ahora = datetime.now(timezone.utc)
+    responsable = f"{u['nombre']} ({u['rol']})"
+    with escribir() as con:
+        _asegura_seguimiento(con, p.link)
+        _escribe_ficha(con, p.link, p.ficha, ahora, responsable, publicada=None)
+    bitacora.anotar(u, "flujo-ficha-guardar", p.link)
+    return {"ok": True, "guardada_en": ahora.isoformat()}
+
+
+@router.post("/ficha/foto")
+def subir_foto(
+    link: str = Form(max_length=LIMITE_LINK),
+    ranura: str = Form(max_length=80),
+    archivo: UploadFile = File(...),
+    u: dict = Depends(usuario_actual),
+):
+    """Sube una foto a su ranura de la ficha y devuelve su URL.
+
+    `ranura` es la clave del hueco en el esquema —`hero`, `interior`,
+    `potencial_1`, `plano_actual`…—, no el nombre del archivo. Es lo que
+    permite reemplazar una foto sin dejar la anterior colgando: se sube la
+    nueva, se apunta en la ranura y se borra la que había.
+    """
+    _exige_pipeline()
+    if link not in _accionables([link]):
+        raise HTTPException(400, "Ese inmueble ya no está en el listado.")
+    if not almacenamiento.disponible():
+        raise HTTPException(
+            503,
+            "El almacén de fotos no está configurado. Falta SUPABASE_URL y/o "
+            "SUPABASE_SERVICE_KEY en el backend.",
+        )
+
+    tipo = (archivo.content_type or "").lower()
+    if tipo not in almacenamiento.TIPOS:
+        raise HTTPException(415, "Formato no admitido. Se aceptan JPG, PNG, WebP y AVIF.")
+
+    datos = archivo.file.read()
+    tope = config.FOTO_MAXIMA_MB * 1024 * 1024
+    if not datos:
+        raise HTTPException(400, "El archivo llegó vacío.")
+    if len(datos) > tope:
+        raise HTTPException(
+            413,
+            f"La foto pesa {len(datos) / 1048576:.1f} MB y el tope son "
+            f"{config.FOTO_MAXIMA_MB} MB.",
+        )
+
+    ruta = almacenamiento.ruta_de(link, ranura, archivo.filename or "", tipo)
+    try:
+        url = almacenamiento.subir(datos, ruta, tipo)
+    except almacenamiento.ErrorDeSubida as e:
+        raise HTTPException(502, str(e)) from e
+
+    ahora = datetime.now(timezone.utc)
+    responsable = f"{u['nombre']} ({u['rol']})"
+    anterior = (_lee_detalle(link).get("ficha_fotos") or {}).get(ranura)
+
+    with escribir() as con:
+        _asegura_seguimiento(con, link)
+        con.execute(
+            """INSERT INTO inmueble_detalle
+                   (url_inmueble, ficha_fotos, actualizado_en, actualizado_por)
+               VALUES (?, ?::jsonb, ?, ?)
+               -- `||` fusiona: se escribe sólo la ranura que cambia y las
+               -- demás fotos se quedan como estaban. Sustituir el objeto
+               -- entero borraría las que otro acabara de subir.
+               ON CONFLICT (url_inmueble) DO UPDATE SET
+                   ficha_fotos     = COALESCE(inmueble_detalle.ficha_fotos, '{}'::jsonb)
+                                     || EXCLUDED.ficha_fotos,
+                   actualizado_en  = EXCLUDED.actualizado_en,
+                   actualizado_por = EXCLUDED.actualizado_por""",
+            (link, json.dumps({ranura: url}), ahora, responsable),
+        )
+
+    # La anterior se borra después de apuntar la nueva, nunca antes: si el
+    # borrado fallara primero nos quedaríamos sin ninguna de las dos.
+    if anterior and anterior != url:
+        ruta_vieja = almacenamiento.ruta_de_url(anterior)
+        if ruta_vieja:
+            almacenamiento.borrar(ruta_vieja)
+
+    bitacora.anotar(u, "flujo-ficha-foto", f"{ranura} · {link}")
+    return {"ok": True, "ranura": ranura, "url": url}
+
+
+class PeticionQuitarFoto(BaseModel):
+    link: str = Field(max_length=LIMITE_LINK)
+    ranura: str = Field(max_length=80)
+
+
+@router.post("/ficha/foto/quitar")
+def quitar_foto(p: PeticionQuitarFoto, u: dict = Depends(usuario_actual)):
+    """Vacía una ranura de foto y borra el archivo del almacén.
+
+    Va por POST y no por DELETE porque el enlace del inmueble es la clave de
+    todo el flujo: en un DELETE viajaría en la URL y acabaría escrito en los
+    registros de acceso de cada salto del camino. En el cuerpo, no.
+    """
+    _exige_pipeline()
+    actual = (_lee_detalle(p.link).get("ficha_fotos") or {}).get(p.ranura)
+
+    ahora = datetime.now(timezone.utc)
+    responsable = f"{u['nombre']} ({u['rol']})"
+    with escribir() as con:
+        con.execute(
+            """UPDATE inmueble_detalle
+                  SET ficha_fotos = COALESCE(ficha_fotos, '{}'::jsonb) - ?,
+                      actualizado_en = ?, actualizado_por = ?
+                WHERE url_inmueble = ?""",
+            (p.ranura, ahora, responsable, p.link),
+        )
+
+    if actual:
+        ruta = almacenamiento.ruta_de_url(actual)
+        if ruta:
+            almacenamiento.borrar(ruta)
+
+    bitacora.anotar(u, "flujo-ficha-foto-quitar", f"{p.ranura} · {p.link}")
+    return {"ok": True}

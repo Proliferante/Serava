@@ -181,7 +181,12 @@ export function SesionProvider({ children }: { children: ReactNode }) {
       ...init,
       credentials: "same-origin",
       headers: {
-        ...(init.body ? { "Content-Type": "application/json" } : {}),
+        /* Con `FormData` no se pone Content-Type: el navegador tiene que
+           escribirlo él para meter el `boundary` del multipart. Ponerlo a
+           mano deja al servidor sin saber dónde empieza cada parte, y la
+           subida de fotos de la ficha llega como un cuerpo ilegible. */
+        ...(init.body && !(init.body instanceof FormData)
+          ? { "Content-Type": "application/json" } : {}),
         ...(init.headers || {}),
       },
     });
