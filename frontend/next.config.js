@@ -8,6 +8,17 @@ const nextConfig = {
     optimizePackageImports: ["framer-motion"],
   },
   images: {
+    // Las fotos de las fichas viven en Supabase Storage, y `next/image` sólo
+    // optimiza dominios declarados. Se acota al bucket público —`/storage/v1/
+    // object/public/`— y no al host entero: un patrón abierto convierte el
+    // optimizador en un proxy de imágenes de cualquiera que sepa la URL.
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
     // AVIF primero, WebP para quien no lo soporte. Las fotos ya eran WebP, así
     // que el formato aporta poco por sí solo: lo que de verdad baja el peso es
     // que `next/image` sirva la variante del tamaño al que se pinta (ver

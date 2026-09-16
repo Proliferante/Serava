@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import PrediosNav from "@/components/predios/PrediosNav";
 import Footer from "@/components/sections/Footer";
-import { Band, BROWN, Cifra, Crece, CREAM, EASE, Entra, HAIRLINE, HeroFicha, Reveal, StrokeIcon, TabsFicha, Termo, Traza } from "./kit";
+import { Band, BROWN, Cifra, Crece, CREAM, EASE, Entra, HAIRLINE, HeroFicha, posicionTermo, Reveal, StrokeIcon, TabsFicha, Termo, Traza } from "./kit";
+import { useFicha, type Lector } from "./datos";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA PREDIO · FINANZAS — frames 729:3168 y 766:3638 de Figma.
@@ -50,10 +51,10 @@ const IcChevron16 = () => <StrokeIcon vb={16} w={1.6} d="M4 6L8 10.5L12 6" />;
 
 /** Las cuatro tarjetas que acompañan a la cifra grande del resumen. */
 export const ESENCIAL = [
-  { left: 405.9, top: 20, h: 112.4, t: "Renta mensual estimada", v: "$18,6M", vSize: 30.4, vLh: 31.92, vTop: 40.49, note: "arriendo remodelado de referencia", nTop: 75.41 },
-  { left: 760.95, top: 20, h: 112.4, t: "Rentabilidad anual neta", v: "4,6%", vSize: 30.4, vLh: 31.92, vTop: 40.49, note: "yield neto sobre el All-in", nTop: 75.41 },
-  { left: 405.9, top: 148.98, h: 113.22, t: "Rango de inversión", v: "$3.100M–$3.450M", vSize: 24, vLh: 25.2, vTop: 41.5, note: "monto de entrada", nTop: 69.5 },
-  { left: 760.95, top: 148.98, h: 112.41, t: "Colocación en arriendo", v: "~30 días", vSize: 30.4, vLh: 31.92, vTop: 40.5, note: "tiempo promedio en la zona", nTop: 75.42, reloj: true },
+  { k: "fin_renta_mensual", kn: "fin_renta_nota", left: 405.9, top: 20, h: 112.4, t: "Renta mensual estimada", v: "$18,6M", vSize: 30.4, vLh: 31.92, vTop: 40.49, note: "arriendo remodelado de referencia", nTop: 75.41 },
+  { k: "fin_rentabilidad", kn: "fin_rentabilidad_nota", left: 760.95, top: 20, h: 112.4, t: "Rentabilidad anual neta", v: "4,6%", vSize: 30.4, vLh: 31.92, vTop: 40.49, note: "yield neto sobre el All-in", nTop: 75.41 },
+  { k: "fin_rango_inversion", kn: "", left: 405.9, top: 148.98, h: 113.22, t: "Rango de inversión", v: "$3.100M–$3.450M", vSize: 24, vLh: 25.2, vTop: 41.5, note: "monto de entrada", nTop: 69.5 },
+  { k: "fin_colocacion", kn: "", left: 760.95, top: 148.98, h: 112.41, t: "Colocación en arriendo", v: "~30 días", vSize: 30.4, vLh: 31.92, vTop: 40.5, note: "tiempo promedio en la zona", nTop: 75.42, reloj: true },
 ];
 
 /** Renta neta acumulada: barras verdes. `x`/`w` y alto salen del frame. */
@@ -75,38 +76,92 @@ export const VALOR = [
   { x: 901.6, y: 32.21, label: "$4,551 M", lx: 867.74, ly: 5.18, lw: 69 },
 ];
 
-const ANIOS = [45.35, 212.46, 378.12, 546.47, 713.51, 880.55];
-
 /**
  * Cascada de la composición del costo. Todo en % del área del gráfico, como
  * lo entrega el frame: cinco columnas, la última partida en dos para que se
  * vea de dónde sale el valor creado.
  */
+/** Las cinco columnas: dónde va cada una y qué cifra lleva encima. */
 const COSTO = [
-  { x: 6.97, w: 11.82, top: 35.61, bottom: 14.5, c: "#5b4633", v: "$2.600M", vTop: 27.6, vx: 8.51, vw: 8.68, t: "Precio", tx: 10.53, tw: 4.79 },
-  { x: 25.15, w: 11.82, top: 20.27, bottom: 64.39, c: "#8f6740", v: "$800M", vTop: 12.25, vx: 27.43, vw: 7.08, t: "Remod.", tx: 28.18, tw: 5.85 },
-  { x: 43.33, w: 11.82, top: 19.31, bottom: 79.73, c: "#c9a877", v: "$50M", vTop: 11.3, vx: 46.36, vw: 5.85, t: "Otros", tx: 47.2, tw: 4.07 },
-  { x: 65.15, w: 11.82, top: 19.31, bottom: 14.5, c: "#3d2c1e", v: "$3.450M", vTop: 11.3, vx: 66.49, vw: 8.86, t: "All-in", tx: 69.01, tw: 4.08 },
-  { x: 84.85, w: 11.81, top: 13.05, bottom: 14.5, c: "#7d8a54", v: "", vTop: 0, vx: 0, vw: 0, t: "Mercado", tx: 87.35, tw: 6.91 },
+  { c: "#5b4633", x: 6.97, w: 11.82, t: "Precio", tx: 10.53, tw: 4.79, vx: 8.51, vw: 8.68 },
+  { c: "#8f6740", x: 25.15, w: 11.82, t: "Remod.", tx: 28.18, tw: 5.85, vx: 27.43, vw: 7.08 },
+  { c: "#c9a877", x: 43.33, w: 11.82, t: "Otros", tx: 47.2, tw: 4.07, vx: 46.36, vw: 5.85 },
+  { c: "#3d2c1e", x: 65.15, w: 11.82, t: "All-in", tx: 69.01, tw: 4.08, vx: 66.49, vw: 8.86 },
+  { c: "#7d8a54", x: 84.85, w: 11.81, t: "Mercado", tx: 87.35, tw: 6.91, vx: 0, vw: 0 },
 ];
 
-/** Enlaces punteados entre el techo de una columna y el suelo de la siguiente. */
-const COSTO_LINKS = [
-  { x: 18.79, w: 6.36, top: 35.61 },
-  { x: 36.97, w: 6.36, top: 20.27 },
-  { x: 55.15, w: 10, top: 19.31 },
-];
+/* El suelo y el techo del área del gráfico, en % desde arriba. Son los del
+   frame; todo lo demás se deriva de ellos. */
+const SUELO = 85.5;
+const TECHO = 13.05;
+
+/**
+ * La cascada, calculada de sus propios importes.
+ *
+ * Es una cascada de verdad: el precio arranca del suelo, la remodelación
+ * empieza donde acabó el precio, y «otros» donde acabó la remodelación. El
+ * All-in es la suma y el mercado, lo que paga la zona; el trozo que le
+ * sobresale al All-in es el valor creado.
+ *
+ * La fórmula reproduce exactamente los porcentajes del frame cuando los
+ * importes son los del diseño (2.600 / 800 / 50 / 3.776), así que el
+ * prototipo se ve igual que siempre y un predio real se dibuja con los
+ * suyos. Antes estaban escritos a mano y un cambio de cifras habría dejado
+ * las barras contando otra historia que sus rótulos.
+ */
+export function cascada(d: Lector) {
+  const precio = d.n("costo_precio", 2600);
+  const remod = d.n("costo_remodelacion", 800);
+  const otros = d.n("costo_otros", 50);
+  const allin = precio + remod + otros;
+  const mercado = d.n("ft_mercado_total", 3776);
+  const tope = Math.max(allin, mercado) || 1;
+
+  /** De un importe a su altura, en % desde arriba. */
+  const y = (v: number) => SUELO - (v / tope) * (SUELO - TECHO);
+  /** Una barra de `a` a `b`, en coordenadas de CSS. */
+  const barra = (a: number, b: number) => ({ top: y(b), bottom: 100 - y(a) });
+
+  const cifras = [
+    d.t("costo_precio", "$2.600M"),
+    d.t("costo_remodelacion", "$800M"),
+    d.t("costo_otros", "$50M"),
+    d.t("puente_allin", "$3.450M"),
+    "",
+  ];
+  const cajas = [
+    barra(0, precio),
+    barra(precio, precio + remod),
+    barra(precio + remod, allin),
+    barra(0, allin),
+    barra(0, mercado),
+  ];
+
+  return {
+    columnas: COSTO.map((c, i) => ({ ...c, ...cajas[i], v: cifras[i], vTop: cajas[i].top - 8 })),
+    /* El trozo del mercado que le saca al All-in: el valor creado. */
+    creado: barra(Math.min(allin, mercado), mercado),
+    creadoTop: y(mercado) - 7.8,
+    /* Los enlaces punteados van del techo de una columna al pie de la
+       siguiente, así que su altura es la de la barra que acaba de terminar. */
+    enlaces: [
+      { x: 18.79, w: 6.36, top: y(precio) },
+      { x: 36.97, w: 6.36, top: y(precio + remod) },
+      { x: 55.15, w: 10, top: y(allin) },
+    ],
+  };
+}
 
 export const ESCENARIOS = [
-  { v: "9,0%", t: "Conservador", h: 106.39, from: "#c2b49b", to: "#a8967a" },
-  { v: "12,5%", t: "Base", h: 121.77, from: "#7d97a6", to: "#5e7a8a" },
-  { v: "16,0%", t: "Óptimo", h: 121.77, from: "#8a9a5f", to: VERDE },
+  { k: "ft_tir_conservador", v: "9,0%", t: "Conservador", h: 106.39, from: "#c2b49b", to: "#a8967a" },
+  { k: "ft_tir_base", v: "12,5%", t: "Base", h: 121.77, from: "#7d97a6", to: "#5e7a8a" },
+  { k: "ft_tir_optimo", v: "16,0%", t: "Óptimo", h: 121.77, from: "#8a9a5f", to: VERDE },
 ];
 
-export const ALTERNATIVAS: { t: string; v: string; verde?: boolean }[] = [
-  { t: "ZEQUARA · TIR base", v: "~12,5%", verde: true },
-  { t: "ZEQUARA · TIR óptimo", v: "~16,0%", verde: true },
-  { t: "CDT / renta fija vigente", v: "~10,5%" },
+export const ALTERNATIVAS: { k: string; t: string; v: string; verde?: boolean }[] = [
+  { k: "ft_tir_base", t: "ZEQUARA · TIR base", v: "~12,5%", verde: true },
+  { k: "ft_tir_optimo", t: "ZEQUARA · TIR óptimo", v: "~16,0%", verde: true },
+  { k: "ft_cdt_vigente", t: "CDT / renta fija vigente", v: "~10,5%" },
 ];
 
 /** Proyección año a año. La última fila va resaltada, como en el frame. */
@@ -123,19 +178,20 @@ const TABLA_COLS = [49.25, 112.2, 104.81, 98.91, 58.39];
 export const TABLA_HEAD = ["Año", "Valor activo", "Renta acum.", "Patrimonio", "Yield"];
 
 export const LIQUIDEZ = [
-  { t: "Payback (solo renta)", v: "~22 años" },
-  { t: "Payback con valorización", v: "~5 años" },
+  { k: "ft_payback_renta", t: "Payback (solo renta)", v: "~22 años" },
+  { k: "ft_payback_valorizacion", t: "Payback con valorización", v: "~5 años" },
 ];
 
 export const SALIDA = [
-  { t: "Comisión de venta (~3%)", v: "~$113M", pie: "" },
-  { t: "Impuesto de venta", v: "Según ganancia", pie: "ganancia ocasional u otros aplicables" },
+  { k: "ft_comision_venta", t: "Comisión de venta (~3%)", v: "~$113M", pie: "", kp: "" },
+  { k: "ft_impuesto_venta", t: "Impuesto de venta", v: "Según ganancia", pie: "ganancia ocasional u otros aplicables", kp: "ft_impuesto_nota" },
 ];
 
 /* ── Piezas ────────────────────────────────────────────────────────────── */
 
 /** Tarjeta clara de dato suelto: rótulo, cifra y pie. La del resumen. */
 function CardClara({ c, i }: { c: (typeof ESENCIAL)[number]; i: number }) {
+  const d = useFicha();
   return (
     <Reveal left={c.left} top={c.top} width={339.05} height={c.h} delay={0.1 + i * 0.07}>
       <div className="relative size-full" style={{ backgroundColor: HUESO, border: `1px solid ${HAIRLINE}`, borderRadius: 14 }}>
@@ -143,8 +199,8 @@ function CardClara({ c, i }: { c: (typeof ESENCIAL)[number]; i: number }) {
           {c.reloj && <span className="shrink-0" style={{ color: BROWN }}><IcClock14 /></span>}
           <span className="whitespace-nowrap font-semibold" style={{ fontSize: 15, lineHeight: "16.8px", color: BROWN }}>{c.t}</span>
         </div>
-        <Cifra v={c.v} dur={1} className="absolute whitespace-nowrap font-semibold" style={{ left: 18, top: c.vTop, fontSize: c.vSize, lineHeight: `${c.vLh}px`, color: "#3d2c1e" }} />
-        <span className="absolute whitespace-nowrap" style={{ left: 18, top: c.nTop, fontSize: 15, lineHeight: "17.28px", color: TOPO }}>{c.note}</span>
+        <Cifra v={d.t(c.k, c.v)} dur={1} className="absolute whitespace-nowrap font-semibold" style={{ left: 18, top: c.vTop, fontSize: c.vSize, lineHeight: `${c.vLh}px`, color: "#3d2c1e" }} />
+        <span className="absolute whitespace-nowrap" style={{ left: 18, top: c.nTop, fontSize: 15, lineHeight: "17.28px", color: TOPO }}>{c.kn ? d.t(c.kn, c.note) : c.note}</span>
       </div>
     </Reveal>
   );
@@ -193,7 +249,54 @@ function FtTitle({ left, top, dark = false, children }: { left: number; top: num
  * exportado porque Figma lo parte en veintitantas imágenes sueltas; las
  * coordenadas son las mismas del frame, sobre un área de 968 × 289.
  */
+/**
+ * Las barras y la línea, sacadas de la tabla año a año.
+ *
+ * El gráfico y la tabla son el mismo dato contado dos veces, así que se
+ * calculan del mismo sitio. Antes el gráfico eran coordenadas escritas a
+ * mano: un predio real habría enseñado su tabla al lado del dibujo de otro.
+ *
+ * Las dos series comparten eje pero no escala —el valor del activo está en
+ * miles de millones y la renta acumulada en cientos de millones—, que es lo
+ * que hace el diseño: la línea usa su propio mínimo y máximo.
+ */
+function series(d: Lector) {
+  const filas = d.tabla("ft_proyeccion", []);
+  if (filas.length < 2) return { renta: RENTA, valor: VALOR };
+
+  const num = (t: string) => {
+    const m = /-?\d+(?:[.,]\d+)?/.exec((t || "").replace(/\.(?=\d{3}\b)/g, ""));
+    return m ? Number(m[0].replace(",", ".")) : 0;
+  };
+
+  const valores = filas.map((f) => num(f[1]));
+  const rentas = filas.map((f) => num(f[2]));
+  const vMin = Math.min(...valores);
+  const vMax = Math.max(...valores);
+  const rMax = Math.max(...rentas) || 1;
+
+  /* Las mismas coordenadas del frame: el área mide 968 × 289, el suelo está
+     en y = 256 y la línea va de y = 123,43 (el mínimo) a y = 32,21 (el
+     máximo). Con los datos del diseño sale el dibujo del diseño. */
+  const valor = filas.map((f, i) => {
+    const x = 66.4 + i * ((901.6 - 66.4) / Math.max(1, filas.length - 1));
+    const y = vMax > vMin ? 123.43 - ((valores[i] - vMin) / (vMax - vMin)) * (123.43 - 32.21) : 123.43;
+    return { x, y, label: f[1] || "—", lx: x - 33.87, ly: y - 27.02, lw: 70 };
+  });
+
+  /* Las barras son la renta acumulada, que en el año 0 vale cero: se salta. */
+  const barras = filas.slice(1);
+  const renta = barras.map((f, i) => {
+    const h = (num(f[2]) / rMax) * 133;
+    const x = 211 + i * ((857 - 211) / Math.max(1, barras.length - 1));
+    return { x, w: 70, h, label: f[2] || "—", lx: x, ly: 256 - h - 27, lw: 70 };
+  });
+
+  return { renta, valor };
+}
+
 export function Proyeccion() {
+  const { renta: RENTA, valor: VALOR } = series(useFicha());
   const puntos = VALOR.map((p) => `${p.x},${p.y}`).join(" ");
   return (
     <div className="relative overflow-hidden" style={{ width: 968, height: 289 }}>
@@ -239,8 +342,8 @@ export function Proyeccion() {
         </motion.span>
       ))}
 
-      {ANIOS.map((x, i) => (
-        <span key={x} className="absolute text-center" style={{ left: x, top: 264.73, width: 43, fontSize: 15, lineHeight: "23px", color: "#94836b" }}>Año {i}</span>
+      {VALOR.map((p, i) => (
+        <span key={`a${i}`} className="absolute text-center" style={{ left: p.x - 21.5, top: 264.73, width: 43, fontSize: 15, lineHeight: "23px", color: "#94836b" }}>Año {i}</span>
       ))}
     </div>
   );
@@ -252,11 +355,12 @@ export function Proyeccion() {
  * dibuja después: así se lee como una suma y no como cinco barras sueltas.
  */
 export function Cascada({ w, h }: { w: number | string; h: number }) {
+  const { columnas, creado, creadoTop, enlaces } = cascada(useFicha());
   return (
     <div className="relative" style={{ width: w, height: h }}>
-      <span className="absolute" style={{ left: "4.55%", right: "1.52%", top: "85.5%", height: 1, backgroundColor: "rgba(60,45,30,0.15)" }} />
+      <span className="absolute" style={{ left: "4.55%", right: "1.52%", top: `${SUELO}%`, height: 1, backgroundColor: "rgba(60,45,30,0.15)" }} />
 
-      {COSTO.map((c, i) => (
+      {columnas.map((c, i) => (
         <Crece
           key={c.t}
           delay={0.08 + i * 0.12}
@@ -270,10 +374,10 @@ export function Cascada({ w, h }: { w: number | string; h: number }) {
         delay={0.08 + 4 * 0.12}
         dur={0.6}
         className="absolute"
-        style={{ left: "84.85%", width: "11.81%", top: "13.05%", bottom: "80.69%", backgroundColor: VERDE, borderTopLeftRadius: 3, borderTopRightRadius: 3 }}
+        style={{ left: "84.85%", width: "11.81%", top: `${creado.top}%`, bottom: `${creado.bottom}%`, backgroundColor: VERDE, borderTopLeftRadius: 3, borderTopRightRadius: 3 }}
       />
 
-      {COSTO_LINKS.map((l, i) => (
+      {enlaces.map((l, i) => (
         <motion.span
           key={l.x}
           className="absolute"
@@ -285,7 +389,7 @@ export function Cascada({ w, h }: { w: number | string; h: number }) {
         />
       ))}
 
-      {COSTO.filter((c) => c.v).map((c, i) => (
+      {columnas.filter((c) => c.v).map((c) => (
         <Cifra
           key={c.v}
           v={c.v}
@@ -294,12 +398,24 @@ export function Cascada({ w, h }: { w: number | string; h: number }) {
           style={{ left: `${c.vx}%`, width: `${c.vw + 8}%`, top: `${c.vTop}%`, fontSize: 11.12, lineHeight: "14px", color: TINTA }}
         />
       ))}
-      <Cifra v="+$326M" dur={0.8} className="absolute block text-center font-bold" style={{ left: "82.89%", width: "17%", top: "5.23%", fontSize: 10.69, lineHeight: "14px", color: HOJA }} />
+      <CifraCreada top={creadoTop} />
 
-      {COSTO.map((c) => (
+      {columnas.map((c) => (
         <span key={`t${c.t}`} className="absolute block text-center" style={{ left: `${c.tx - 3}%`, width: `${c.tw + 6}%`, top: "90.84%", fontSize: 8.55, lineHeight: "11px", color: SOMBRA }}>{c.t}</span>
       ))}
     </div>
+  );
+}
+
+/** La cifra del valor creado, encima de la columna de mercado. */
+function CifraCreada({ top }: { top: number }) {
+  const d = useFicha();
+  return (
+    <Cifra
+      v={d.t("valor_creado", "+$326M")} dur={0.8}
+      className="absolute block text-center font-bold"
+      style={{ left: "82.89%", width: "17%", top: `${top}%`, fontSize: 10.69, lineHeight: "14px", color: HOJA }}
+    />
   );
 }
 
@@ -353,6 +469,7 @@ function Fila({
 export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onToggle: () => void }) {
   /* La columna de contenido de la ficha: 1100 px centrados en el lienzo. */
   const COL = 411;
+  const d = useFicha();
 
   return (
     <div className="relative size-full" style={{ backgroundColor: CREAM }}>
@@ -390,8 +507,8 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
           <Reveal left={0} top={20} width={389.9} height={263.52} delay={0.04}>
             <div className="relative size-full" style={{ backgroundColor: "#7f8b57", borderRadius: 16 }}>
               <span className="absolute" style={{ left: 26, right: 26, top: 38.64, fontSize: 20, lineHeight: "19.2px", color: "rgba(247,241,229,0.8)" }}>Retorno total acumulado</span>
-              <Cifra v="54,4%" dur={1.5} className="absolute whitespace-nowrap font-bold" style={{ left: 26, top: 66.64, fontSize: 64, lineHeight: "64px", color: ARENA }} />
-              <span className="absolute" style={{ left: 26, right: 26, top: 138.64, fontSize: 20, lineHeight: "19.2px", color: "rgba(247,241,229,0.85)" }}>a 5 años · sobre el capital invertido</span>
+              <Cifra v={d.t("fin_retorno", "54,4%")} dur={1.5} className="absolute whitespace-nowrap font-bold" style={{ left: 26, top: 66.64, fontSize: 64, lineHeight: "64px", color: ARENA }} />
+              <span className="absolute" style={{ left: 26, right: 26, top: 138.64, fontSize: 20, lineHeight: "19.2px", color: "rgba(247,241,229,0.85)" }}>{d.t("fin_retorno_nota", "a 5 años · sobre el capital invertido")}</span>
               <motion.span
                 className="absolute flex items-center whitespace-nowrap font-semibold"
                 style={{ left: 26, top: 191.64, height: 32.23, padding: "0 13px", borderRadius: 999, backgroundColor: "rgba(247,241,229,0.14)", fontSize: 20, lineHeight: "18.24px", color: ARENA }}
@@ -400,7 +517,7 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
                 viewport={{ once: true, amount: 0.5 }}
                 transition={{ duration: 0.5, delay: 0.5, ease: EASE }}
               >
-                TIR ~12,5% E.A. · vs. 10,5% CDT
+                TIR {d.t("fin_tir", "~12,5%")} E.A. · vs. {d.t("fin_cdt", "10,5%")} CDT
               </motion.span>
             </div>
           </Reveal>
@@ -412,9 +529,16 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
             <div className="relative size-full" style={{ backgroundColor: HUESO, border: `1px solid ${HAIRLINE}`, borderRadius: 14 }}>
               <span className="absolute" style={{ left: 18, top: 18, fontSize: 20, lineHeight: "16.8px", color: SOMBRA }}>Posición en el rango de precios de mercado ($/m²)</span>
               <div className="absolute" style={{ left: 18, top: 67 }}>
-                <Termo width={1061.95} pos={15.86} label="Este activo · $8,1M" min="$7,5M" max="Mercado remodelado $12M" delay={0.1} />
+                <Termo
+                  width={1061.95}
+                  pos={posicionTermo(d.n("termo_actual", 8.1), d.n("termo_min", 7.5), d.n("termo_max", 12), 15.86)}
+                  label={`Este activo · $${d.n("termo_actual", 8.1).toLocaleString("es-CO", { maximumFractionDigits: 1 })}M`}
+                  min={`$${d.n("termo_min", 7.5).toLocaleString("es-CO", { maximumFractionDigits: 1 })}M`}
+                  max={d.t("termo_max_rotulo", "Mercado remodelado $12M")}
+                  delay={0.1}
+                />
               </div>
-              <span className="absolute" style={{ left: 11, top: 115, fontSize: 11.5, lineHeight: "17.28px", color: TOPO }}>Entramos por debajo del mercado: margen de valorización desde la compra.</span>
+              <span className="absolute" style={{ left: 11, right: 18, top: 115, fontSize: 11.5, lineHeight: "17.28px", color: TOPO }}>{d.t("termo_nota", "Entramos por debajo del mercado: margen de valorización desde la compra.")}</span>
             </div>
           </Reveal>
 
@@ -451,10 +575,10 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
           {/* ── Rentabilidad detallada + Contexto de mercado ── */}
           <Band left={-1} width={1921} top={1405} height={510} bg={BROWN} corner="br" z={17}>
             <FtTitle left={COL} top={128}>Rentabilidad detallada</FtTitle>
-            <Mini left={COL} top={173} width={262} height={140} t="Gastos estimados anuales" v="$14M" pie="admin., predial, seguros" delay={0.06} />
+            <Mini left={COL} top={173} width={262} height={140} t="Gastos estimados anuales" v={d.t("ft_gastos_anuales", "$14M")} pie={d.t("ft_gastos_nota", "admin., predial, seguros")} delay={0.06} />
             <Mini
               left={COL + 278} top={173} width={262} height={140}
-              t="TIR a 5 años" v="~12,5%" pie="efectivo anual" delay={0.12}
+              t="TIR a 5 años" v={d.t("ft_tir_5", "~12,5%")} pie="efectivo anual" delay={0.12}
               bg="linear-gradient(151.696deg, rgba(127,139,87,0.4) 0%, rgba(95,107,62,0.3) 100%)"
             />
 
@@ -466,14 +590,18 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
                     del carril y a 55 se comía el rótulo. */}
                 <div className="absolute" style={{ left: 22, top: 70 }}>
                   <Termo
-                    width={496} pos={51.8} label="Mediana $18,6M" min="Mín $16M" max="Máx $21M"
+                    width={496}
+                    pos={posicionTermo(d.n("ft_arriendo_mediana", 18.6), d.n("ft_arriendo_min", 16), d.n("ft_arriendo_max", 21), 51.8)}
+                    label={`Mediana ${d.t("ft_arriendo_mediana", "$18,6M")}`}
+                    min={`Mín ${d.t("ft_arriendo_min", "$16M")}`}
+                    max={`Máx ${d.t("ft_arriendo_max", "$21M")}`}
                     grad="linear-gradient(90deg, #8a9a5f 0%, #c9a877 100%)"
                     mark={ARENA} labelColor={ARENA} endsColor="rgba(247,241,229,0.6)" delay={0.14}
                   />
                 </div>
                 <div className="absolute" style={{ left: 22, top: 122, width: 496, height: 118, backgroundColor: VELO, border: VELO_BORDE, borderRadius: 12 }}>
                   <span className="absolute" style={{ left: 20, right: 20, top: 17, fontSize: 15, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>Tasa de vacancia estimada</span>
-                  <Cifra v="~4%" dur={1} className="absolute whitespace-nowrap font-semibold" style={{ left: 20, top: 34, fontSize: 30, lineHeight: "43.2px", color: ARENA }} />
+                  <Cifra v={d.t("ft_vacancia", "~4%")} dur={1} className="absolute whitespace-nowrap font-semibold" style={{ left: 20, top: 34, fontSize: 30, lineHeight: "43.2px", color: ARENA }} />
                   <span className="absolute" style={{ left: 20, top: 80, fontSize: 11.5, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>de la zona</span>
                 </div>
               </div>
@@ -494,8 +622,8 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
 
             <div className="absolute" style={{ left: COL + 638, top: 347, width: 469.57, height: 288.69 }}>
               {[
-                { t: "Costo total (All-in)", v: "$3.450M", badge: "$10,8M / m²", vc: "#3d2c1e" },
-                { t: "Media mercado remodelado", v: "$3.776M", badge: "$11,8M / m²", vc: "#3d2c1e" },
+                { t: "Costo total (All-in)", v: d.t("puente_allin", "$3.450M"), badge: d.t("puente_allin_m2", "$10,8M / m²"), vc: "#3d2c1e" },
+                { t: "Media mercado remodelado", v: d.t("ft_mercado_total", "$3.776M"), badge: d.t("puente_mercado_m2", "$11,8M / m²"), vc: "#3d2c1e" },
               ].map((c, i) => (
                 <Reveal key={c.t} left={i * 242.8} top={0} width={226.8} height={124.26} delay={0.08 + i * 0.07}>
                   <div className="relative size-full" style={{ backgroundColor: HUESO, border: `1px solid ${HAIRLINE}`, borderRadius: 12 }}>
@@ -507,8 +635,8 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
               ))}
 
               {[
-                { t: "Spread de valor", v: "+9%", bg: undefined as string | undefined },
-                { t: "Valor creado hoy", v: "+$326M", bg: "linear-gradient(154.622deg, rgb(226,231,209) 0%, rgb(215,221,196) 100%)" },
+                { t: "Spread de valor", v: d.t("ft_spread", "+9%"), bg: undefined as string | undefined },
+                { t: "Valor creado hoy", v: d.t("valor_creado", "+$326M"), bg: "linear-gradient(154.622deg, rgb(226,231,209) 0%, rgb(215,221,196) 100%)" },
               ].map((c, i) => (
                 <Reveal key={c.t} left={i * 242.8} top={138.26} width={226.8} height={98.99} delay={0.2 + i * 0.07}>
                   <div className="relative size-full" style={{ backgroundColor: c.bg ? undefined : HUESO, backgroundImage: c.bg, border: `1px solid ${HAIRLINE}`, borderRadius: 12 }}>
@@ -521,7 +649,7 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
               <div className="absolute flex gap-[10px]" style={{ left: 0, top: 251.25, width: 469.57 }}>
                 <span className="shrink-0" style={{ marginTop: 2, color: "#a57a4e" }}><IcInfo15 /></span>
                 <p className="font-light" style={{ fontSize: 12.5, lineHeight: "18.72px", color: SOMBRA }}>
-                  Precio de compra $2.600M · Remodelación $800M · Otros (notariales, transacción) $50M. Cifras de referencia.
+                  {d.t("ft_composicion_nota", "Precio de compra $2.600M · Remodelación $800M · Otros (notariales, transacción) $50M. Cifras de referencia.")}
                 </p>
               </div>
             </div>
@@ -535,7 +663,7 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
                 <div className="absolute flex items-end gap-[22px]" style={{ left: 33, top: 25.99, height: 190 }}>
                   {ESCENARIOS.map((e, i) => (
                     <div key={e.t} className="flex flex-col items-center justify-end" style={{ width: 143.33, height: 190 }}>
-                      <Cifra v={e.v} dur={1} className="whitespace-nowrap font-bold" style={{ paddingBottom: 8, fontSize: 25, lineHeight: "31.2px", color: CREAM }} />
+                      <Cifra v={d.t(e.k, e.v)} dur={1} className="whitespace-nowrap font-bold" style={{ paddingBottom: 8, fontSize: 25, lineHeight: "31.2px", color: CREAM }} />
                       <Crece
                         delay={0.1 + i * 0.1}
                         dur={0.75}
@@ -555,13 +683,13 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
                 <div className="absolute" style={{ left: 23, top: 25.99, width: 494, height: 160 }}>
                   <Fila cells={["Alternativa", "Retorno anual"]} cols={[304.05, 189.95]} top={0} alto={35.84} cabecera dark />
                   {ALTERNATIVAS.map((a, i) => (
-                    <Fila key={a.t} cells={[a.t, a.v]} cols={[304.05, 189.95]} top={35.84 + i * 41.39} alto={41.39} dark delay={0.1 + i * 0.07} />
+                    <Fila key={a.t} cells={[a.t, d.t(a.k, a.v)]} cols={[304.05, 189.95]} top={35.84 + i * 41.39} alto={41.39} dark delay={0.1 + i * 0.07} />
                   ))}
                 </div>
                 <div className="absolute flex gap-[10px]" style={{ left: 23, right: 23, top: 200 }}>
                   <span className="shrink-0" style={{ marginTop: 2, color: "#a57a4e" }}><IcInfo15 /></span>
                   <p className="font-light" style={{ fontSize: 12.5, lineHeight: "18.72px", color: "rgba(247,241,229,0.6)" }}>
-                    La TIR incluye renta y valorización; el CDT es renta fija sin activo subyacente.
+                    {d.t("ft_alternativas_nota", "La TIR incluye renta y valorización; el CDT es renta fija sin activo subyacente.")}
                   </p>
                 </div>
               </div>
@@ -598,8 +726,8 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
               <div className="relative size-full" style={{ backgroundColor: HUESO, border: `1px solid ${HAIRLINE}`, borderRadius: 16 }}>
                 <div className="absolute" style={{ left: 22, top: 22, width: 425.57 }}>
                   <Fila cells={TABLA_HEAD} cols={TABLA_COLS} top={0} alto={35.84} cabecera />
-                  {TABLA.map((r, i) => (
-                    <Fila key={r[0]} cells={r} cols={TABLA_COLS} top={35.84 + i * 39.78} alto={39.78} resalte={i === TABLA.length - 1} delay={0.08 + i * 0.05} />
+                  {d.tabla("ft_proyeccion", TABLA).map((r, i, todas) => (
+                    <Fila key={`${r[0]}-${i}`} cells={r} cols={TABLA_COLS} top={35.84 + i * 39.78} alto={39.78} resalte={i === todas.length - 1} delay={0.08 + i * 0.05} />
                   ))}
                 </div>
               </div>
@@ -610,12 +738,12 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
           <Band left={-1} width={1921} top={3402} height={528} bg={BROWN} corner="br" z={13}>
             <FtTitle left={COL} top={80}>Liquidez</FtTitle>
             {LIQUIDEZ.map((m, i) => (
-              <Mini key={m.t} left={COL + i * 277} top={173} width={263} height={98.77} t={m.t} v={m.v} delay={0.06 + i * 0.07} />
+              <Mini key={m.t} left={COL + i * 277} top={173} width={263} height={98.77} t={m.t} v={d.t(m.k, m.v)} delay={0.06 + i * 0.07} />
             ))}
 
             <FtTitle left={COL + 560} top={80}>Costos de salida</FtTitle>
             {SALIDA.map((m, i) => (
-              <Mini key={m.t} left={COL + 560 + i * 277} top={173} width={263} height={138.3} t={m.t} v={m.v} pie={m.pie} delay={0.12 + i * 0.07} />
+              <Mini key={m.t} left={COL + 560 + i * 277} top={173} width={263} height={138.3} t={m.t} v={d.t(m.k, m.v)} pie={m.kp ? d.t(m.kp, m.pie) : m.pie} delay={0.12 + i * 0.07} />
             ))}
 
             <p className="absolute font-light" style={{ left: COL, top: 339, width: 1100, fontSize: 12.5, lineHeight: "18.72px", color: "rgba(247,241,229,0.6)" }}>

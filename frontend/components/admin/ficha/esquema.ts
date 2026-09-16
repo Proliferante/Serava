@@ -151,6 +151,25 @@ const COMUN: Bloque[] = [
   },
 ];
 
+/* ── La tarjeta del listado ──────────────────────────────────────────────── */
+
+/* Lo único que no sale de la ficha sino de la página anterior: la tarjeta con
+   la que el predio aparece en /predios. Casi todo lo reusa de la cabecera
+   —foto, score, título, precio, tipo— y sólo hacen falta estos tres, que
+   cuentan el estado comercial y no el inmueble. */
+const TARJETA: Bloque[] = [
+  {
+    k: "tarjeta",
+    titulo: "Tarjeta del listado",
+    nota: "Cómo se ve el predio en /predios, antes de que nadie abra la ficha. La foto, el Score, el título, el precio y el tipo son los de arriba: aquí sólo lo que cuenta su estado comercial.",
+    campos: [
+      { k: "card_badge", l: "Etiqueta de la foto", tipo: "opcion", req: true, ej: "Disponible", opciones: ["Disponible", "Nueva oportunidad", "Alta actividad", "Reserva en curso", "Reserva liberada", "Reservada"], ayuda: "La píldora de color arriba a la izquierda de la foto." },
+      { k: "card_estado", l: "Estado de la oportunidad", tipo: "texto", ej: "Abierto para evaluación", ayuda: "El renglón del pie de la tarjeta." },
+      { k: "card_horizonte", l: "Horizonte", tipo: "texto", ej: "Horizonte: 5 años", ayuda: "Junto a la TIR, en el pie de la tarjeta." },
+    ],
+  },
+];
+
 /* ── Pestaña 1 · Oportunidad ─────────────────────────────────────────────── */
 
 const razon = (n: number): Campo[] => [
@@ -420,7 +439,7 @@ const TRANSFORMACION: Bloque[] = [
 ];
 
 export const FICHA: PestanaFicha[] = [
-  { k: "comun", l: "Cabecera", nota: "Lo que se repite en las tres pestañas de la ficha.", bloques: COMUN },
+  { k: "comun", l: "Cabecera", nota: "Lo que se repite en las tres pestañas de la ficha, y la tarjeta con la que el predio aparece en el listado.", bloques: [...COMUN, ...TARJETA] },
   { k: "oportunidad", l: "Oportunidad", nota: "La primera pestaña: por qué se seleccionó, qué valor hay y el entorno.", bloques: OPORTUNIDAD },
   { k: "finanzas", l: "Finanzas", nota: "La segunda: el resumen corto y la ficha técnica que se despliega.", bloques: FINANZAS },
   { k: "transformacion", l: "Transformación", nota: "La tercera: la visión, el alcance, los planos y el cronograma.", bloques: TRANSFORMACION },

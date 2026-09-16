@@ -4,7 +4,9 @@ import type { CSSProperties } from "react";
 import Footer from "@/components/sections/Footer";
 import { motion } from "framer-motion";
 import PrediosNav from "@/components/predios/PrediosNav";
+import CanvasImage from "@/components/CanvasImage";
 import { Band, BROWN, Crece, CREAM, EASE, Entra, HAIRLINE, HeroFicha, Reveal, STRIPES, TabsFicha, Traza } from "./kit";
+import { useFicha } from "./datos";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA PREDIO · TRANSFORMACIÓN — frame 752:2869 de Figma (1920 × 2705).
@@ -92,13 +94,17 @@ export const PLANOS = [
  * recorte va en el 51.86 % que marca el frame, donde cae el tirador.
  */
 function AntesDespues() {
+  const d = useFicha();
   return (
     <div className="absolute overflow-hidden" style={{ left: 838, top: 68, width: 665, height: 374, borderRadius: 16 }}>
       {/* Después */}
       <div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(148.21deg, rgb(107,88,66) 0%, rgb(63,48,32) 100%)" }}>
+        {d.esRemota("despues") && <div className="absolute inset-0"><CanvasImage src={d.foto("despues", "")} w={665} /></div>}
+        {!d.esRemota("despues") && (
         <span className="absolute -translate-x-1/2 whitespace-nowrap font-semibold uppercase" style={{ left: "50%", top: 192.31, fontSize: 9.9, lineHeight: "14.88px", letterSpacing: 1.389, color: "rgba(247,241,229,0.6)" }}>
           Después — render referencial
         </span>
+        )}
       </div>
       {/* Antes, recortado por el tirador. Al entrar en pantalla el recorte
           empieza tapando el render y se abre hasta el 51.86 % del frame: la
@@ -111,9 +117,12 @@ function AntesDespues() {
         viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 1.1, delay: 0.5, ease: EASE }}
       >
+        {d.esRemota("antes") && <div className="absolute inset-0"><CanvasImage src={d.foto("antes", "")} w={665} /></div>}
+        {!d.esRemota("antes") && (
         <span className="absolute -translate-x-1/2 whitespace-nowrap font-semibold uppercase" style={{ left: "50%", top: 178.25, fontSize: 9.9, lineHeight: "14.88px", letterSpacing: 1.389, color: "rgba(247,241,229,0.6)" }}>
           Antes — estado actual
         </span>
+        )}
       </motion.div>
 
       <motion.span
@@ -143,27 +152,34 @@ function AntesDespues() {
 }
 
 /** Plano de 224.77 de ancho: rótulo, dibujo y dos líneas de pie. */
-function Plano({ p, left, retraso = 0 }: { p: (typeof PLANOS)[number]; left: number; retraso?: number }) {
+function Plano({ p, left, retraso = 0, i }: { p: (typeof PLANOS)[number]; left: number; retraso?: number; i: number }) {
+  const d = useFicha();
+  const clave = i === 0 ? "plano_actual" : "plano_propuesta";
   return (
     <div className="absolute" style={{ left, top: 237.33, width: 224.77, height: 248.82 }}>
       <p className="absolute w-full whitespace-nowrap text-center font-semibold" style={{ top: 0, fontSize: 20, lineHeight: "17.28px", color: "#a57a4e" }}>{p.label}</p>
 
       <div className="absolute" style={{ left: 0, top: 40.67, width: 224.77, height: 181.82, backgroundColor: "#fbf8f1", border: `1px solid ${HAIRLINE}`, borderRadius: 12 }}>
         <div className="absolute overflow-hidden" style={{ left: 14, top: 22.99, width: 194.77, height: 142.83 }}>
+          {/* Si el equipo subió el plano de verdad, manda ése: el dibujo de
+              abajo es el esquema de referencia del diseño, no este inmueble. */}
+          {d.esRemota(clave) && <div className="absolute inset-0"><CanvasImage src={d.foto(clave, "")} w={195} /></div>}
           {/* Los dos planos se dibujan solos: primero el contorno y después la
               tabiquería, que es el orden en que se levantaría. `largo` va con
               holgura sobre el camino real. */}
+          {!d.esRemota(clave) && <>
           <svg className="absolute" style={{ left: 1.62, top: 1.62 }} width={191.523} height={139.585} viewBox="0 0 191.523 139.585" fill="none" aria-hidden>
             <Traza d={PLANO_MARCO} largo={700} dur={1} delay={retraso} stroke="#bfae93" strokeWidth={1.94769} />
           </svg>
           <svg className="absolute" style={{ left: 2.59, top: 2.6 }} width={189.576} height={137.637} viewBox="0 0 189.576 137.637" fill="none" aria-hidden>
             <Traza d={p.d} largo={900} dur={1.1} delay={retraso + 0.45} stroke="#cbbb9e" strokeWidth={1.55833} />
           </svg>
+          </>}
         </div>
       </div>
 
-      <p className="absolute w-full whitespace-nowrap text-center font-semibold" style={{ top: 221.49 + 22.5 - 10.08, fontSize: 13.4, lineHeight: "20.16px", color: "#2a241c" }}>{p.t}</p>
-      <p className="absolute w-full whitespace-nowrap text-center font-light" style={{ top: 253.49 + 9.5 - 9.12, fontSize: 12.2, lineHeight: "18.24px", color: "#6b5b47" }}>{p.s}</p>
+      <p className="absolute w-full text-center font-semibold" style={{ top: 221.49 + 22.5 - 10.08, fontSize: 13.4, lineHeight: "20.16px", color: "#2a241c" }}>{d.t(`${clave}_t`, p.t)}</p>
+      <p className="absolute w-full text-center font-light" style={{ top: 253.49 + 9.5 - 9.12, fontSize: 12.2, lineHeight: "18.24px", color: "#6b5b47" }}>{d.t(`${clave}_s`, p.s)}</p>
     </div>
   );
 }
@@ -171,6 +187,7 @@ function Plano({ p, left, retraso = 0 }: { p: (typeof PLANOS)[number]; left: num
 /* ── Página ────────────────────────────────────────────────────────────── */
 
 export default function Transformacion() {
+  const d = useFicha();
   return (
     <div className="relative size-full" style={{ backgroundColor: CREAM }}>
       {/* ── Pestañas ── */}
@@ -191,7 +208,7 @@ export default function Transformacion() {
           specs={{ left: 145, top: 353 }}
           termo={{ left: 135, top: 294 }}
           photo={false}
-          title={<>De un mueble usado a<br />un activo extraordinario.</>}
+          title={d.nodo("trans_titulo", <>De un mueble usado a<br />un activo extraordinario.</>)}
         >
           <AntesDespues />
         </HeroFicha>
@@ -201,7 +218,7 @@ export default function Transformacion() {
       <Band width={1919} top={663} height={510} bg={CREAM} corner="br" z={3}>
         <h2 className="absolute font-semibold" style={{ left: 206, top: 110, width: 717, fontSize: 60, lineHeight: "34.56px", letterSpacing: -0.32, color: "#3d2c1e" }}>Visión de diseño</h2>
         <p className="absolute font-light" style={{ left: 206, top: 178, width: 714, fontSize: 25, lineHeight: "29px", color: "#6b5b47" }}>
-          Un estilo contemporáneo y atemporal, con materiales naturales, espacios abiertos y una distribución que responde al estilo de vida actual. Diseñamos para que el inmueble se sienta más amplio, más luminoso y más conectado con su entorno.
+          {d.t("vision_texto", "Un estilo contemporáneo y atemporal, con materiales naturales, espacios abiertos y una distribución que responde al estilo de vida actual. Diseñamos para que el inmueble se sienta más amplio, más luminoso y más conectado con su entorno.")}
         </p>
 
         <div className="absolute flex gap-[16px]" style={{ left: 206, top: 363, width: 717 }}>
@@ -211,7 +228,7 @@ export default function Transformacion() {
                 <Ic vb={20} d={v.d} w={1.25} />
               </span>
               <span className="font-semibold" style={{ fontSize: 13.1, lineHeight: "16.4px", color: "#2a241c" }}>
-                {v.t[0]}{v.t[1] && <><br />{v.t[1]}</>}
+                {d.t(`vision_${i + 1}`, v.t.join(" "))}
               </span>
             </Entra>
           ))}
@@ -221,7 +238,7 @@ export default function Transformacion() {
           <div className="relative size-full" style={{ backgroundColor: "#fbf8f1", border: `1px solid ${HAIRLINE}`, borderRadius: 16 }}>
             <h2 className="absolute font-semibold" style={{ left: 26, right: 26, top: 25, fontSize: 32, lineHeight: "34.56px", letterSpacing: -0.32, color: "#3d2c1e" }}>Qué transforma esta oportunidad</h2>
             <ul className="absolute" style={{ left: 26, right: 26, top: 76.55 }}>
-              {QLIST.map((t, i) => (
+              {d.lista("transforma", QLIST).map((t, i) => (
                 <motion.li
                   key={t}
                   className="flex items-center gap-[12px]"
@@ -232,7 +249,7 @@ export default function Transformacion() {
                   transition={{ duration: 0.42, delay: 0.14 + i * 0.06, ease: EASE }}
                 >
                   <Ic vb={17} d={D_CHECK17} w={1.7} className="shrink-0" style={{ color: "#a57a4e" }} />
-                  <span className="whitespace-nowrap" style={{ fontSize: 14.1, lineHeight: "21.12px", color: "#6b5b47" }}>{t}</span>
+                  <span style={{ fontSize: 14.1, lineHeight: "21.12px", color: "#6b5b47" }}>{t}</span>
                 </motion.li>
               ))}
             </ul>
@@ -256,12 +273,16 @@ export default function Transformacion() {
               transition={{ duration: 0.55, delay: 0.04 + i * 0.08, ease: EASE }}
               style={{
                 left: c.left, top: c.top, width: c.w, height: c.h, borderRadius: 13,
-                backgroundImage: `linear-gradient(148deg, rgba(201,168,119,0.16) 0%, rgba(201,168,119,0) 100%), ${STRIPES}`,
+                backgroundImage: d.esRemota(`prop_${i + 1}`)
+                  ? undefined
+                  : `linear-gradient(148deg, rgba(201,168,119,0.16) 0%, rgba(201,168,119,0) 100%), ${STRIPES}`,
                 color: "rgba(247,241,229,0.5)",
               }}
             >
-              <Ic vb={22} d={D_IMG22} w={1.1875} />
-              <span className="absolute whitespace-nowrap uppercase" style={{ left: 10, bottom: 8.88, padding: "4px 9px", borderRadius: 6, backgroundColor: "rgba(20,14,9,0.6)", fontSize: 9.9, lineHeight: "14.88px", letterSpacing: 0.595, color: "#efe6d5" }}>{c.cap}</span>
+              {d.esRemota(`prop_${i + 1}`)
+                ? <div className="absolute inset-0"><CanvasImage src={d.foto(`prop_${i + 1}`, "")} w={Math.round(c.w)} /></div>
+                : <Ic vb={22} d={D_IMG22} w={1.1875} />}
+              <span className="absolute whitespace-nowrap uppercase" style={{ left: 10, bottom: 8.88, padding: "4px 9px", borderRadius: 6, backgroundColor: "rgba(20,14,9,0.6)", fontSize: 9.9, lineHeight: "14.88px", letterSpacing: 0.595, color: "#efe6d5" }}>{d.t(`prop_${i + 1}_r`, c.cap)}</span>
             </motion.div>
           ))}
         </div>
@@ -269,25 +290,32 @@ export default function Transformacion() {
         <div className="absolute" style={{ left: 1473, top: 174, width: 300 }}>
           <h2 className="font-semibold" style={{ fontSize: 25, lineHeight: "22.46px", letterSpacing: -0.208, color: CREAM }}>Alcance de la remodelación</h2>
           <ul style={{ marginTop: 14 }}>
-            {ALCANCE.map((a, i) => (
+            {/* El icono y el sangrado son los del diseño y se quedan donde
+                están; lo que cambia por predio es el texto. Si el equipo
+                escribe más partidas que las ocho del diseño, las de más
+                heredan el icono de la última. */}
+            {d.lista("alcance", ALCANCE.map((a) => a.t)).map((texto, i) => {
+              const a = ALCANCE[Math.min(i, ALCANCE.length - 1)];
+              return (
               <motion.li
-                key={a.t}
+                key={texto}
                 className="relative"
-                style={{ height: i === ALCANCE.length - 1 ? 42.64 : 43.64, borderBottom: i === ALCANCE.length - 1 ? undefined : `1px solid ${HAIRLINE}` }}
+                style={{ height: 43.64, borderBottom: `1px solid ${HAIRLINE}` }}
                 initial={{ opacity: 0, x: 18 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, amount: 0.6 }}
                 transition={{ duration: 0.42, delay: 0.06 + i * 0.055, ease: EASE }}
               >
                 <Ic vb={18} d={a.d} w={1.20417} className="absolute -translate-y-1/2" style={{ left: 0, top: "50%", color: "#a57a4e" }} />
-                <span className="absolute -translate-y-1/2 whitespace-nowrap" style={{ left: a.x, top: "50%", fontSize: 20, lineHeight: "20.64px", color: CREAM }}>{a.t}</span>
+                <span className="absolute -translate-y-1/2" style={{ left: a.x, right: 0, top: "50%", fontSize: 20, lineHeight: "20.64px", color: CREAM }}>{texto}</span>
               </motion.li>
-            ))}
+              );
+            })}
           </ul>
           <div className="flex gap-[11px]" style={{ marginTop: 14, width: 346, padding: "15px 16px", borderRadius: 12, backgroundColor: "#ede7da" }}>
             <Ic vb={17} d={D_INFO17} w={1.20417} className="mt-px shrink-0" style={{ color: "#a57a4e" }} />
             <span className="font-light" style={{ fontSize: 15, lineHeight: "19.2px", color: "#6b5b47" }}>
-              El alcance definitivo se define durante el proceso de negociación, ajustado a tus objetivos de inversión.
+              {d.t("alcance_nota", "El alcance definitivo se define durante el proceso de negociación, ajustado a tus objetivos de inversión.")}
             </span>
           </div>
         </div>
@@ -298,7 +326,7 @@ export default function Transformacion() {
         <h2 className="absolute whitespace-nowrap font-semibold" style={{ left: 291, top: 157, fontSize: 60, lineHeight: "34.56px", letterSpacing: -0.32, color: "#3d2c1e" }}>Distribución</h2>
         <span className="absolute whitespace-nowrap" style={{ left: 675, top: 181, fontSize: 12.8, lineHeight: "13.82px", color: "#6b5b47" }}>(referencial)</span>
 
-        <Plano p={PLANOS[0]} left={287.94} />
+        <Plano p={PLANOS[0]} left={287.94} i={0} />
         <motion.span
           className="absolute"
           style={{ left: 526.71, top: 347.24, color: "#a57a4e" }}
@@ -309,7 +337,7 @@ export default function Transformacion() {
         >
           <Ic vb={22} d={D_ARROW22} w={1.83333} />
         </motion.span>
-        <Plano p={PLANOS[1]} left={562.71} retraso={0.5} />
+        <Plano p={PLANOS[1]} left={562.71} retraso={0.5} i={1} />
 
         <div className="absolute" style={{ left: 960, top: 203, width: 579.45 }}>
           <h2 className="font-semibold" style={{ fontSize: 32, lineHeight: "34.56px", letterSpacing: -0.32, color: "#3d2c1e" }}>Cronograma estimado</h2>
@@ -319,21 +347,22 @@ export default function Transformacion() {
 
           <div className="relative" style={{ marginTop: 14, paddingTop: 16 }}>
             <Crece eje="x" dur={0.9} className="absolute" style={{ left: 6, right: 6, top: 22, height: 2, backgroundColor: "rgba(60,45,30,0.13)" }} />
-            {PASOS.map((p, i) => (
+            {/* Los hitos salen de la rejilla de la consola: primera columna
+                la etapa, segunda la duración. Las posiciones se reparten a lo
+                ancho, así que tres o cinco hitos también cuadran. */}
+            {d.tabla("cronograma", PASOS.map((p) => [p.tLines.join(" "), p.dur])).map((fila, i, todos) => (
               <motion.div
-                key={p.dur}
+                key={`${fila[0]}-${i}`}
                 className="absolute"
-                style={{ left: p.x, top: 16, width: 136.11 }}
+                style={{ left: 2.495 + i * (438.33 / Math.max(1, todos.length - 1)), top: 16, width: 136.11 }}
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
                 transition={{ duration: 0.45, delay: 0.25 + i * 0.18, ease: EASE }}
               >
                 <span className="block" style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: "#a57a4e", border: "3px solid #f3eee4" }} />
-                <span className="block font-semibold" style={{ paddingTop: p.pt, fontSize: 13.1, lineHeight: "19.68px", color: "#2a241c" }}>
-                  {p.tLines[0]}{p.tLines[1] && <><br />{p.tLines[1]}</>}
-                </span>
-                <span className="block font-light" style={{ fontSize: 11.8, lineHeight: "17.76px", color: "#6b5b47" }}>{p.dur}</span>
+                <span className="block font-semibold" style={{ paddingTop: 13, fontSize: 13.1, lineHeight: "19.68px", color: "#2a241c" }}>{fila[0]}</span>
+                <span className="block font-light" style={{ fontSize: 11.8, lineHeight: "17.76px", color: "#6b5b47" }}>{fila[1]}</span>
               </motion.div>
             ))}
             <div style={{ height: 99.46 }} />
@@ -342,10 +371,10 @@ export default function Transformacion() {
           <div className="flex flex-wrap items-center gap-x-[14px]" style={{ marginTop: 14, padding: "24px 18px 16px", borderRadius: 12, backgroundColor: "#fbf8f1", border: `1px solid ${HAIRLINE}` }}>
             <span className="relative" style={{ width: 250.17, height: 20.64 }}>
               <Ic vb={17} d={D_SEARCH17} w={1.275} className="absolute -translate-y-1/2" style={{ left: 0, top: "50%", color: "#6b5b47" }} />
-              <span className="absolute -translate-y-1/2 whitespace-nowrap font-semibold" style={{ left: 26, top: "50%", fontSize: 13.8, lineHeight: "20.64px", color: "#3d2c1e" }}>Tiempo total estimado: 6 meses</span>
+              <span className="absolute -translate-y-1/2 whitespace-nowrap font-semibold" style={{ left: 26, top: "50%", fontSize: 13.8, lineHeight: "20.64px", color: "#3d2c1e" }}>Tiempo total estimado: {d.t("cronograma_total", "6 meses")}</span>
             </span>
             <span className="flex-1 font-light" style={{ minWidth: 200, fontSize: 12.8, lineHeight: "19.2px", color: "#6b5b47" }}>
-              Nos enfocamos en cumplir tiempos y presupuesto sin sacrificar el estándar de calidad.
+              {d.t("cronograma_nota", "Nos enfocamos en cumplir tiempos y presupuesto sin sacrificar el estándar de calidad.")}
             </span>
           </div>
         </div>

@@ -88,7 +88,9 @@ export default function PredioCardCompact({ data, delay = 0, href = "/predios/fi
           </span>
           <span className="text-right">
             <span className="block text-[10px] font-semibold uppercase tracking-[0.8px]" style={{ color: MUTED }}>TIR estimada</span>
-            <span className="block text-[15.5px] font-semibold" style={{ color: VERD }}>{data.tir}% anual</span>
+            <span className="block text-[15.5px] font-semibold" style={{ color: VERD }}>
+              {data.tir.toLocaleString("es-CO", { maximumFractionDigits: 1 })}% anual
+            </span>
             <span className="block text-[11.5px] font-light" style={{ color: MUTED }}>{data.horizon}</span>
           </span>
         </div>

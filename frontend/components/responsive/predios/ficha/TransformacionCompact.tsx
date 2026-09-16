@@ -3,6 +3,7 @@
 import { MotionConfig } from "framer-motion";
 import { In, WRAP } from "@/components/responsive/kit";
 import { StrokeIcon } from "@/components/predios/ficha/kit";
+import { useFicha } from "@/components/predios/ficha/datos";
 import {
   ALCANCE, D_CHECK17, D_INFO17, D_SEARCH17, PASOS, PLANO_MARCO, PLANOS, PGRID, QLIST, VIC,
 } from "@/components/predios/ficha/Transformacion";
@@ -65,6 +66,7 @@ function Plano({ d }: { d: string }) {
 }
 
 export default function TransformacionCompact() {
+  const d = useFicha();
   return (
     <MotionConfig reducedMotion="user">
       <FichaShellCompact
@@ -72,7 +74,7 @@ export default function TransformacionCompact() {
         hero={
           <HeroCompact
             media={<AntesDespues />}
-            title={<>De un mueble usado a un activo extraordinario.</>}
+            title={d.nodo("trans_titulo", <>De un mueble usado a un activo extraordinario.</>)}
           >
             <ReservaCompact />
           </HeroCompact>
@@ -84,7 +86,7 @@ export default function TransformacionCompact() {
             <In>
               <H2>Visión de diseño</H2>
               <Sub>
-                Un estilo contemporáneo y atemporal, con materiales naturales, espacios abiertos y una distribución que responde al estilo de vida actual. Diseñamos para que el inmueble se sienta más amplio, más luminoso y más conectado con su entorno.
+                {d.t("vision_texto", "Un estilo contemporáneo y atemporal, con materiales naturales, espacios abiertos y una distribución que responde al estilo de vida actual. Diseñamos para que el inmueble se sienta más amplio, más luminoso y más conectado con su entorno.")}
               </Sub>
             </In>
 
@@ -94,7 +96,7 @@ export default function TransformacionCompact() {
                   <span className="flex size-[40px] items-center justify-center rounded-[11px]" style={{ backgroundColor: "#ede7da", color: "#a57a4e" }}>
                     <StrokeIcon vb={20} d={v.d} w={1.25} />
                   </span>
-                  <span className="mt-[10px] block text-[13.5px] font-semibold leading-[1.25]" style={{ color: ZEUS }}>{v.t.join(" ")}</span>
+                  <span className="mt-[10px] block text-[13.5px] font-semibold leading-[1.25]" style={{ color: ZEUS }}>{d.t(`vision_${i + 1}`, v.t.join(" "))}</span>
                 </In>
               ))}
             </div>
@@ -102,7 +104,7 @@ export default function TransformacionCompact() {
             <In delay={0.1} className="mt-[24px] rounded-[16px] border border-solid p-[20px]" style={{ backgroundColor: "#fbf8f1", borderColor: HAIRLINE }}>
               <h3 className="m-0 text-[clamp(1.3rem,5.4vw,1.8rem)] font-semibold leading-[1.15] tracking-[-0.01em]" style={{ color: "#3d2c1e" }}>Qué transforma esta oportunidad</h3>
               <ul className="m-0 mt-[12px] list-none p-0">
-                {QLIST.map((t) => (
+                {d.lista("transforma", QLIST).map((t) => (
                   <li key={t} className="flex items-start gap-[12px] py-[9px]">
                     <StrokeIcon vb={17} d={D_CHECK17} w={1.7} className="mt-[3px] shrink-0" style={{ color: "#a57a4e" }} />
                     <span className="text-[14.5px] leading-[1.45]" style={{ color: MILL }}>{t}</span>
@@ -119,24 +121,35 @@ export default function TransformacionCompact() {
             <In><H2 dark>Propuesta de transformación<Ref dark /></H2></In>
 
             <div className="mt-[22px] grid grid-cols-2 gap-[10px]">
-              {PGRID.map((c, i) => (
+              {PGRID.map((c, i) => {
+                const rotulo = d.t(`prop_${i + 1}_r`, c.cap);
+                const url = d.foto(`prop_${i + 1}`, "");
+                return (
                 <In key={c.cap} delay={0.04 * i} className={i === 0 ? "col-span-2" : undefined}>
-                  <FotoPendiente caption={c.cap} ratio={i === 0 ? "16 / 10" : "1 / 1"} />
+                  {url
+                    ? (
+                      <span className="relative block overflow-hidden rounded-[14px]" style={{ aspectRatio: i === 0 ? "16 / 10" : "1 / 1" }}>
+                        <img src={url} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
+                        <span className="absolute bottom-[9px] left-[10px] rounded-[6px] px-[9px] py-[4px] text-[9.9px] font-semibold uppercase tracking-[0.6px]" style={{ backgroundColor: "rgba(20,14,9,0.6)", color: "#efe6d5" }}>{rotulo}</span>
+                      </span>
+                    )
+                    : <FotoPendiente caption={rotulo} ratio={i === 0 ? "16 / 10" : "1 / 1"} />}
                 </In>
-              ))}
+                );
+              })}
             </div>
 
             <In delay={0.1} className="mt-[30px]">
               <h3 className="m-0 text-[clamp(1.3rem,5.4vw,1.7rem)] font-semibold leading-[1.15] tracking-[-0.01em]" style={{ color: CREAM }}>Alcance de la remodelación</h3>
               <ul className="m-0 mt-[12px] list-none p-0">
-                {ALCANCE.map((a, i) => (
+                {d.lista("alcance", ALCANCE.map((a) => a.t)).map((texto, i, todas) => (
                   <li
-                    key={a.t}
+                    key={texto}
                     className="flex items-center gap-[12px] py-[13px]"
-                    style={{ borderBottom: i < ALCANCE.length - 1 ? `1px solid rgba(226,205,174,0.16)` : undefined }}
+                    style={{ borderBottom: i < todas.length - 1 ? `1px solid rgba(226,205,174,0.16)` : undefined }}
                   >
-                    <StrokeIcon vb={18} d={a.d} w={1.20417} className="shrink-0" style={{ color: "#a57a4e" }} />
-                    <span className="text-[16px] leading-[1.3]" style={{ color: CREAM }}>{a.t}</span>
+                    <StrokeIcon vb={18} d={ALCANCE[Math.min(i, ALCANCE.length - 1)].d} w={1.20417} className="shrink-0" style={{ color: "#a57a4e" }} />
+                    <span className="text-[16px] leading-[1.3]" style={{ color: CREAM }}>{texto}</span>
                   </li>
                 ))}
               </ul>
@@ -144,7 +157,7 @@ export default function TransformacionCompact() {
               <div className="mt-[18px] flex gap-[11px] rounded-[12px] p-[16px]" style={{ backgroundColor: "#ede7da" }}>
                 <StrokeIcon vb={17} d={D_INFO17} w={1.20417} className="mt-[2px] shrink-0" style={{ color: "#a57a4e" }} />
                 <span className="text-[14px] font-light leading-[1.4]" style={{ color: MILL }}>
-                  El alcance definitivo se define durante el proceso de negociación, ajustado a tus objetivos de inversión.
+                  {d.t("alcance_nota", "El alcance definitivo se define durante el proceso de negociación, ajustado a tus objetivos de inversión.")}
                 </span>
               </div>
             </In>
@@ -157,16 +170,22 @@ export default function TransformacionCompact() {
             <In><H2>Distribución<Ref /></H2></In>
 
             <div className="mt-[20px] grid grid-cols-2 gap-[12px]">
-              {PLANOS.map((p, i) => (
+              {PLANOS.map((p, i) => {
+                const clave = i === 0 ? "plano_actual" : "plano_propuesta";
+                const url = d.foto(clave, "");
+                return (
                 <In key={p.label} delay={0.05 * i} className="text-center">
                   <span className="block text-[15px] font-semibold" style={{ color: "#a57a4e" }}>{p.label}</span>
-                  <span className="mt-[10px] block rounded-[12px] border border-solid p-[12px]" style={{ backgroundColor: "#fbf8f1", borderColor: HAIRLINE }}>
-                    <Plano d={p.d} />
+                  <span className="mt-[10px] block overflow-hidden rounded-[12px] border border-solid p-[12px]" style={{ backgroundColor: "#fbf8f1", borderColor: HAIRLINE }}>
+                    {url
+                      ? <img src={url} alt="" loading="lazy" decoding="async" className="block w-full object-cover" style={{ aspectRatio: "4 / 3" }} />
+                      : <Plano d={p.d} />}
                   </span>
-                  <span className="mt-[10px] block text-[13.4px] font-semibold" style={{ color: ZEUS }}>{p.t}</span>
-                  <span className="block text-[12.2px] font-light" style={{ color: MILL }}>{p.s}</span>
+                  <span className="mt-[10px] block text-[13.4px] font-semibold" style={{ color: ZEUS }}>{d.t(`${clave}_t`, p.t)}</span>
+                  <span className="block text-[12.2px] font-light" style={{ color: MILL }}>{d.t(`${clave}_s`, p.s)}</span>
                 </In>
-              ))}
+                );
+              })}
             </div>
 
             <In delay={0.1} className="mt-[34px]">
@@ -178,11 +197,11 @@ export default function TransformacionCompact() {
               {/* En vertical: el filete a la izquierda y los hitos colgando. */}
               <ol className="relative m-0 mt-[18px] list-none p-0 pl-[26px]">
                 <span className="absolute bottom-[10px] left-[6px] top-[10px] block w-[2px]" style={{ backgroundColor: "rgba(60,45,30,0.13)" }} />
-                {PASOS.map((p) => (
-                  <li key={p.dur} className="relative pb-[18px] last:pb-0">
+                {d.tabla("cronograma", PASOS.map((p) => [p.tLines.join(" "), p.dur])).map((fila, i) => (
+                  <li key={`${fila[0]}-${i}`} className="relative pb-[18px] last:pb-0">
                     <span className="absolute -left-[26px] top-[4px] block size-[14px] rounded-full" style={{ backgroundColor: "#a57a4e", border: "3px solid #f3eee4" }} />
-                    <span className="block text-[14.5px] font-semibold leading-[1.3]" style={{ color: ZEUS }}>{p.tLines.join(" ")}</span>
-                    <span className="block text-[12.5px] font-light" style={{ color: MILL }}>{p.dur}</span>
+                    <span className="block text-[14.5px] font-semibold leading-[1.3]" style={{ color: ZEUS }}>{fila[0]}</span>
+                    <span className="block text-[12.5px] font-light" style={{ color: MILL }}>{fila[1]}</span>
                   </li>
                 ))}
               </ol>
@@ -190,10 +209,10 @@ export default function TransformacionCompact() {
               <div className="mt-[18px] rounded-[12px] border border-solid p-[18px]" style={{ backgroundColor: "#fbf8f1", borderColor: HAIRLINE }}>
                 <span className="flex items-center gap-[10px]">
                   <StrokeIcon vb={17} d={D_SEARCH17} w={1.275} className="shrink-0" style={{ color: MILL }} />
-                  <span className="text-[14.5px] font-semibold" style={{ color: "#3d2c1e" }}>Tiempo total estimado: 6 meses</span>
+                  <span className="text-[14.5px] font-semibold" style={{ color: "#3d2c1e" }}>Tiempo total estimado: {d.t("cronograma_total", "6 meses")}</span>
                 </span>
                 <p className="m-0 mt-[8px] text-[13.5px] font-light leading-[1.45]" style={{ color: MILL }}>
-                  Nos enfocamos en cumplir tiempos y presupuesto sin sacrificar el estándar de calidad.
+                  {d.t("cronograma_nota", "Nos enfocamos en cumplir tiempos y presupuesto sin sacrificar el estándar de calidad.")}
                 </p>
               </div>
             </In>

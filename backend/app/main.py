@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router, usuario_actual
 from app.api.flujo import router as flujo_router
+from app.api.inmuebles import router as inmuebles_router
 from app.core import config, sesiones
 
 log = logging.getLogger("zequara")
@@ -170,7 +171,24 @@ app.include_router(admin_router, prefix="/api/admin", tags=["admin"],
 app.include_router(flujo_router, prefix="/api/admin/flujo", tags=["flujo"],
                    dependencies=SESION)
 
-# TODO (backend oficial): sumar aquí los routers de inmuebles, dashboard y
+# Los predios publicados, para la web del inversionista.
+#
+# VA SIN `SESION`, Y ESO ES UNA DECISIÓN, NO UN OLVIDO.
+# La página `/predios` del sitio hoy no tiene nada delante: no hay
+# middleware, y la autenticación de inversionista no existe todavía (la de
+# `usuarios` es la del equipo). Cerrar la API mientras la página sigue
+# abierta no protegería el portafolio y sólo dejaría la página en blanco.
+#
+# Lo que este router expone es únicamente lo publicado y sólo sus campos de
+# portafolio — nunca el anuncio original, el contacto del vendedor ni lo que
+# está a medio camino. Ver app/api/inmuebles.py.
+#
+# El día que haya acceso de inversionista, se cierra AQUÍ: se le añade
+# `dependencies=` con la dependencia que toque y ni el router ni el servicio
+# cambian.
+app.include_router(inmuebles_router, prefix="/api/predios", tags=["predios"])
+
+# TODO (backend oficial): sumar aquí los routers de dashboard y
 # notificaciones cuando estén — no reemplazar este archivo, sólo añadir.
 
 

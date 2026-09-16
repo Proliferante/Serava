@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import CountUp from "@/components/motion/CountUp";
+import CanvasImage from "@/components/CanvasImage";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    TARJETA DE PREDIO — Component 6 de Figma (368 × 644.03).
@@ -71,6 +72,8 @@ export type Predio = {
   priceNote: string;
   /** TIR estimada en porcentaje. */
   tir: number;
+  /** Portada, cuando el predio ya tiene su foto subida. */
+  foto?: string | null;
   horizon: string;
   status: string;
 };
@@ -121,20 +124,30 @@ export default function PredioCard({
       transition={{ duration: 0.55, delay, ease: EASE }}
       whileHover={{ y: -6, transition: { duration: 0.25, ease: EASE } }}
     >
-      {/* ── Foto (520:361) ── */}
+      {/* ── Foto (520:361) ──
+          Con foto, la foto; sin ella, el hueco del diseño con el nombre de la
+          zona. El hueco no es un error a la espera de arreglo: un predio
+          recién publicado puede no tener fotos todavía y la tarjeta tiene que
+          poder salir igual. */}
       <div className="absolute overflow-hidden" style={{ left: 0, top: 0, width: 366, height: 251.63 }}>
-        <div className="ix-zoom absolute inset-0" style={{ background: PHOTO_BG }} />
-        <span className="absolute" style={{ left: 170, top: 94.43, color: "rgba(247,241,229,0.42)" }}><Home /></span>
-        <p
-          className="absolute m-0 text-center uppercase"
-          style={{
-            left: 122.08, top: 128.62, width: 123.84,
-            fontSize: 9.5, lineHeight: "14.5px", fontWeight: 600, letterSpacing: "1.1px",
-            color: "rgba(247,241,229,0.5)",
-          }}
-        >
-          Foto — {data.photo}
-        </p>
+        <div className="ix-zoom absolute inset-0" style={{ background: PHOTO_BG }}>
+          {data.foto && <CanvasImage src={data.foto} w={366} alt="" />}
+        </div>
+        {!data.foto && (
+          <>
+            <span className="absolute" style={{ left: 170, top: 94.43, color: "rgba(247,241,229,0.42)" }}><Home /></span>
+            <p
+              className="absolute m-0 text-center uppercase"
+              style={{
+                left: 122.08, top: 128.62, width: 123.84,
+                fontSize: 9.5, lineHeight: "14.5px", fontWeight: 600, letterSpacing: "1.1px",
+                color: "rgba(247,241,229,0.5)",
+              }}
+            >
+              Foto — {data.photo}
+            </p>
+          </>
+        )}
 
         {/* Etiqueta de estado */}
         <span
@@ -211,7 +224,13 @@ export default function PredioCard({
       <div className="absolute text-right" style={{ right: 24, top: 460.94, width: 120 }}>
         <p className="m-0 whitespace-nowrap uppercase" style={{ fontSize: 10, lineHeight: "16px", fontWeight: 600, letterSpacing: "0.8px", color: MUTED }}>TIR estimada</p>
         <p className="m-0 whitespace-nowrap" style={{ fontSize: 19.5, lineHeight: "28px", fontWeight: 600, letterSpacing: "-0.3px", color: VERD }}>
-          <CountUp value={data.tir} suffix="% anual" duration={1.2} />
+          {/* Un decimal sólo si lo tiene. Las TIR del prototipo son enteras
+              («16% anual») y las de un predio real no («12,5% anual»):
+              redondear las segundas las convertía en otro número. */}
+          <CountUp
+            value={data.tir} suffix="% anual" duration={1.2}
+            decimals={Number.isInteger(data.tir) ? 0 : 1} comma={!Number.isInteger(data.tir)}
+          />
         </p>
         <p className="m-0 whitespace-nowrap" style={{ marginTop: 2, fontSize: 11.5, lineHeight: "16px", fontWeight: 300, color: MUTED }}>{data.horizon}</p>
       </div>

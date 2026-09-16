@@ -3,7 +3,8 @@
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import { useState } from "react";
 import { EASE, In, WRAP } from "@/components/responsive/kit";
-import { Cifra, StrokeIcon, Termo } from "@/components/predios/ficha/kit";
+import { Cifra, posicionTermo, StrokeIcon, Termo } from "@/components/predios/ficha/kit";
+import { useFicha } from "@/components/predios/ficha/datos";
 import {
   ALTERNATIVAS, Cascada, ESCENARIOS, ESENCIAL, LIQUIDEZ, Proyeccion, SALIDA, TABLA, TABLA_HEAD,
 } from "@/components/predios/ficha/Finanzas";
@@ -79,6 +80,7 @@ function Nota({ dark = false, children }: { dark?: boolean; children: React.Reac
 }
 
 export default function FinanzasCompact() {
+  const d = useFicha();
   const [abierta, setAbierta] = useState(false);
 
   return (
@@ -102,10 +104,10 @@ export default function FinanzasCompact() {
             {/* La cifra que manda */}
             <In delay={0.04} className="mt-[22px] rounded-[16px] px-[22px] py-[26px]" style={{ backgroundColor: OLIVE }}>
               <span className="block text-[15px] leading-[1.3]" style={{ color: "rgba(247,241,229,0.8)" }}>Retorno total acumulado</span>
-              <Cifra v="54,4%" dur={1.5} className="mt-[8px] block text-[clamp(3rem,15vw,4rem)] font-bold leading-[1]" style={{ color: ARENA }} />
-              <span className="mt-[8px] block text-[15px] leading-[1.35]" style={{ color: "rgba(247,241,229,0.85)" }}>a 5 años · sobre el capital invertido</span>
+              <Cifra v={d.t("fin_retorno", "54,4%")} dur={1.5} className="mt-[8px] block text-[clamp(3rem,15vw,4rem)] font-bold leading-[1]" style={{ color: ARENA }} />
+              <span className="mt-[8px] block text-[15px] leading-[1.35]" style={{ color: "rgba(247,241,229,0.85)" }}>{d.t("fin_retorno_nota", "a 5 años · sobre el capital invertido")}</span>
               <span className="mt-[14px] inline-block rounded-full px-[13px] py-[6px] text-[13.5px] font-semibold" style={{ backgroundColor: "rgba(247,241,229,0.14)", color: ARENA }}>
-                TIR ~12,5% E.A. · vs. 10,5% CDT
+                TIR {d.t("fin_tir", "~12,5%")} E.A. · vs. {d.t("fin_cdt", "10,5%")} CDT
               </span>
             </In>
 
@@ -113,8 +115,8 @@ export default function FinanzasCompact() {
               {ESENCIAL.map((c, i) => (
                 <In key={c.t} delay={0.04 * i} className="rounded-[14px] border border-solid px-[18px] py-[17px]" style={{ backgroundColor: HUESO, borderColor: HAIRLINE }}>
                   <span className="block text-[15px] font-semibold leading-[1.2]" style={{ color: BROWN }}>{c.t}</span>
-                  <Cifra v={c.v} className="mt-[4px] block text-[clamp(1.4rem,6vw,1.9rem)] font-semibold leading-[1.15]" style={{ color: "#3d2c1e" }} />
-                  <span className="mt-[4px] block text-[13px] leading-[1.35]" style={{ color: TOPO }}>{c.note}</span>
+                  <Cifra v={d.t(c.k, c.v)} className="mt-[4px] block text-[clamp(1.4rem,6vw,1.9rem)] font-semibold leading-[1.15]" style={{ color: "#3d2c1e" }} />
+                  <span className="mt-[4px] block text-[13px] leading-[1.35]" style={{ color: TOPO }}>{c.kn ? d.t(c.kn, c.note) : c.note}</span>
                 </In>
               ))}
             </div>
@@ -123,9 +125,16 @@ export default function FinanzasCompact() {
             <In delay={0.12} className="mt-[12px] rounded-[14px] border border-solid px-[18px] pb-[16px] pt-[18px]" style={{ backgroundColor: HUESO, borderColor: HAIRLINE }}>
               <span className="block text-[14.5px] leading-[1.3]" style={{ color: SOMBRA }}>Posición en el rango de precios de mercado ($/m²)</span>
               <div className="mt-[26px]">
-                <Termo width="100%" pos={15.86} label="Este activo · $8,1M" min="$7,5M" max="Mercado remodelado $12M" delay={0.1} />
+                <Termo
+                  width="100%"
+                  pos={posicionTermo(d.n("termo_actual", 8.1), d.n("termo_min", 7.5), d.n("termo_max", 12), 15.86)}
+                  label={`Este activo · $${d.n("termo_actual", 8.1).toLocaleString("es-CO", { maximumFractionDigits: 1 })}M`}
+                  min={`$${d.n("termo_min", 7.5).toLocaleString("es-CO", { maximumFractionDigits: 1 })}M`}
+                  max={d.t("termo_max_rotulo", "Mercado remodelado $12M")}
+                  delay={0.1}
+                />
               </div>
-              <p className="m-0 mt-[14px] text-[12px] leading-[1.45]" style={{ color: TOPO }}>Entramos por debajo del mercado: margen de valorización desde la compra.</p>
+              <p className="m-0 mt-[14px] text-[12px] leading-[1.45]" style={{ color: TOPO }}>{d.t("termo_nota", "Entramos por debajo del mercado: margen de valorización desde la compra.")}</p>
             </In>
 
             <In delay={0.16}>
@@ -161,8 +170,8 @@ export default function FinanzasCompact() {
                 <div className={WRAP}>
                   <In><H2 dark>Rentabilidad detallada</H2></In>
                   <div className="mt-[20px] grid grid-cols-1 gap-[10px] sm:grid-cols-2">
-                    <Mini t="Gastos estimados anuales" v="$14M" pie="admin., predial, seguros" />
-                    <Mini t="TIR a 5 años" v="~12,5%" pie="efectivo anual" delay={0.06} bg="linear-gradient(151.696deg, rgba(127,139,87,0.4) 0%, rgba(95,107,62,0.3) 100%)" />
+                    <Mini t="Gastos estimados anuales" v={d.t("ft_gastos_anuales", "$14M")} pie={d.t("ft_gastos_nota", "admin., predial, seguros")} />
+                    <Mini t="TIR a 5 años" v={d.t("ft_tir_5", "~12,5%")} pie="efectivo anual" delay={0.06} bg="linear-gradient(151.696deg, rgba(127,139,87,0.4) 0%, rgba(95,107,62,0.3) 100%)" />
                   </div>
 
                   <In className="mt-[34px]"><H2 dark>Contexto de mercado</H2></In>
@@ -170,13 +179,17 @@ export default function FinanzasCompact() {
                     <span className="block text-[14.5px] leading-[1.3]" style={{ color: "rgba(247,241,229,0.7)" }}>Rango de arriendo mensual (320 m²)</span>
                     <div className="mt-[26px]">
                       <Termo
-                        width="100%" pos={51.8} label="Mediana $18,6M" min="Mín $16M" max="Máx $21M"
+                        width="100%"
+                        pos={posicionTermo(d.n("ft_arriendo_mediana", 18.6), d.n("ft_arriendo_min", 16), d.n("ft_arriendo_max", 21), 51.8)}
+                        label={`Mediana ${d.t("ft_arriendo_mediana", "$18,6M")}`}
+                        min={`Mín ${d.t("ft_arriendo_min", "$16M")}`}
+                        max={`Máx ${d.t("ft_arriendo_max", "$21M")}`}
                         grad="linear-gradient(90deg, #8a9a5f 0%, #c9a877 100%)"
                         mark={ARENA} labelColor={ARENA} endsColor="rgba(247,241,229,0.6)" delay={0.12}
                       />
                     </div>
                     <div className="mt-[22px]">
-                      <Mini t="Tasa de vacancia estimada" v="~4%" pie="de la zona" delay={0.12} />
+                      <Mini t="Tasa de vacancia estimada" v={d.t("ft_vacancia", "~4%")} pie="de la zona" delay={0.12} />
                     </div>
                   </In>
                 </div>
@@ -203,12 +216,12 @@ export default function FinanzasCompact() {
 
                 <div className={`${WRAP} mt-[14px]`}>
                   <div className="grid grid-cols-1 gap-[10px] sm:grid-cols-2">
-                    <MiniClara t="Costo total (All-in)" v="$3.450M" badge="$10,8M / m²" />
-                    <MiniClara t="Media mercado remodelado" v="$3.776M" badge="$11,8M / m²" delay={0.06} />
-                    <MiniClara t="Spread de valor" v="+9%" vc={VERD} delay={0.1} />
-                    <MiniClara t="Valor creado hoy" v="+$326M" vc={VERD} delay={0.14} bg="linear-gradient(154.622deg, rgb(226,231,209) 0%, rgb(215,221,196) 100%)" />
+                    <MiniClara t="Costo total (All-in)" v={d.t("puente_allin", "$3.450M")} badge={d.t("puente_allin_m2", "$10,8M / m²")} />
+                    <MiniClara t="Media mercado remodelado" v={d.t("ft_mercado_total", "$3.776M")} badge={d.t("puente_mercado_m2", "$11,8M / m²")} delay={0.06} />
+                    <MiniClara t="Spread de valor" v={d.t("ft_spread", "+9%")} vc={VERD} delay={0.1} />
+                    <MiniClara t="Valor creado hoy" v={d.t("valor_creado", "+$326M")} vc={VERD} delay={0.14} bg="linear-gradient(154.622deg, rgb(226,231,209) 0%, rgb(215,221,196) 100%)" />
                   </div>
-                  <Nota>Precio de compra $2.600M · Remodelación $800M · Otros (notariales, transacción) $50M. Cifras de referencia.</Nota>
+                  <Nota>{d.t("ft_composicion_nota", "Precio de compra $2.600M · Remodelación $800M · Otros (notariales, transacción) $50M. Cifras de referencia.")}</Nota>
                 </div>
               </Band>
 
@@ -221,7 +234,7 @@ export default function FinanzasCompact() {
                     <div className="flex items-end justify-center gap-[12px]" style={{ height: 190 }}>
                       {ESCENARIOS.map((e) => (
                         <span key={e.t} className="flex h-full flex-1 flex-col items-center justify-end">
-                          <Cifra v={e.v} className="pb-[8px] text-[clamp(1.1rem,5vw,1.55rem)] font-bold leading-[1.2]" style={{ color: "#e2cdae" }} />
+                          <Cifra v={d.t(e.k, e.v)} className="pb-[8px] text-[clamp(1.1rem,5vw,1.55rem)] font-bold leading-[1.2]" style={{ color: "#e2cdae" }} />
                           <motion.span
                             className="block w-full rounded-t-[8px]"
                             style={{ height: e.h, backgroundImage: `linear-gradient(180deg, ${e.from} 0%, ${e.to} 100%)`, transformOrigin: "center bottom" }}
@@ -244,10 +257,10 @@ export default function FinanzasCompact() {
                     {ALTERNATIVAS.map((a) => (
                       <div key={a.t} className="flex items-baseline justify-between gap-[12px] border-b border-solid py-[10px] last:border-b-0" style={{ borderColor: VELO_BORDE }}>
                         <span className="text-[13.6px]" style={{ color: "rgba(247,241,229,0.85)" }}>{a.t}</span>
-                        <span className="shrink-0 text-[13.6px] font-semibold" style={{ color: a.verde ? VERD : "rgba(247,241,229,0.85)" }}>{a.v}</span>
+                        <span className="shrink-0 text-[13.6px] font-semibold" style={{ color: a.verde ? VERD : "rgba(247,241,229,0.85)" }}>{d.t(a.k, a.v)}</span>
                       </div>
                     ))}
-                    <Nota dark>La TIR incluye renta y valorización; el CDT es renta fija sin activo subyacente.</Nota>
+                    <Nota dark>{d.t("ft_alternativas_nota", "La TIR incluye renta y valorización; el CDT es renta fija sin activo subyacente.")}</Nota>
                   </In>
                 </div>
               </Band>
@@ -283,19 +296,19 @@ export default function FinanzasCompact() {
                     por columnas, así que cada año es una tarjeta. */}
                 <div className={`${WRAP} mt-[14px]`}>
                   <Card>
-                    {TABLA.map((r, i) => (
+                    {d.tabla("ft_proyeccion", TABLA).map((r, i, todas) => (
                       <In
-                        key={r[0]}
+                        key={`${r[0]}-${i}`}
                         delay={0.04 * i}
                         className="border-b border-solid py-[12px] first:pt-0 last:border-b-0 last:pb-0"
-                        style={{ borderColor: HAIRLINE, backgroundColor: i === TABLA.length - 1 ? "#e2e7d1" : undefined }}
+                        style={{ borderColor: HAIRLINE, backgroundColor: i === todas.length - 1 ? "#e2e7d1" : undefined }}
                       >
                         <span className="block text-[11px] font-semibold uppercase tracking-[0.4px]" style={{ color: TOPO }}>Año {r[0]}</span>
                         <div className="mt-[6px] grid grid-cols-2 gap-x-[12px] gap-y-[4px] sm:grid-cols-4">
                           {r.slice(1).map((c, j) => (
                             <span key={TABLA_HEAD[j + 1]} className="min-w-0">
                               <span className="block truncate text-[11.5px]" style={{ color: SOMBRA }}>{TABLA_HEAD[j + 1]}</span>
-                              <span className="block text-[14.5px] font-semibold" style={{ color: i === TABLA.length - 1 ? VERD : "#3a2c1c" }}>{c}</span>
+                              <span className="block text-[14.5px] font-semibold" style={{ color: i === todas.length - 1 ? VERD : "#3a2c1c" }}>{c}</span>
                             </span>
                           ))}
                         </div>
@@ -310,12 +323,12 @@ export default function FinanzasCompact() {
                 <div className={WRAP}>
                   <In><H2 dark>Liquidez</H2></In>
                   <div className="mt-[20px] grid grid-cols-1 gap-[10px] sm:grid-cols-2">
-                    {LIQUIDEZ.map((m, i) => <Mini key={m.t} t={m.t} v={m.v} delay={0.05 * i} />)}
+                    {LIQUIDEZ.map((m, i) => <Mini key={m.t} t={m.t} v={d.t(m.k, m.v)} delay={0.05 * i} />)}
                   </div>
 
                   <In className="mt-[34px]"><H2 dark>Costos de salida</H2></In>
                   <div className="mt-[20px] grid grid-cols-1 gap-[10px] sm:grid-cols-2">
-                    {SALIDA.map((m, i) => <Mini key={m.t} t={m.t} v={m.v} pie={m.pie || undefined} delay={0.05 * i} />)}
+                    {SALIDA.map((m, i) => <Mini key={m.t} t={m.t} v={d.t(m.k, m.v)} pie={m.kp ? d.t(m.kp, m.pie) : m.pie || undefined} delay={0.05 * i} />)}
                   </div>
 
                   <p className="m-0 mt-[22px] text-[12.5px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.6)" }}>

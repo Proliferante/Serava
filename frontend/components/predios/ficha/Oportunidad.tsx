@@ -4,6 +4,7 @@ import CanvasImage from "@/components/CanvasImage";
 import PrediosNav from "@/components/predios/PrediosNav";
 import Footer from "@/components/sections/Footer";
 import { motion } from "framer-motion";
+import { rutas, useFicha, type Lector } from "./datos";
 import {
   Band, Barre, BROWN, Cifra, CREAM, EASE, Entra, HAIRLINE, HeroFicha, IcArrowRight,
   IcCalendar, IcChat, IcCheck13, IcCheck18, IcDoc, IcHome18, IcHome22, IcPhone, IcPin, IcStar,
@@ -48,6 +49,31 @@ export const LEGEND = [
   { c: "#5f6b3e", l: "Valor creado", v: "+$326M", vc: "#4a5730", w: 72.39 },
 ];
 
+/** Las claves de las cuatro cifras, en el orden en que se apilan. */
+const TRAMOS = ["costo_precio", "costo_remodelacion", "costo_otros", "valor_creado"] as const;
+
+/**
+ * La barra apilada, a partir de sus cuatro importes.
+ *
+ * Los anchos NO se preguntan: se calculan. Quien rellena la ficha escribe
+ * cuatro cifras —$2.600M, $800M, $50M, +$326M— y la proporción sale de
+ * ellas. Preguntar además el porcentaje sería pedir dos veces el mismo dato
+ * y abrir la puerta a que la barra deje de cuadrar con sus propios números.
+ *
+ * Los porcentajes del diseño (68,86 / 21,19 / 1,32 / 8,63) son exactamente
+ * esa división, así que el prototipo sale idéntico sin tocar nada.
+ */
+export function tramos(d: Lector) {
+  const importes = TRAMOS.map((k, i) => d.n(k, [2600, 800, 50, 326][i]));
+  const total = importes.reduce((a, b) => a + b, 0);
+  return STACK.map((t, i) => ({
+    ...t,
+    w: total > 0 ? (importes[i] / total) * 100 : t.w,
+    label: t.label ? d.t(TRAMOS[i], LEGEND[i].v) : "",
+    leyenda: d.t(TRAMOS[i], LEGEND[i].v),
+  }));
+}
+
 /** Las tres cifras que cierran la mirada, antes del enlace al análisis. */
 export const MIRADA = [
   { t: "Retorno total (5 años)", v: "54,4%", cop: false },
@@ -81,20 +107,21 @@ export const POIS = [
 /** Tarjeta de "Por qué ZEQUARA lo seleccionó". El radio lo pone quien la usa. */
 function WhyCard({ i, radius }: { i: number; radius?: string }) {
   const { Ic, t, d } = WHY[i];
+  const f = useFicha();
   return (
     <div className="relative size-full" style={{ backgroundColor: "#eedbc0", borderRadius: radius }}>
       <div className="absolute flex items-center justify-center" style={{ left: 22, top: 26, width: 42, height: 42, borderRadius: 11, backgroundColor: "#ccd5af", color: "#463527" }}>
         <Ic />
       </div>
-      <p className="absolute font-semibold" style={{ left: 22, right: 22, top: 83, fontSize: 30, lineHeight: "22.46px", letterSpacing: -0.208, color: "#4b542e" }}>{t}</p>
-      <p className="absolute font-light" style={{ left: 22, right: 22, top: i === 0 || i === 1 ? 131 : 127, fontSize: 25, lineHeight: "37px", color: BROWN }}>{d}</p>
+      <p className="absolute font-semibold" style={{ left: 22, right: 22, top: 83, fontSize: 30, lineHeight: "22.46px", letterSpacing: -0.208, color: "#4b542e" }}>{f.t(`razon_${i + 1}_t`, t)}</p>
+      <p className="absolute font-light" style={{ left: 22, right: 22, top: i === 0 || i === 1 ? 131 : 127, fontSize: 25, lineHeight: "37px", color: BROWN }}>{f.t(`razon_${i + 1}_d`, d)}</p>
     </div>
   );
 }
 
 /** Tramo de la barra apilada. El rótulo va centrado dentro de su tramo. */
-function Seg({ i }: { i: number }) {
-  const s = STACK[i];
+function Seg({ i, t }: { i: number; t: ReturnType<typeof tramos>[number] }) {
+  const s = t;
   return (
     <div
       className="relative flex h-full shrink-0 items-center justify-center"
@@ -105,7 +132,9 @@ function Seg({ i }: { i: number }) {
       }}
     >
       {s.label && (
-        <span className="absolute whitespace-nowrap font-semibold text-white" style={{ fontSize: 11.8, lineHeight: "17.76px" }}>{s.label}</span>
+        <span className="absolute whitespace-nowrap font-semibold text-white" style={{ fontSize: 11.8, lineHeight: "17.76px" }}>
+          {i === 0 ? `Precio · ${s.label}` : i === 1 ? `Remod. ${s.label}` : s.label}
+        </span>
       )}
     </div>
   );
@@ -114,6 +143,9 @@ function Seg({ i }: { i: number }) {
 /* ── Página ────────────────────────────────────────────────────────────── */
 
 export default function Oportunidad() {
+  const d = useFicha();
+  const t = tramos(d);
+  const ir = rutas(d.slug);
   return (
     <div className="relative size-full" style={{ backgroundColor: CREAM }}>
       {/* ── Nav ── */}
@@ -153,8 +185,11 @@ export default function Oportunidad() {
           foto entra al 146 % del ancho de la caja, como en el diseño. */}
       <Reveal left={1129} top={765} width={696} height={658} delay={0.06} zIndex={6}>
         <div className="relative size-full overflow-hidden" style={{ borderRadius: 16 }}>
-          <div className="absolute" style={{ left: -320.4, top: 0, width: 1016.2, height: 658 }}>
-            <CanvasImage src={`${A}/ficha-interior.webp`} w={1016} />
+          {/* El encuadre desplazado es el del diseño, pensado para esa foto.
+              Una foto subida por el equipo se centra: recortarla a ciegas por
+              la izquierda escondería justo lo que quisieron enseñar. */}
+          <div className="absolute" style={{ left: d.esRemota("interior") ? 0 : -320.4, top: 0, width: d.esRemota("interior") ? 696 : 1016.2, height: 658 }}>
+            <CanvasImage src={d.foto("interior", `${A}/ficha-interior.webp`)} w={d.esRemota("interior") ? 696 : 1016} />
           </div>
         </div>
       </Reveal>
@@ -173,8 +208,8 @@ export default function Oportunidad() {
             <div className="absolute" style={{ left: 24, top: 24, width: 556.31, height: 74 }}>
               <div className="absolute" style={{ left: 0, top: 0, width: 140 }}>
                 <span className="block whitespace-nowrap font-semibold uppercase" style={{ fontSize: 10.2, lineHeight: "16px", letterSpacing: 0.922, color: "#9d8b70" }}>Tu All-in Cost</span>
-                <Cifra v="$3.450M" className="block whitespace-nowrap font-semibold" style={{ paddingTop: 5, fontSize: 32, lineHeight: "32px", color: "#3a2c1c" }} />
-                <span className="block whitespace-nowrap" style={{ paddingTop: 5, fontSize: 11.5, lineHeight: "17px", color: "#9d8b70" }}>$10,8M / m²</span>
+                <Cifra v={d.t("puente_allin", "$3.450M")} className="block whitespace-nowrap font-semibold" style={{ paddingTop: 5, fontSize: 32, lineHeight: "32px", color: "#3a2c1c" }} />
+                <span className="block whitespace-nowrap" style={{ paddingTop: 5, fontSize: 11.5, lineHeight: "17px", color: "#9d8b70" }}>{d.t("puente_allin_m2", "$10,8M / m²")}</span>
               </div>
               <motion.span
                 className="absolute font-normal"
@@ -188,8 +223,8 @@ export default function Oportunidad() {
               </motion.span>
               <div className="absolute text-right" style={{ left: 357.3, top: 0, width: 199 }}>
                 <span className="block whitespace-nowrap font-semibold uppercase" style={{ fontSize: 10.2, lineHeight: "16px", letterSpacing: 0.922, color: "#9d8b70" }}>Valor de mercado remodelado</span>
-                <Cifra v="$3.776M" className="block whitespace-nowrap font-semibold" style={{ paddingTop: 5, fontSize: 32, lineHeight: "32px", color: "#3a2c1c" }} />
-                <span className="block whitespace-nowrap" style={{ paddingTop: 5, fontSize: 11.5, lineHeight: "17px", color: "#9d8b70" }}>$11,8M / m²</span>
+                <Cifra v={d.t("puente_mercado", "$3.776M")} className="block whitespace-nowrap font-semibold" style={{ paddingTop: 5, fontSize: 32, lineHeight: "32px", color: "#3a2c1c" }} />
+                <span className="block whitespace-nowrap" style={{ paddingTop: 5, fontSize: 11.5, lineHeight: "17px", color: "#9d8b70" }}>{d.t("puente_mercado_m2", "$11,8M / m²")}</span>
               </div>
             </div>
 
@@ -197,11 +232,11 @@ export default function Oportunidad() {
                 inversión: primero el precio, luego la obra, y al final lo que
                 no se paga. */}
             <Barre className="absolute flex overflow-hidden" style={{ left: 24, top: 116, width: 556.31, height: 60, borderRadius: 11 }} delay={0.18}>
-              {STACK.map((_, i) => <Seg key={i} i={i} />)}
+              {t.map((x, i) => <Seg key={i} i={i} t={x} />)}
             </Barre>
 
             <p className="absolute font-light" style={{ left: 24, top: 190, width: 556.31, fontSize: 13.1, lineHeight: "20px", color: "#7a6a52" }}>
-              Tu inversión llega a <span className="font-semibold" style={{ color: "#3d2c1e" }}>$3.450M</span>; el mercado remodelado paga <span className="font-semibold" style={{ color: "#3d2c1e" }}>$3.776M</span>. Ese <span className="font-semibold" style={{ color: "#5f6b3e" }}>+$326M (+9%)</span> es valor patrimonial que no pagas.
+              Tu inversión llega a <span className="font-semibold" style={{ color: "#3d2c1e" }}>{d.t("puente_allin", "$3.450M")}</span>; el mercado remodelado paga <span className="font-semibold" style={{ color: "#3d2c1e" }}>{d.t("puente_mercado", "$3.776M")}</span>. Ese <span className="font-semibold" style={{ color: "#5f6b3e" }}>{d.t("valor_creado", "+$326M")} ({d.t("valor_creado_pct", "+9%")})</span> es valor patrimonial que no pagas.
             </p>
 
             <div className="absolute flex flex-wrap gap-x-[16px]" style={{ left: 24, top: 245, width: 556.31, paddingTop: 16, borderTop: "1px solid rgba(60,45,30,0.09)" }}>
@@ -217,7 +252,7 @@ export default function Oportunidad() {
                   <span className="shrink-0" style={{ width: 12, height: 12, borderRadius: 4, backgroundColor: g.c }} />
                   <div className="relative" style={{ width: g.w, height: 39.44 }}>
                     <span className="absolute whitespace-nowrap" style={{ left: 0, top: -1, fontSize: 11.2, lineHeight: "13.44px", color: "#7a6a52" }}>{g.l}</span>
-                    <span className="absolute whitespace-nowrap font-semibold" style={{ left: 0, top: 13.44, fontSize: 16.8, lineHeight: "26px", color: g.vc }}>{g.v}</span>
+                    <span className="absolute whitespace-nowrap font-semibold" style={{ left: 0, top: 13.44, fontSize: 16.8, lineHeight: "26px", color: g.vc }}>{t[i].leyenda}</span>
                   </div>
                 </motion.div>
               ))}
@@ -239,14 +274,14 @@ export default function Oportunidad() {
             >
               <IcTrend />
             </motion.span>
-            <Cifra v="+$326M" className="absolute block font-bold" style={{ left: 26, top: 58, width: 325.69, fontSize: 54.4, lineHeight: "54.4px", color: "#4a5730" }} />
-            <Cifra v="+9%" className="absolute block font-semibold" style={{ left: 26, top: 116, width: 325.69, fontSize: 25.6, lineHeight: "38px", color: "#5f6b3e" }} />
+            <Cifra v={d.t("valor_creado", "+$326M")} className="absolute block font-bold" style={{ left: 26, top: 58, width: 325.69, fontSize: 54.4, lineHeight: "54.4px", color: "#4a5730" }} />
+            <Cifra v={d.t("valor_creado_pct", "+9%")} className="absolute block font-semibold" style={{ left: 26, top: 116, width: 325.69, fontSize: 25.6, lineHeight: "38px", color: "#5f6b3e" }} />
             <p className="absolute font-light" style={{ left: 26, top: 170, width: 325.69, fontSize: 13.6, lineHeight: "20.4px", color: "#4a5730" }}>
-              Compras por debajo de lo que el mercado remodelado comparable ya paga en la microzona. Ese diferencial es tu margen patrimonial desde el día uno.
+              {d.t("valor_creado_texto", "Compras por debajo de lo que el mercado remodelado comparable ya paga en la microzona. Ese diferencial es tu margen patrimonial desde el día uno.")}
             </p>
             <div className="absolute flex items-center gap-[7px]" style={{ left: 26, top: 280.6, height: 30, padding: "0 12px", borderRadius: 999, backgroundColor: "rgba(255,255,255,0.55)" }}>
               <IcCheck13 className="shrink-0" style={{ color: "#5f6b3e" }} />
-              <span className="whitespace-nowrap font-semibold" style={{ fontSize: 11.5, lineHeight: "17.28px", color: "#5f6b3e" }}>~8% por debajo de la media remodelada</span>
+              <span className="whitespace-nowrap font-semibold" style={{ fontSize: 11.5, lineHeight: "17.28px", color: "#5f6b3e" }}>{d.t("valor_creado_chip", "~8% por debajo de la media remodelada")}</span>
             </div>
           </div>
         </Reveal>
@@ -266,13 +301,13 @@ export default function Oportunidad() {
               }}
             >
               <span className="absolute whitespace-nowrap font-semibold uppercase" style={{ left: 18, top: 17, fontSize: 10.9, lineHeight: "16px", letterSpacing: 0.653, color: "rgba(247,241,229,0.65)" }}>{k.t}</span>
-              <Cifra v={k.v} className="absolute whitespace-nowrap font-semibold" style={{ left: 18, top: 39, fontSize: 30.4, lineHeight: "31.92px", color: "#e7dbc2" }} />
+              <Cifra v={d.t(["kpi_retorno", "kpi_renta_mensual", "kpi_rentabilidad"][i], k.v)} className="absolute whitespace-nowrap font-semibold" style={{ left: 18, top: 39, fontSize: 30.4, lineHeight: "31.92px", color: "#e7dbc2" }} />
               {k.cop && <span className="absolute whitespace-nowrap" style={{ left: 130, top: 55, fontSize: 11.5, lineHeight: "12px", color: "rgba(247,241,229,0.65)" }}>COP</span>}
             </Entra>
           ))}
           <Entra delay={0.3}>
             <a
-              href="/predios/ficha/finanzas"
+              href={ir.finanzas}
               className="ix-press flex items-center justify-center gap-[9px] font-semibold"
               style={{ width: 220.38, height: 52, borderRadius: 11, backgroundColor: CREAM, fontSize: 14.1, color: "#3d2c1e" }}
             >
@@ -287,21 +322,26 @@ export default function Oportunidad() {
       <Band top={2178} height={700} bg={CREAM} corner="br" z={3}>
         <a href="#galeria" className="ix-nav absolute whitespace-nowrap font-semibold" style={{ left: 1011.56, top: 41.88, fontSize: 13.1, color: "#a57a4e" }}>Ver más fotos →</a>
         <h2 className="absolute whitespace-nowrap font-semibold" style={{ left: 154, top: 119.24, fontSize: 60, lineHeight: "36.29px", letterSpacing: -0.336, color: "#3d2c1e" }}>El potencial de transformación</h2>
-        <p className="absolute whitespace-nowrap font-light" style={{ left: 154, top: 193, fontSize: 25, lineHeight: "37.5px", color: "#6b5b47" }}>
-          Espacios con gran capacidad de cambio. La propuesta arquitectónica se desarrolla durante el proceso de negociación.
+        <p className="absolute font-light" style={{ left: 154, right: 154, top: 193, fontSize: 25, lineHeight: "37.5px", color: "#6b5b47" }}>
+          {d.t("potencial_intro", "Espacios con gran capacidad de cambio. La propuesta arquitectónica se desarrolla durante el proceso de negociación.")}
         </p>
 
         <div className="absolute flex gap-[14px]" style={{ left: 89, top: 259, width: 1747 }}>
           {TCARDS.map((c, i) => (
-            <Entra key={c.t} delay={0.04 + i * 0.08} className="ix-lift relative overflow-hidden" style={{ width: 426.25, height: 336.88, borderRadius: 14, backgroundColor: BROWN, backgroundImage: STRIPES }}>
-              <div className="flex size-full flex-col items-start justify-end" style={{ padding: 18, backgroundImage: "linear-gradient(180deg, rgba(18,12,8,0) 38%, rgba(18,12,8,0.86) 100%)" }}>
+            <Entra key={c.t} delay={0.04 + i * 0.08} className="ix-lift relative overflow-hidden" style={{ width: 426.25, height: 336.88, borderRadius: 14, backgroundColor: BROWN, backgroundImage: d.esRemota(`potencial_${i + 1}`) ? undefined : STRIPES }}>
+              {d.esRemota(`potencial_${i + 1}`) && (
+                <div className="absolute inset-0"><CanvasImage src={d.foto(`potencial_${i + 1}`, "")} w={426} /></div>
+              )}
+              <div className="relative flex size-full flex-col items-start justify-end" style={{ padding: 18, backgroundImage: "linear-gradient(180deg, rgba(18,12,8,0) 38%, rgba(18,12,8,0.86) 100%)" }}>
                 <span className="mb-[12px] flex items-center justify-center" style={{ width: 34, height: 34, borderRadius: 9, backgroundColor: "rgba(247,241,229,0.16)", color: "#efe6d5" }}>
                   <IcHome18 />
                 </span>
-                <span className="whitespace-nowrap font-semibold" style={{ fontSize: 25, lineHeight: "22.88px", color: "#efe6d5" }}>{c.t}</span>
-                <span className="mt-[5px] block" style={{ fontSize: 20, lineHeight: "30px", color: "rgba(247,241,229,0.82)" }}>{c.d[0]}<br />{c.d[1]}</span>
+                <span className="whitespace-nowrap font-semibold" style={{ fontSize: 25, lineHeight: "22.88px", color: "#efe6d5" }}>{d.t(`potencial_${i + 1}_t`, c.t)}</span>
+                <span className="mt-[5px] block" style={{ fontSize: 20, lineHeight: "30px", color: "rgba(247,241,229,0.82)" }}>
+                  {d.t(`potencial_${i + 1}_d`, `${c.d[0]} ${c.d[1]}`)}
+                </span>
               </div>
-              <span className="sr-only">Foto {i + 1} pendiente</span>
+              {!d.esRemota(`potencial_${i + 1}`) && <span className="sr-only">Foto {i + 1} pendiente</span>}
             </Entra>
           ))}
         </div>
@@ -341,16 +381,19 @@ export default function Oportunidad() {
         <Reveal left={350} top={147} width={623} height={417} delay={0.04}>
           <div className="relative size-full" style={{ backgroundColor: "#fbf8f1", border: `1px solid ${HAIRLINE}`, borderRadius: 16 }}>
             <h2 className="absolute font-semibold" style={{ left: 24, right: 24, top: 46.57, fontSize: 40, lineHeight: "29.38px", letterSpacing: -0.272, color: "#3d2c1e" }}>Ubicación y entorno</h2>
-            <p className="absolute whitespace-nowrap font-light" style={{ left: 24, top: 94.55, fontSize: 20, lineHeight: "30px", color: "#6b5b47" }}>Conectividad, exclusividad y alta demanda.</p>
+            <p className="absolute font-light" style={{ left: 24, right: 24, top: 94.55, fontSize: 20, lineHeight: "30px", color: "#6b5b47" }}>{d.t("entorno_bajada", "Conectividad, exclusividad y alta demanda.")}</p>
 
             <div className="absolute overflow-hidden" style={{ left: 24, top: 138.12, width: 309.44, height: 230, borderRadius: 12 }}>
-              <div className="absolute" style={{ left: 0, top: 0, width: 329, height: 230 }}>
-                <CanvasImage src={`${A}/ficha-mapa.webp`} w={329} alt="Mapa de La Cabrera, Bogotá" />
+              <div className="absolute" style={{ left: 0, top: 0, width: d.esRemota("mapa") ? 309.44 : 329, height: 230 }}>
+                <CanvasImage src={d.foto("mapa", `${A}/ficha-mapa.webp`)} w={d.esRemota("mapa") ? 309 : 329} alt={`Mapa de ${d.t("hero_ubicacion", "La Cabrera, Bogotá")}`} />
               </div>
             </div>
 
             <ul className="absolute" style={{ left: 351.44, top: 138.12, width: 247.56 }}>
-              {POIS.map(([name, min], i) => (
+              {POIS.map(([nombre, minutos], i) => {
+                const name = d.t(`poi_${i + 1}_n`, nombre);
+                const min = d.t(`poi_${i + 1}_m`, minutos);
+                return (
                 <motion.li
                   key={name}
                   className="flex items-center justify-between"
@@ -366,7 +409,8 @@ export default function Oportunidad() {
                   </span>
                   <span className="whitespace-nowrap font-semibold" style={{ fontSize: 13.8, color: "#2a241c" }}>{min}</span>
                 </motion.li>
-              ))}
+                );
+              })}
             </ul>
           </div>
         </Reveal>

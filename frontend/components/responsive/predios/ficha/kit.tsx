@@ -5,7 +5,8 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import MobileFooter from "@/components/responsive/MobileFooter";
 import { PrediosNavCompact } from "@/components/responsive/predios/PrediosShell";
 import { EASE, In, WRAP } from "@/components/responsive/kit";
-import { IcArea, IcBath, IcBed, IcCar, type TabKey, Termo } from "@/components/predios/ficha/kit";
+import { IcArea, IcBath, IcBed, IcCar, posicionTermo, type TabKey, Termo } from "@/components/predios/ficha/kit";
+import { rutas, useFicha } from "@/components/predios/ficha/datos";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA DE PREDIO — piezas de la vista fluida (móvil y tablet).
@@ -98,6 +99,7 @@ const TABS: { key: TabKey; label: string; corto: string; href: string }[] = [
 ];
 
 export function TabsCompact({ active }: { active: TabKey }) {
+  const href = rutas(useFicha().slug);
   return (
     <nav
       aria-label="Secciones de la ficha"
@@ -110,7 +112,7 @@ export function TabsCompact({ active }: { active: TabKey }) {
           return (
             <a
               key={t.key}
-              href={t.href}
+              href={href[t.key]}
               aria-current={on ? "page" : undefined}
               className="ix-pill relative flex h-[42px] flex-1 items-center justify-center whitespace-nowrap rounded-[14px] px-[10px] text-[14px] font-medium"
               style={{ color: on ? BROWN : "#e5dccf" }}
@@ -141,10 +143,10 @@ export function TabsCompact({ active }: { active: TabKey }) {
    velo —como hace el lienzo— deja ilegible lo poco que se vería de ella. */
 
 const SPECS = [
-  { Ic: IcArea, v: "320 m²", l: "Área total" },
-  { Ic: IcBed, v: "3", l: "Habitaciones" },
-  { Ic: IcBath, v: "3", l: "Baños" },
-  { Ic: IcCar, v: "4", l: "Parqueaderos" },
+  { k: "spec_area", Ic: IcArea, v: "320", u: " m²", l: "Área total" },
+  { k: "spec_habitaciones", Ic: IcBed, v: "3", u: "", l: "Habitaciones" },
+  { k: "spec_banos", Ic: IcBath, v: "3", u: "", l: "Baños" },
+  { k: "spec_parqueaderos", Ic: IcCar, v: "4", u: "", l: "Parqueaderos" },
 ];
 
 export function HeroCompact({
@@ -156,14 +158,21 @@ export function HeroCompact({
   /** La tarjeta de reserva, que en el lienzo va dentro del propio hero. */
   children?: ReactNode;
 }) {
+  const d = useFicha();
+  const actual = d.n("termo_actual", 8.1);
+  const min = d.n("termo_min", 7.5);
+  const max = d.n("termo_max", 12);
+  const millones = (n: number) => "$" + n.toLocaleString("es-CO", { maximumFractionDigits: 1 }) + "M";
   return (
     <div className="relative" style={{ backgroundColor: BROWN, borderBottomLeftRadius: 40 }}>
       {media}
 
       <div className={`${WRAP} pb-[28px] pt-[24px]`}>
         <In y={16}>
-          <p className="m-0 text-[11.5px] font-semibold uppercase leading-[1.5] tracking-[2px]" style={{ color: "#c9a877" }}>La Cabrera, Bogotá</p>
-          <h1 className="mt-[10px] text-[clamp(2rem,8.4vw,3rem)] font-light leading-[1.08] tracking-[-0.02em]" style={{ color: "#efe6d5" }}>{title}</h1>
+          <p className="m-0 text-[11.5px] font-semibold uppercase leading-[1.5] tracking-[2px]" style={{ color: "#c9a877" }}>{d.t("hero_ubicacion", "La Cabrera, Bogotá")}</p>
+          {/* En vertical el titular puede crecer sin pisar nada: el termómetro
+              y los metros van debajo, no en coordenadas fijas como el lienzo. */}
+          <h1 className="mt-[10px] text-[clamp(1.75rem,7.4vw,3rem)] font-light leading-[1.08] tracking-[-0.02em]" style={{ color: "#efe6d5" }}>{title}</h1>
         </In>
 
         {/* El termómetro de precio: el rediseño lo pone en el hero de las tres
@@ -171,10 +180,10 @@ export function HeroCompact({
         <In delay={0.06} className="mt-[34px] max-w-[520px]">
           <Termo
             width="100%"
-            pos={15.84}
-            label="Este activo · $8,1M"
-            min="$7,5M"
-            max="Mercado remodelado $12M"
+            pos={posicionTermo(actual, min, max)}
+            label={`Este activo · ${millones(actual)}`}
+            min={millones(min)}
+            max={d.t("termo_max_rotulo", `Mercado remodelado ${millones(max)}`)}
             trackH={16}
             mark={CREAM}
             labelColor={CREAM}
@@ -186,11 +195,11 @@ export function HeroCompact({
         </In>
 
         <div className="mt-[20px] grid grid-cols-2 gap-[10px] sm:grid-cols-4">
-          {SPECS.map(({ Ic, v, l }, i) => (
+          {SPECS.map(({ k, Ic, v, u, l }, i) => (
             <In key={l} delay={0.04 * i} y={12} className="flex items-center gap-[10px] rounded-[14px] border border-solid px-[13px] py-[11px]" style={{ borderColor: "rgba(201,168,119,0.24)", background: "rgba(247,241,229,0.04)" }}>
               <Ic className="shrink-0" style={{ color: "#c9a877" }} />
               <span className="min-w-0">
-                <span className="block text-[16px] font-semibold leading-[1.2]" style={{ color: "#efe6d5" }}>{v}</span>
+                <span className="block text-[16px] font-semibold leading-[1.2]" style={{ color: "#efe6d5" }}>{d.t(k, v) + u}</span>
                 <span className="block truncate text-[11px] leading-[1.3]" style={{ color: "rgba(247,241,229,0.6)" }}>{l}</span>
               </span>
             </In>
@@ -205,9 +214,12 @@ export function HeroCompact({
 
 /** Foto del inmueble a sangre, con el marrón entrando por abajo. */
 export function HeroFoto() {
+  const d = useFicha();
   return (
     <div className="relative">
-      <img src="/figma/ficha-hero.webp" alt="" fetchPriority="high" decoding="async" className="block w-full max-w-none object-cover" style={{ aspectRatio: "16 / 10" }} />
+      {/* `<img>` y no `next/image`: aquí la foto ocupa el ancho del viewport y
+          no hay un `sizes` exacto que dar como en el lienzo. */}
+      <img src={d.foto("hero", "/figma/ficha-hero.webp")} alt="" fetchPriority="high" decoding="async" className="block w-full max-w-none object-cover" style={{ aspectRatio: "16 / 10" }} />
       <span className="pointer-events-none absolute inset-x-0 bottom-0 block h-[38%]" style={{ background: "linear-gradient(180deg, rgba(73,33,0,0) 0%, rgba(73,33,0,0.86) 62%, #492100 100%)" }} />
     </div>
   );
@@ -228,7 +240,8 @@ function useCuentaAtras(inicio: number) {
 }
 
 export function ReservaCompact() {
-  const tiempo = useCuentaAtras(2 * 3600 + 59 * 60 + 38);
+  const d = useFicha();
+  const tiempo = useCuentaAtras(d.n("reserva_horas", 2) * 3600 + 59 * 60 + 38);
   const BORDE = "rgba(90,67,50,0.16)";
 
   return (
@@ -240,22 +253,22 @@ export function ReservaCompact() {
 
       <div className="p-[20px]">
         <div className="flex items-center gap-[13px] border-b border-solid pb-[16px]" style={{ borderColor: BORDE }}>
-          <span className="text-[26px] font-bold leading-none" style={{ color: VERD }}>96/100</span>
+          <span className="text-[26px] font-bold leading-none" style={{ color: VERD }}>{d.t("score", "96")}/100</span>
           <span>
             <span className="block text-[10.6px] uppercase tracking-[0.6px]" style={{ color: "#5b4332" }}>Score Zequara</span>
-            <span className="block text-[15px] font-semibold" style={{ color: ZEUS }}>Prioridad alta</span>
+            <span className="block text-[15px] font-semibold" style={{ color: ZEUS }}>{d.t("prioridad", "Prioridad alta")}</span>
           </span>
         </div>
 
         <p className="m-0 mt-[16px] text-[12px] font-light" style={{ color: "#5b4332" }}>Inversión total</p>
         <div className="mt-[2px] flex items-baseline gap-[8px]">
-          <span className="text-[clamp(1.9rem,8vw,2.4rem)] font-light leading-[1.15] tracking-[-0.02em]" style={{ color: "#3d2c1e" }}>$3.100M</span>
+          <span className="text-[clamp(1.9rem,8vw,2.4rem)] font-light leading-[1.15] tracking-[-0.02em]" style={{ color: "#3d2c1e" }}>{d.t("inversion_total", "$3.100M")}</span>
           <span className="text-[13px] font-light" style={{ color: "#5b4332" }}>COP</span>
         </div>
 
         <div className="mt-[12px] flex items-baseline justify-between gap-[10px] border-b border-solid pb-[16px]" style={{ borderColor: BORDE }}>
           <span className="text-[13px] font-light" style={{ color: "#5b4332" }}>ROI estimado</span>
-          <span className="text-[18px] font-bold" style={{ color: VERD }}>~22%</span>
+          <span className="text-[18px] font-bold" style={{ color: VERD }}>{d.t("roi_estimado", "~22%")}</span>
         </div>
 
         <div className="mt-[16px] flex items-center gap-[10px] rounded-[12px] border border-solid px-[14px] py-[12px]" style={{ background: "rgba(181,84,47,0.08)", borderColor: "rgba(181,84,47,0.25)" }}>
@@ -272,7 +285,7 @@ export function ReservaCompact() {
         </button>
 
         <p className="m-0 mt-[14px] text-center text-[12.5px] font-medium" style={{ color: TUSCANY }}>
-          <span className="motion-safe:animate-pulse">●</span> 5 inversionistas viendo este predio
+          <span className="motion-safe:animate-pulse">●</span> {d.t("viendo_ahora", "5")} inversionistas viendo este predio
         </p>
         <p className="m-0 mt-[8px] text-center text-[12px] font-light leading-[1.5]" style={{ color: "#5b4332" }}>
           Al reservar, <span className="font-semibold" style={{ color: "#3d2c1e" }}>el predio se bloquea</span> y deja de estar disponible para otros mientras tu reserva esté vigente.

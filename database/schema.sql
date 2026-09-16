@@ -252,3 +252,26 @@ ALTER TABLE inmueble_detalle
 -- Guardar, y una foto se sube en cuanto se elige. Mezclarlas obligaría a
 -- reescribir todo el bloque en cada subida, y dos personas trabajando a la
 -- vez sobre el mismo inmueble se pisarían el texto del otro.
+
+
+-- ───────────────────────────────────────────────────────────────────────────
+-- 6. EL SLUG — cómo se llama el predio en la URL pública
+-- ───────────────────────────────────────────────────────────────────────────
+--
+-- `/predios/ficha/apartamento-gran-formato-la-cabrera`.
+--
+-- No puede salir de la URL del anuncio (es del portal, y larga) ni del id de
+-- `clean_listings` (cambia en cada corrida del pipeline). Se calcula del
+-- título y la zona AL PUBLICAR y se guarda: si luego alguien corrige el
+-- título, el enlace que ya se compartió por WhatsApp tiene que seguir
+-- llevando al mismo sitio.
+--
+-- UNIQUE porque es lo que se busca desde la web, y dos predios con el mismo
+-- slug serían dos fichas compitiendo por la misma dirección. La colisión se
+-- resuelve al generarlo, añadiendo un número.
+
+ALTER TABLE inmueble_detalle
+    ADD COLUMN IF NOT EXISTS slug TEXT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS inmueble_detalle_slug_idx
+    ON inmueble_detalle (slug) WHERE slug IS NOT NULL;

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { animate, motion, useInView, useReducedMotion } from "framer-motion";
 import CanvasImage from "@/components/CanvasImage";
+import { rutas, useFicha } from "./datos";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA DE PREDIO — piezas que comparten las tres pestañas.
@@ -304,9 +305,9 @@ export function RevealN({
    Las tres posiciones salen del frame, así que cada página sólo pasa `active`. */
 
 const TABS = [
-  { key: "oportunidad" as const, label: "Oportunidad", href: "/predios/ficha" },
-  { key: "finanzas" as const, label: "Finanzas", href: "/predios/ficha/finanzas" },
-  { key: "transformacion" as const, label: "Transformación", href: "/predios/ficha/transformacion" },
+  { key: "oportunidad" as const, label: "Oportunidad" },
+  { key: "finanzas" as const, label: "Finanzas" },
+  { key: "transformacion" as const, label: "Transformación" },
 ];
 
 export type TabKey = (typeof TABS)[number]["key"];
@@ -324,6 +325,9 @@ const TAB_LAYOUT: Record<TabKey, { pill: { x: number; y: number; w: number; h: n
 
 export function TabsFicha({ active }: { active: TabKey }) {
   const { pill, labels } = TAB_LAYOUT[active];
+  /* Las tres pestañas tienen que quedarse dentro del mismo predio. Sin esto
+     saltar de Oportunidad a Finanzas devolvía siempre al prototipo. */
+  const href = rutas(useFicha().slug);
   return (
     <div
       className="absolute left-0 w-full overflow-hidden"
@@ -342,7 +346,7 @@ export function TabsFicha({ active }: { active: TabKey }) {
         ) : (
           <a
             key={t.key}
-            href={t.href}
+            href={href[t.key]}
             className="ix-nav absolute whitespace-nowrap font-medium"
             style={{ left: labels[t.key], top: 97 - 21.6 / 2, fontSize: 23, lineHeight: "21.6px", color: "#e5dccf" }}
           >
@@ -387,11 +391,30 @@ export function Band({
    geometría se deriva de `contentTop`: el frame coloca todo respecto a la
    caja de contenido, que sobresale del hero por arriba y por abajo. */
 
+/**
+ * El cuerpo de letra del titular, según su largo.
+ *
+ * Los cortes salen de lo que cabe en 520 px de ancho y 151 de alto: hasta dos
+ * renglones se queda en los 60 px del diseño, y de ahí en adelante baja para
+ * que quepan tres. Es un escalón y no una fórmula continua a propósito: dos
+ * fichas seguidas con tamaños de titular casi iguales pero no iguales se ven
+ * peor que dos con el mismo tamaño.
+ */
+function tituloPx(titulo: string) {
+  const n = titulo.length;
+  if (n <= 42) return 60;
+  if (n <= 78) return 46;
+  return 38;
+}
+
+/* Los cuatro datos de la fila del hero. `w` es el ancho de la caja de texto
+   en el frame; con una cifra más larga («1.200 m²») el texto la desborda sin
+   romper nada porque no recorta, sólo reserva sitio. */
 const HERO_SPECS = [
-  { Ic: IcArea, v: "320 m²", l: "Área total", w: 58.16 },
-  { Ic: IcBed, v: "3", l: "Habitaciones", w: 71.84 },
-  { Ic: IcBath, v: "3", l: "Baños", w: 33.63 },
-  { Ic: IcCar, v: "4", l: "Parqueaderos", w: 76.91 },
+  { k: "spec_area", Ic: IcArea, v: "320", l: "Área total", u: " m²", w: 58.16 },
+  { k: "spec_habitaciones", Ic: IcBed, v: "3", l: "Habitaciones", u: "", w: 71.84 },
+  { k: "spec_banos", Ic: IcBath, v: "3", l: "Baños", u: "", w: 33.63 },
+  { k: "spec_parqueaderos", Ic: IcCar, v: "4", l: "Parqueaderos", u: "", w: 76.91 },
 ];
 
 /* ── Termómetro de precio ──────────────────────────────────────────────────
@@ -472,16 +495,37 @@ export function Termo({
   );
 }
 
+/**
+ * Dónde cae la marca, en % del carril.
+ *
+ * Se calcula y no se pregunta: quien rellena la ficha escribe tres precios,
+ * no una posición. Si los tres no dan un rango con sentido —falta uno, o el
+ * mínimo es mayor que el máximo— se queda donde la deja el diseño.
+ */
+export function posicionTermo(actual: number, min: number, max: number, respaldo = 15.84) {
+  if (!(max > min)) return respaldo;
+  return Math.min(100, Math.max(0, ((actual - min) / (max - min)) * 100));
+}
+
+/** Formatea «8,1» como «$8,1M», que es como lo imprime la ficha. */
+const millones = (n: number) =>
+  "$" + n.toLocaleString("es-CO", { maximumFractionDigits: 1 }) + "M";
+
 /** El termómetro tal y como va en el hero: carril grueso y todo en crema. */
 export function TermoHero({ left, top }: { left: number; top: number }) {
+  const d = useFicha();
+  const actual = d.n("termo_actual", 8.1);
+  const min = d.n("termo_min", 7.5);
+  const max = d.n("termo_max", 12);
+
   return (
     <div className="absolute" style={{ left, top }}>
       <Termo
         width={543}
-        pos={15.84}
-        label="Este activo · $8,1M"
-        min="$7,5M"
-        max="Mercado remodelado $12M"
+        pos={posicionTermo(actual, min, max)}
+        label={`Este activo · ${millones(actual)}`}
+        min={millones(min)}
+        max={d.t("termo_max_rotulo", `Mercado remodelado ${millones(max)}`)}
         trackH={22}
         mark={CREAM}
         labelColor={CREAM}
@@ -514,11 +558,12 @@ export function HeroFicha({
   priority?: boolean;
   children?: ReactNode;
 }) {
+  const d = useFicha();
   return (
     <>
       {photo && (
         <div className="absolute" style={{ left: 657, top: 0, width: 1272, height: 552 }}>
-          <CanvasImage src="/figma/ficha-hero.webp" w={1272} priority={priority} />
+          <CanvasImage src={d.foto("hero", "/figma/ficha-hero.webp")} w={1272} priority={priority} />
         </div>
       )}
       <div
@@ -526,20 +571,44 @@ export function HeroFicha({
         style={{ left: 582, top: veil.top, width: 461, height: veil.height, backgroundImage: "linear-gradient(89.993deg, rgb(73,33,0) 0%, rgba(73,33,0,0.98) 42.789%, rgba(73,33,0,0.74) 78.361%, rgba(73,33,0,0) 99.993%)" }}
       />
 
-      <p className="absolute whitespace-nowrap font-semibold uppercase" style={{ left: contentLeft + 100, top: contentTop + 106, fontSize: 11.5, lineHeight: "17.28px", letterSpacing: 2.074, color: "#c9a877" }}>La Cabrera, Bogotá</p>
+      <p className="absolute whitespace-nowrap font-semibold uppercase" style={{ left: contentLeft + 100, top: contentTop + 106, fontSize: 11.5, lineHeight: "17.28px", letterSpacing: 2.074, color: "#c9a877" }}>
+        {d.t("hero_ubicacion", "La Cabrera, Bogotá")}
+      </p>
 
-      <h1 className="absolute whitespace-nowrap font-light" style={{ left: contentLeft + 96, top: contentTop + 141.33, fontSize: 60, lineHeight: "65.66px", letterSpacing: -0.608, color: "#efe6d5" }}>
-        {title ?? <>Un clásico con gran<br />potencial de valor</>}
+      {/* EL TITULAR SE ADAPTA A SU LARGO, Y NO AL REVÉS.
+          El del diseño son dos líneas de 60 px con su propio salto, y así se
+          queda. Uno de la base es una sola cadena que puede medir el doble:
+          «Apartamento de gran formato con potencial de reconversión» a 60 px
+          ocupaba cuatro renglones y se montaba encima del termómetro y de los
+          metros. Entre el titular y la franja hay 151 px y eso no se negocia
+          —moverlo desencuadra el hero—, así que lo que cede es el cuerpo de
+          letra: tres renglones como mucho, y el tamaño que quepa en ellos. */}
+      <h1
+        className={`absolute font-light${d.real ? "" : " whitespace-nowrap"}`}
+        style={{
+          left: contentLeft + 96, top: contentTop + 141.33,
+          ...(d.real
+            ? {
+                width: 520, maxHeight: 151, overflow: "hidden",
+                display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const,
+                fontSize: tituloPx(d.t("hero_titulo", "")),
+                lineHeight: `${tituloPx(d.t("hero_titulo", "")) * 1.09}px`,
+              }
+            : { fontSize: 60, lineHeight: "65.66px" }),
+          letterSpacing: -0.608, color: "#efe6d5",
+        }}
+      >
+        {d.nodo("hero_titulo", title ?? <>Un clásico con gran<br />potencial de valor</>)}
       </h1>
 
       <TermoHero left={termo.left} top={termo.top} />
 
       <div className="absolute flex gap-[28px]" style={{ left: specs.left, top: specs.top, height: 41.5 }}>
-        {HERO_SPECS.map(({ Ic, v, l, w }) => (
+        {HERO_SPECS.map(({ k, Ic, v, l, u, w }) => (
           <div key={l} className="flex items-center gap-[11px]">
             <Ic className="shrink-0" style={{ color: "#c9a877" }} />
             <div className="relative" style={{ width: w, height: 41.5 }}>
-              <span className="absolute whitespace-nowrap font-semibold" style={{ left: 0, top: -1, fontSize: 16.8, lineHeight: "25.2px", color: "#efe6d5" }}>{v}</span>
+              <span className="absolute whitespace-nowrap font-semibold" style={{ left: 0, top: -1, fontSize: 16.8, lineHeight: "25.2px", color: "#efe6d5" }}>{d.t(k, v) + u}</span>
               <span className="absolute whitespace-nowrap" style={{ left: 0, top: 24.19, fontSize: 10.9, lineHeight: "16.32px", color: "rgba(247,241,229,0.6)" }}>{l}</span>
             </div>
           </div>
@@ -567,7 +636,11 @@ function useCountdown(startSeconds: number) {
 }
 
 export function SidebarReserva() {
-  const time = useCountdown(2 * 3600 + 59 * 60 + 38);
+  const d = useFicha();
+  /* Las horas salen de la ficha; los 59:38 de propina son los del diseño, y
+     dan la sensación de una cuenta ya empezada en vez de un reloj recién
+     puesto en marcha. */
+  const time = useCountdown(d.n("reserva_horas", 2) * 3600 + 59 * 60 + 38);
   const BORDER = "rgba(90,67,50,0.16)";
 
   return (
@@ -584,10 +657,10 @@ export function SidebarReserva() {
       <div className="relative" style={{ height: 518 }}>
         {/* Score */}
         <div className="absolute flex items-center gap-[13px]" style={{ left: 22, right: 22, top: 22, paddingBottom: 18, borderBottom: `1px solid ${BORDER}` }}>
-          <span className="whitespace-nowrap font-bold" style={{ fontSize: 24, lineHeight: "37.2px", color: "#5f6b3e" }}>96/100</span>
+          <span className="whitespace-nowrap font-bold" style={{ fontSize: 24, lineHeight: "37.2px", color: "#5f6b3e" }}>{d.t("score", "96")}/100</span>
           <div className="relative" style={{ width: 101.63, height: 39.17 }}>
             <span className="absolute whitespace-nowrap uppercase" style={{ left: 0, top: -1, fontSize: 10.6, lineHeight: "16.37px", letterSpacing: 0.634, color: "#5b4332" }}>Score Zequara</span>
-            <span className="absolute whitespace-nowrap font-semibold" style={{ left: 0, top: 16.36, fontSize: 14.7, lineHeight: "22.82px", color: "#2a1e14" }}>Prioridad alta</span>
+            <span className="absolute whitespace-nowrap font-semibold" style={{ left: 0, top: 16.36, fontSize: 14.7, lineHeight: "22.82px", color: "#2a1e14" }}>{d.t("prioridad", "Prioridad alta")}</span>
           </div>
         </div>
 
@@ -595,7 +668,7 @@ export function SidebarReserva() {
         <div className="absolute" style={{ left: 22, right: 22, top: 68.65, paddingTop: 18 }}>
           <p style={{ fontSize: 11.8, lineHeight: "18.35px", color: "#5b4332" }}>Inversión total</p>
           <div className="relative" style={{ height: 49.59 }}>
-            <span className="absolute font-light" style={{ left: 0, top: 24.5 - 49.6 / 2, fontSize: 32, lineHeight: "49.6px", letterSpacing: -0.64, color: "#3d2c1e" }}>$3.100M</span>
+            <span className="absolute font-light" style={{ left: 0, top: 24.5 - 49.6 / 2, fontSize: 32, lineHeight: "49.6px", letterSpacing: -0.64, color: "#3d2c1e" }}>{d.t("inversion_total", "$3.100M")}</span>
             <span className="absolute" style={{ left: 123.02, top: 19.85 - 19.84 / 2, fontSize: 12.8, lineHeight: "19.84px", color: "#5b4332" }}>COP</span>
           </div>
         </div>
@@ -603,7 +676,7 @@ export function SidebarReserva() {
         {/* ROI */}
         <div className="absolute" style={{ left: 22, right: 22, top: 141.65, height: 58.27, borderBottom: `1px solid ${BORDER}` }}>
           <span className="absolute whitespace-nowrap" style={{ left: 0, top: 26.5 - 20.34 / 2, fontSize: 13.1, lineHeight: "20.34px", color: "#5b4332" }}>ROI estimado</span>
-          <span className="absolute whitespace-nowrap font-bold" style={{ left: 241, top: 27 - 27.28 / 2, fontSize: 17.6, lineHeight: "27.28px", color: "#5f6b3e" }}>~22%</span>
+          <span className="absolute whitespace-nowrap text-right font-bold" style={{ left: 160, width: 129, top: 27 - 27.28 / 2, fontSize: 17.6, lineHeight: "27.28px", color: "#5f6b3e" }}>{d.t("roi_estimado", "~22%")}</span>
         </div>
 
         {/* Cuenta atrás */}
@@ -627,7 +700,7 @@ export function SidebarReserva() {
 
         {/* Viendo ahora */}
         <p className="absolute text-center font-medium" style={{ left: 22, right: 22, top: 358.65, fontSize: 12.2, lineHeight: "18.85px", color: "#b5542f" }}>
-          <span className="motion-safe:animate-pulse">●</span> 5 inversionistas viendo este predio
+          <span className="motion-safe:animate-pulse">●</span> {d.t("viendo_ahora", "5")} inversionistas viendo este predio
         </p>
 
         {/* Aviso de bloqueo */}

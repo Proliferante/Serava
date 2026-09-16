@@ -3,6 +3,7 @@
 import { MotionConfig } from "framer-motion";
 import { useMemo, useState } from "react";
 import { PREDIOS } from "@/components/predios/data";
+import type { PredioPublicado } from "@/lib/predios";
 import { SCORE_TIP } from "@/components/predios/PredioCard";
 import PredioCardCompact from "@/components/responsive/predios/PredioCardCompact";
 import { PrediosHead, PrediosNavCompact } from "@/components/responsive/predios/PrediosShell";
@@ -74,21 +75,28 @@ function Campo({ label, value, opciones, onChange }: { label: string; value: str
   );
 }
 
-export default function PrediosCompact() {
+/**
+ * `predios` lo pasa la página desde el servidor: es lo publicado. Cuando no
+ * hay nada y las tarjetas de muestra están encendidas, llegan las ocho del
+ * diseño; cuando están apagadas, llega una lista vacía y se dice.
+ */
+export default function PrediosCompact({ predios = PREDIOS as PredioPublicado[] }: {
+  predios?: PredioPublicado[];
+}) {
   const [ciudad, setCiudad] = useState<string | null>(null);
   const [tipo, setTipo] = useState<string | null>(null);
   const [orden, setOrden] = useState<Orden>("score");
 
-  const ciudades = useMemo(() => [...new Set(PREDIOS.map((p) => p.city.split(" · ")[1]))], []);
-  const tipos = useMemo(() => [...new Set(PREDIOS.map((p) => p.chip))], []);
+  const ciudades = useMemo(() => [...new Set(predios.map((p) => p.city.split(" · ")[1]).filter(Boolean))], [predios]);
+  const tipos = useMemo(() => [...new Set(predios.map((p) => p.chip).filter(Boolean))], [predios]);
 
   const visibles = useMemo(() => {
-    const l = PREDIOS.filter((p) => (!ciudad || p.city.endsWith(ciudad)) && (!tipo || p.chip === tipo));
+    const l = predios.filter((p) => (!ciudad || p.city.endsWith(ciudad)) && (!tipo || p.chip === tipo));
     return [...l].sort((a, b) =>
       orden === "score" ? b.score - a.score
         : orden === "tir" ? b.tir - a.tir
           : montoDe(a.price) - montoDe(b.price));
-  }, [ciudad, tipo, orden]);
+  }, [predios, ciudad, tipo, orden]);
 
   return (
     <MotionConfig reducedMotion="user">
@@ -173,9 +181,31 @@ export default function PrediosCompact() {
           </p>
           <div className="mt-[16px] grid grid-cols-1 gap-[16px] sm:grid-cols-2">
             {visibles.map((p, i) => (
-              <PredioCardCompact key={p.title} data={p} delay={Math.min(i, 5) * 0.05} />
+              <PredioCardCompact
+                key={p.slug ?? p.title} data={p} delay={Math.min(i, 5) * 0.05}
+                href={p.slug ? `/predios/ficha/${p.slug}` : "/predios/ficha"}
+              />
             ))}
           </div>
+
+          {visibles.length === 0 && (
+            <div
+              className="mt-[16px] rounded-[16px] border border-dashed px-[22px] py-[34px] text-center"
+              style={{ borderColor: "rgba(165,122,78,0.35)", background: "rgba(247,241,229,0.04)" }}
+            >
+              <p className="m-0 text-[18px] font-light leading-[1.4]" style={{ color: "#f7f1e5" }}>
+                {predios.length === 0
+                  ? "Todavía no hay oportunidades publicadas."
+                  : "Ningún predio cumple ese filtro."}
+              </p>
+              {predios.length === 0 && (
+                <p className="m-0 mt-[10px] text-[13.5px] font-light leading-[1.55]" style={{ color: "rgba(247,241,229,0.7)" }}>
+                  El portafolio se actualiza cada mes. En cuanto entre un activo que cumpla los
+                  criterios de Zequara, aparecerá aquí con su ficha completa.
+                </p>
+              )}
+            </div>
+          )}
 
           <In delay={0.1}>
             <p className="mt-[26px] text-[13px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.5)" }}>

@@ -5,7 +5,8 @@ import { In, WRAP } from "@/components/responsive/kit";
 import {
   Barre, Cifra, IcArrowRight, IcCalendar, IcCheck13, IcPin,
 } from "@/components/predios/ficha/kit";
-import { LEGEND, MIRADA, PASOS, POIS, STACK, TCARDS, WHY } from "@/components/predios/ficha/Oportunidad";
+import { LEGEND, MIRADA, PASOS, POIS, TCARDS, tramos, WHY } from "@/components/predios/ficha/Oportunidad";
+import { rutas, useFicha } from "@/components/predios/ficha/datos";
 import {
   Band, BROWN, Card, CREAM, FichaShellCompact, FotoPendiente, H2, HAIRLINE, HeroCompact,
   HeroFoto, MILL, OLIVE, ReservaCompact, Sub, VERD,
@@ -26,6 +27,9 @@ import {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export default function OportunidadCompact() {
+  const d = useFicha();
+  const t = tramos(d);
+  const ir = rutas(d.slug);
   return (
     <MotionConfig reducedMotion="user">
       <FichaShellCompact
@@ -42,13 +46,13 @@ export default function OportunidadCompact() {
             <In><H2>Por qué ZEQUARA lo seleccionó</H2></In>
 
             <div className="mt-[22px] grid grid-cols-1 gap-[12px] sm:grid-cols-2">
-              {WHY.map(({ Ic, t, d }, i) => (
-                <In key={t} delay={0.05 * i} className="rounded-[16px] p-[20px]" style={{ backgroundColor: "#eedbc0" }}>
+              {WHY.map(({ Ic, t: titulo, d: desc }, i) => (
+                <In key={titulo} delay={0.05 * i} className="rounded-[16px] p-[20px]" style={{ backgroundColor: "#eedbc0" }}>
                   <span className="flex size-[42px] items-center justify-center rounded-[11px]" style={{ backgroundColor: "#ccd5af", color: "#463527" }}>
                     <Ic />
                   </span>
-                  <h3 className="m-0 mt-[16px] text-[19px] font-semibold leading-[1.2] tracking-[-0.01em]" style={{ color: "#4b542e" }}>{t}</h3>
-                  <p className="m-0 mt-[8px] text-[15px] font-light leading-[1.5]" style={{ color: BROWN }}>{d}</p>
+                  <h3 className="m-0 mt-[16px] text-[19px] font-semibold leading-[1.2] tracking-[-0.01em]" style={{ color: "#4b542e" }}>{d.t(`razon_${i + 1}_t`, titulo)}</h3>
+                  <p className="m-0 mt-[8px] text-[15px] font-light leading-[1.5]" style={{ color: BROWN }}>{d.t(`razon_${i + 1}_d`, desc)}</p>
                 </In>
               ))}
             </div>
@@ -69,60 +73,60 @@ export default function OportunidadCompact() {
               <div className="flex items-end justify-between gap-[12px]">
                 <span>
                   <span className="block text-[10.6px] font-semibold uppercase tracking-[0.95px]" style={{ color: "#94836b" }}>Tu All-in Cost</span>
-                  <span className="mt-[3px] block text-[clamp(1.5rem,7vw,2.1rem)] font-semibold leading-[1.05]" style={{ color: OLIVE }}>$3.450M</span>
+                  <span className="mt-[3px] block text-[clamp(1.5rem,7vw,2.1rem)] font-semibold leading-[1.05]" style={{ color: OLIVE }}>{d.t("puente_allin", "$3.450M")}</span>
                   <span className="block text-[11.5px]" style={{ color: "#94836b" }}>$10,8M / m²</span>
                 </span>
                 <span className="mb-[16px] shrink-0 text-[26px] leading-none" style={{ color: "#a57a4e" }}>→</span>
                 <span className="text-right">
                   <span className="block text-[10.6px] font-semibold uppercase tracking-[0.95px]" style={{ color: "#94836b" }}>Valor de mercado</span>
-                  <span className="mt-[3px] block text-[clamp(1.5rem,7vw,2.1rem)] font-semibold leading-[1.05]" style={{ color: OLIVE }}>$3.776M</span>
+                  <span className="mt-[3px] block text-[clamp(1.5rem,7vw,2.1rem)] font-semibold leading-[1.05]" style={{ color: OLIVE }}>{d.t("puente_mercado", "$3.776M")}</span>
                   <span className="block text-[11.5px]" style={{ color: "#94836b" }}>$11,8M / m²</span>
                 </span>
               </div>
 
               {/* Sin rótulos dentro: los cuatro números viven en la leyenda. */}
               <Barre className="mt-[18px] flex h-[44px] overflow-hidden rounded-[12px]" delay={0.12}>
-                {STACK.map((s, i) => (
+                {t.map((s, i) => (
                   <span
                     key={s.from}
                     className="block h-full shrink-0"
                     style={{
                       width: `${s.w}%`,
                       backgroundImage: `linear-gradient(180deg, ${s.from} 0%, ${s.to} 100%)`,
-                      borderRight: i === STACK.length - 1 ? undefined : "2px solid #faf5ea",
+                      borderRight: i === t.length - 1 ? undefined : "2px solid #faf5ea",
                     }}
                   />
                 ))}
               </Barre>
 
               <div className="mt-[16px] grid grid-cols-2 gap-x-[14px] gap-y-[12px] border-t border-solid pt-[16px]" style={{ borderColor: HAIRLINE }}>
-                {LEGEND.map((g) => (
+                {LEGEND.map((g, i) => (
                   <span key={g.v} className="flex items-center gap-[9px]">
                     <span className="block size-[12px] shrink-0 rounded-[4px]" style={{ backgroundColor: g.c }} />
                     <span className="min-w-0">
                       <span className="block truncate text-[11.5px]" style={{ color: MILL }}>{g.l}</span>
-                      <Cifra v={g.v} className="block text-[17px] font-semibold leading-[1.25]" style={{ color: g.vc }} />
+                      <Cifra v={t[i].leyenda} className="block text-[17px] font-semibold leading-[1.25]" style={{ color: g.vc }} />
                     </span>
                   </span>
                 ))}
               </div>
 
               <p className="m-0 mt-[16px] text-[14px] leading-[1.45]" style={{ color: MILL }}>
-                Tu inversión llega a <span style={{ color: "#3d2c1e" }}>$3.450M</span>; el mercado remodelado paga <span style={{ color: "#3d2c1e" }}>$3.776M</span>. Ese <span style={{ color: VERD }}>+$326M (+9%)</span> es valor patrimonial que no pagas.
+                Tu inversión llega a <span style={{ color: "#3d2c1e" }}>{d.t("puente_allin", "$3.450M")}</span>; el mercado remodelado paga <span style={{ color: "#3d2c1e" }}>{d.t("puente_mercado", "$3.776M")}</span>. Ese <span style={{ color: VERD }}>{d.t("valor_creado", "+$326M")} ({d.t("valor_creado_pct", "+9%")})</span> es valor patrimonial que no pagas.
               </p>
             </Card>
 
             {/* Valor creado hoy */}
             <Card className="mt-[12px]" delay={0.06} style={{ backgroundColor: "#f6ecd9" }}>
               <span className="block text-[10.9px] font-semibold uppercase tracking-[1.3px]" style={{ color: VERD }}>Valor creado hoy</span>
-              <Cifra v="+$326M" className="mt-[6px] block text-[clamp(2.6rem,13vw,3.6rem)] font-bold leading-[1]" style={{ color: "#4a5730" }} />
-              <Cifra v="+9%" className="mt-[2px] block text-[clamp(1.2rem,5vw,1.7rem)] font-semibold" style={{ color: VERD }} />
+              <Cifra v={d.t("valor_creado", "+$326M")} className="mt-[6px] block text-[clamp(2.6rem,13vw,3.6rem)] font-bold leading-[1]" style={{ color: "#4a5730" }} />
+              <Cifra v={d.t("valor_creado_pct", "+9%")} className="mt-[2px] block text-[clamp(1.2rem,5vw,1.7rem)] font-semibold" style={{ color: VERD }} />
               <p className="m-0 mt-[10px] text-[clamp(0.95rem,3.9vw,1.15rem)] font-light leading-[1.35]" style={{ color: "#4a5730" }}>
-                Compras por debajo de lo que el mercado remodelado comparable ya paga en la microzona. Ese diferencial es tu margen patrimonial desde el día uno.
+                {d.t("valor_creado_texto", "Compras por debajo de lo que el mercado remodelado comparable ya paga en la microzona. Ese diferencial es tu margen patrimonial desde el día uno.")}
               </p>
               <span className="mt-[14px] inline-flex items-center gap-[8px] rounded-full px-[12px] py-[6px]" style={{ background: "rgba(255,255,255,0.55)" }}>
                 <IcCheck13 className="shrink-0" style={{ color: VERD }} />
-                <span className="text-[11.5px] font-semibold" style={{ color: VERD }}>~8% por debajo de la media remodelada</span>
+                <span className="text-[11.5px] font-semibold" style={{ color: VERD }}>{d.t("valor_creado_chip", "~8% por debajo de la media remodelada")}</span>
               </span>
             </Card>
 
@@ -140,7 +144,7 @@ export default function OportunidadCompact() {
                 >
                   <span className="block text-[10.9px] font-semibold uppercase tracking-[0.65px]" style={{ color: "rgba(247,241,229,0.65)" }}>{k.t}</span>
                   <span className="mt-[4px] block text-[clamp(1.6rem,7vw,2rem)] font-semibold leading-[1.05]" style={{ color: "#e7dbc2" }}>
-                    <Cifra v={k.v} />
+                    <Cifra v={d.t(["kpi_retorno", "kpi_renta_mensual", "kpi_rentabilidad"][i], k.v)} />
                     {k.cop && <span className="ml-[6px] text-[11.5px] font-normal" style={{ color: "rgba(247,241,229,0.65)" }}>COP</span>}
                   </span>
                 </In>
@@ -149,7 +153,7 @@ export default function OportunidadCompact() {
 
             <In delay={0.16}>
               <a
-                href="/predios/ficha/finanzas"
+                href={ir.finanzas}
                 className="ix-press mt-[14px] flex h-[52px] w-full items-center justify-center gap-[9px] rounded-[12px] text-[16px] font-semibold"
                 style={{ backgroundColor: "#e2cdae", color: "#3d2c1e" }}
               >

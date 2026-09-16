@@ -85,7 +85,7 @@ from pydantic import BaseModel, Field
 from app.api.auth import usuario_actual
 from app.core import bitacora, config
 from app.core.database import cursor, escribir, tabla_existe
-from app.services import almacenamiento
+from app.services import almacenamiento, inmueble_service
 
 router = APIRouter()
 
@@ -721,9 +721,10 @@ def completar(p: PeticionCompletar, u: dict = Depends(usuario_actual)):
         )
         if p.ficha is not None:
             _escribe_ficha(con, p.link, p.ficha, ahora, responsable, publicada=True)
+        slug = _asegura_slug(con, p.link, p.titulo, p.ficha)
     bitacora.anotar(u, "flujo-publicar",
                     f"{p.tipo_transformacion or 'sin tipo'} · {p.link}")
-    return {"ok": True, "etapa": "publicado"}
+    return {"ok": True, "etapa": "publicado", "slug": slug}
 
 
 # ── La ficha del predio ───────────────────────────────────────────────────
@@ -766,10 +767,40 @@ def _escribe_ficha(con, link: str, ficha: dict, ahora, responsable: str,
     )
 
 
+def _asegura_slug(con, link: str, titulo: str | None, ficha: dict | None) -> str | None:
+    """Le pone nombre público al predio la primera vez que se publica.
+
+    Se calcula UNA vez y se guarda. Si ya lo tiene, se respeta aunque el
+    título haya cambiado: el enlace que alguien ya compartió por WhatsApp
+    tiene que seguir llevando al mismo sitio, y una ficha que cambia de
+    dirección cada vez que se corrige una palabra es una ficha que nadie
+    puede enlazar.
+    """
+    fila = con.execute(
+        "SELECT slug FROM inmueble_detalle WHERE url_inmueble = ?", (link,)
+    ).fetchone()
+    if fila and fila["slug"]:
+        return fila["slug"]
+
+    ubicacion = con.execute(
+        "SELECT zona, ciudad FROM clean_listings WHERE link = ? LIMIT 1", (link,)
+    ).fetchone() or {}
+
+    nombre = (ficha or {}).get("hero_titulo") or titulo
+    zona = (ficha or {}).get("hero_ubicacion") or ubicacion.get("zona")
+    slug = inmueble_service.slug_de(
+        nombre, zona, ubicacion.get("ciudad"), inmueble_service.slugs_ocupados(con)
+    )
+    con.execute(
+        "UPDATE inmueble_detalle SET slug = ? WHERE url_inmueble = ?", (slug, link)
+    )
+    return slug
+
+
 def _lee_detalle(link: str) -> dict:
     with cursor() as con:
         fila = con.execute(
-            """SELECT d.ficha, d.ficha_fotos, d.ficha_publicada,
+            """SELECT d.ficha, d.ficha_fotos, d.ficha_publicada, d.slug,
                       d.ficha_guardada_en, d.ficha_guardada_por,
                       d.titulo, d.habitaciones, d.banos, d.area_confirmada_m2,
                       d.tipo_transformacion, d.notas_visita,
@@ -829,6 +860,9 @@ def leer_ficha(link: str = Query(max_length=LIMITE_LINK),
         "ficha": d.get("ficha") or {},
         "fotos": d.get("ficha_fotos") or {},
         "publicada": bool(d.get("ficha_publicada")),
+        # La dirección pública, para poder abrir la ficha ya publicada desde
+        # la consola y ver lo mismo que ve el inversionista.
+        "slug": d.get("slug"),
         "guardada_en": guardada.isoformat() if guardada else None,
         "guardada_por": d.get("ficha_guardada_por"),
         "sugeridos": _sugeridos(d),
