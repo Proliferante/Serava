@@ -6,6 +6,7 @@ import CountUp from "@/components/motion/CountUp";
 import MobileNav from "@/components/responsive/MobileNav";
 import MobileFooter from "@/components/responsive/MobileFooter";
 import { EASE, In, WRAP } from "@/components/responsive/kit";
+import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    CÓMO OPERAMOS — vista fluida para móvil y tablet (por debajo de 1280).
@@ -131,7 +132,7 @@ export default function ModeloCompact() {
             <In y={16}><Paso dark>Cómo operamos</Paso></In>
             <In y={20} delay={0.08}>
               <h1 className="mt-[14px] text-[clamp(2rem,8.2vw,3.1rem)] font-light leading-[1.1] tracking-[-0.02em]" style={{ color: LINEN }}>
-                Una inversión bien operada empieza con <span className="font-semibold">mejores decisiones.</span>
+                Una buena inversión comienza con <span className="font-semibold">las mejores decisiones.</span>
               </h1>
               <P dark>Zequara integra selección, remodelación y operación en un sistema diseñado para aumentar el valor del activo y simplificar la experiencia del inversionista.</P>
             </In>
@@ -176,7 +177,7 @@ export default function ModeloCompact() {
           <In><Paso>Paso 02 · Selección del inmueble</Paso></In>
           <In delay={0.05}>
             <Pregunta>¿Cómo validamos cada oportunidad?</Pregunta>
-            <H3>Dos filtros antes de recomendar una compra.</H3>
+            <H3>Los filtros que aplicamos antes de una compra.</H3>
           </In>
           <Foto src="como-inmueble.webp" alt="Selección del inmueble" />
           <In delay={0.1}>
@@ -221,7 +222,7 @@ export default function ModeloCompact() {
             <Card title="Administración del arriendo" delay={0.12}>Comercialización, arrendatario y operación del activo.</Card>
             <Card title="Gestión de venta" delay={0.24}>Salida acompañada cuando decides vender.</Card>
           </div>
-          <Callout>Conoces los honorarios y las condiciones antes de aprobar cada servicio.</Callout>
+          <Callout>Conoces los costos y las condiciones de antemano.</Callout>
         </Sec>
 
         {/* ══════════ 7 · PASO 05 · CONTROL DE OBRA ══════════ */}
@@ -361,8 +362,8 @@ export default function ModeloCompact() {
             <P>Tú mantienes la propiedad y apruebas las decisiones clave. Zequara conecta selección, remodelación y operación mediante un solo equipo, un proceso trazable y un único interlocutor.</P>
           </In>
           <In delay={0.12}>
-            <a href="/solicitud-acceso" className="ix-press mt-[24px] flex h-[56px] w-full max-w-[340px] items-center justify-center rounded-full text-[16px] font-semibold" style={{ background: BROWN, color: CREAM }}>
-              Solicitar acceso
+            <a href={CTA_PORTAFOLIO_HREF} className="ix-press mt-[24px] flex h-[56px] w-full max-w-[340px] items-center justify-center rounded-full text-[16px] font-semibold" style={{ background: BROWN, color: CREAM }}>
+              {CTA_PORTAFOLIO}
             </a>
             <p className="mt-[16px] text-[13px] font-light leading-[1.5]" style={{ color: "rgba(91,67,50,0.85)" }}>
               Portafolio reservado para un grupo limitado de inversionistas. Acceso sujeto a evaluación.

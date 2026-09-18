@@ -129,7 +129,7 @@ export default function SolicitudCompact() {
               <H2>Cuéntanos cómo <span className="font-semibold">quieres invertir.</span></H2>
               <P>Tus respuestas nos ayudan a preparar una conversación más útil desde el primer contacto.</P>
             </In>
-            <CheckList items={["Toma unos 2 minutos.", "Sin membresía ni comisión para el inversionista.", "Tus datos se tratan de forma confidencial."]} />
+            <CheckList items={["Toma unos 2 minutos.", "Sin pagos por suscripción ni comisión para el inversionista.", "Tus datos se tratan de forma confidencial."]} />
 
             <In delay={0.14} className="mt-[28px] rounded-[20px] p-[20px]" style={{ background: "#f7f1e5" }}>
               <form className="flex flex-col gap-[16px]" onSubmit={(e) => { e.preventDefault(); setEnviado(true); }}>

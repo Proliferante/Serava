@@ -1,6 +1,7 @@
 import FiltroCard from "@/components/sections/FiltroCard";
 import { tinted, WORDMARK } from "@/components/brand";
 import CanvasImage from "@/components/CanvasImage";
+import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
 
 const A = "/figma";
 
@@ -71,9 +72,11 @@ export default function Section2Criterio() {
       {/* CTA → solicitud de acceso. Va en marrón sobre el crema de la sección;
           por eso el hover es `ix-fill`, que aclara a crema, y no `ix-invert`,
           que oscurecía —lo correcto cuando el botón era crema. */}
-      <a href="/solicitud-acceso" className="ix-fill ix-pulse-brown absolute bg-brown-dark h-[104px] left-[1234px] overflow-clip rounded-[98px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.25)] top-[865px] w-[404px] flex items-center justify-center">
+      {/* Mismo ensanche que en el hero, y hacia la izquierda: el botón estaba
+          pegado al margen derecho del lienzo (1234 + 404 = 1638 de 1920). */}
+      <a href={CTA_PORTAFOLIO_HREF} className="ix-fill ix-pulse-brown absolute bg-brown-dark h-[104px] left-[1200px] overflow-clip rounded-[98px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.25)] top-[865px] w-[470px] flex items-center justify-center">
         <p className="[word-break:break-word] font-semibold not-italic text-cream text-[24px] text-center leading-[1.15]">
-          Solicitar Entrevista
+          {CTA_PORTAFOLIO}
         </p>
       </a>
     </div>

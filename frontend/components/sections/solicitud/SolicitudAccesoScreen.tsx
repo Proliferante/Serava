@@ -448,7 +448,7 @@ export default function SolicitudAccesoScreen() {
           </T>
           {([
             ["Toma unos 2 minutos.", IC_TICK],
-            ["Sin membresía ni comisión para el inversionista.", IC_TICK],
+            ["Sin pagos por suscripción ni comisión para el inversionista.", IC_TICK],
             ["Tus datos se tratan de forma confidencial.", IC_LOCK],
           ] as const).map(([txt, ico], i) => (
             <Rise key={txt} className="absolute flex items-center gap-[11px]" style={{ left: 460, top: 421.62 + i * 34.3 }} delay={0.52 + i * 0.09} y={14} x={-14}>

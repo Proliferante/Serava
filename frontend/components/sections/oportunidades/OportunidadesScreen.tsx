@@ -3,6 +3,7 @@
 import { MotionConfig, animate, motion, useInView, useMotionTemplate, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Bloom, EASE, MLine, Orbit, POP, Pop, Rise, Rule, useParallaxY } from "@/components/motion/Kinetics";
+import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    OPORTUNIDADES — reproducción 1:1 del frame de Figma 311:1996 (1920 × 5701).
@@ -170,23 +171,23 @@ function CTA({ x, y, tone, d = 0 }: { x: number; y: number; tone: "olive" | "cre
   return (
     <Pop className="absolute" style={{ left: x, top: y }} delay={d} from={0.86} dur={0.6}>
       <a
-        href="/solicitud-acceso"
+        href={CTA_PORTAFOLIO_HREF}
         className={`ix-cta relative block overflow-hidden ${olive ? "ix-pulse-green" : "ix-pulse"}`}
         style={{
-          width: 222.17, height: 58.8,
+          width: 320, height: 58.8,
           background: olive ? AVOCADO : LINEN,
           borderRadius: 999,
           boxShadow: olive ? "0px 16px 32px -16px rgba(47,55,30,0.6)" : "0px 16px 32px -16px rgba(0,0,0,0.4)",
         }}
       >
         <T
-          x={32} cy={28.5} w={130.195}
+          x={32} cy={28.5} w={222}
           className={`font-semibold ${olive ? "" : "text-center"}`}
           style={{ fontSize: 16, lineHeight: "24.8px", color: olive ? LINEN : OIL }}
         >
-          <p>Solicitar acceso</p>
+          <p>{CTA_PORTAFOLIO}</p>
         </T>
-        <Ico size={18} layers={olive ? IC_ARROW_CREAM : IC_ARROW_DARK} className="ix-cta-arrow absolute" style={{ left: 172.17, top: 20.39 }} />
+        <Ico size={18} layers={olive ? IC_ARROW_CREAM : IC_ARROW_DARK} className="ix-cta-arrow absolute" style={{ left: 270, top: 20.39 }} />
         <span className="ix-cta-shine" aria-hidden />
       </a>
     </Pop>
@@ -458,7 +459,7 @@ export default function OportunidadesScreen() {
           <CTA x={601} y={686.64} tone="olive" d={0.94} />
           <T x={601} cy={796.8} d={1.06} className="whitespace-nowrap font-light" style={{ fontSize: 20.8, lineHeight: "32.24px", color: "rgba(247,241,229,0.6)" }}>
             <p>Las oportunidades activas están disponibles únicamente para</p>
-            <p>inversionistas aprobados.</p>
+            <p>inversionistas miembros.</p>
           </T>
         </L>
 
@@ -477,7 +478,7 @@ export default function OportunidadesScreen() {
           </L>
 
           <T x={440} cy={211.16} w={760} d={0} ry={16} className="font-normal" style={{ fontSize: 14.4, lineHeight: "22.32px", color: VERDIGRIS }}>
-            <p>El tipo de activos que buscamos</p>
+            <p>El tipo de activos que encontrarás</p>
           </T>
           <T x={440} cy={283.38} w={638.48} className="whitespace-nowrap" style={{ fontSize: 43.2, lineHeight: "48.38px", letterSpacing: "-1.08px", color: BISTRE }}>
             <MLine delay={0.12}>
@@ -520,7 +521,7 @@ export default function OportunidadesScreen() {
             <MLine delay={0.42}><span className="font-semibold">valor.</span></MLine>
           </T>
           <T x={238} cy={434.15} w={639.75} d={0.56} className="whitespace-nowrap font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: LINEN80 }}>
-            <p>Los inversionistas aprobados reciben una ficha que conecta los datos</p>
+            <p>Al obtener la membresía tendrás acceso a la ficha que conecta los datos</p>
             <p>del activo con la propuesta de transformación desarrollada por Zequara.</p>
             <p>La información permite entender el valor de entrada, la inversión</p>
             <p>requerida, el potencial de renta y la proyección de valorización.</p>
@@ -625,7 +626,7 @@ export default function OportunidadesScreen() {
           </T>
 
           <T x={417} cy={387.16} w={488} d={0.4} className="font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: MILLBROOK }}>
-            <p>Zequara acompaña cada operación desde la selección del activo hasta su remodelación y gestión posterior.</p>
+            <p>Zequara acompaña cada operación desde la selección del activo hasta su remodelación y posterior administración.</p>
           </T>
           <T x={417} cy={470.35} w={488} d={0.52} className="font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: MILLBROOK }}>
             <p>

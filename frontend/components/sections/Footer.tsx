@@ -1,4 +1,5 @@
 import { WORDMARK } from "@/components/brand";
+import { CTA_PORTAFOLIO_CORTO } from "@/components/copy";
 const A = "/figma";
 
 /** Footer (1922 × 364) */
@@ -29,7 +30,7 @@ export default function Footer() {
       <p className="[word-break:break-word] absolute font-extralight leading-[1.137] left-[1460px] not-italic text-[#cd9a64] text-[26px] top-[78px] tracking-[9.36px] whitespace-nowrap">CUENTA</p>
       <div className="[word-break:break-word] absolute font-light leading-[0] left-[1459px] not-italic text-[20px] text-white top-[147px] whitespace-nowrap">
         <p className="leading-[2.27] mb-0"><a href="/login" className="hover:underline">Iniciar sesión</a></p>
-        <p className="leading-[2.27]"><a href="/solicitud-acceso" className="hover:underline">Solicita acceso</a></p>
+        <p className="leading-[2.27]"><a href="/solicitud-acceso" className="hover:underline">{CTA_PORTAFOLIO_CORTO}</a></p>
       </div>
     </div>
   );

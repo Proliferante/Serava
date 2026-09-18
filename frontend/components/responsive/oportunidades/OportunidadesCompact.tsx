@@ -5,6 +5,7 @@ import MobileNav from "@/components/responsive/MobileNav";
 import MobileFooter from "@/components/responsive/MobileFooter";
 import BeforeAfterTouch from "@/components/responsive/BeforeAfterTouch";
 import { BROWN, Card, CheckList, CTA, Eyebrow, H2, In, LASER, Note, P, Parallax, Reveal, WRAP } from "@/components/responsive/kit";
+import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    OPORTUNIDADES — vista fluida para móvil y tablet (por debajo de 1280).
@@ -71,15 +72,15 @@ export default function OportunidadesCompact() {
               <P>Zequara selecciona activos en zonas consolidadas, con condiciones para aumentar su valor mediante diseño, remodelación y mejor operación.</P>
             </In>
             <In delay={0.16}>
-              <CTA href="/solicitud-acceso" tone="olive">Solicitar acceso</CTA>
-              <Note>Las oportunidades activas están disponibles únicamente para inversionistas aprobados.</Note>
+              <CTA href={CTA_PORTAFOLIO_HREF} tone="olive">{CTA_PORTAFOLIO}</CTA>
+              <Note>Las oportunidades activas están disponibles únicamente para inversionistas miembros.</Note>
             </In>
           </div>
         </section>
 
         {/* ══════════ 2 · PROYECTOS DE REFERENCIA ══════════ */}
         <section className={`${WRAP} py-[62px]`}>
-          <In><Eyebrow tone="brown">El tipo de activos que buscamos</Eyebrow></In>
+          <In><Eyebrow tone="brown">El tipo de activos que encontrarás</Eyebrow></In>
           <In delay={0.06}>
             <H2 dark>Espacios donde el valor <span className="font-semibold">puede construirse.</span></H2>
             <P dark>Conoce transformaciones realizadas por nuestro equipo y el tipo de propiedades que orientan la selección Zequara. Buscamos inmuebles bien ubicados, con atributos difíciles de replicar y capacidad de mejorar su posicionamiento a través de una intervención estratégica.</P>
@@ -130,7 +131,7 @@ export default function OportunidadesCompact() {
             <In><Eyebrow>Información para decidir</Eyebrow></In>
             <In delay={0.06}>
               <H2>Cada oportunidad muestra dónde está el potencial y <span className="font-semibold">cómo puede convertirse en valor.</span></H2>
-              <P>Los inversionistas aprobados reciben una ficha que conecta los datos del activo con la propuesta de transformación desarrollada por Zequara. La información permite entender el valor de entrada, la inversión requerida, el potencial de renta y la proyección de valorización.</P>
+              <P>Al obtener la membresía tendrás acceso a la ficha que conecta los datos del activo con la propuesta de transformación desarrollada por Zequara. La información permite entender el valor de entrada, la inversión requerida, el potencial de renta y la proyección de valorización.</P>
             </In>
 
             {/* Las cifras que en el lienzo van sobre la maqueta de la ficha. */}
@@ -167,7 +168,7 @@ export default function OportunidadesCompact() {
           <In><Eyebrow tone="brown">Una operación acompañada</Eyebrow></In>
           <In delay={0.06}>
             <H2 dark>Información para decidir. <span className="font-semibold">Un equipo para ejecutar.</span></H2>
-            <P dark>Zequara acompaña cada operación desde la selección del activo hasta su remodelación y gestión posterior. El inversionista <span className="font-semibold" style={{ color: BROWN }}>conserva la propiedad</span>, aprueba las decisiones clave y consulta el avance desde un solo lugar.</P>
+            <P dark>Zequara acompaña cada operación desde la selección del activo hasta su remodelación y posterior administración. El inversionista <span className="font-semibold" style={{ color: BROWN }}>conserva la propiedad</span>, aprueba las decisiones clave y consulta el avance desde un solo lugar.</P>
           </In>
           <CheckList dark items={ACOMPANAMIENTO} />
           <In delay={0.2}>
@@ -195,7 +196,7 @@ export default function OportunidadesCompact() {
               </p>
             </In>
             <In delay={0.14} className="flex flex-col items-center">
-              <CTA href="/solicitud-acceso" tone="linen">Solicitar acceso</CTA>
+              <CTA href={CTA_PORTAFOLIO_HREF} tone="linen">{CTA_PORTAFOLIO}</CTA>
               <p className="mt-[18px] text-[13px] font-light" style={{ color: "rgba(247,241,229,0.6)" }}>
                 Portafolio confidencial. Acceso sujeto a evaluación y disponibilidad.
               </p>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { WORDMARK, wordmarkH } from "@/components/brand";
 import { EASE, LASER, WRAP } from "@/components/responsive/kit";
+import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LOGIN — vista fluida para móvil y tablet (por debajo de 1280).
@@ -128,13 +129,13 @@ export default function LoginCompact() {
               <span className="h-px flex-1" style={{ background: "rgba(247,241,229,0.18)" }} />
             </div>
 
-            <a href="/solicitud-acceso" className="ix-press mt-[18px] flex h-[56px] w-full items-center justify-center rounded-full border border-solid text-[15px] font-medium text-cream-93" style={{ borderColor: "rgba(247,241,229,0.18)" }}>
-              Solicitar acceso a Zequara
+            <a href={CTA_PORTAFOLIO_HREF} className="ix-press mt-[18px] flex h-[56px] w-full items-center justify-center rounded-full border border-solid text-[15px] font-medium text-cream-93" style={{ borderColor: "rgba(247,241,229,0.18)" }}>
+              {CTA_PORTAFOLIO}
             </a>
 
             <div className="mt-[26px] flex flex-col items-center gap-[3px] text-center" style={{ color: "rgba(247,241,229,0.5)" }}>
               <span className="flex items-center gap-[6px] text-[13px] font-light"><LockIcon />Acceso cerrado y verificado.</span>
-              <span className="text-[13px] font-light">Solo inversionistas aprobados pueden ver las oportunidades.</span>
+              <span className="text-[13px] font-light">Solo los inversionistas miembros pueden ver las oportunidades.</span>
             </div>
           </motion.div>
         </section>

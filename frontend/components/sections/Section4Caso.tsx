@@ -246,12 +246,12 @@ export default function Section4Caso() {
             {tab === "escenarios" ? (
               <motion.div key="esc" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -14 }} transition={{ duration: 0.35, ease: EASE }}>
                 <p className="[word-break:break-word] font-normal leading-[1.25] not-italic text-brown-dark text-[25px] w-[980px]">
-                  Aun en el escenario más conservador, tu capital se multiplica <span className="font-bold">1,75× — cobrando renta cada año.</span>
+                  Aun en el escenario más conservador, tu capital se multiplica por <span className="font-bold">1,75 incluyendo los 5 años de renta + su valorización acumulada.</span>
                 </p>
                 <div className="mt-[26px] flex gap-[16px]">
-                  <ScenarioCard title="Conservador" rate="6% / año" sub="piso realista" value={5.41} multiplo={1.75} ganancia={2.31} delay={0} />
-                  <ScenarioCard title="Base" rate="8% / año" sub="premium" value={5.82} multiplo={1.88} ganancia={2.72} accent delay={0.12} />
-                  <ScenarioCard title="Optimista" rate="10% / año" sub="techo premium" value={6.26} multiplo={2.02} ganancia={3.16} delay={0.24} />
+                  <ScenarioCard title="Conservador" rate="6% / año" sub="por debajo de la media de la zona" value={5.41} multiplo={1.75} ganancia={2.31} delay={0} />
+                  <ScenarioCard title="Base" rate="8% / año" sub="en línea con la media de la zona" value={5.82} multiplo={1.88} ganancia={2.72} accent delay={0.12} />
+                  <ScenarioCard title="Optimista" rate="10% / año" sub="por encima de la media de la zona" value={6.26} multiplo={2.02} ganancia={3.16} delay={0.24} />
                 </div>
               </motion.div>
             ) : (

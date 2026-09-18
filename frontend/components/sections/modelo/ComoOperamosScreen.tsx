@@ -4,6 +4,7 @@ import { MotionConfig, motion } from "framer-motion";
 import { useRef, type CSSProperties, type ReactNode } from "react";
 import CountUp from "@/components/motion/CountUp";
 import { Draw, EASE, Float, MLine, Orbit, POP, Pop, Rise, Rule, useParallaxY } from "@/components/motion/Kinetics";
+import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    COMO OPERAMOS — reproducción 1:1 del frame de Figma 311:1396 (1920 × 9717).
@@ -602,7 +603,7 @@ export default function ComoOperamosScreen() {
           <Paso x={1076} cy={68.93} w={484} label="Paso 02 · Selección del inmueble" color={DRIFT} />
           <Question x={1076} cy={104.01} w={484} color={VERDIGRIS}>¿Cómo validamos cada oportunidad?</Question>
           <H3 x={1076} cy={161.85} w={484} color={BROWN}>
-            <p>Dos filtros antes de recomendar una compra.</p>
+            <p>Los filtros que aplicamos antes de una compra.</p>
           </H3>
 
           {/* Línea de tiempo (Line 13 + Ellipse 22/23/24) que se traza al entrar */}
@@ -706,7 +707,7 @@ export default function ComoOperamosScreen() {
           </L>
 
           <Callout x={440} y={623.945} w={602.88} h={79.63} icon={CK_LIGHT} textCy={39.4} textW={528.88} d={0.4}>
-            <p className="whitespace-nowrap">Conoces los honorarios y las condiciones antes de aprobar cada</p>
+            <p className="whitespace-nowrap">Conoces los costos y las condiciones de antemano.</p>
             <p>servicio.</p>
           </Callout>
         </Sec>
@@ -1013,18 +1014,18 @@ export default function ComoOperamosScreen() {
 
           <Pop className="absolute" style={{ left: 849, top: 491 }} delay={0.84} from={0.86} dur={0.6}>
             <a
-              href="/solicitud-acceso"
+              href={CTA_PORTAFOLIO_HREF}
               className="ix-cta relative block overflow-hidden"
-              style={{ width: 222.17, height: 58.8, background: LINEN, borderRadius: 999, boxShadow: "0px 16px 32px -16px rgba(0,0,0,0.4)" }}
+              style={{ width: 320, height: 58.8, background: LINEN, borderRadius: 999, boxShadow: "0px 16px 32px -16px rgba(0,0,0,0.4)" }}
             >
-              <T x={32} cy={28.5} w={130.195} className="text-center font-semibold" style={{ fontSize: 16, lineHeight: "24.8px", color: OIL }}>
-                <p>Solicitar acceso</p>
+              <T x={32} cy={28.5} w={222} className="text-center font-semibold" style={{ fontSize: 16, lineHeight: "24.8px", color: OIL }}>
+                <p>{CTA_PORTAFOLIO}</p>
               </T>
               <Ico
                 size={18}
                 layers={[["50% 20.83% 50% 20.83%", "-0.75px 0", "arrow1.svg"], ["25% 20.83% 25% 54.17%", "-5.89% -23.57% -5.89% -11.79%", "arrow2.svg"]]}
                 className="ix-cta-arrow absolute"
-                style={{ left: 172.17, top: 20.4 }}
+                style={{ left: 270, top: 20.4 }}
               />
               <span className="ix-cta-shine" aria-hidden />
             </a>

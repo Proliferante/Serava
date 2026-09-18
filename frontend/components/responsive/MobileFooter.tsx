@@ -1,4 +1,5 @@
 import { WORDMARK, wordmarkH } from "@/components/brand";
+import { CTA_PORTAFOLIO_CORTO } from "@/components/copy";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PIE DE MÓVIL Y TABLET.
@@ -67,7 +68,7 @@ export default function MobileFooter() {
             Iniciar sesión
           </a>
           <a href="/solicitud-acceso" className="ix-press flex h-[54px] shrink-0 items-center justify-center rounded-full sm:flex-1 bg-cream text-[15.5px] font-semibold text-brown-dark">
-            Solicita acceso
+            {CTA_PORTAFOLIO_CORTO}
           </a>
         </div>
 

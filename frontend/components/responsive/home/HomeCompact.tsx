@@ -10,6 +10,7 @@ import MobileNav from "@/components/responsive/MobileNav";
 import MobileFooter from "@/components/responsive/MobileFooter";
 import DiagnosticoTrigger from "@/components/DiagnosticoTrigger";
 import { Parallax, Reveal } from "@/components/responsive/kit";
+import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    HOME — vista fluida para móvil y tablet (por debajo de 1280).
@@ -145,9 +146,9 @@ const METRICAS = [
 
 /** Los tres escenarios de valorización (las ScenarioCard del lienzo). */
 const ESCENARIOS = [
-  { title: "Conservador", rate: "6% / año", sub: "piso realista", value: "5,41", multiplo: "1,75", ganancia: "2,31", accent: false },
-  { title: "Base", rate: "8% / año", sub: "premium", value: "5,82", multiplo: "1,88", ganancia: "2,72", accent: true },
-  { title: "Optimista", rate: "10% / año", sub: "techo premium", value: "6,26", multiplo: "2,02", ganancia: "3,16", accent: false },
+  { title: "Conservador", rate: "6% / año", sub: "por debajo de la media de la zona", value: "5,41", multiplo: "1,75", ganancia: "2,31", accent: false },
+  { title: "Base", rate: "8% / año", sub: "en línea con la media de la zona", value: "5,82", multiplo: "1,88", ganancia: "2,72", accent: true },
+  { title: "Optimista", rate: "10% / año", sub: "por encima de la media de la zona", value: "6,26", multiplo: "2,02", ganancia: "3,16", accent: false },
 ];
 
 const REMODELACION = [
@@ -211,9 +212,12 @@ export default function HomeCompact() {
             <img src={WORDMARK} alt="Zequara" decoding="async" className="block size-full max-w-none" />
           </motion.div>
 
-          <h1 className="mt-[30px] text-[clamp(2.1rem,9.2vw,3.5rem)] font-semibold leading-[1.05] text-cream">
-            <Reveal delay={0.12}><span className="block">Invierte tu capital,</span></Reveal>
-            <Reveal delay={0.22}><span className="block text-tan">no tu tiempo.</span></Reveal>
+          {/* Manda la promesa y el lema pasa a bajada (OBS-02). Baja de 3,5rem
+              a 2,9rem de tope: el titular nuevo es el doble de largo y a 3,5
+              ocupaba cuatro renglones en un móvil de 390. */}
+          <h1 className="mt-[30px] text-[clamp(1.8rem,7.6vw,2.9rem)] font-semibold leading-[1.08] text-cream">
+            <Reveal delay={0.12}><span className="block">Inversión inmobiliaria gestionada</span></Reveal>
+            <Reveal delay={0.22}><span className="block">de principio a fin.</span></Reveal>
           </h1>
 
           <motion.p
@@ -221,14 +225,14 @@ export default function HomeCompact() {
             initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
           >
-            Inversión inmobiliaria gestionada de principio a fin.
+            Invierte tu capital, <span className="text-tan">no tu tiempo.</span>
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3, ease: EASE }}
           >
-            <CTA href="/solicitud-acceso">Solicitar Entrevista</CTA>
+            <CTA href={CTA_PORTAFOLIO_HREF}>{CTA_PORTAFOLIO}</CTA>
           </motion.div>
 
           {/* Las tres cifras. En móvil una debajo de otra con su filete; a
@@ -249,7 +253,7 @@ export default function HomeCompact() {
 
           <In delay={0.1} className="mt-[38px]">
             <p className="text-[clamp(1rem,4vw,1.25rem)] font-medium leading-[1.45] text-cream">
-              Zequara encuentra el activo, lo remodela sin sobrecostos y lo administra.
+              Zequara encuentra por ti el inmueble que tenga mayor potencial de valorización, lo remodela sin sobrecostos y lo administra.
             </p>
             <p className="mt-[8px] text-[clamp(1rem,4vw,1.25rem)] font-black leading-[1.45] text-cream">
               Tú sumas un inmueble a tu patrimonio, rentando y valorizándose.
@@ -285,7 +289,7 @@ export default function HomeCompact() {
             <span className="font-light">Así se construye </span>
             <span className="font-semibold">patrimonio.</span>
           </p>
-          <CTA href="/solicitud-acceso" tone="brown">Solicitar Entrevista</CTA>
+          <CTA href={CTA_PORTAFOLIO_HREF} tone="brown">{CTA_PORTAFOLIO}</CTA>
         </In>
         </div>
       </section>
@@ -399,8 +403,8 @@ export default function HomeCompact() {
             <In delay={0.12}>
               <p className="m-0 mt-[26px] text-[13px] font-semibold uppercase tracking-[1.6px] text-[#a57a4e]">Escenarios</p>
               <p className="m-0 mt-[8px] text-[clamp(1rem,4.2vw,1.25rem)] font-light leading-[1.4] text-[#5b4332]">
-                Aún en el escenario más conservador, tu capital se multiplica{" "}
-                <span className="font-semibold text-brown-dark">1,75×</span> — cobrando renta cada año.
+                Aun en el escenario más conservador, tu capital se multiplica por{" "}
+                <span className="font-semibold text-brown-dark">1,75 incluyendo los 5 años de renta + su valorización acumulada.</span>
               </p>
             </In>
             <div className="mt-[12px] grid grid-cols-1 gap-[12px] sm:grid-cols-3">
@@ -470,7 +474,7 @@ export default function HomeCompact() {
               </div>
 
               <p className="m-0 mt-[16px] border-t border-solid pt-[14px] text-[15px] font-light leading-[1.5] text-[rgba(247,241,229,0.72)]" style={{ borderColor: "rgba(247,241,229,0.12)" }}>
-                <span className="font-extrabold text-cream-93">1,75× tu patrimonio en 5 años</span> — cobrando renta cada año.
+                <span className="font-extrabold text-cream-93">1,75× tu patrimonio en 5 años</span> — renta de los 5 años más la valorización acumulada.
               </p>
             </In>
           </div>

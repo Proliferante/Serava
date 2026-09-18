@@ -340,7 +340,7 @@ export default function DiagnosticoModal({ open, onClose, initialStep = "intro",
                   {/* CTA card */}
                   <div className="mt-[16px] w-full overflow-hidden rounded-[20px] p-[36px]" style={{ background: "linear-gradient(160deg, #7f8b57 0%, #5f6b3e 100%)" }}>
                     <h3 className="font-light text-[clamp(24px,4vw,30px)] text-[#f7f1e5]">Tu perfil se alinea con el modelo Zequara.</h3>
-                    <p className="mx-auto mt-[10px] max-w-[420px] font-light text-[14px] leading-[1.5]" style={{ color: "rgba(247,241,229,0.85)" }}>Solicita una evaluación de acceso. El acceso a Zequara es selectivo: cada solicitud se evalúa.</p>
+                    <p className="mx-auto mt-[10px] max-w-[420px] font-light text-[14px] leading-[1.5]" style={{ color: "rgba(247,241,229,0.85)" }}>Forma parte de este selecto grupo de inversionistas. Cada solicitud se evalúa de forma individual.</p>
                     <motion.a
                       href="/solicitud-acceso"
                       whileHover={{ scale: 1.03 }}
