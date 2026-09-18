@@ -68,6 +68,73 @@ def validar_clave(clave: str, correo: str = "", nombre: str = "") -> None:
             raise ErrorAuth("La contraseña no puede contener tu nombre ni tu correo.")
 
 
+# Dos listas para armar contraseñas que se puedan DICTAR por teléfono.
+#
+# Hacen falta porque las del equipo hay que repartirlas a mano, y una cadena
+# como `k7$Ld91qXm` se copia mal, se transcribe peor y acaba escrita en un
+# papel encima de la mesa — que es peor que cualquier cosa que evite.
+#
+# Sustantivo + adjetivo + tres dígitos da 14-16 caracteres, por encima del
+# mínimo de 12, y unas 40.000 combinaciones por dígito: no es una frase de
+# paso de las buenas, pero para seis cuentas internas detrás de un login con
+# límite de intentos es lo razonable frente a lo que sustituye.
+#
+# El vocabulario es del negocio a propósito: son fáciles de recordar para
+# quien trabaja en esto.
+_NOMBRES = (
+    "Obra", "Trato", "Cifra", "Llave", "Rumbo", "Puerta", "Senda", "Marco",
+    "Plano", "Campo", "Muro", "Techo", "Patio", "Umbral", "Cimiento", "Viga",
+    "Norte", "Cauce", "Puente", "Faro", "Vela", "Ancla", "Brújula", "Sendero",
+)
+_ADJETIVOS = (
+    "Limpia", "Justo", "Exacta", "Maestra", "Firme", "Ancha", "Clara", "Amplio",
+    "Nuevo", "Abierto", "Alto", "Sólido", "Sereno", "Recto", "Llano", "Cierto",
+    "Claro", "Hondo", "Vivo", "Pleno", "Nítido", "Franco", "Diáfano", "Certero",
+)
+
+
+def generar_clave(correo: str = "", nombre: str = "", intentos: int = 40) -> str:
+    """Una contraseña al azar que se puede dictar y que pasa `validar_clave`.
+
+    Se valida lo que sale antes de devolverlo. No es paranoia: la propia
+    validación prohíbe que la contraseña contenga el nombre de la persona, y
+    con un apellido como «Muro» o «Norte» el generador puede producir justo
+    eso. Si tras varios intentos no sale ninguna limpia, se cae a una cadena
+    al azar: fea de dictar, pero válida — mejor eso que devolver una que el
+    backend va a rechazar.
+    """
+    for _ in range(intentos):
+        clave = (secrets.choice(_NOMBRES) + secrets.choice(_ADJETIVOS)
+                 + "-" + str(secrets.randbelow(900) + 100))
+        try:
+            validar_clave(clave, correo, nombre)
+            return clave
+        except ErrorAuth:
+            continue
+    return secrets.token_urlsafe(12)
+
+
+def poner_clave(usuario_id: int, clave: str, exigir_cambio: bool = False,
+                correo: str = "", nombre: str = "") -> None:
+    """Fija la contraseña de un usuario SIN pedir la anterior.
+
+    Es la operación de un administrador que repone un acceso, no la de alguien
+    cambiando la suya —para eso está `cambiar_clave`, que sí verifica—. Existe
+    porque hasta ahora lo único que sabía hacer esto era un UPDATE a mano
+    dentro de `scripts/crear_usuarios.py`, y rotar las contraseñas del equipo
+    no debería obligar a editar un script de siembra.
+
+    En la base sólo entra el hash bcrypt. La contraseña en claro no se guarda,
+    no se registra y no vuelve: quien la pide es quien la reparte.
+    """
+    validar_clave(clave, correo, nombre)
+    with escribir() as con:
+        con.execute(
+            "UPDATE usuarios SET clave_hash = ?, debe_cambiar_clave = ? WHERE id = ?",
+            (security.hashear(clave), exigir_cambio, usuario_id),
+        )
+
+
 def normalizar_correo(correo: str) -> str:
     return (correo or "").strip().lower()
 

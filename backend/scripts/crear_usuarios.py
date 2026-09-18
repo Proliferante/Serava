@@ -6,32 +6,31 @@ Siembra los usuarios internos del equipo.
     cd backend
     python -m scripts.crear_usuarios
 
-Cada uno entra con la contraseña que tiene asignada abajo en `EQUIPO`, y la
-puede cambiar cuando quiera desde el menú lateral de la consola. No se le
-obliga a cambiarla al entrar: son cuentas de un equipo de seis personas que
-tiene que ponerse a trabajar, no altas de un servicio público.
+Cada uno entra con la contraseña que este script imprime al correrlo, y la
+puede cambiar cuando quiera desde el menú lateral de la consola.
 
-SOBRE ESTAS CONTRASEÑAS
-    Son deliberadamente sencillas y predecibles —`Zq<Nombre>26`— porque hay
-    que dictarlas y repartirlas. Eso está bien para la consola interna
-    mientras vive en `localhost`, y NO está bien el día que esto tenga un
-    dominio: antes de publicar, que cada quien cambie la suya desde la
-    consola, o se pasa este script a `--azar`.
+AQUÍ NO HAY NINGUNA CONTRASEÑA ESCRITA, Y ESO ES EL PUNTO
+    Las hubo: seis, en la lista `EQUIPO`, con nombre y apellido al lado.
+    Acabaron publicadas en GitHub en un repositorio público y legibles por
+    cualquiera, porque una contraseña escrita en un archivo del repo va donde
+    va el repo. El acceso completo a la consola interna estuvo a un clic de
+    distancia de quien diera con la URL.
 
-    En la base sólo se guarda el hash bcrypt, nunca la contraseña.
+    Ahora se generan en memoria al correr el script, se guarda su hash bcrypt
+    y se imprimen una vez en la terminal. Nada toca el disco.
+
+    Para reponer la contraseña de alguien que ya existe, esto no es la
+    herramienta: es `scripts/rotar_claves.py`.
 
 OPCIONES
-    --reiniciar   a los que ya existan les vuelve a poner su contraseña de
-                  `EQUIPO`. Sin esto, los existentes se saltan y se avisa.
-    --azar        en vez de las de `EQUIPO`, genera una al azar por persona y
-                  exige cambiarla al entrar. Es lo que hay que usar cuando
-                  esto salga de localhost.
-    --clave X     la misma X para todos. Para una demo controlada.
+    --reiniciar       a los que ya existan les pone contraseña nueva. Sin
+                      esto, los existentes se saltan y se avisa.
+    --exigir-cambio   además, la consola les pide cambiarla al entrar.
+    --clave X         la misma X para todos. Para una demo controlada; no
+                      para producción, y no se escribe en ningún sitio.
 """
 
 import argparse
-import secrets
-import string
 import sys
 
 # La consola de Windows viene en cp1252, que no puede escribir ni "ñ" ni los
@@ -57,38 +56,25 @@ from app.services import auth_service as svc
 # David estaban sin el punto (`laurap`, `davidc`) y eran los dos únicos: un
 # correo que no sigue el patrón del resto se teclea mal la primera vez, y
 # aquí el correo ES la identidad para entrar.
-# Las contraseñas cumplen la política de `app/core/config.py`: doce
-# caracteres o más, no están en la lista de obvias y no contienen el nombre ni
-# el correo de su dueño —por eso NO son "ZqChristian26" y parecidas, que la
-# validación rechaza justamente por llevar el nombre dentro—.
-#
-# Son frases cortas y fáciles de dictar, no cadenas al azar: hay que
-# repartirlas por chat y que cada quien las teclee sin equivocarse. Para el
-# día que esto tenga dominio está `--azar`.
+# Quién es quién. SIN contraseña: la pone `auth_service.generar_clave()` al
+# correr, y sale por pantalla. Ver el encabezado del archivo para el porqué.
 EQUIPO = [
-    ("Christian Mejía", "christian.mejia@zequara.com", "arquitectura", "ObraLimpia-472"),
-    ("Laura P.",        "laura.p@proliferante.com",    "comercial",    "TratoJusto-915"),
-    ("David C.",        "david.c@proliferante.com",     "data",         "CifraExacta-268"),
-    ("Paola A.",        "paola.a@proliferante.com",    "admin",        "LlaveMaestra-731"),
-    ("Nati C.",         "nati.c@proliferante.com",     "admin",        "RumboFirme-584"),
-    ("Jesús A.",        "jesus.a@proliferante.com",    "admin",        "PuertaAncha-390"),
+    ("Christian Mejía",  "christian.mejia@zequara.com", "arquitectura"),
+    ("Laura P.",         "laura.p@proliferante.com",    "comercial"),
+    ("David C.",         "david.c@proliferante.com",    "data"),
+    ("Paola A.",         "paola.a@proliferante.com",    "admin"),
+    ("Nati C.",          "nati.c@proliferante.com",     "admin"),
+    ("Jesús A.",         "jesus.a@proliferante.com",    "admin"),
+    ("Natalia Gonzalez", "nata.g@proliferante.com",     "admin"),
 ]
-
-# Sin caracteres ambiguos (l, I, 1, O, 0): estas contraseñas se leen en voz
-# alta o se copian a mano más de una vez.
-ALFABETO = "".join(c for c in string.ascii_letters + string.digits if c not in "lI1O0")
-
-
-def clave_al_azar(n: int = 14) -> str:
-    return "".join(secrets.choice(ALFABETO) for _ in range(n))
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Crea los usuarios internos del equipo.")
     ap.add_argument("--reiniciar", action="store_true",
-                    help="reasigna contraseña a los que ya existan")
-    ap.add_argument("--azar", action="store_true",
-                    help="contraseña al azar por persona, y obliga a cambiarla al entrar")
+                    help="pone contraseña nueva a los que ya existan")
+    ap.add_argument("--exigir-cambio", action="store_true",
+                    help="pedirles que la cambien al entrar")
     ap.add_argument("--clave", default=None,
                     help="usa esta contraseña para todos (demo; no producción)")
     args = ap.parse_args()
@@ -109,14 +95,11 @@ def main() -> int:
         print("ERROR: --clave debe tener al menos 8 caracteres.", file=sys.stderr)
         return 1
 
-    # `--azar` es el único modo que obliga a cambiarla: si la contraseña la
-    # eligió una persona y se repartió a mano, forzar el cambio tiene sentido
-    # sólo cuando esa contraseña es de un solo uso.
-    forzar_cambio = args.azar
+    forzar_cambio = args.exigir_cambio
 
     resultados = []
-    for nombre, correo, rol, clave_fija in EQUIPO:
-        clave = args.clave or (clave_al_azar() if args.azar else clave_fija)
+    for nombre, correo, rol in EQUIPO:
+        clave = args.clave or svc.generar_clave(correo, nombre)
         existente = svc.por_correo(correo)
 
         if existente and not args.reiniciar:
@@ -139,7 +122,7 @@ def main() -> int:
         except svc.ErrorAuth as e:
             resultados.append((correo, rol, None, f"ERROR: {e}"))
 
-    ancho = max(len(c) for _, c, _, _ in EQUIPO) + 2
+    ancho = max(len(c) for _, c, _ in EQUIPO) + 2
     print()
     print("  CONTRASEÑAS DE ACCESO" + (" (temporales, se piden cambiar al entrar)"
                                        if forzar_cambio else ""))
