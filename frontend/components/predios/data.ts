@@ -24,7 +24,8 @@ export const PREDIOS: Predio[] = [
     title: "Apartamento de gran formato con potencial de reconversión",
     chip: "Reposicionamiento premium", specs: "320 m² · 3 hab · 3 baños · 2 parq",
     price: "COP $3.100M", priceNote: "Compra + remodelación",
-    tir: 16, horizon: "Horizonte: 5 años", status: "Abierto para evaluación",
+    tir: 16, horizon: "Horizonte: 5 años", status: "Disponible para reservar",
+    viendo: 5, publicado: "hace 2 días",
   },
   {
     badge: { label: "Disponible", tone: "green" }, score: 88,
@@ -32,7 +33,8 @@ export const PREDIOS: Predio[] = [
     title: "Casa con potencial de división en dos unidades",
     chip: "División en dos unidades", specs: "260 m² · 4 hab · 3 baños · 2 parq",
     price: "COP $1.450M", priceNote: "Compra + remodelación",
-    tir: 17, horizon: "Horizonte: 5 años", status: "Abierto para evaluación",
+    tir: 17, horizon: "Horizonte: 5 años", status: "Disponible para reservar",
+    viendo: 3, publicado: "hace 6 días",
   },
   {
     badge: { label: "Disponible", tone: "green" }, score: 85,
@@ -40,7 +42,8 @@ export const PREDIOS: Predio[] = [
     title: "Torre exclusiva lista para remodelación integral",
     chip: "Remodelación completa", specs: "150 m² · 2 hab · 2 baños · 2 parq",
     price: "COP $1.520M", priceNote: "Compra + remodelación",
-    tir: 15, horizon: "Horizonte: 4 años", status: "Abierto para evaluación",
+    tir: 15, horizon: "Horizonte: 4 años", status: "Disponible para reservar",
+    viendo: 2, publicado: "hace 9 días",
   },
   {
     badge: { label: "Nueva oportunidad", tone: "gold" }, score: 90,
@@ -49,6 +52,7 @@ export const PREDIOS: Predio[] = [
     chip: "Remodelación completa", specs: "145 m² · 2 hab · 2 baños · 1 parq",
     price: "COP $1.180M", priceNote: "Compra + remodelación",
     tir: 18, horizon: "Horizonte: 4 años", status: "Recién incorporada al portafolio",
+    viendo: 7, publicado: "hoy",
   },
   {
     badge: { label: "Reserva liberada", tone: "green" }, score: 86,
@@ -57,6 +61,7 @@ export const PREDIOS: Predio[] = [
     chip: "Cambio de distribución", specs: "160 m² · 2 hab · 2 baños · 2 parq",
     price: "COP $1.680M", priceNote: "Compra + remodelación",
     tir: 14, horizon: "Horizonte: 5 años", status: "Disponible nuevamente",
+    viendo: 4, publicado: "hace 3 días",
   },
   {
     badge: { label: "Alta actividad", tone: "amber" }, score: 92,
@@ -65,6 +70,7 @@ export const PREDIOS: Predio[] = [
     chip: "Cambio de distribución", specs: "210 m² · 2 hab · 2 baños · 2 parq",
     price: "COP $2.050M", priceNote: "Compra + remodelación",
     tir: 15, horizon: "Horizonte: 5 años", status: "Actualmente en evaluación por inversionistas",
+    viendo: 11, publicado: "hace 12 días",
   },
   {
     badge: { label: "En proceso de reserva", tone: "steel" }, score: 87,
@@ -73,6 +79,7 @@ export const PREDIOS: Predio[] = [
     chip: "Reposicionamiento premium", specs: "180 m² · 3 hab · 3 baños · 1 parq",
     price: "COP $1.950M", priceNote: "Compra + remodelación",
     tir: 15, horizon: "Horizonte: 5 años", status: "Reserva en validación",
+    viendo: 8, publicado: "hace 15 días",
   },
   {
     badge: { label: "Reservada", tone: "dark" }, score: 91,
@@ -81,5 +88,6 @@ export const PREDIOS: Predio[] = [
     chip: "Reposicionamiento premium", specs: "190 m² · 2 hab · 2 baños · 2 parq",
     price: "COP $1.900M", priceNote: "Compra + remodelación",
     tir: 16, horizon: "Horizonte: 5 años", status: "Oportunidad reservada",
+    publicado: "hace 21 días",
   },
 ];

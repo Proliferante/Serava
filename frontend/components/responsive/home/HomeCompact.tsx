@@ -123,10 +123,14 @@ const STATS = [
 ];
 
 /** Texto literal de Section3Proceso: en móvil va el mismo, no un resumen. */
+/* Los cuatro pasos del Anexo A del plan de edición (OBS-05). El paso 02 es el
+   que faltaba, y es el que dice que la propiedad queda a nombre de quien
+   invierte — que era justo lo que echaban en falta. */
 const PASOS = [
-  { n: "PASO 01", t: "Accedes a oportunidades con potencial real", d: "Zequara busca y filtra propiedades con fundamentos arquitectónicos, financieros y legales para aumentar su valor mediante remodelación." },
-  { n: "PASO 02", t: "Aumentas el valor de tu propiedad", d: "La experiencia arquitectónica de Zequara optimiza la remodelación para aumentar el valor del inmueble sin invertir de más y con el presupuesto controlado." },
-  { n: "PASO 03", t: "Generas retorno sin operarla", d: "Zequara administra la renta y te acompaña en la venta, para que la propiedad produzca sin convertirse en otra operación para ti." },
+  { n: "PASO 01", t: "Accedes a inmuebles previamente evaluados", d: "Cada inmueble publicado ha sido revisado arquitectónica y financieramente y cuenta con un modelo de inversión." },
+  { n: "PASO 02", t: "Compras con un rango definido", d: "Definimos el precio de compra según el modelo de inversión y negociamos bajo ese criterio. El inmueble queda a tu nombre." },
+  { n: "PASO 03", t: "Transformas con una inversión planificada", d: "Diseñamos, presupuestamos y ejecutamos la remodelación de acuerdo con el alcance definido para el inmueble." },
+  { n: "PASO 04", t: "Gestionamos el plan de valorización", d: "Después de la transformación, te acompañamos en la renta o venta del inmueble según la estrategia definida." },
 ];
 
 /** Las tres tarjetas de filtro de Section2Criterio, que faltaban enteras. */
@@ -560,7 +564,7 @@ export default function HomeCompact() {
           <In delay={0.3} className="mt-[16px] rounded-bl-[40px] rounded-tr-[40px] px-[22px] py-[16px] shadow-[6px_4px_4px_0px_rgba(0,0,0,0.18)]" style={{ background: "#c1986c" }}>
             <p className="m-0 text-[16px] font-extrabold leading-[1.14] text-brown-dark">Así se ve tu inversión</p>
             <p className="m-0 text-[16px] leading-[1.14] text-white">
-              El mismo modelo que eligió tu inmueble, <span className="font-extrabold">ahora lo cuida.</span>
+              El mismo equipo que lo eligió <span className="font-extrabold">es el que lo administra.</span>
             </p>
           </In>
         </div>
@@ -578,7 +582,7 @@ export default function HomeCompact() {
         <Parallax src={`${A}/63f0d4b26acea5bd4269d62fe7c1683462dc68c9.webp`} opacity={0.2} amount={48} anchor="top" />
         <div className={`${WRAP} relative py-[68px]`}>
           <In>
-            <h2 className="m-0 text-[clamp(1.9rem,7.4vw,2.8rem)] font-black leading-[1.08] text-cream">El criterio de entrada</h2>
+            <h2 className="m-0 text-[clamp(1.9rem,7.4vw,2.8rem)] font-black leading-[1.08] text-cream">El mismo criterio en cada mercado</h2>
             <P>Los datos, el diseño, la curaduría y el seguimiento son Zequara, estés donde estés.</P>
           </In>
 

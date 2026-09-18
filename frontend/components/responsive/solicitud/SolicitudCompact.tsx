@@ -2,9 +2,10 @@
 
 import { MotionConfig } from "framer-motion";
 import { useState } from "react";
+import IrA from "@/components/IrA";
 import MobileNav from "@/components/responsive/MobileNav";
 import ConfirmacionModal from "@/components/sections/solicitud/ConfirmacionModal";
-import { BROWN, Card, CheckList, CTA, Eyebrow, H2, In, LASER, MILLBROOK, Note, P, Reveal, Step, Timeline, WRAP } from "@/components/responsive/kit";
+import { BROWN, Card, CheckList, CTA, Eyebrow, H2, In, LASER, MILLBROOK, Note, P, Reveal, Step, Timeline, Volver, WRAP } from "@/components/responsive/kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SOLICITUD DE ACCESO — vista fluida para móvil y tablet (por debajo de 1280).
@@ -96,10 +97,21 @@ export default function SolicitudCompact() {
               <P>Completa tu perfil para iniciar el proceso de acceso a oportunidades seleccionadas según tu capital, objetivo y mercados de interés.</P>
             </In>
             <In delay={0.16}>
-              <a href="#formulario" className="ix-press mt-[26px] flex h-[56px] w-full max-w-[340px] items-center justify-center rounded-full text-[16px] font-semibold" style={{ background: "#7f8b57", color: "#f7f1e5" }}>
+              {/* Con `IrA` y no con un ancla suelta: el margen deja el destino
+                  por debajo de la cabecera pegajosa, y así los dos botones se
+                  comportan igual aquí y en el lienzo (OBS-44). */}
+              <IrA destino="formulario" margen={84} className="ix-press mt-[26px] flex h-[56px] w-full max-w-[340px] items-center justify-center rounded-full text-[16px] font-semibold" style={{ background: "#7f8b57", color: "#f7f1e5" }}>
                 Completar mi perfil
-              </a>
+              </IrA>
+              {/* En vertical van uno debajo del otro: dos botones de 56 px de
+                  alto no caben lado a lado en 390 sin partir el texto. */}
+              <IrA destino="espacio-privado" margen={84} className="ix-press mt-[10px] flex h-[56px] w-full max-w-[340px] items-center justify-center rounded-full border border-solid text-[16px] font-semibold" style={{ borderColor: "rgba(226,205,174,0.45)", color: "#e2cdae" }}>
+                ¿Qué beneficios obtengo?
+              </IrA>
               <p className="mt-[16px] text-[15px] font-medium" style={{ color: "#e2cdae" }}>El formulario toma aproximadamente 2 minutos.</p>
+              {/* Se entra aquí desde un correo o un enlace suelto, sin el menú
+                  a mano: la vuelta al home tiene que verse (OBS-20). */}
+              <div className="mt-[20px]"><Volver tono="oscuro" /></div>
             </In>
           </div>
         </section>
@@ -192,6 +204,7 @@ export default function SolicitudCompact() {
 
         {/* ══════════ 4 · QUÉ ENCUENTRAS ══════════ */}
         <section className={`${WRAP} py-[58px]`}>
+          <span id="espacio-privado" className="block scroll-mt-[80px]" />
           <In><Eyebrow tone="brown">Tu espacio privado</Eyebrow></In>
           <In delay={0.06}>
             <H2 dark>Información estructurada para <span className="font-semibold">evaluar cada oportunidad.</span></H2>

@@ -18,12 +18,13 @@ import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
 
 const A = "/figma";
 
-/** Los mismos cuatro pares del lienzo, con sus rótulos literales. */
+/** Los mismos cuatro pares del lienzo, con sus rótulos literales. El espacio
+    sale del propio archivo del comparador, que es lo que enseña la imagen. */
 const PROYECTOS = [
-  { slug: "1502-sala", ciudad: "Bogotá", predio: "Cabrera 1502" },
-  { slug: "1502-bano", ciudad: "Bogotá", predio: "Cabrera 1601" },
-  { slug: "1601-cocina", ciudad: "Bogotá", predio: "Cabrera 1502" },
-  { slug: "1602-sala", ciudad: "Bogotá", predio: "Cabrera 1602" },
+  { slug: "1502-sala", ciudad: "Bogotá", zona: "La Cabrera", predio: "Cabrera 1502", espacio: "Sala" },
+  { slug: "1502-bano", ciudad: "Bogotá", zona: "La Cabrera", predio: "Cabrera 1601", espacio: "Baño" },
+  { slug: "1601-cocina", ciudad: "Bogotá", zona: "La Cabrera", predio: "Cabrera 1502", espacio: "Cocina" },
+  { slug: "1602-sala", ciudad: "Bogotá", zona: "La Cabrera", predio: "Cabrera 1602", espacio: "Sala" },
 ];
 
 /** Las cuatro columnas de la ficha, con el texto del lienzo. */
@@ -86,40 +87,39 @@ export default function OportunidadesCompact() {
             <P dark>Conoce transformaciones realizadas por nuestro equipo y el tipo de propiedades que orientan la selección Zequara. Buscamos inmuebles bien ubicados, con atributos difíciles de replicar y capacidad de mejorar su posicionamiento a través de una intervención estratégica.</P>
           </In>
 
-          {/* La ficha del proyecto destacado, con las mismas dos filas de datos
-              que el lienzo pone al pie del comparador grande. */}
-          <In delay={0.12} className="mt-[24px] rounded-[16px] border border-solid border-[rgba(165,122,78,0.28)] bg-[rgba(255,255,255,0.45)] p-[18px]">
-            <p className="m-0 text-[17px] font-semibold" style={{ color: BROWN }}>Cabrera 1502 · Bogotá</p>
-            <p className="m-0 mt-[3px] text-[13.5px] font-light" style={{ color: "#5b4332" }}>Remodelación integral ultra lujo</p>
-            <div className="mt-[14px] grid grid-cols-2 gap-[12px]">
-              <div>
-                <p className="m-0 text-[11px] font-semibold uppercase tracking-[1px]" style={{ color: "#a57a4e" }}>Ciudad / Zona</p>
-                <p className="m-0 mt-[3px] text-[14px] font-medium" style={{ color: BROWN }}>Bogotá · Cabrera 1502</p>
-              </div>
-              <div>
-                <p className="m-0 text-[11px] font-semibold uppercase tracking-[1px]" style={{ color: "#a57a4e" }}>Intervención</p>
-                <p className="m-0 mt-[3px] text-[14px] font-medium" style={{ color: BROWN }}>Integral</p>
-              </div>
-            </div>
+
+          {/* La instrucción va ANTES de las imágenes: al final no la leía nadie
+              y el comparador parecía una foto más (OBS-39). */}
+          <In delay={0.16}>
+            <p className="mt-[18px] text-[13.5px] font-light leading-[1.5]" style={{ color: "#5b4332" }}>
+              Arrastra el círculo (o toca la imagen) para ver el antes y el después de cada proyecto.
+            </p>
           </In>
 
-          <div className="mt-[22px] flex flex-col gap-[22px]">
+          <div className="mt-[14px] flex flex-col gap-[22px]">
             {PROYECTOS.map((p, i) => (
               <In key={`${p.slug}-${i}`} delay={0.06 * i}>
                 <BeforeAfterTouch slug={p.slug} alt={`${p.predio} · ${p.ciudad}`} />
-                <div className="mt-[10px] flex items-baseline justify-between gap-[12px]">
+                {/* El mismo pie para los cuatro: antes uno llevaba ficha y los
+                    otros tres eran fotos sueltas (OBS-38). */}
+                <div className="mt-[10px] rounded-[14px] border border-solid border-[rgba(165,122,78,0.28)] bg-[rgba(255,255,255,0.45)] px-[16px] py-[13px]">
                   <p className="m-0 text-[12px] font-semibold uppercase tracking-[1.4px]" style={{ color: "#a57a4e" }}>Antes / Después</p>
-                  <p className="m-0 text-[13.5px] font-medium" style={{ color: BROWN }}>{p.ciudad} · {p.predio}</p>
+                  <p className="m-0 mt-[4px] text-[15.5px] font-semibold" style={{ color: BROWN }}>{p.predio}</p>
+                  <div className="mt-[10px] grid grid-cols-2 gap-[12px]">
+                    <div>
+                      <p className="m-0 text-[11px] font-semibold uppercase tracking-[1px]" style={{ color: "#a57a4e" }}>Ciudad / Zona</p>
+                      <p className="m-0 mt-[3px] text-[13.5px] font-medium" style={{ color: BROWN }}>{p.ciudad} · {p.zona}</p>
+                    </div>
+                    <div>
+                      <p className="m-0 text-[11px] font-semibold uppercase tracking-[1px]" style={{ color: "#a57a4e" }}>Espacio</p>
+                      <p className="m-0 mt-[3px] text-[13.5px] font-medium" style={{ color: BROWN }}>{p.espacio}</p>
+                    </div>
+                  </div>
                 </div>
               </In>
             ))}
           </div>
 
-          <In delay={0.24}>
-            <p className="mt-[18px] text-[13.5px] font-light leading-[1.5]" style={{ color: "#5b4332" }}>
-              Arrastra el círculo (o toca la imagen) para ver el antes y el después de cada proyecto.
-            </p>
-          </In>
           <Note dark>Los proyectos mostrados son casos de referencia. El portafolio activo es confidencial.</Note>
         </section>
 

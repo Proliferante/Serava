@@ -45,6 +45,25 @@ export const MIEMBROS = "inversionistas miembros";
 /** Lo que de verdad no se cobra. Sustituye a «acceso sin membresía». */
 export const SIN_SUSCRIPCION = "Sin pagos por suscripción";
 
+/* ── El presupuesto ───────────────────────────────────────────────────────
+   Tal y como estaba redactado —«los hallazgos técnicos se incorporan al
+   presupuesto inicial»— se podía leer al revés de lo que pasa: como si la obra
+   pudiera encarecerse sobre la marcha. El mensaje tiene que aparecer igual en
+   Cómo operamos y en la ficha del predio, así que vive aquí. */
+
+/** Qué protege el presupuesto: el alcance ya costeado. */
+export const PRESUPUESTO_CERRADO_1 =
+  "El presupuesto es cerrado: el alcance se costea antes de empezar y los "
+  + "hallazgos de obra no lo modifican.";
+
+/** Lo único que sí puede moverlo, y siempre con aprobación previa. */
+export const PRESUPUESTO_CERRADO_2 =
+  "Solo los cambios de diseño que tú solicites se cotizan y se aprueban antes "
+  + "de ejecutarse.";
+
+/** Las dos frases seguidas, para donde quepa el mensaje entero. */
+export const PRESUPUESTO_CERRADO = `${PRESUPUESTO_CERRADO_1} ${PRESUPUESTO_CERRADO_2}`;
+
 /* ── Aviso legal ──────────────────────────────────────────────────────────
    Va en el pie de todas las pantallas públicas y en la ficha del predio: es
    la frontera entre informar y recomendar, y conviene que esté donde se

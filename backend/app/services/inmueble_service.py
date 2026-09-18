@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from datetime import datetime, timezone
 
 from app.core.database import cursor
 
@@ -145,6 +146,30 @@ def _specs(ficha: dict) -> str:
     return " · ".join(partes)
 
 
+def _publicado(cuando) -> str | None:
+    """«hoy», «ayer», «hace 6 días» — lo que la tarjeta enseña al lado del reloj.
+
+    Es una señal de oportunidad, no una fecha: a quien mira le importa si esto
+    acaba de salir o lleva tres semanas ahí, no el día exacto. Por encima de un
+    mes se deja de contar, que «hace 47 días» ya no dice nada.
+    """
+    if not cuando:
+        return None
+    dias = (datetime.now(timezone.utc) - _con_zona(cuando)).days
+    if dias <= 0:
+        return "hoy"
+    if dias == 1:
+        return "ayer"
+    if dias <= 30:
+        return f"hace {dias} días"
+    return None
+
+
+def _con_zona(t: datetime) -> datetime:
+    """La columna puede venir sin zona horaria; se asume UTC, que es como se graba."""
+    return t if t.tzinfo else t.replace(tzinfo=timezone.utc)
+
+
 def _tarjeta(fila: dict) -> dict:
     ficha = fila.get("ficha") or {}
     fotos = fila.get("ficha_fotos") or {}
@@ -169,6 +194,11 @@ def _tarjeta(fila: dict) -> dict:
         "tir": _numero(ficha.get("fin_tir")) or 0,
         "horizon": _txt(ficha, "card_horizonte") or "",
         "status": _txt(ficha, "card_estado") or "",
+        # Las dos señales de actividad de la portada (OBS-50). Salen de lo que
+        # ya se escribe en la ficha y de cuándo se publicó; si faltan, la
+        # tarjeta simplemente no las pinta.
+        "viendo": _numero(ficha.get("viendo_ahora")),
+        "publicado": _publicado(fila.get("ficha_guardada_en")),
     }
 
 

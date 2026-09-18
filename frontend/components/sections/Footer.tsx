@@ -1,5 +1,5 @@
 import { WORDMARK } from "@/components/brand";
-import { CTA_PORTAFOLIO_CORTO } from "@/components/copy";
+import { CTA_PORTAFOLIO_CORTO, DISCLAIMER } from "@/components/copy";
 const A = "/figma";
 
 /** Footer (1922 × 364) */
@@ -17,12 +17,17 @@ export default function Footer() {
         <p className="font-normal italic leading-[1.66] text-[#c1986c]">Nosotros hacemos el resto.</p>
       </div>
 
+      {/* Aviso: la frontera entre informar y recomendar (OBS-61). */}
+      <p className="absolute font-light leading-[1.5] left-[427px] top-[296px] w-[620px] text-[14px] text-[rgba(226,205,174,0.55)]">
+        {DISCLAIMER}
+      </p>
+
       {/* Navega column */}
       <p className="[word-break:break-word] absolute font-extralight leading-[1.137] left-[1125px] not-italic text-[#cd9a64] text-[26px] top-[78px] tracking-[9.36px] whitespace-nowrap">NAVEGA</p>
       <div className="[word-break:break-word] absolute font-light leading-[0] left-[1125px] not-italic text-[20px] text-white top-[147px] w-[312px]">
         <p className="leading-[2.27] mb-0"><a href="/" className="hover:underline">Inicio</a></p>
         <p className="leading-[2.27] mb-0"><a href="/modelo" className="hover:underline">¿Cómo operamos?</a></p>
-        <p className="leading-[2.27] mb-0"><a href="/oportunidades" className="hover:underline">Oportunidades</a></p>
+        <p className="leading-[2.27] mb-0"><a href="/oportunidades" className="hover:underline">Proyectos realizados</a></p>
         <p className="leading-[2.27]"><a href="/hub" className="hover:underline">HUB</a></p>
       </div>
 

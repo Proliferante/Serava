@@ -1,6 +1,7 @@
 "use client";
 
 import { MotionConfig, motion } from "framer-motion";
+import IrA from "@/components/IrA";
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { EASE, MLine, POP, Pop, Rise, Rule } from "@/components/motion/Kinetics";
 import { WORDMARK, wordmarkH } from "@/components/brand";
@@ -109,31 +110,39 @@ const IC_CARD: [string, string, string][][] = [
   [["12.5%", "0 0 -4.72% -4.72%", "c3.svg"]],
 ];
 
-/** Botón pill de CTA (Component 2 / Component 4 de Figma). */
-function CTA({ x, y, tone, label, d = 0, centered }: { x: number; y: number; tone: "olive" | "cream"; label: string; d?: number; centered?: boolean }) {
+/** Botón pill de CTA (Component 2 / Component 4 de Figma).
+ *
+ * `destino` por defecto es el formulario. Va con `IrA` y no con un `href`
+ * de ancla porque dentro del lienzo escalado el salto de fragmento no mueve
+ * la página — ver components/IrA.tsx. Era el bug de «Completar perfil no
+ * acciona nada». */
+function CTA({ x, y, tone, label, d = 0, centered, destino = "formulario", ancho = 251.39, anchoTexto = 159.121 }: {
+  x: number; y: number; tone: "olive" | "cream"; label: string; d?: number;
+  centered?: boolean; destino?: string; ancho?: number; anchoTexto?: number;
+}) {
   const olive = tone === "olive";
   return (
     <Pop className="absolute" style={{ left: x, top: y }} delay={d} from={0.88} dur={0.6}>
-      <a
-        href="#formulario"
+      <IrA
+        destino={destino}
         className={`ix-cta relative block overflow-hidden ${olive ? "ix-pulse-green" : "ix-pulse"}`}
         style={{
-          width: 251.39, height: 58.8,
+          width: ancho, height: 58.8,
           background: olive ? AVOCADO : LINEN,
           borderRadius: 999,
           boxShadow: olive ? "0px 16px 32px -16px rgba(47,55,30,0.6)" : "0px 16px 32px -16px rgba(0,0,0,0.4)",
         }}
       >
         <T
-          x={32} cy={28.5} w={159.121}
+          x={32} cy={28.5} w={anchoTexto}
           className={`font-semibold ${centered ? "text-center" : ""}`}
           style={{ fontSize: 16, lineHeight: "24.8px", color: olive ? LINEN : OIL }}
         >
           <p>{label}</p>
         </T>
-        <Ico size={18} layers={olive ? IC_ARROW_CREAM : IC_ARROW_DARK} className="ix-cta-arrow" pos="absolute" style={{ left: 201.39, top: 20.39 }} />
+        <Ico size={18} layers={olive ? IC_ARROW_CREAM : IC_ARROW_DARK} className="ix-cta-arrow" pos="absolute" style={{ left: ancho - 50, top: 20.39 }} />
         <span className="ix-cta-shine" aria-hidden />
-      </a>
+      </IrA>
     </Pop>
   );
 }
@@ -301,6 +310,12 @@ export default function SolicitudAccesoScreen() {
             <p>mercados de interés.</p>
           </T>
           <CTA x={320.01} y={668} tone="olive" label="Completar mi perfil" d={0.94} />
+          {/* Para quien todavía no quiere dar sus datos: primero que vea qué
+              gana. Baja a «Tu espacio privado» (OBS-45). */}
+          <CTA
+            x={591.4} y={668} tone="cream" label="¿Qué beneficios obtengo?"
+            destino="espacio-privado" ancho={344} anchoTexto={244} d={1.04} centered
+          />
           {/* En crema (311:4520). Iba en marrón sobre la foto oscura, así que
               apenas se leía. */}
           <T x={320} cy={760.65} d={1.06} className="whitespace-nowrap font-medium" style={{ fontSize: 20.5, lineHeight: "31.74px", color: CREAM }}>
@@ -360,6 +375,8 @@ export default function SolicitudAccesoScreen() {
 
         {/* ══════════ 4 · QUÉ ENCUENTRAS AL INGRESAR (311:4713) ══════════ */}
         <L x={0} y={2668} w={1920} h={1158} className="overflow-hidden" style={{ background: CREAM }}>
+          {/* Destino del botón «¿Qué beneficios obtengo?» (OBS-45). */}
+          <span id="espacio-privado" className="absolute left-0 top-0" />
           <T x={460} cy={321.16} w={760} d={0} ry={16} className="font-normal" style={{ fontSize: 14.4, lineHeight: "22.32px", color: BROWN }}>
             <p>Tu espacio privado</p>
           </T>

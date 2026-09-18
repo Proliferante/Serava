@@ -19,7 +19,7 @@ export default function CompararButton() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Compara tu inversión: por tu cuenta vs. con Zequara"
-        className="ix-cta absolute bg-cream h-[104px] left-[1324px] overflow-hidden rounded-[98px] shadow-[0px_16px_32px_-16px_rgba(0,0,0,0.45)] top-[988px] w-[454px] flex items-center justify-between pl-[54.5px] pr-[16px]"
+        className="ix-cta absolute bg-cream h-[104px] left-[1324px] overflow-hidden rounded-[98px] shadow-[0px_16px_32px_-16px_rgba(0,0,0,0.45)] top-[1020px] w-[454px] flex items-center justify-between pl-[54.5px] pr-[16px]"
       >
         <span className="[word-break:break-word] w-[295px] not-italic text-brown-dark text-left">
           <span className="block font-semibold text-[25px] leading-[34px]">Compara tu inversión:</span>

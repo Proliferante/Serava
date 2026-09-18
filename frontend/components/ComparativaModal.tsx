@@ -38,7 +38,7 @@ const STEPS: Step[] = [
     num: "01", title: "Elegir la zona", Icon: Pin,
     cuenta: "Semanas investigando mercados para, aun así, decidir sin certeza.",
     serava: [
-      <>Zonas validadas por nuestros <b className="font-semibold">datos y el Serava Score</b>.</>,
+      <>Zonas validadas por nuestros <b className="font-semibold">datos y el Zequara Score</b>.</>,
       "Demanda alta, oferta limitada.",
     ],
     takeaway: "Meses de investigación que te ahorras.",
@@ -63,7 +63,7 @@ const STEPS: Step[] = [
     ],
     chip: "95% cumplimiento de tiempos",
     takeaway: "Cada mes de obra que no se pierde es renta que empieza antes.",
-    foot: "Salvo imprevistos ajenos a Serava.",
+    foot: "Salvo imprevistos ajenos a Zequara.",
   },
   
   {
@@ -98,14 +98,14 @@ const STEPS: Step[] = [
 /* ── Step card ─────────────────────────────────────────────────────── */
 function StepCard({ step }: { step: Step }) {
   return (
-    <div className="w-[520px] max-w-full rounded-[24px] bg-[#f7f1e5] px-[28px] pt-[24px] pb-[24px]">
+    <div className="w-full max-w-[520px] rounded-[24px] bg-[#f7f1e5] px-[18px] pt-[22px] pb-[22px] sm:px-[28px] sm:pt-[24px] sm:pb-[24px]">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
           <p className="font-bold not-italic text-[#a57a4e] text-[12px] leading-[18px]">{step.num}</p>
           <p className="font-light not-italic text-[#2a1e14] text-[21px] leading-[27px]">{step.title}</p>
           {step.badge && (
-            <span className="mt-[6px] inline-block rounded-[6px] bg-[#7f8b57] px-[9px] py-[3px] font-bold text-[9px] leading-[13px] text-[#f7f1e5]">{step.badge}</span>
+            <span className="mt-[6px] inline-block rounded-[6px] bg-[#7f8b57] px-[9px] py-[3px] font-bold text-[10.5px] leading-[15px] text-[#f7f1e5]">{step.badge}</span>
           )}
         </div>
         <div className="flex size-[42px] shrink-0 items-center justify-center rounded-full border border-solid border-[rgba(165,122,78,0.28)] bg-[rgba(165,122,78,0.12)] text-[#3d2c1e]">
@@ -114,16 +114,16 @@ function StepCard({ step }: { step: Step }) {
       </div>
 
       {/* Comparison */}
-      <div className="mt-[18px] flex items-stretch gap-[10px]">
+      <div className="mt-[18px] flex flex-col items-stretch gap-[10px] sm:flex-row">
         {/* Por tu cuenta */}
         <div className="flex-1 rounded-[12px] border border-solid border-[rgba(181,84,47,0.18)] bg-[rgba(181,84,47,0.06)] p-[13px]">
-          <p className="font-bold text-[9px] leading-[13px] text-[#b5542f]">Por tu cuenta</p>
+          <p className="font-bold text-[13px] leading-[18px] text-[#b5542f]">Por tu cuenta</p>
           <p className="mt-[8px] font-light text-[12.5px] leading-[18px] text-[#5b4332]">{step.cuenta}</p>
         </div>
-        {/* Con Serava */}
+        {/* Con Zequara */}
         <div className="flex-1 rounded-[12px] border border-solid border-[rgba(127,139,87,0.28)] bg-[rgba(127,139,87,0.09)] p-[13px]">
           <div className="flex items-center justify-between">
-            <p className="font-bold text-[9px] leading-[13px] text-[#5f6b3e]">Con Serava</p>
+            <p className="font-bold text-[13px] leading-[18px] text-[#5f6b3e]">Con Zequara</p>
             <span className="flex size-[17px] items-center justify-center rounded-full bg-[#7f8b57] p-[3.5px] text-[#f7f1e5]"><Check /></span>
           </div>
           <ul className="mt-[9px] flex flex-col gap-[7px]">
@@ -171,10 +171,10 @@ function ModalContent() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto w-full bg-[#eadec9] px-[40px] pt-[38px] pb-[30px]">
+    <div className="flex-1 overflow-y-auto w-full bg-[#eadec9] px-[20px] pt-[30px] pb-[26px] sm:px-[40px] sm:pt-[28px] sm:pb-[24px]">
       {/* Header */}
       <p className="font-semibold text-[#a57a4e] text-[14px] leading-[18px]">El ciclo de tu inversión</p>
-      <p className="mt-[14px] max-w-[620px] font-semibold text-[30px] leading-[36px]">
+      <p className="mt-[14px] max-w-[620px] font-semibold text-[clamp(1.35rem,6vw,30px)] leading-[1.2]">
         <span className="font-light text-[#3d2c1e]">En una inversión, cada etapa cuesta tiempo. Y el tiempo es </span>
         <span className="text-[#2a1e14]">renta y es riesgo. </span>
         <span className="text-[#5f6b3e]">Nosotros lo asumimos.</span>
@@ -182,11 +182,11 @@ function ModalContent() {
       <p className="mt-[14px] max-w-[560px] text-[14px] leading-[20px]">
         <span className="font-light text-[#5b4332]">Invertir directo es posible. Pero cada mes que tardas en encontrar, remodelar o arrendar es </span>
         <span className="font-medium text-[#3d2c1e]">renta que no entra y capital detenido. </span>
-        <span className="font-light text-[#5b4332]">Serava elimina ese tiempo — y lo que ese tiempo te cuesta.</span>
+        <span className="font-light text-[#5b4332]">Zequara elimina ese tiempo — y lo que ese tiempo te cuesta.</span>
       </p>
 
       {/* Carousel */}
-      <div className="mt-[26px] flex min-h-[360px] items-start justify-center">
+      <div className="mt-[18px] flex w-full min-h-[340px] items-start justify-center">
         <AnimatePresence initial={false} custom={dir} mode="wait">
           <motion.div
             key={idx}
@@ -196,6 +196,7 @@ function ModalContent() {
             animate="center"
             exit="exit"
             transition={{ duration: 0.32, ease: EASE }}
+            className="flex w-full justify-center"
           >
             <StepCard step={STEPS[idx]} />
           </motion.div>
@@ -244,25 +245,25 @@ function ModalContent() {
       </div>
 
       {/* Footer */}
-      <div className="mt-[26px] flex items-center justify-between gap-[20px]">
-        <p className="max-w-[260px] text-[15px] leading-[23px]">
+      <div className="mt-[20px] flex flex-col items-stretch gap-[16px] sm:flex-row sm:items-center sm:justify-between sm:gap-[20px]">
+        <p className="text-[15px] leading-[23px] sm:max-w-[260px]">
           <span className="font-light text-[#3d2c1e]">Tú sumas un inmueble a tu patrimonio. </span>
           <span className="text-[#5f6b3e]">Nosotros hacemos el resto.</span>
         </p>
         <a
           href="/solicitud-acceso"
-          className="flex h-[48px] shrink-0 items-center gap-[9px] rounded-[999px] bg-[#7f8b57] px-[24px] text-cream-93 transition-transform duration-200 hover:scale-[1.03] active:scale-95"
+          className="flex h-[48px] items-center justify-center gap-[9px] rounded-[999px] bg-[#7f8b57] px-[20px] text-center text-cream-93 transition-transform duration-200 hover:scale-[1.03] active:scale-95 sm:shrink-0 sm:px-[24px]"
           style={{ filter: "drop-shadow(0px 12px 14px rgba(47,55,30,0.55))" }}
         >
           <span className="font-semibold text-[14px]">Conoce el proceso de acceso</span>
-          <span className="size-[16px]"><ArrowR /></span>
+          <span className="size-[16px] shrink-0"><ArrowR /></span>
         </a>
       </div>
     </div>
   );
 }
 
-/** Popup: "El ciclo de tu inversión" — Por tu cuenta vs. Con Serava, en 6 pasos. */
+/** Popup: "El ciclo de tu inversión" — Por tu cuenta vs. Con Zequara, en 6 pasos. */
 export default function ComparativaModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -288,7 +289,7 @@ export default function ComparativaModal({ open, onClose }: { open: boolean; onC
           className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain"
           role="dialog"
           aria-modal="true"
-          aria-label="El ciclo de tu inversión: por tu cuenta vs. con Serava"
+          aria-label="El ciclo de tu inversión: por tu cuenta vs. con Zequara"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -298,8 +299,7 @@ export default function ComparativaModal({ open, onClose }: { open: boolean; onC
 
           <div className="relative flex min-h-full items-center justify-center p-4 sm:p-6" onClick={onClose}>
             <motion.div
-              className="relative flex max-h-[90vh
-              ] w-[min(880px,94vw)] flex-col overflow-hidden rounded-[28px] shadow-[0_40px_120px_rgba(0,0,0,0.5)]"
+              className="relative flex max-h-[90vh] w-[min(880px,94vw)] flex-col overflow-hidden rounded-[28px] shadow-[0_40px_120px_rgba(0,0,0,0.5)]"
               onClick={(e) => e.stopPropagation()}
               initial={{ opacity: 0, y: 24, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}

@@ -32,12 +32,17 @@ const ORDENES: { v: Orden; label: string }[] = [
   { v: "precio", label: "Menor inversión" },
 ];
 
-/** Las mismas tres cifras del portafolio que van bajo el encabezado. */
-const CIFRAS = [
-  { pre: "", n: "5", txt: "oportunidades disponibles" },
-  { pre: "", n: "3", txt: "en proceso de reserva" },
-  { pre: "Portafolio actualizado el", n: "14 de julio", txt: "" },
-];
+/** Las mismas tres cifras del portafolio que van bajo el encabezado, contadas
+    sobre lo que de verdad hay publicado (el escritorio ya lo hacía así). */
+function cifrasDe(lista: PredioPublicado[], fecha: string) {
+  const enReserva = lista.filter((x) => x.badge.label.startsWith("Reserva")).length;
+  const libres = lista.length - enReserva;
+  return [
+    { pre: "", n: String(libres), txt: libres === 1 ? "oportunidad disponible" : "oportunidades disponibles" },
+    { pre: "", n: String(enReserva), txt: "en proceso de reserva" },
+    { pre: "Portafolio actualizado el", n: fecha, txt: "" },
+  ];
+}
 
 /** El precio viene como "COP $3.100M": se saca el número para poder ordenar. */
 const montoDe = (s: string) => Number(s.replace(/[^\d,]/g, "").replace(",", ".")) || 0;
@@ -80,9 +85,12 @@ function Campo({ label, value, opciones, onChange }: { label: string; value: str
  * hay nada y las tarjetas de muestra están encendidas, llegan las ocho del
  * diseño; cuando están apagadas, llega una lista vacía y se dice.
  */
-export default function PrediosCompact({ predios = PREDIOS as PredioPublicado[] }: {
+export default function PrediosCompact({ predios = PREDIOS as PredioPublicado[], actualizado = "14 de julio" }: {
   predios?: PredioPublicado[];
+  /** La fecha ya escrita («14 de julio»), como la calcula la página. */
+  actualizado?: string;
 }) {
+  const CIFRAS = cifrasDe(predios, actualizado);
   const [ciudad, setCiudad] = useState<string | null>(null);
   const [tipo, setTipo] = useState<string | null>(null);
   const [orden, setOrden] = useState<Orden>("score");

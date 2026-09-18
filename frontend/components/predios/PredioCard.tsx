@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import type { ReactNode } from "react";
 import CountUp from "@/components/motion/CountUp";
 import CanvasImage from "@/components/CanvasImage";
 
@@ -76,6 +77,10 @@ export type Predio = {
   foto?: string | null;
   horizon: string;
   status: string;
+  /** Cuántos inversionistas están mirándolo ahora. Sale de la ficha. */
+  viendo?: number | null;
+  /** «hace 3 días», «hoy». Sale de cuándo se publicó la ficha. */
+  publicado?: string | null;
 };
 
 /* ── Iconos ──────────────────────────────────────────────────────────────── */
@@ -101,6 +106,35 @@ const Arrow = () => (
     <path d="M4.5 12h15M13.6 6.2 19.5 12l-5.9 5.8" />
   </svg>
 );
+const Flame = () => (
+  <svg width={12} height={12} viewBox="0 0 24 24" strokeWidth={1.8} {...st} aria-hidden>
+    <path d="M12 3s4.5 3.6 4.5 8.1A4.5 4.5 0 0 1 12 15.6a4.5 4.5 0 0 1-4.5-4.5C7.5 6.6 12 3 12 3z" />
+    <path d="M12 21a5.6 5.6 0 0 0 5.6-5.6c0-1.3-.5-2.5-1.3-3.4A5.6 5.6 0 0 1 12 21a5.6 5.6 0 0 1-4.3-9c-.8.9-1.3 2.1-1.3 3.4A5.6 5.6 0 0 0 12 21z" />
+  </svg>
+);
+const Clock = () => (
+  <svg width={12} height={12} viewBox="0 0 24 24" strokeWidth={1.8} {...st} aria-hidden>
+    <circle cx="12" cy="12" r="8.5" /><path d="M12 7.2v5l3.2 2" />
+  </svg>
+);
+
+/** Píldora del rótulo de actividad, sobre la foto. */
+function Senal({ children }: { children: ReactNode }) {
+  return (
+    <span
+      className="inline-flex items-center gap-[5px] whitespace-nowrap"
+      style={{
+        height: 24, padding: "0 9px", borderRadius: 7,
+        background: "rgba(23,16,11,0.62)", color: "rgba(247,241,229,0.92)",
+        fontSize: 10.5, fontWeight: 600, letterSpacing: "0.3px",
+        backdropFilter: "blur(6px)",
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
 const Bookmark = () => (
   <svg width={17} height={17} viewBox="0 0 24 24" strokeWidth={1.7} {...st} aria-hidden>
     <path d="M6.5 3.8h11a1 1 0 0 1 1 1v15.4l-6.5-4.4-6.5 4.4V4.8a1 1 0 0 1 1-1z" />
@@ -175,6 +209,20 @@ export default function PredioCard({
           <span style={{ fontSize: 13.1, lineHeight: "19.68px", color: VERD }}><CountUp value={data.score} duration={1.1} /></span>
           <span className="ix-tip-box" style={{ right: 0, top: 39.69 }}>{SCORE_TIP}</span>
         </span>
+
+        {/* Señales de actividad (OBS-50): lo que empuja a entrar estaba sólo
+            dentro de la ficha. Se pintan si el predio las trae. */}
+        {(data.viendo || data.publicado) && (
+          <div className="absolute flex items-center gap-[6px]" style={{ left: 14, bottom: 14 }}>
+            {!!data.viendo && (
+              <Senal>
+                <span style={{ color: "#e8935f" }} className="motion-safe:animate-pulse"><Flame /></span>
+                {data.viendo} viendo
+              </Senal>
+            )}
+            {data.publicado && <Senal><Clock />{data.publicado}</Senal>}
+          </div>
+        )}
       </div>
 
       {/* ── Ficha (520:379) ── */}

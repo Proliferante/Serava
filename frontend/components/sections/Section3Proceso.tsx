@@ -9,10 +9,10 @@ const A = "/figma";
  */
 function Paso({ top, label, title, body }: { top: number; label: string; title: string; body: string }) {
   return (
-    <div className="absolute left-[1291px] w-[520px]" style={{ top }}>
+    <div className="absolute left-[1291px] w-[580px]" style={{ top }}>
       <p className="[word-break:break-word] font-semibold leading-[1.32] not-italic text-cream text-[20px]">{label}</p>
-      <p className="[word-break:break-word] mt-[6px] font-medium leading-[1.15] not-italic text-cream text-[30px]">{title}</p>
-      <p className="[word-break:break-word] mt-[16px] font-light leading-[1.25] not-italic text-[21px] text-white">{body}</p>
+      <p className="[word-break:break-word] mt-[6px] font-medium leading-[1.15] not-italic text-cream text-[28px]">{title}</p>
+      <p className="[word-break:break-word] mt-[14px] font-light leading-[1.25] not-italic text-[19px] text-white">{body}</p>
     </div>
   );
 }
@@ -37,22 +37,30 @@ export default function Section3Proceso() {
       <Section3Timeline />
 
       <Paso
-        top={241}
+        top={200}
         label="PASO 01"
-        title="Accedes a oportunidades con potencial real"
-        body="Zequara busca y filtra propiedades con fundamentos arquitectónicos, financieros y legales para aumentar su valor mediante remodelación."
+        title="Accedes a inmuebles previamente evaluados"
+        body="Cada inmueble publicado ha sido revisado arquitectónica y financieramente y cuenta con un modelo de inversión."
       />
+      {/* El paso que faltaba, y el que más importa: aquí es donde se dice que
+          la propiedad queda a nombre de quien invierte. */}
       <Paso
-        top={511}
+        top={400}
         label="PASO 02"
-        title="Aumentas el valor de tu propiedad"
-        body="La experiencia arquitectónica de Zequara optimiza la remodelación para aumentar el valor del inmueble sin invertir de más y con el presupuesto controlado."
+        title="Compras con un rango definido"
+        body="Definimos el precio de compra según el modelo de inversión y negociamos bajo ese criterio. El inmueble queda a tu nombre."
       />
       <Paso
-        top={781}
+        top={600}
         label="PASO 03"
-        title="Generas retorno sin operarla"
-        body="Zequara administra la renta y te acompaña en la venta, para que la propiedad produzca sin convertirse en otra operación para ti."
+        title="Transformas con una inversión planificada"
+        body="Diseñamos, presupuestamos y ejecutamos la remodelación de acuerdo con el alcance definido para el inmueble."
+      />
+      <Paso
+        top={800}
+        label="PASO 04"
+        title="Gestionamos el plan de valorización"
+        body="Después de la transformación, te acompañamos en la renta o venta del inmueble según la estrategia definida."
       />
 
       {/* CTA — abre la ventana emergente comparativa */}

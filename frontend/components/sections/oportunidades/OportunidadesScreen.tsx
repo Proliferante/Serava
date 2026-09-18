@@ -316,8 +316,8 @@ function Comparador({ active, setActive }: { active: number; setActive: (i: numb
           className="ix-breathe absolute top-1/2 flex items-center justify-center gap-[3px]"
           style={{ left: leftPct, x: -26, y: -26, width: 52, height: 52, background: LINEN, borderRadius: 26, boxShadow: "0px 8px 24px -6px rgba(0,0,0,0.5)" }}
         >
-          <Ico size={15} layers={IC_CHEV_L} />
-          <Ico size={15} layers={IC_CHEV_R} />
+          <Ico size={16.2} layers={IC_CHEV_L} />
+          <Ico size={16.2} layers={IC_CHEV_R} />
         </motion.div>
       </motion.div>
 
@@ -381,7 +381,7 @@ function Comparador({ active, setActive }: { active: number; setActive: (i: numb
 
       {/* Nota (311:2151) — el icono se balancea como pista de arrastre */}
       <Pop className="absolute" style={{ left: 440, top: 1401.55 }} delay={0.6}>
-        <Ico size={15} layers={IC_DRAG} className="ix-sway" />
+        <Ico size={16.2} layers={IC_DRAG} className="ix-sway" />
       </Pop>
       <T x={463} cy={1409.05} d={0.66} ry={14} className="whitespace-nowrap font-light" style={{ fontSize: 12.8, lineHeight: "19.84px", color: MILLBROOK }}>
         <p>Arrastra el círculo (o toca la imagen) para ver el antes y el después de cada proyecto.</p>
@@ -477,7 +477,7 @@ export default function OportunidadesScreen() {
             </div>
           </L>
 
-          <T x={440} cy={211.16} w={760} d={0} ry={16} className="font-normal" style={{ fontSize: 14.4, lineHeight: "22.32px", color: VERDIGRIS }}>
+          <T x={440} cy={211.16} w={760} d={0} ry={16} className="font-normal" style={{ fontSize: 15.5, lineHeight: "24px", color: VERDIGRIS }}>
             <p>El tipo de activos que encontrarás</p>
           </T>
           <T x={440} cy={283.38} w={638.48} className="whitespace-nowrap" style={{ fontSize: 43.2, lineHeight: "48.38px", letterSpacing: "-1.08px", color: BISTRE }}>
@@ -487,16 +487,16 @@ export default function OportunidadesScreen() {
             </MLine>
             <MLine delay={0.24}><span className="font-semibold">construirse.</span></MLine>
           </T>
-          <T x={440} cy={406.71} w={639.75} d={0.4} className="whitespace-nowrap font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: MILLBROOK }}>
-            <p>Conoce transformaciones realizadas por nuestro equipo y el tipo de</p>
-            <p>propiedades que orientan la selección Zequara. Buscamos inmuebles</p>
-            <p>bien ubicados, con atributos difíciles de replicar y capacidad de</p>
-            <p>mejorar su posicionamiento a través de una intervención estratégica.</p>
+          <T x={440} cy={406.71} w={700} d={0.4} className="whitespace-nowrap font-light" style={{ fontSize: 19.3, lineHeight: "29.9px", color: MILLBROOK }}>
+            <p>Conoce transformaciones realizadas por nuestro equipo y el tipo</p>
+            <p>de propiedades que orientan la selección Zequara. Buscamos</p>
+            <p>inmuebles bien ubicados, con atributos difíciles de replicar y</p>
+            <p>capacidad de mejorar su posicionamiento con una intervención.</p>
           </T>
 
           <Comparador active={active} setActive={setActive} />
 
-          <T x={440} cy={1450.47} w={1040} d={0.1} className="font-light" style={{ fontSize: 13.4, lineHeight: "20.83px", color: MILLBROOK }}>
+          <T x={440} cy={1450.47} w={1040} d={0.1} className="font-light" style={{ fontSize: 14.5, lineHeight: "22.5px", color: MILLBROOK }}>
             <p>Los proyectos mostrados son casos de referencia. El portafolio activo es confidencial.</p>
           </T>
         </L>
@@ -511,7 +511,7 @@ export default function OportunidadesScreen() {
             style={{ backgroundImage: "linear-gradient(89.6216deg, rgb(73,33,0) 0.278%, rgb(73,33,0) 29.649%, rgb(73,33,0) 48.532%, rgb(73,33,0) 74.48%, rgba(73,33,0,0) 99.722%)" }}
           />
 
-          <T x={238} cy={141.16} w={820} d={0} ry={16} className="font-normal" style={{ fontSize: 14.4, lineHeight: "22.32px", color: LASER }}>
+          <T x={238} cy={141.16} w={820} d={0} ry={16} className="font-normal" style={{ fontSize: 15.5, lineHeight: "24px", color: LASER }}>
             <p>Información para decidir</p>
           </T>
           <T x={238} cy={262} w={638.48} className="whitespace-nowrap" style={{ fontSize: 43.2, lineHeight: "48.38px", letterSpacing: "-1.08px", color: LINEN }}>
@@ -520,9 +520,9 @@ export default function OportunidadesScreen() {
             <MLine delay={0.32}><span className="font-semibold">cómo puede convertirse en</span></MLine>
             <MLine delay={0.42}><span className="font-semibold">valor.</span></MLine>
           </T>
-          <T x={238} cy={434.15} w={639.75} d={0.56} className="whitespace-nowrap font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: LINEN80 }}>
-            <p>Al obtener la membresía tendrás acceso a la ficha que conecta los datos</p>
-            <p>del activo con la propuesta de transformación desarrollada por Zequara.</p>
+          <T x={238} cy={434.15} w={639.75} d={0.56} className="whitespace-nowrap font-light" style={{ fontSize: 19.3, lineHeight: "29.9px", color: LINEN80 }}>
+            <p>Al obtener la membresía tendrás acceso a la ficha que conecta</p>
+            <p>los datos del activo con la propuesta de Zequara.</p>
             <p>La información permite entender el valor de entrada, la inversión</p>
             <p>requerida, el potencial de renta y la proyección de valorización.</p>
           </T>
@@ -554,17 +554,17 @@ export default function OportunidadesScreen() {
                   viewport={{ once: true, amount: 0.6 }}
                   transition={{ duration: 0.55, delay: 0.34 + i * 0.08, ease: EASE }}
                 >
-                  <span className="font-light" style={{ fontSize: 13.8, lineHeight: "21.33px", color: LINEN72 }}>{k}</span>
-                  <span className="font-semibold" style={{ fontSize: 14.4, lineHeight: "22.32px", color: LASER, filter: blur ? "blur(2.5px)" : undefined }}>{v}</span>
+                  <span className="font-light" style={{ fontSize: 14.9, lineHeight: "23px", color: LINEN72 }}>{k}</span>
+                  <span className="font-semibold" style={{ fontSize: 15.5, lineHeight: "24px", color: LASER, filter: blur ? "blur(2.5px)" : undefined }}>{v}</span>
                 </motion.div>
               ))}
             </L>
 
             <L x={0} y={568.98} w={448.95} h={66.66} style={{ background: "rgba(201,168,119,0.1)", borderTop: `1px solid ${LINEN18}` }}>
               <Pop className="absolute" style={{ left: 24, top: 25.83 }} delay={0.86} from={0.3}>
-                <Ico size={15} layers={IC_LOCK} />
+                <Ico size={16.2} layers={IC_LOCK} />
               </Pop>
-              <T x={48} cy={32.41} d={0.9} ry={12} className="whitespace-nowrap font-normal" style={{ fontSize: 12.2, lineHeight: "18.85px", color: LINEN80 }}>
+              <T x={48} cy={32.41} d={0.9} ry={12} className="whitespace-nowrap font-normal" style={{ fontSize: 13.2, lineHeight: "20.4px", color: LINEN80 }}>
                 <p>La información detallada se habilita dentro de la plataforma</p>
                 <p>después de la aprobación de acceso.</p>
               </T>
@@ -597,8 +597,8 @@ export default function OportunidadesScreen() {
               >
                 <Ico size={21} layers={IC_CARD[i]} />
               </motion.div>
-              <p className="font-semibold" style={{ marginTop: 14, fontSize: 16.3, lineHeight: "25.3px", color: LINEN }}>{t}</p>
-              <p className="font-light" style={{ marginTop: 6, fontSize: 13.8, lineHeight: "21.33px", color: LINEN72 }}>{d}</p>
+              <p className="font-semibold" style={{ marginTop: 14, fontSize: 17.6, lineHeight: "27.3px", color: LINEN }}>{t}</p>
+              <p className="font-light" style={{ marginTop: 6, fontSize: 14.9, lineHeight: "23px", color: LINEN72 }}>{d}</p>
             </motion.div>
           ))}
         </L>
@@ -614,7 +614,7 @@ export default function OportunidadesScreen() {
           x={0} y={3862} w={1920} h={1064} className="overflow-hidden"
           style={{ borderRadius: "0 150px 0 0", backgroundImage: "linear-gradient(90.449deg, rgb(226,205,174) 27.749%, rgba(226,205,174,0.98) 43.017%, rgba(226,205,174,0.94) 56.872%, rgba(226,205,174,0.68) 72.872%)" }}
         >
-          <T x={417} cy={193.16} w={820} d={0} ry={16} className="font-normal" style={{ fontSize: 14.4, lineHeight: "22.32px", color: VERDIGRIS }}>
+          <T x={417} cy={193.16} w={820} d={0} ry={16} className="font-normal" style={{ fontSize: 15.5, lineHeight: "24px", color: VERDIGRIS }}>
             <p>Una operación acompañada</p>
           </T>
           <T x={417} cy={265.38} w={638.48} className="whitespace-nowrap" style={{ fontSize: 43.2, lineHeight: "48.38px", letterSpacing: "-1.08px", color: BISTRE }}>
@@ -625,17 +625,17 @@ export default function OportunidadesScreen() {
             <MLine delay={0.24}><span className="font-semibold">equipo para ejecutar.</span></MLine>
           </T>
 
-          <T x={417} cy={387.16} w={488} d={0.4} className="font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: MILLBROOK }}>
+          <T x={417} cy={387.16} w={488} d={0.4} className="font-light" style={{ fontSize: 19.3, lineHeight: "29.9px", color: MILLBROOK }}>
             <p>Zequara acompaña cada operación desde la selección del activo hasta su remodelación y posterior administración.</p>
           </T>
-          <T x={417} cy={470.35} w={488} d={0.52} className="font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: MILLBROOK }}>
+          <T x={417} cy={470.35} w={488} d={0.52} className="font-light" style={{ fontSize: 19.3, lineHeight: "29.9px", color: MILLBROOK }}>
             <p>
               <span>El inversionista </span>
               <span className="font-semibold" style={{ color: BISTRE }}>conserva la propiedad</span>
               <span>, aprueba las decisiones clave y consulta el avance desde un solo lugar.</span>
             </p>
           </T>
-          <T x={417} cy={544.09} w={488} d={0.64} className="font-medium" style={{ fontSize: 13.4, lineHeight: "20.83px", color: VERDIGRIS }}>
+          <T x={417} cy={544.09} w={488} d={0.64} className="font-medium" style={{ fontSize: 14.5, lineHeight: "22.5px", color: VERDIGRIS }}>
             <p>Un solo equipo conecta análisis, diseño, obra y operación.</p>
           </T>
 
@@ -690,12 +690,12 @@ export default function OportunidadesScreen() {
             <MLine delay={0.26}><span className="font-light">Accede al portafolio</span></MLine>
             <MLine delay={0.38}><span className="font-semibold">privado de Zequara.</span></MLine>
           </T>
-          <T x={650} cy={335.29} w={620} d={0.56} className="whitespace-nowrap text-center font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: "rgba(247,241,229,0.84)" }}>
+          <T x={620} cy={335.29} w={680} d={0.56} className="whitespace-nowrap text-center font-light" style={{ fontSize: 19.3, lineHeight: "29.9px", color: "rgba(247,241,229,0.84)" }}>
             <p>Solicita tu evaluación para conocer oportunidades seleccionadas</p>
             <p>según tu capital, perfil y estrategia de inversión.</p>
           </T>
           <CTA x={848.915} y={397.515} tone="cream" d={0.7} />
-          <T x={650} cy={489.72} w={620} d={0.86} className="whitespace-nowrap text-center font-light" style={{ fontSize: 13.4, lineHeight: "20.83px", color: "rgba(247,241,229,0.6)" }}>
+          <T x={650} cy={489.72} w={620} d={0.86} className="whitespace-nowrap text-center font-light" style={{ fontSize: 14.5, lineHeight: "22.5px", color: "rgba(247,241,229,0.6)" }}>
             <p>Portafolio confidencial. Acceso sujeto a evaluación y disponibilidad.</p>
           </T>
 

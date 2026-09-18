@@ -69,8 +69,8 @@ export default function Section8Control() {
       <div className="[word-break:break-word] absolute font-normal leading-[0] left-[1275px] not-italic text-[0px] text-white top-[1081px] w-[310px]">
         <p className="font-extrabold leading-[1.137] mb-0 text-brown-dark text-[16px]">Así se ve tu inversión</p>
         <p className="text-[16px]">
-          <span className="leading-[1.137]">El mismo modelo que eligió tu inmueble, </span>
-          <span className="[word-break:break-word] font-extrabold leading-[1.137] not-italic">ahora lo cuida.</span>
+          <span className="leading-[1.137]">El mismo equipo que lo eligió </span>
+          <span className="[word-break:break-word] font-extrabold leading-[1.137] not-italic">es el que lo administra.</span>
         </p>
       </div>
     </div>

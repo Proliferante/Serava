@@ -279,3 +279,28 @@ export function Reveal({ children, delay = 0, className }: { children: ReactNode
     </span>
   );
 }
+
+/**
+ * «Volver al inicio» — la salida de las pantallas que no llevan el menú
+ * completo (acceso y solicitud).
+ *
+ * El logotipo de la cabecera ya enlazaba al home, pero en un móvil un
+ * logotipo no se lee como un botón, y en estas dos pantallas la cabecera
+ * además se esconde al bajar: quien entraba a rellenar el formulario se
+ * quedaba sin manera evidente de volver (OBS-20).
+ */
+export function Volver({ tono = "claro" }: { tono?: "claro" | "oscuro" }) {
+  const color = tono === "oscuro" ? "rgba(247,241,229,0.72)" : MILLBROOK;
+  return (
+    <a
+      href="/"
+      className="ix-nav inline-flex items-center gap-[8px] text-[13.5px] font-medium"
+      style={{ color }}
+    >
+      <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M19 12H5M11 6l-6 6 6 6" />
+      </svg>
+      Volver al inicio
+    </a>
+  );
+}

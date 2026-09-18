@@ -4,7 +4,7 @@ import { MotionConfig, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { WORDMARK, wordmarkH } from "@/components/brand";
-import { EASE, LASER, WRAP } from "@/components/responsive/kit";
+import { EASE, LASER, Volver, WRAP } from "@/components/responsive/kit";
 import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -66,6 +66,13 @@ export default function LoginCompact() {
             >
               <img src={WORDMARK} alt="Zequara" decoding="async" className="block size-full max-w-none" />
             </motion.a>
+            {/* Se llega aquí al cerrar sesión y no había vuelta evidente (OBS-20). */}
+            <motion.div
+              className="mt-[14px]"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.1, ease: EASE }}
+            >
+              <Volver tono="oscuro" />
+            </motion.div>
             <motion.p
               className="mt-[26px] text-[clamp(1.5rem,7vw,2.2rem)] font-light leading-[1.15] text-cream-93"
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.08, ease: EASE }}

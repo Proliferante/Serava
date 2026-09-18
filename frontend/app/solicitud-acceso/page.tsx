@@ -1,3 +1,4 @@
+import { AlLlegarBajar } from "@/components/IrA";
 import ScaledCanvas from "@/components/ScaledCanvas";
 import { Compact, Desk } from "@/components/responsive/Adaptive";
 import SolicitudCompact from "@/components/responsive/solicitud/SolicitudCompact";
@@ -7,6 +8,8 @@ import SolicitudAccesoScreen from "@/components/sections/solicitud/SolicitudAcce
 export default function SolicitudAccesoPage() {
   return (
     <main className="min-h-screen bg-cream">
+      {/* Se llega aquí desde el diagnóstico con #formulario (OBS-17). */}
+      <AlLlegarBajar />
       <Compact><SolicitudCompact /></Compact>
       <Desk>
       <ScaledCanvas width={1920} height={4470}>

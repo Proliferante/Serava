@@ -23,23 +23,30 @@ export default function Section3Timeline() {
     offset: ["start 0.9", "end 0.6"],
   });
 
-  // Line fill height (0 → 612px) tied to scroll progress.
-  const fillHeight = useTransform(scrollYProgress, [0, 1], [0, 612]);
+  // Alto del relleno (0 → 600 px), atado al avance del scroll. Eran 612 con
+  // tres pasos; con cuatro la separación es de 200 px y el carril va de
+  // y=213 (centro del primer punto) a y=813 (centro del cuarto).
+  const fillHeight = useTransform(scrollYProgress, [0, 1], [0, 600]);
 
-  // Dots activate as the fill reaches their position along the line.
-  const d1o = useTransform(scrollYProgress, [0.0, 0.06], [0.3, 1]);
-  const d1s = useTransform(scrollYProgress, [0.0, 0.06], [0.55, 1]);
-  const d2o = useTransform(scrollYProgress, [0.41, 0.49], [0.3, 1]);
-  const d2s = useTransform(scrollYProgress, [0.41, 0.49], [0.55, 1]);
-  const d3o = useTransform(scrollYProgress, [0.8, 0.88], [0.3, 1]);
-  const d3s = useTransform(scrollYProgress, [0.8, 0.88], [0.55, 1]);
+  // Cada punto se enciende cuando el relleno llega a su altura. Los cortes
+  // salen de dónde cae cada punto sobre los 600 px del carril.
+  const luz = (a: number) => [Math.max(0, a - 0.04), a + 0.04] as [number, number];
+  const P = [0.0, 1 / 3, 2 / 3, 1.0];
+  const d1o = useTransform(scrollYProgress, luz(P[0]), [0.3, 1]);
+  const d1s = useTransform(scrollYProgress, luz(P[0]), [0.55, 1]);
+  const d2o = useTransform(scrollYProgress, luz(P[1]), [0.3, 1]);
+  const d2s = useTransform(scrollYProgress, luz(P[1]), [0.55, 1]);
+  const d3o = useTransform(scrollYProgress, luz(P[2]), [0.3, 1]);
+  const d3s = useTransform(scrollYProgress, luz(P[2]), [0.55, 1]);
+  const d4o = useTransform(scrollYProgress, luz(P[3]), [0.3, 1]);
+  const d4s = useTransform(scrollYProgress, luz(P[3]), [0.55, 1]);
 
   return (
     <>
       {/* Track (faint) — also the scroll measurement target */}
       <div
         ref={ref}
-        className="absolute left-[1201px] top-[346px] w-[4px] h-[612px] rounded-full"
+        className="absolute left-[1201px] top-[213px] w-[4px] h-[600px] rounded-full"
         style={{ background: "rgba(104,117,64,0.22)" }}
       >
         {/* Fill grows downward with scroll */}
@@ -50,13 +57,18 @@ export default function Section3Timeline() {
       </div>
 
       {/* Timeline dots */}
-      <motion.div className="absolute h-[41px] left-[1183px] top-[331px] w-[40px]" style={{ opacity: d1o, scale: d1s }}>
+      <motion.div className="absolute h-[41px] left-[1183px] top-[193px] w-[40px]" style={{ opacity: d1o, scale: d1s }}>
         <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={E1} />
       </motion.div>
-      <motion.div className="absolute h-[41px] left-[1183px] top-[601px] w-[40px]" style={{ opacity: d2o, scale: d2s }}>
+      <motion.div className="absolute h-[41px] left-[1183px] top-[393px] w-[40px]" style={{ opacity: d2o, scale: d2s }}>
         <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={E2} />
       </motion.div>
-      <motion.div className="absolute h-[41px] left-[1183px] top-[842px] w-[40px]" style={{ opacity: d3o, scale: d3s }}>
+      <motion.div className="absolute h-[41px] left-[1183px] top-[593px] w-[40px]" style={{ opacity: d3o, scale: d3s }}>
+        <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={E3} />
+      </motion.div>
+      {/* El cuarto reusa el dibujo del tercero: son tres SVG para tres pasos y
+          el cuarto llegó después. Visualmente son el mismo punto. */}
+      <motion.div className="absolute h-[41px] left-[1183px] top-[793px] w-[40px]" style={{ opacity: d4o, scale: d4s }}>
         <img loading="lazy" decoding="async" alt="" className="absolute block inset-0 max-w-none size-full" src={E3} />
       </motion.div>
     </>

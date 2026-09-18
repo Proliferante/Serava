@@ -21,7 +21,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const LINKS = [
   { href: "/", label: "Inicio" },
   { href: "/modelo", label: "¿Cómo operamos?" },
-  { href: "/oportunidades", label: "Oportunidades" },
+  { href: "/oportunidades", label: "Proyectos realizados" },
   { href: "/hub", label: "HUB" },
 ];
 

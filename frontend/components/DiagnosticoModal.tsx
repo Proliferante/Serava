@@ -342,7 +342,7 @@ export default function DiagnosticoModal({ open, onClose, initialStep = "intro",
                     <h3 className="font-light text-[clamp(24px,4vw,30px)] text-[#f7f1e5]">Tu perfil se alinea con el modelo Zequara.</h3>
                     <p className="mx-auto mt-[10px] max-w-[420px] font-light text-[14px] leading-[1.5]" style={{ color: "rgba(247,241,229,0.85)" }}>Forma parte de este selecto grupo de inversionistas. Cada solicitud se evalúa de forma individual.</p>
                     <motion.a
-                      href="/solicitud-acceso"
+                      href="/solicitud-acceso#formulario"
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
                       className="mt-[22px] inline-flex items-center justify-center gap-[10px] rounded-full bg-[#f7f1e5] px-[30px] py-[15px] font-bold text-[15px] text-[#2a1e14] shadow-[0px_10px_24px_-10px_rgba(0,0,0,0.5)]"

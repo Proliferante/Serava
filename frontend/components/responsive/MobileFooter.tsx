@@ -1,5 +1,5 @@
 import { WORDMARK, wordmarkH } from "@/components/brand";
-import { CTA_PORTAFOLIO_CORTO } from "@/components/copy";
+import { CTA_PORTAFOLIO_CORTO, DISCLAIMER } from "@/components/copy";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PIE DE MÓVIL Y TABLET.
@@ -17,7 +17,7 @@ import { CTA_PORTAFOLIO_CORTO } from "@/components/copy";
 const NAVEGA = [
   { href: "/", label: "Inicio" },
   { href: "/modelo", label: "¿Cómo operamos?" },
-  { href: "/oportunidades", label: "Oportunidades" },
+  { href: "/oportunidades", label: "Proyectos realizados" },
   { href: "/hub", label: "HUB" },
 ];
 
@@ -72,7 +72,12 @@ export default function MobileFooter() {
           </a>
         </div>
 
-        <p className="mt-[26px] text-[12.5px] font-light leading-[1.5] text-[rgba(226,205,174,0.5)]">
+        {/* Aviso (OBS-61), antes del pie legal. */}
+        <p className="mt-[26px] text-[12.5px] font-light leading-[1.5] text-[rgba(226,205,174,0.55)]">
+          {DISCLAIMER}
+        </p>
+
+        <p className="mt-[14px] text-[12.5px] font-light leading-[1.5] text-[rgba(226,205,174,0.5)]">
           © {new Date().getFullYear()} Zequara. Portafolio reservado para un grupo limitado de inversionistas. Acceso sujeto a evaluación.
         </p>
       </div>

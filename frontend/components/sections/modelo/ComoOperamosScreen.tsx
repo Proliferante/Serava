@@ -4,7 +4,7 @@ import { MotionConfig, motion } from "framer-motion";
 import { useRef, type CSSProperties, type ReactNode } from "react";
 import CountUp from "@/components/motion/CountUp";
 import { Draw, EASE, Float, MLine, Orbit, POP, Pop, Rise, Rule, useParallaxY } from "@/components/motion/Kinetics";
-import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
+import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF, PRESUPUESTO_CERRADO_1, PRESUPUESTO_CERRADO_2 } from "@/components/copy";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    COMO OPERAMOS — reproducción 1:1 del frame de Figma 311:1396 (1920 × 9717).
@@ -257,6 +257,17 @@ function ChrSvg({ children }: { children: ReactNode }) {
   );
 }
 
+/* Los perfiles que sostienen la operación además de la dirección técnica
+   (OBS-31): la página entera habla de equipo y tecnología y luego lo reducía
+   todo a una persona. */
+const EQUIPO = [
+  "Dirección · Paola",
+  "Diseño · Natalia",
+  "Datos · David",
+  "Tecnología · Jesús",
+  "Mercadeo · Laura",
+] as const;
+
 /* ── Bits del sistema de diseño ──────────────────────────────────────────── */
 
 /** Eyebrow: filete de 34 px que se dibuja + label 11.5/17.86 SemiBold. */
@@ -296,7 +307,7 @@ function Paso({ x, cy, w, label, color, d = 0 }: { x: number; cy: number; w: num
 /** Pregunta de sección — 14.4/22.32 Regular. */
 function Question({ x, cy, w, children, color, d = 0.1 }: { x: number; cy: number; w: number; children: ReactNode; color: string; d?: number }) {
   return (
-    <T x={x} cy={cy} w={w} d={d} ry={16} className="font-normal" style={{ fontSize: 14.4, lineHeight: "22.32px", color }}>
+    <T x={x} cy={cy} w={w} d={d} ry={16} className="font-normal" style={{ fontSize: 15.5, lineHeight: "24px", color }}>
       <p>{children}</p>
     </T>
   );
@@ -319,7 +330,7 @@ function H3({
 
 /** Párrafo largo — 17.9/27.78 Light. */
 function P({
-  x, cy, w, color, children, size = 17.9, lh = 27.78, className, d = 0.26,
+  x, cy, w, color, children, size = 19.3, lh = 29.9, className, d = 0.26,
 }: { x: number; cy: number; w?: number; color: string; children: ReactNode; size?: number; lh?: number; className?: string; d?: number }) {
   return (
     <T x={x} cy={cy} w={w} d={d} className={`font-light ${className ?? ""}`} style={{ fontSize: size, lineHeight: `${lh}px`, color }}>
@@ -356,16 +367,17 @@ const CK_S: [string, string, string][] = [
  * Medium. Variante clara (avocado) y oscura (laser).
  */
 function Callout({
-  x, y, w, h, dark, icon, textX = 53, textCy, textW, iconX = 21, iconY = 19, d = 0.34, children,
-}: Box & { w: number; h: number; dark?: boolean; icon: [string, string, string][]; textX?: number; textCy: number; textW?: number; iconX?: number; iconY?: number; d?: number; children: ReactNode }) {
+  x, y, w, h, dark, nota, icon, textX = 53, textCy, textW, iconX = 21, iconY = 19, d = 0.34, children,
+}: Box & { w: number; h: number; dark?: boolean; nota?: boolean; icon: [string, string, string][]; textX?: number; textCy: number; textW?: number; iconX?: number; iconY?: number; d?: number; children: ReactNode }) {
   return (
     <motion.div
       className="absolute"
       style={{
         left: x, top: y, width: w, height: h,
-        background: dark ? LASER12 : AVOCADO10,
-        border: `1px solid ${dark ? LASER30 : AVOCADO30}`,
-        borderRadius: 14,
+        background: nota ? "transparent" : dark ? LASER12 : AVOCADO10,
+        border: nota ? "none" : `1px solid ${dark ? LASER30 : AVOCADO30}`,
+        borderLeft: nota ? `3px solid ${dark ? LASER30 : AVOCADO30}` : undefined,
+        borderRadius: nota ? 0 : 14,
       }}
       initial={{ opacity: 0, y: 18, scale: 0.97 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -375,7 +387,7 @@ function Callout({
       <Pop className="absolute" style={{ left: iconX, top: iconY }} delay={d + 0.22} from={0.3}>
         <Ico size={19} layers={icon} />
       </Pop>
-      <T x={textX} cy={textCy} w={textW} className="font-medium" style={{ fontSize: 14.7, lineHeight: "22.82px", color: dark ? LINEN : BISTRE }}>
+      <T x={textX} cy={textCy} w={textW} className="font-medium" style={{ fontSize: 15.8, lineHeight: "24.5px", color: dark ? LINEN : BISTRE }}>
         {children}
       </T>
     </motion.div>
@@ -384,8 +396,8 @@ function Callout({
 
 /** Tarjeta 336 × 197 con icono, Heading 4 y descripción. */
 function Card({
-  x, w = 336, dark, icon, title, children, delay,
-}: { x: number; w?: number; dark?: boolean; icon: [string, string, string][]; title: string; children: ReactNode; delay: number }) {
+  x, w = 336, h = 197, dark, icon, title, children, delay,
+}: { x: number; w?: number; h?: number; dark?: boolean; icon: [string, string, string][]; title: string; children: ReactNode; delay: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 34, scale: 0.97 }}
@@ -395,7 +407,7 @@ function Card({
       whileHover={{ y: -7 }}
       className="ix-card absolute overflow-hidden"
       style={{
-        left: x, top: 0, width: w, height: 197,
+        left: x, top: 0, width: w, height: h,
         background: dark ? BROWN : LINEN,
         border: `1px solid ${DRIFT28}`,
         borderRadius: 16,
@@ -413,10 +425,10 @@ function Card({
       >
         <Ico size={23} layers={icon} />
       </motion.div>
-      <p className="font-semibold" style={{ marginTop: 16, fontSize: 17.9, lineHeight: "27.78px", color: dark ? CREAM : OIL }}>
+      <p className="font-semibold" style={{ marginTop: 16, fontSize: 19.3, lineHeight: "29.9px", color: dark ? CREAM : OIL }}>
         {title}
       </p>
-      <p className="font-light" style={{ marginTop: 8, fontSize: 14.4, lineHeight: "22.32px", color: dark ? CREAM : MILLBROOK }}>
+      <p className="font-light" style={{ marginTop: 8, fontSize: 15.5, lineHeight: "24px", color: dark ? CREAM : MILLBROOK }}>
         {children}
       </p>
     </motion.div>
@@ -515,8 +527,8 @@ export default function ComoOperamosScreen() {
           <Eyebrow x={440} cy={146.5} label="Nuestro método" color={DRIFT} w={147.13} />
           <T x={440} cy={224.7} w={820} style={{ fontSize: 44.8, lineHeight: "50.18px", letterSpacing: "-1.12px", color: BISTRE }}>
             <MLine delay={0.16} dur={1}>
-              <span className="font-light">Un sistema construido durante </span>
-              <span className="font-semibold">veinte años.</span>
+              <span className="font-light">Un sistema construido </span>
+              <span className="font-semibold">con experiencia.</span>
             </MLine>
           </T>
           <P x={440} cy={309.42} w={617.69} color={MILLBROOK} className="whitespace-nowrap" d={0.34}>
@@ -535,24 +547,27 @@ export default function ComoOperamosScreen() {
             <p>·</p>
           </T>
           <T x={792} cy={358.02} d={0.66} ry={14} className="whitespace-nowrap font-semibold" style={{ fontSize: 16.8, lineHeight: "26px", color: BISTRE }}>
-            <p>Experiencia operativa</p>
+            <p>Gestión integral</p>
           </T>
 
-          <L x={440} y={404} w={1040} h={197}>
-            <Card x={0} dark icon={[["25% 12.5% 41.67% 12.5%", "-18.39% -3.78% -6.37% -3.34%", "ic-a1.svg"], ["83.33% 12.5% 16.67% 12.5%", "-0.81px 0", "ic-a2.svg"]]} title="Datos verificables" delay={0}>
-              Modelos y métricas de zona que sustentan cada decisión, no intuiciones.
+          {/* Las tarjetas suben de 197 a 245 px: el texto del Anexo B es más
+              largo y a la altura de antes la tercera se cortaba. */}
+          <L x={440} y={404} w={1040} h={245}>
+            <Card x={0} h={245} dark icon={[["25% 12.5% 41.67% 12.5%", "-18.39% -3.78% -6.37% -3.34%", "ic-a1.svg"], ["83.33% 12.5% 16.67% 12.5%", "-0.81px 0", "ic-a2.svg"]]} title="Datos verificables" delay={0}>
+              Precios, comparables, costos y métricas de zona para sustentar cada decisión.
             </Card>
-            <Card x={352} dark icon={[["12.5% 16.67% 24.17% 16.67%", "-12.5% -11.41% -9.79% -11.41%", "ic-b1.svg"]]} title="Criterio técnico" delay={0.12}>
-              Arquitectura, distribución y estado real del inmueble evaluados por expertos.
+            <Card x={352} h={245} dark icon={[["12.5% 16.67% 24.17% 16.67%", "-12.5% -11.41% -9.79% -11.41%", "ic-b1.svg"]]} title="Criterio técnico" delay={0.12}>
+              Arquitectura, distribución y estado del inmueble evaluados para definir cómo intervenirlo.
             </Card>
-            <Card x={704} dark icon={[["12.5%", "-5.8% 0 -4.72% 0", "ic-c1.svg"], ["62.5% 37.5% 12.5% 37.5%", "-14.17% -14.17% 0 -14.17%", "ic-c2.svg"]]} title="Experiencia operativa" delay={0.24}>
-              Veinte años ejecutando obra traducidos en procesos y controles.
+            {/* El Anexo B decía «gestión posterior»; OBS-41/42 pide no usar esa
+                palabra, así que aquí va «posterior administración». */}
+            <Card x={704} h={245} dark icon={[["12.5%", "-5.8% 0 -4.72% 0", "ic-c1.svg"], ["62.5% 37.5% 12.5% 37.5%", "-14.17% -14.17% 0 -14.17%", "ic-c2.svg"]]} title="Gestión integral" delay={0.24}>
+              Coordinamos la compra, la transformación y la posterior administración del inmueble según el modelo de inversión.
             </Card>
           </L>
 
-          <P x={440} cy={668} color={MILLBROOK} className="whitespace-nowrap" d={0.2}>
-            <p>Seleccionamos activos con condiciones reales para generar renta, aumentar su valor y conservar</p>
-            <p>alternativas de salida en el tiempo.</p>
+          <P x={440} cy={700} color={MILLBROOK} className="whitespace-nowrap" d={0.2}>
+            <p>Cada inmueble se selecciona, transforma y gestiona bajo un modelo de inversión definido desde el inicio.</p>
           </P>
         </Sec>
 
@@ -612,13 +627,13 @@ export default function ComoOperamosScreen() {
           <Svg src="dot13.svg" x={1084} y={336} w={13} d={0.75} />
           <Svg src="dot13b.svg" x={1084} y={435} w={13} h={14} d={0.95} />
 
-          <P x={1129} cy={259.26} w={484} color={MILLBROOK} size={15} lh={22} d={0.42}>
+          <P x={1129} cy={259.26} w={484} color={MILLBROOK} size={16.2} lh={22} d={0.42}>
             <p>Primero analizamos la microzona, el precio por metro cuadrado, la inversión estimada y el potencial de valorización.</p>
           </P>
-          <P x={1129} cy={362} w={484} color={MILLBROOK} size={15} lh={22} d={0.56}>
+          <P x={1129} cy={362} w={484} color={MILLBROOK} size={16.2} lh={22} d={0.56}>
             <p>Después, nuestro equipo inspecciona el inmueble y evalúa su arquitectura, distribución, luz natural, estado del edificio, entorno y posibilidades reales de remodelación.</p>
           </P>
-          <P x={1129} cy={454} w={484} color={MILLBROOK} size={15} lh={22} d={0.7}>
+          <P x={1129} cy={454} w={484} color={MILLBROOK} size={16.2} lh={22} d={0.7}>
             <p>Cada activo debe cumplir los criterios comerciales y técnicos de Zequara para avanzar.</p>
           </P>
           <Callout x={1076} y={540.25} w={484} h={79.63} icon={CK_LIGHT_TICK} textX={52} textCy={38.41} textW={410} iconX={20} iconY={18} d={0.82}>
@@ -658,8 +673,10 @@ export default function ComoOperamosScreen() {
             <p>decisión del inversionista.</p>
           </P>
 
-          <Callout x={419} y={575} w={602.88} h={57} dark icon={CK_P} textCy={28.5} d={0.84}>
-            <p className="whitespace-nowrap">Acceso sin membresía. Compra sin comisión para el inversionista.</p>
+          {/* Va como nota, no como recuadro: con borde y esquinas redondas se
+              leía como un botón que no lleva a ninguna parte (OBS-33). */}
+          <Callout x={419} y={575} w={602.88} h={57} dark nota icon={CK_P} textCy={28.5} d={0.84}>
+            <p className="whitespace-nowrap">Sin pagos por suscripción. Compra sin comisión para el inversionista.</p>
           </Callout>
         </Sec>
 
@@ -681,7 +698,7 @@ export default function ComoOperamosScreen() {
           <H3 x={440} cy={230.84} w={760} color={BROWN}>
             <p>Honorarios vinculados a la ejecución sobre el activo.</p>
           </H3>
-          <P x={440} cy={341.5} w={617.69} color={MILLBROOK} className="whitespace-nowrap" d={0.34}>
+          <P x={440} cy={341.5} w={680} color={MILLBROOK} className="whitespace-nowrap" d={0.34}>
             <p>El acceso aprobado a la plataforma y la curaduría de oportunidades</p>
             <p>
               <span>hacen parte del proceso de vinculación. </span>
@@ -746,7 +763,7 @@ export default function ComoOperamosScreen() {
           <T x={208} cy={259.5} w={186} d={0.52} ry={0} className="font-semibold" style={{ fontSize: 20, lineHeight: "35px", letterSpacing: "-0.468px", color: CREAM }}>
             <p>ANTES DE EMPEZAR</p>
           </T>
-          <P x={199} cy={303} w={484} color={LINEN80} size={15} d={0.5}>
+          <P x={199} cy={303} w={484} color={LINEN80} size={16.2} d={0.5}>
             <p>Antes de iniciar la remodelación se establecen :</p>
           </P>
 
@@ -757,7 +774,7 @@ export default function ComoOperamosScreen() {
               {it.ico
                 ? <Pop className="absolute" style={{ left: it.icon[0], top: it.icon[1] }} delay={0.68 + i * 0.09}><Ico size={50} layers={it.ico} /></Pop>
                 : <Svg src={it.iconSrc!} x={it.icon[0]} y={it.icon[1]} w={it.iconW ?? 50} h={50} d={0.68 + i * 0.09} />}
-              <P x={it.text[0]} cy={it.text[1]} w={it.textW} color={LINEN80} size={15} lh={it.lh} className={it.center ? "text-center" : undefined} d={0.76 + i * 0.09}>
+              <P x={it.text[0]} cy={it.text[1]} w={it.textW} color={LINEN80} size={16.2} lh={it.lh} className={it.center ? "text-center" : undefined} d={0.76 + i * 0.09}>
                 <p>{it.label}</p>
               </P>
             </div>
@@ -772,11 +789,11 @@ export default function ComoOperamosScreen() {
 
           <Svg src="findpage70.svg" x={185} y={508} w={70} d={0.62} />
           <P x={254} cy={544} w={180} color={LINEN80} size={13} lh={18} d={0.7}>
-            <p>Los hallazgos técnicos identificados durante la evaluación se incorporan al presupuesto inicial.</p>
+            <p>{PRESUPUESTO_CERRADO_1}</p>
           </P>
           <Svg src="paper.svg" x={453} y={508} w={70} inset="12.5% 12.5% 0.78% 8.33%" d={0.74} />
           <P x={536} cy={553} w={166} color={LINEN80} size={13} lh={18} d={0.82}>
-            <p>Las modificaciones posteriores se documentan, cotizan y aprueban antes de ejecutarse.</p>
+            <p>{PRESUPUESTO_CERRADO_2}</p>
           </P>
           <Svg src="growth70.svg" x={703} y={508} w={70} d={0.86} />
           <P x={782} cy={544} w={150} color={LINEN80} size={13} lh={18} d={0.94}>
@@ -809,7 +826,7 @@ export default function ComoOperamosScreen() {
 
           <P x={1162} cy={232.39} w={484} color={MILLBROOK} d={0.4}>
             <p className="font-bold" style={{ color: BROWN }}>Primero</p>
-            <p>Antes de remodelar, identificamos quién debe querer vivir en el inmueble y qué características valora.</p>
+            <p>Antes de remodelar, definimos a qué tipo de habitante se dirige el inmueble y qué características valora.</p>
           </P>
           <P x={1162} cy={349.385} w={484} color={MILLBROOK} d={0.62}>
             <p className="font-bold" style={{ color: BROWN }}>Después</p>
@@ -880,7 +897,7 @@ export default function ComoOperamosScreen() {
             <p>permanecen en manos del inversionista.</p>
           </P>
 
-          <Callout x={440} y={579.865} w={602.88} h={79.63} dark icon={CK_S} textCy={39.4} textW={528.88} d={0.94}>
+          <Callout x={440} y={579.865} w={640} h={79.63} dark icon={CK_S} textCy={39.4} textW={566} d={0.94}>
             <p className="whitespace-nowrap">Una misma inversión puede conservar alternativas de renta, venta o</p>
             <p>permanencia.</p>
           </Callout>
@@ -906,10 +923,10 @@ export default function ComoOperamosScreen() {
             <p>Veinte años de ejecución verificable.</p>
           </H3>
           <P x={440} cy={306.5} w={617.69} color={MILLBROOK} className="whitespace-nowrap" d={0.34}>
-            <p>El equipo Zequara reúne experiencia en diseño, estructuración y</p>
-            <p>ejecución de proyectos residenciales, comerciales, institucionales e</p>
-            <p>industriales. Ese recorrido se traduce en procesos, presupuestos y</p>
-            <p>controles aplicados a cada nueva operación.</p>
+            <p>El equipo Zequara reúne experiencia en diseño, estructuración</p>
+            <p>y ejecución de proyectos residenciales, comerciales,</p>
+            <p>institucionales e industriales. Ese recorrido se traduce en</p>
+            <p>procesos, presupuestos y controles aplicados a cada operación.</p>
           </P>
 
           {([
@@ -934,11 +951,11 @@ export default function ComoOperamosScreen() {
               <p className="font-bold" style={{ fontSize: 48, lineHeight: "74.4px", letterSpacing: "-0.96px", color: CREAM }}>
                 <CountUp value={value} prefix={prefix} suffix={suffix} grouping={grouping} />
               </p>
-              <p className="font-light" style={{ marginTop: 6, fontSize: 14.4, lineHeight: "22.32px", color: "#ffffff" }}>{label}</p>
+              <p className="font-light" style={{ marginTop: 6, fontSize: 15.5, lineHeight: "24px", color: "#ffffff" }}>{label}</p>
             </motion.div>
           ))}
 
-          <Callout x={440} y={605.535} w={602.88} h={57} icon={CK_LIGHT} textCy={28.5} textW={418} d={0.8}>
+          <Callout x={440} y={605.535} w={640} h={57} icon={CK_LIGHT} textCy={28.5} textW={456} d={0.8}>
             <p className="whitespace-nowrap">Track record disponible durante la entrevista de acceso.</p>
           </Callout>
         </Sec>
@@ -983,9 +1000,31 @@ export default function ComoOperamosScreen() {
               <p>se hace bien o no se hace.”</p>
             </T>
           </L>
-          <P x={440} cy={713} w={484} color="rgba(247,241,229,0.6)" size={14.1} lh={21.82} d={0.92}>
-            <p>Christian revisa cada operación que ingresa al portafolio Zequara.</p>
+          <P x={440} cy={714} w={484} color="rgba(247,241,229,0.6)" size={14.1} lh={21.82} d={0.92}>
+            <p>Christian revisa cada operación que ingresa al portafolio, con un equipo detrás.</p>
           </P>
+          <L x={440} y={744} w={484}>
+            <motion.div
+              className="flex flex-wrap gap-[8px]"
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.6, delay: 1, ease: EASE }}
+            >
+              {EQUIPO.map((p) => (
+                <span
+                  key={p}
+                  className="whitespace-nowrap font-medium"
+                  style={{
+                    fontSize: 13, lineHeight: "20px", padding: "6px 14px", borderRadius: 100,
+                    border: `1px solid ${LASER30}`, color: LINEN80,
+                  }}
+                >
+                  {p}
+                </span>
+              ))}
+            </motion.div>
+          </L>
         </Sec>
 
         {/* ══════════ 12 · CIERRE ══════════ */}
@@ -1006,7 +1045,7 @@ export default function ComoOperamosScreen() {
             <MLine delay={0.48}><span className="font-semibold">operación.</span></MLine>
           </T>
 
-          <T x={651.155} cy={420.76} w={617.69} d={0.68} className="whitespace-nowrap text-center font-light" style={{ fontSize: 17.9, lineHeight: "27.78px", color: BROWN }}>
+          <T x={620} cy={420.76} w={680} d={0.68} className="whitespace-nowrap text-center font-light" style={{ fontSize: 19.3, lineHeight: "29.9px", color: BROWN }}>
             <p>Tú mantienes la propiedad y apruebas las decisiones clave. Zequara</p>
             <p>conecta selección, remodelación y operación mediante un solo</p>
             <p>equipo, un proceso trazable y un único interlocutor.</p>
@@ -1031,7 +1070,7 @@ export default function ComoOperamosScreen() {
             </a>
           </Pop>
 
-          <T x={630} cy={595.29} w={660} d={1} className="whitespace-nowrap text-center font-semibold" style={{ fontSize: 13.4, lineHeight: "20.83px", color: BROWN }}>
+          <T x={615} cy={595.29} w={690} d={1} className="whitespace-nowrap text-center font-semibold" style={{ fontSize: 14.5, lineHeight: "22.5px", color: BROWN }}>
             <p>Portafolio reservado para un grupo limitado de inversionistas. Acceso sujeto a evaluación.</p>
           </T>
         </Sec>

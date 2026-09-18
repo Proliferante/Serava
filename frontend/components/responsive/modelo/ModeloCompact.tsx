@@ -6,7 +6,7 @@ import CountUp from "@/components/motion/CountUp";
 import MobileNav from "@/components/responsive/MobileNav";
 import MobileFooter from "@/components/responsive/MobileFooter";
 import { EASE, In, WRAP } from "@/components/responsive/kit";
-import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
+import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF, PRESUPUESTO_CERRADO_1, PRESUPUESTO_CERRADO_2 } from "@/components/copy";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    CÓMO OPERAMOS — vista fluida para móvil y tablet (por debajo de 1280).
@@ -73,12 +73,14 @@ function P({ children, dark }: { children: ReactNode; dark?: boolean }) {
 }
 
 /** Recuadro de remate de cada paso (los `Callout` del lienzo). */
-function Callout({ children, dark }: { children: ReactNode; dark?: boolean }) {
+function Callout({ children, dark, nota }: { children: ReactNode; dark?: boolean; nota?: boolean }) {
+  // `nota` quita la caja y deja sólo un filete a la izquierda: un recuadro
+  // redondeado con fondo se lee como un botón (OBS-33).
   return (
-    <In delay={0.1} className="mt-[20px] flex items-start gap-[11px] rounded-[16px] border border-solid p-[16px]"
+    <In delay={0.1} className={`mt-[20px] flex items-start gap-[11px] border-solid ${nota ? "border-l-[3px] py-[4px] pl-[14px]" : "rounded-[16px] border p-[16px]"}`}
       style={dark
-        ? { borderColor: "rgba(226,205,174,0.28)", background: "rgba(226,205,174,0.06)" }
-        : { borderColor: "rgba(165,122,78,0.3)", background: "rgba(255,255,255,0.4)" }}>
+        ? { borderColor: "rgba(226,205,174,0.28)", background: nota ? "transparent" : "rgba(226,205,174,0.06)" }
+        : { borderColor: "rgba(165,122,78,0.3)", background: nota ? "transparent" : "rgba(255,255,255,0.4)" }}>
       <span className="mt-[2px] flex size-[20px] shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(127,139,87,0.22)" }}>
         <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke={GREEN_SMOKE} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6 9 17l-5-5" /></svg>
       </span>
@@ -109,6 +111,10 @@ function Card({ title, children, dark, delay = 0 }: { title: string; children: R
 }
 
 const ANTES_ITEMS = ["Materiales", "Mano de obra", "Cronograma", "Fechas de pago", "Proceso de aprobación de cambios"];
+
+/* Los perfiles que sostienen la operación además de la dirección técnica
+   (OBS-31). */
+const EQUIPO = ["Dirección · Paola", "Diseño · Natalia", "Datos · David", "Tecnología · Jesús", "Mercadeo · Laura"];
 
 const INDICADORES = ["Microzona", "Oferta disponible", "Velocidad de venta", "Nuevos proyectos"];
 
@@ -143,18 +149,19 @@ export default function ModeloCompact() {
         <Sec bg={CREAM} className="rounded-tl-[64px]">
           <In><Paso>Nuestro método</Paso></In>
           <In delay={0.06}>
-            <H3>Un sistema construido durante <span className="font-semibold">veinte años.</span></H3>
+            <H3>Un sistema construido <span className="font-semibold">con experiencia.</span></H3>
             <P>Cada decisión de Zequara combina tres capacidades:</P>
             <p className="mt-[10px] text-[15px] font-semibold" style={{ color: BISTRE }}>
-              Datos verificables <span style={{ color: DRIFT }}>·</span> Criterio técnico <span style={{ color: DRIFT }}>·</span> Experiencia operativa
+              Datos verificables <span style={{ color: DRIFT }}>·</span> Criterio técnico <span style={{ color: DRIFT }}>·</span> Gestión integral
             </p>
           </In>
           <div className="mt-[22px] grid grid-cols-1 gap-[12px] sm:grid-cols-3">
-            <Card title="Datos verificables" delay={0}>Modelos y métricas de zona que sustentan cada decisión, no intuiciones.</Card>
-            <Card title="Criterio técnico" delay={0.12}>Arquitectura, distribución y estado real del inmueble evaluados por expertos.</Card>
-            <Card title="Experiencia operativa" delay={0.24}>Veinte años ejecutando obra traducidos en procesos y controles.</Card>
+            <Card title="Datos verificables" delay={0}>Precios, comparables, costos y métricas de zona para sustentar cada decisión.</Card>
+            <Card title="Criterio técnico" delay={0.12}>Arquitectura, distribución y estado del inmueble evaluados para definir cómo intervenirlo.</Card>
+            {/* «gestión posterior» del Anexo B sale como «posterior administración», que es lo que pide OBS-41/42. */}
+            <Card title="Gestión integral" delay={0.24}>Coordinamos la compra, la transformación y la posterior administración del inmueble según el modelo de inversión.</Card>
           </div>
-          <In delay={0.1}><P>Seleccionamos activos con condiciones reales para generar renta, aumentar su valor y conservar alternativas de salida en el tiempo.</P></In>
+          <In delay={0.1}><P>Cada inmueble se selecciona, transforma y gestiona bajo un modelo de inversión definido desde el inicio.</P></In>
         </Sec>
 
         {/* ══════════ 3 · PASO 01 · SELECCIÓN DE LA ZONA ══════════ */}
@@ -201,7 +208,7 @@ export default function ModeloCompact() {
             <P dark>Cuando adquieres un inmueble presentado en la plataforma, la remodelación se desarrolla con nuestro equipo, bajo un alcance, presupuesto y contrato previamente aprobados.</P>
             <P dark>La administración posterior del activo permanece como una decisión del inversionista.</P>
           </In>
-          <Callout dark>Acceso sin membresía. Compra sin comisión para el inversionista.</Callout>
+          <Callout dark nota>Sin pagos por suscripción. Compra sin comisión para el inversionista.</Callout>
         </Sec>
 
         {/* ══════════ 6 · PASO 04 · MODELO DE COBRO ══════════ */}
@@ -245,8 +252,8 @@ export default function ModeloCompact() {
 
           <In delay={0.16} className="mt-[12px] rounded-[20px] border border-solid p-[18px]" style={{ borderColor: CREAM }}>
             <span className="inline-block rounded-full px-[16px] py-[7px] text-[14px] font-semibold" style={{ background: "#687540", color: CREAM }}>DURANTE LA EJECUCIÓN</span>
-            <p className="m-0 mt-[14px] text-[13.5px] font-light leading-[1.5]" style={{ color: LINEN80 }}>Los hallazgos técnicos identificados durante la evaluación se incorporan al presupuesto inicial.</p>
-            <p className="m-0 mt-[10px] text-[13.5px] font-light leading-[1.5]" style={{ color: LINEN80 }}>Las modificaciones posteriores se documentan, cotizan y aprueban antes de ejecutarse.</p>
+            <p className="m-0 mt-[14px] text-[13.5px] font-light leading-[1.5]" style={{ color: LINEN80 }}>{PRESUPUESTO_CERRADO_1}</p>
+            <p className="m-0 mt-[10px] text-[13.5px] font-light leading-[1.5]" style={{ color: LINEN80 }}>{PRESUPUESTO_CERRADO_2}</p>
             <p className="m-0 mt-[10px] text-[13.5px] font-light leading-[1.5]" style={{ color: LINEN80 }}>Durante la obra puedes consultar digitalmente el avance del proyecto.</p>
           </In>
 
@@ -267,7 +274,7 @@ export default function ModeloCompact() {
           <Foto src="como-renta.webp" alt="Estrategia de renta" />
           <div className="mt-[16px] flex flex-col gap-[14px]">
             {([
-              ["Primero", "Antes de remodelar, identificamos quién debe querer vivir en el inmueble y qué características valora."],
+              ["Primero", "Antes de remodelar, definimos a qué tipo de habitante se dirige el inmueble y qué características valora."],
               ["Después", "La distribución, los materiales, el mobiliario y el canon se proyectan según la demanda de cada microzona y el perfil del arrendatario objetivo."],
               ["Finalmente", "Una vez disponible, Zequara gestiona la comercialización, las visitas, la selección del arrendatario y la operación del activo."],
             ] as const).map(([t, d], i) => (
@@ -350,7 +357,15 @@ export default function ModeloCompact() {
               </p>
             </blockquote>
           </In>
-          <Callout dark>Christian revisa cada operación que ingresa al portafolio Zequara.</Callout>
+          {/* El respaldo es de equipo, no de una sola persona (OBS-31). */}
+          <In delay={0.18}>
+            <P dark>Christian revisa cada operación que ingresa al portafolio, con un equipo detrás.</P>
+            <ul className="mt-[12px] flex list-none flex-wrap gap-[8px] p-0">
+              {EQUIPO.map((p) => (
+                <li key={p} className="rounded-full border border-solid px-[13px] py-[6px] text-[13px] font-medium" style={{ borderColor: "rgba(201,168,119,0.3)", color: LINEN80 }}>{p}</li>
+              ))}
+            </ul>
+          </In>
         </Sec>
 
         {/* ══════════ 12 · CIERRE ══════════ */}

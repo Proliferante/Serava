@@ -164,7 +164,7 @@ const TARJETA: Bloque[] = [
     nota: "Cómo se ve el predio en /predios, antes de que nadie abra la ficha. La foto, el Score, el título, el precio y el tipo son los de arriba: aquí sólo lo que cuenta su estado comercial.",
     campos: [
       { k: "card_badge", l: "Etiqueta de la foto", tipo: "opcion", req: true, ej: "Disponible", opciones: ["Disponible", "Nueva oportunidad", "Alta actividad", "Reserva en curso", "Reserva liberada", "Reservada"], ayuda: "La píldora de color arriba a la izquierda de la foto." },
-      { k: "card_estado", l: "Estado de la oportunidad", tipo: "texto", ej: "Abierto para evaluación", ayuda: "El renglón del pie de la tarjeta." },
+      { k: "card_estado", l: "Estado de la oportunidad", tipo: "texto", ej: "Disponible para reservar", ayuda: "El renglón del pie de la tarjeta." },
       { k: "card_horizonte", l: "Horizonte", tipo: "texto", ej: "Horizonte: 5 años", ayuda: "Junto a la TIR, en el pie de la tarjeta." },
     ],
   },

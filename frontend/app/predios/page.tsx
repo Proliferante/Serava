@@ -108,7 +108,7 @@ export default async function PrediosPage() {
 
   return (
     <main className="bg-cream">
-      <Compact><PrediosCompact predios={lista} /></Compact>
+      <Compact><PrediosCompact predios={lista} actualizado={fecha} /></Compact>
       <Desk>
       <ScaledCanvas width={CANVAS_W} height={CANVAS_H}>
         <div className="relative size-full" style={{ background: "linear-gradient(0deg, #E2CDAE 0.02%, #492100 82.77%), #FFF" }}>

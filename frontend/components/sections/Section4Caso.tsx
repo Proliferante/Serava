@@ -22,14 +22,14 @@ function ScenarioTable() {
   return (
     <div className="w-[1054px] overflow-clip rounded-[14px] border border-solid bg-brown-dark" style={{ borderColor: border }}>
       <div className="border-b border-solid px-[18px] py-[10px]" style={{ borderColor: border }}>
-        <p className="font-semibold text-[10px] text-tan-63">Año a año · escenario base</p>
-        <p className="mt-[3px] font-light text-[9px]" style={{ color: muted }}>Escenario base a 5 años · TIR neta estimada: 16,5% anual</p>
+        <p className="font-semibold text-[12.5px] text-tan-63">Año a año · escenario base</p>
+        <p className="mt-[3px] font-light text-[13.5px]" style={{ color: muted }}>Escenario base a 5 años · TIR neta estimada: 16,5% anual</p>
       </div>
       <div className={`${COLS} border-b border-solid`} style={{ borderColor: border }}>
-        <div className="px-[14px] py-[11px] font-semibold text-[9px]" style={{ color: muted }}>Año</div>
-        <div className="px-[14px] py-[11px] text-right font-semibold text-[9px]" style={{ color: muted }}>Renta neta del año</div>
-        <div className="px-[14px] py-[11px] text-right font-semibold text-[9px]" style={{ color: muted }}>Valor estimado de mercado</div>
-        <div className="px-[14px] py-[11px] text-right font-semibold text-[9px]" style={{ color: muted }}>Múltiplo sobre la inversión</div>
+        <div className="px-[14px] py-[11px] font-semibold text-[13.5px]" style={{ color: muted }}>Año</div>
+        <div className="px-[14px] py-[11px] text-right font-semibold text-[13.5px]" style={{ color: muted }}>Renta neta del año</div>
+        <div className="px-[14px] py-[11px] text-right font-semibold text-[13.5px]" style={{ color: muted }}>Valor estimado de mercado</div>
+        <div className="px-[14px] py-[11px] text-right font-semibold text-[13.5px]" style={{ color: muted }}>Múltiplo sobre la inversión</div>
       </div>
       {TABLE_ROWS.map((r, i) => (
         <motion.div
@@ -40,14 +40,14 @@ function ScenarioTable() {
           className={`${COLS} border-b border-solid`}
           style={{ borderColor: border }}
         >
-          <div className="px-[14px] py-[11px] font-medium text-[13px]" style={{ color: muted }}>{r.year}</div>
-          <div className="px-[14px] py-[11px] text-right font-normal text-[13px] text-cream-93"><CountUp value={r.renta} prefix="$" suffix="M" /></div>
-          <div className="px-[14px] py-[11px] text-right font-normal text-[13px] text-cream-93"><CountUp value={r.valor} prefix="$" suffix="MM" decimals={2} comma /></div>
-          <div className="px-[14px] py-[11px] text-right font-normal text-[13px] text-cream-93"><CountUp value={r.mult} suffix="×" decimals={2} comma /></div>
+          <div className="px-[14px] py-[11px] font-medium text-[14.5px]" style={{ color: muted }}>{r.year}</div>
+          <div className="px-[14px] py-[11px] text-right font-normal text-[14.5px] text-cream-93"><CountUp value={r.renta} prefix="$" suffix="M" /></div>
+          <div className="px-[14px] py-[11px] text-right font-normal text-[14.5px] text-cream-93"><CountUp value={r.valor} prefix="$" suffix="MM" decimals={2} comma /></div>
+          <div className="px-[14px] py-[11px] text-right font-normal text-[14.5px] text-cream-93"><CountUp value={r.mult} suffix="×" decimals={2} comma /></div>
         </motion.div>
       ))}
       {/* Nota al pie (Figma 179:1250) */}
-      <p className="px-[18px] py-[10px] font-light leading-[1.5] text-[8px]" style={{ color: muted }}>
+      <p className="px-[18px] py-[10px] font-light leading-[1.5] text-[14.5px]" style={{ color: muted }}>
         · La TIR estimada incluye la inversión inicial, las rentas de las ventas anuales y la venta estimada de la propiedad al final del año cinco. Todas las estimaciones consideran gastos proyectados.
       </p>
     </div>
@@ -108,9 +108,9 @@ function Metric({ left, width, iconX, iconY, textX, labelY, valueY, subY, arrowX
     <div className="absolute top-[1px] h-[94.42px] bg-[rgba(247,241,229,0.04)]" style={{ left, width }}>
       <span className="absolute" style={{ left: iconX, top: iconY }}>{icon}</span>
       {arrowX !== undefined && <span className="absolute top-[19px]" style={{ left: arrowX }}><IcoUp /></span>}
-      <p className="absolute whitespace-nowrap font-normal leading-[15px] text-[10px]" style={{ left: textX, top: labelY, color: muted }}>{label}</p>
+      <p className="absolute whitespace-nowrap font-normal leading-[18px] text-[12.5px]" style={{ left: textX, top: labelY, color: muted }}>{label}</p>
       <p className="absolute whitespace-nowrap font-light leading-[23px] text-cream-93 text-[23px]" style={{ left: textX, top: valueY }}>{children}</p>
-      <p className="absolute whitespace-nowrap font-light leading-[14px] text-[9px]" style={{ left: textX, top: subY, color: muted }}>{sub}</p>
+      <p className="absolute whitespace-nowrap font-light leading-[14px] text-[13.5px]" style={{ left: textX, top: subY, color: muted }}>{sub}</p>
     </div>
   );
 }
@@ -132,25 +132,25 @@ function ScenarioCard({ title, rate, sub, value, multiplo, ganancia, accent, del
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="font-bold text-[18px] leading-none" style={{ color: accent ? green : cream }}>{title}</p>
-          <p className="mt-[5px] font-light text-[10px]" style={{ color: "rgba(247,241,229,0.55)" }}>{sub}</p>
+          <p className="font-bold text-[20px] leading-none" style={{ color: accent ? green : cream }}>{title}</p>
+          <p className="mt-[5px] font-light text-[12.5px]" style={{ color: "rgba(247,241,229,0.55)" }}>{sub}</p>
         </div>
-        <p className="font-normal text-[11px]" style={{ color: "rgba(247,241,229,0.55)" }}>{rate}</p>
+        <p className="font-normal text-[14.5px]" style={{ color: "rgba(247,241,229,0.55)" }}>{rate}</p>
       </div>
       <p className="mt-[16px] font-light text-[40px] leading-none" style={{ color: accent ? green : cream }}>
         <CountUp value={value} prefix="$" suffix="MM" decimals={2} comma />
       </p>
-      <p className="mt-[12px] font-light text-[11px]" style={{ color: "rgba(247,241,229,0.55)" }}>tu patrimonio en 5 años</p>
+      <p className="mt-[12px] font-light text-[14.5px]" style={{ color: "rgba(247,241,229,0.55)" }}>tu patrimonio en 5 años</p>
 
       <div className="mt-[20px] h-px w-full" style={{ background: "rgba(247,241,229,0.1)" }} />
       <div className="flex items-center justify-between py-[13px]">
-        <span className="font-light text-[13px]" style={{ color: "rgba(247,241,229,0.6)" }}>Múltiplo</span>
-        <span className="font-bold text-[15px]" style={{ color: accent ? green : cream }}><CountUp value={multiplo} suffix="×" decimals={2} comma /></span>
+        <span className="font-light text-[14.5px]" style={{ color: "rgba(247,241,229,0.6)" }}>Múltiplo</span>
+        <span className="font-bold text-[16.5px]" style={{ color: accent ? green : cream }}><CountUp value={multiplo} suffix="×" decimals={2} comma /></span>
       </div>
       <div className="h-px w-full" style={{ background: "rgba(247,241,229,0.1)" }} />
       <div className="flex items-center justify-between pt-[13px]">
-        <span className="font-light text-[13px]" style={{ color: "rgba(247,241,229,0.6)" }}>Ganancia neta</span>
-        <span className="font-bold text-[15px] text-cream-93"><CountUp value={ganancia} prefix="+$" suffix="MM" decimals={2} comma /></span>
+        <span className="font-light text-[14.5px]" style={{ color: "rgba(247,241,229,0.6)" }}>Ganancia neta</span>
+        <span className="font-bold text-[16.5px] text-cream-93"><CountUp value={ganancia} prefix="+$" suffix="MM" decimals={2} comma /></span>
       </div>
     </motion.div>
   );
@@ -191,8 +191,8 @@ export default function Section4Caso() {
 
         {/* Horizonte slider */}
         <div ref={sliderRef} className="absolute bg-brown-dark border border-solid border-[rgba(247,241,229,0.12)] h-[55.19px] left-[57px] rounded-[12px] top-[388px] w-[1060px]">
-          <p className="[word-break:break-word] absolute font-semibold leading-[17px] left-[19px] not-italic text-cream-93 text-[11px] top-[18.7px]">Horizonte</p>
-          <p className="[word-break:break-word] absolute font-semibold leading-[25px] left-[986px] not-italic text-tan-63 text-[16px] top-[15px]">5 años</p>
+          <p className="[word-break:break-word] absolute font-semibold leading-[17px] left-[19px] not-italic text-cream-93 text-[14.5px] top-[18.7px]">Horizonte</p>
+          <p className="[word-break:break-word] absolute font-semibold leading-[25px] left-[986px] not-italic text-tan-63 text-[17px] top-[15px]">5 años</p>
           {/* track — 875 × 7 en x=94, y=24 (Figma 180:1334) */}
           <div className="absolute left-[94px] top-[24px] h-[7px] w-[875px] overflow-hidden rounded-[40px]" style={{ background: "rgba(201,168,119,0.25)" }}>
             <motion.div className="h-full rounded-[40px] bg-tan-63" initial={{ width: 0 }} animate={sliderInView ? { width: "100%" } : { width: 0 }} transition={{ duration: 1, ease: EASE }} />
@@ -208,11 +208,11 @@ export default function Section4Caso() {
           <div className="absolute flex h-[46px] items-center left-0 rounded-[999px] top-0 w-[258px] p-[5px] bg-[rgba(247,241,229,0.72)]">
             <button type="button" onClick={() => setTab("escenarios")} className="relative z-10 flex h-[36px] w-[102px] items-center justify-center rounded-[999px]">
               {tab === "escenarios" && <motion.span layoutId="s4tab" className="absolute inset-0 rounded-[999px] bg-[#7f8b57]" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
-              <span className={`relative z-10 font-medium text-[12px] transition-colors ${tab === "escenarios" ? "text-cream-93" : "text-[#8a6a3f]"}`}>Escenarios</span>
+              <span className={`relative z-10 font-medium text-[13.5px] transition-colors ${tab === "escenarios" ? "text-cream-93" : "text-[#8a6a3f]"}`}>Escenarios</span>
             </button>
             <button type="button" onClick={() => setTab("tabla")} className="relative z-10 flex h-[36px] flex-1 items-center justify-center rounded-[999px]">
               {tab === "tabla" && <motion.span layoutId="s4tab" className="absolute inset-0 rounded-[999px] bg-[#7f8b57]" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
-              <span className={`relative z-10 font-medium text-[12px] transition-colors ${tab === "tabla" ? "text-cream-93" : "text-[#8a6a3f]"}`}>Año a año · base</span>
+              <span className={`relative z-10 font-medium text-[13.5px] transition-colors ${tab === "tabla" ? "text-cream-93" : "text-[#8a6a3f]"}`}>Año a año · base</span>
             </button>
           </div>
           {/* Flechas (180:1342 / 180:1345) — pasan entre las dos vistas del bloque.
