@@ -1,6 +1,7 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
 import { Compact, Desk } from "@/components/responsive/Adaptive";
 import OportunidadesCompact from "@/components/responsive/oportunidades/OportunidadesCompact";
+import NavFlotante from "@/components/NavFlotante";
 import Navbar from "@/components/Navbar";
 import OportunidadesScreen from "@/components/sections/oportunidades/OportunidadesScreen";
 import Footer from "@/components/sections/Footer";
@@ -27,6 +28,9 @@ export default function OportunidadesPage() {
         </div>
         <Navbar />
       </ScaledCanvas>
+      {/* Fuera del lienzo a propósito: dentro, el `transform`
+          del lienzo rompe el `position: fixed`. */}
+      <NavFlotante />
       </Desk>
     </main>
   );

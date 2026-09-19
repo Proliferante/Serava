@@ -2,6 +2,7 @@ import ScaledCanvas from "@/components/ScaledCanvas";
 import { Compact, Desk } from "@/components/responsive/Adaptive";
 import HubCompact from "@/components/responsive/hub/HubCompact";
 import CanvasImage from "@/components/CanvasImage";
+import NavFlotante from "@/components/NavFlotante";
 import Navbar from "@/components/Navbar";
 import { RevealLayer, Reveal } from "@/components/motion/Reveal";
 import HubSection1Hero from "@/components/sections/hub/HubSection1Hero";
@@ -52,6 +53,9 @@ export default function HubPage() {
         <Layer left={-2} top={3463} width={1922} height={364}><Footer /></Layer>
         <Navbar />
       </ScaledCanvas>
+      {/* Fuera del lienzo a propósito: dentro, el `transform`
+          del lienzo rompe el `position: fixed`. */}
+      <NavFlotante />
       </Desk>
     </main>
   );

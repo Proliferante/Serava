@@ -1,6 +1,7 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
 import { Compact, Desk } from "@/components/responsive/Adaptive";
 import ModeloCompact from "@/components/responsive/modelo/ModeloCompact";
+import NavFlotante from "@/components/NavFlotante";
 import Navbar from "@/components/Navbar";
 import ComoOperamosScreen from "@/components/sections/modelo/ComoOperamosScreen";
 import Footer from "@/components/sections/Footer";
@@ -28,6 +29,9 @@ export default function ModeloPage() {
         </div>
         <Navbar />
       </ScaledCanvas>
+      {/* Fuera del lienzo a propósito: dentro, el `transform`
+          del lienzo rompe el `position: fixed`. */}
+      <NavFlotante />
       </Desk>
     </main>
   );

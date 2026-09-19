@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring } fr
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { MARK } from "@/components/brand";
+import { ENLACES as LINKS } from "@/components/nav";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    NAV DE MÓVIL Y TABLET — barra fija arriba y cajón a pantalla completa.
@@ -18,12 +19,7 @@ import { MARK } from "@/components/brand";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-const LINKS = [
-  { href: "/", label: "Inicio" },
-  { href: "/modelo", label: "¿Cómo operamos?" },
-  { href: "/oportunidades", label: "Proyectos realizados" },
-  { href: "/hub", label: "HUB" },
-];
+
 
 export default function MobileNav() {
   const [open, setOpen] = useState(false);

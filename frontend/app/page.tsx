@@ -1,4 +1,5 @@
 import ScaledCanvas from "@/components/ScaledCanvas";
+import NavFlotante from "@/components/NavFlotante";
 import Navbar from "@/components/Navbar";
 import { Compact, Desk } from "@/components/responsive/Adaptive";
 import HomeCompact from "@/components/responsive/home/HomeCompact";
@@ -58,6 +59,9 @@ export default function Home() {
         <Layer left={-2} top={9175} width={1922} height={364}><Footer /></Layer>
         <Navbar />
       </ScaledCanvas>
+      {/* Fuera del lienzo a propósito: dentro, el `transform`
+          del lienzo rompe el `position: fixed`. */}
+      <NavFlotante />
       </Desk>
     </main>
   );
