@@ -2,7 +2,7 @@
 
 import { MotionConfig } from "framer-motion";
 import { useState } from "react";
-import IrA from "@/components/IrA";
+import IrA, { Ancla } from "@/components/IrA";
 import MobileNav from "@/components/responsive/MobileNav";
 import ConfirmacionModal from "@/components/sections/solicitud/ConfirmacionModal";
 import { BROWN, Card, CheckList, CTA, Eyebrow, H2, In, LASER, MILLBROOK, Note, P, Reveal, Step, Timeline, Volver, WRAP } from "@/components/responsive/kit";
@@ -133,7 +133,7 @@ export default function SolicitudCompact() {
         </section>
 
         {/* ══════════ 3 · FORMULARIO ══════════ */}
-        <section id="formulario" className="relative overflow-hidden rounded-tl-[64px] bg-brown-dark py-[58px]">
+        <section data-ancla="formulario" className="relative overflow-hidden rounded-tl-[64px] bg-brown-dark py-[58px]">
           <img src={`${A}/acceso-cuadros.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-x-0 top-0 w-full object-cover" style={{ height: 900, opacity: 0.18 }} />
           <div className={`${WRAP} relative`}>
             <In><Eyebrow>Tu perfil de inversión</Eyebrow></In>
@@ -204,7 +204,7 @@ export default function SolicitudCompact() {
 
         {/* ══════════ 4 · QUÉ ENCUENTRAS ══════════ */}
         <section className={`${WRAP} py-[58px]`}>
-          <span id="espacio-privado" className="block scroll-mt-[80px]" />
+          <Ancla nombre="espacio-privado" className="block scroll-mt-[80px]" />
           <In><Eyebrow tone="brown">Tu espacio privado</Eyebrow></In>
           <In delay={0.06}>
             <H2 dark>Información estructurada para <span className="font-semibold">evaluar cada oportunidad.</span></H2>

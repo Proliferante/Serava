@@ -6,7 +6,9 @@ import { EASE } from "@/components/motion/Kinetics";
 import { CUENTA, CUENTA_LINKS } from "@/components/sections/cuenta/data";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   MENÚ DEL AVATAR — lo que hay detrás del `button#meBtn` del diseño.
+   MENÚ DEL AVATAR — lo que hay detrás del botón del avatar del diseño
+   (`meBtn` en Figma; aquí no lleva ese id porque el nav se monta en los dos
+   árboles y el id salía repetido en la página).
 
    Las pantallas de cuenta (688:4032 y 688:4280) traen el avatar de iniciales
    en la barra, con id de botón y sin nada colgando: es el único sitio del
@@ -72,7 +74,6 @@ export default function AccountMenu({
     <div ref={caja} className="relative" style={{ width: size, height: size }}>
       <button
         type="button"
-        id="meBtn"
         aria-haspopup="menu"
         aria-expanded={abierto}
         aria-label="Tu cuenta"

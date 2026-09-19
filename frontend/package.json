@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "ids": "node scripts/ids-unicos.mjs",
+    "ids:vivo": "node scripts/ids-unicos.mjs --url http://127.0.0.1:3000"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",

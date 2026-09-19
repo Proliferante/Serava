@@ -1,7 +1,7 @@
 "use client";
 
 import { MotionConfig, motion } from "framer-motion";
-import IrA from "@/components/IrA";
+import IrA, { Ancla } from "@/components/IrA";
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { EASE, MLine, POP, Pop, Rise, Rule } from "@/components/motion/Kinetics";
 import { WORDMARK, wordmarkH } from "@/components/brand";
@@ -376,7 +376,7 @@ export default function SolicitudAccesoScreen() {
         {/* ══════════ 4 · QUÉ ENCUENTRAS AL INGRESAR (311:4713) ══════════ */}
         <L x={0} y={2668} w={1920} h={1158} className="overflow-hidden" style={{ background: CREAM }}>
           {/* Destino del botón «¿Qué beneficios obtengo?» (OBS-45). */}
-          <span id="espacio-privado" className="absolute left-0 top-0" />
+          <Ancla nombre="espacio-privado" className="absolute left-0 top-0" />
           <T x={460} cy={321.16} w={760} d={0} ry={16} className="font-normal" style={{ fontSize: 14.4, lineHeight: "22.32px", color: BROWN }}>
             <p>Tu espacio privado</p>
           </T>
@@ -448,7 +448,7 @@ export default function SolicitudAccesoScreen() {
             className="pointer-events-none absolute max-w-none object-cover"
             style={{ left: 0, top: -465, width: 1920, height: 1688, opacity: 0.18 }}
           />
-          <span id="formulario" className="absolute left-0 top-0" />
+          <Ancla nombre="formulario" className="absolute left-0 top-0" />
 
           {/* Columna izquierda (311:4566) */}
           <T x={460} cy={179.16} w={399.5} d={0} ry={16} className="font-normal" style={{ fontSize: 14.4, lineHeight: "22.32px", color: CREAM }}>
