@@ -71,21 +71,19 @@ const IcoPortafolio = () => (
   </svg>
 );
 
-/* ── La rejilla ──────────────────────────────────────────────────────────
-   La isla iba a 1180 px fijos centrados en la ventana, y eso estaba mal: todo
-   lo demás de la página está colocado sobre el lienzo de 1920, que se escala
-   al ancho disponible. Dos rejillas distintas no cuadran nunca, y el desajuste
-   además cambia con el tamaño de la ventana — en /modelo y /hub la isla
-   sobresalía 200 px por cada lado de la columna de contenido.
+/* ── El ancho de la isla ─────────────────────────────────────────────────
+   Se pasó por dos sitios equivocados antes de dar con éste.
 
-   Así que la isla se coloca en coordenadas del lienzo, en porcentaje del
-   ancho disponible (que es lo mismo que usa el lienzo para escalarse; `vw`
-   no vale porque incluye la barra de scroll). Toma el hueco exacto de la
-   barra de la página: del filo del wordmark (x=121) al filo del botón de
-   acceso (1591 + 209 = 1800). */
-const LIENZO = 1920;
-const IZQ = (121 / LIENZO) * 100;          // 6.30 %
-const ANCHO = ((1800 - 121) / LIENZO) * 100; // 87.45 %
+   Primero fueron 1180 px fijos, y en un monitor de 1920 se veía estrecha y
+   metida hacia dentro respecto de la barra grande. Después se ató a la
+   rejilla del lienzo (87 % del ancho), y eso fue peor: en 1920 la isla
+   medía 1666 px con los enlaces apelotonados a la izquierda, los botones al
+   otro extremo y novecientos píxeles de agujero en medio.
+
+   Una isla flotante no es una barra estirada: mide lo que mide su contenido
+   y va centrada. Así se ve igual de intencionada en un portátil que en un
+   monitor grande, y nunca deja huecos. El `max-width` sólo la protege de
+   ventanas estrechas; el contenido ya cabe de sobra en el corte de 1280. */
 
 /** Alto de la barra de la página, en coordenadas del lienzo de 1920. */
 const NAVBAR_LIENZO = 173;
@@ -110,7 +108,7 @@ export default function NavFlotante() {
     <>
       <motion.nav
         aria-label="Navegación flotante"
-        className="fixed inset-x-0 top-[14px] z-[70]"
+        className="fixed inset-x-0 top-[14px] z-[70] flex justify-center px-[24px]"
         initial={false}
         /* `visibility` además de la opacidad: con opacidad 0 a secas los
            enlaces siguen siendo enfocables con el tabulador, y se tabula a una
@@ -123,10 +121,8 @@ export default function NavFlotante() {
         style={{ pointerEvents: escondida ? "none" : "auto" }}
       >
         <div
-          className="flex h-[56px] items-center gap-[9px] rounded-full pl-[20px] pr-[9px]"
+          className="flex h-[56px] max-w-full items-center gap-[10px] rounded-full pl-[22px] pr-[10px]"
           style={{
-            marginLeft: `${IZQ}%`,
-            width: `${ANCHO}%`,
             // Translúcida: el marrón de marca al 70 % con desenfoque detrás,
             // para que se lea encima de la foto del hero y de las secciones
             // claras sin taparlas.
@@ -141,7 +137,7 @@ export default function NavFlotante() {
             <img src={MARK} alt="" decoding="async" className="block size-full max-w-none" />
           </a>
 
-          <div className="ml-[16px] flex flex-1 items-center gap-[22px]">
+          <div className="ml-[18px] mr-[20px] flex items-center gap-[24px]">
             {ENLACES.map((l) => {
               const aqui = pathname === l.href;
               return (
