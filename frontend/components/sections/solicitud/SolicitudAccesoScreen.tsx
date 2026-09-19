@@ -4,6 +4,7 @@ import { MotionConfig, motion } from "framer-motion";
 import IrA, { Ancla } from "@/components/IrA";
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { EASE, MLine, POP, Pop, Rise, Rule } from "@/components/motion/Kinetics";
+import VolverAlInicio from "@/components/VolverAlInicio";
 import { WORDMARK, wordmarkH } from "@/components/brand";
 import ConfirmacionModal from "@/components/sections/solicitud/ConfirmacionModal";
 
@@ -612,6 +613,10 @@ export default function SolicitudAccesoScreen() {
             <img alt="Zequara" src={WORDMARK} className="absolute inset-0 block size-full max-w-none" />
           </motion.a>
         </div>
+        {/* Se entra aquí desde un correo o un enlace suelto, sin menú a mano
+            (OBS-20). Va fuera de la franja de 83 px de la cabecera, ya sobre
+            el hero. */}
+        <VolverAlInicio x={63} y={92} />
 
         <ConfirmacionModal open={enviado} onClose={() => setEnviado(false)} />
       </div>

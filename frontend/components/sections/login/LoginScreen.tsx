@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import VolverAlInicio from "@/components/VolverAlInicio";
 import { WORDMARK, wordmarkH } from "@/components/brand";
 import CanvasImage from "@/components/CanvasImage";
 
@@ -95,6 +96,9 @@ export default function LoginScreen() {
         <a href="/" aria-label="Zequara — Inicio" className="ix-nav absolute left-[32px] top-[39.0px]" style={{ width: 175.276, height: wordmarkH(175.276) }}>
           <img loading="lazy" decoding="async" alt="Zequara" className="absolute block inset-0 max-w-none size-full" src={WORDMARK} />
         </a>
+        {/* Aquí se cae al cerrar sesión, y el logotipo solo no se lee como
+            salida (OBS-20). */}
+        <VolverAlInicio x={32} y={82} />
 
         {/* Bottom text */}
         <div className="absolute left-[44px] top-[724px] w-[920px]">
