@@ -35,6 +35,12 @@ function Home() {
 function Pin() {
   return (<svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M19 10.4c0 5.3-7 10.4-7 10.4s-7-5.1-7-10.4a7 7 0 0 1 14 0z" /><circle cx="12" cy="10.2" r="2.4" /></svg>);
 }
+function Flame() {
+  return (<svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M12 3s4.5 3.6 4.5 8.1A4.5 4.5 0 0 1 12 15.6a4.5 4.5 0 0 1-4.5-4.5C7.5 6.6 12 3 12 3z" /><path d="M12 21a5.6 5.6 0 0 0 5.6-5.6c0-1.3-.5-2.5-1.3-3.4A5.6 5.6 0 0 1 12 21a5.6 5.6 0 0 1-4.3-9c-.8.9-1.3 2.1-1.3 3.4A5.6 5.6 0 0 0 12 21z" /></svg>);
+}
+function Reloj() {
+  return (<svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="8.5" /><path d="M12 7.2v5l3.2 2" /></svg>);
+}
 function Arrow() {
   return (<svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M4.5 12h15M13.6 6.2 19.5 12l-5.9 5.8" /></svg>);
 }
@@ -61,9 +67,29 @@ export default function PredioCardCompact({ data, delay = 0, href = "/predios/fi
         <span className="absolute right-[12px] top-[12px] flex items-center gap-[5px] rounded-[8px] border border-solid px-[9px] py-[4px] text-[10px] font-bold" style={{ background: "rgba(34,24,18,0.6)", borderColor: "rgba(201,168,119,0.3)", color: "#c9a877" }} title={SCORE_TIP}>
           Score Zequara {data.score}
         </span>
-        <span className="absolute bottom-[10px] left-[12px] text-[9.6px] font-semibold uppercase tracking-[0.96px]" style={{ color: "rgba(247,241,229,0.55)" }}>
-          Foto — {data.photo}
-        </span>
+        {/* Pie de la foto y señales de actividad (OBS-50) comparten renglón:
+            el pie se recorta si hace falta y las señales no se mueven, que son
+            las que empujan a entrar. */}
+        <div className="absolute inset-x-[12px] bottom-[10px] flex items-end justify-between gap-[8px]">
+          <span className="min-w-0 truncate text-[9.6px] font-semibold uppercase tracking-[0.96px]" style={{ color: "rgba(247,241,229,0.55)" }}>
+            Foto — {data.photo}
+          </span>
+          {(data.viendo || data.publicado) && (
+            <span className="flex shrink-0 flex-wrap justify-end gap-[5px]">
+              {!!data.viendo && (
+                <span className="inline-flex items-center gap-[4px] whitespace-nowrap rounded-[6px] px-[8px] py-[3px] text-[9.8px] font-semibold" style={{ background: "rgba(23,16,11,0.62)", color: "rgba(247,241,229,0.92)" }}>
+                  <span className="motion-safe:animate-pulse" style={{ color: "#e8935f" }}><Flame /></span>
+                  {data.viendo} viendo
+                </span>
+              )}
+              {data.publicado && (
+                <span className="inline-flex items-center gap-[4px] whitespace-nowrap rounded-[6px] px-[8px] py-[3px] text-[9.8px] font-semibold" style={{ background: "rgba(23,16,11,0.62)", color: "rgba(247,241,229,0.92)" }}>
+                  <Reloj />{data.publicado}
+                </span>
+              )}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col p-[18px]">

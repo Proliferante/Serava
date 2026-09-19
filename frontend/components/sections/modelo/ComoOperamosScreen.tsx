@@ -503,12 +503,9 @@ export default function ComoOperamosScreen() {
           />
           <Eyebrow x={251} cy={247.5} label="Cómo operamos" color={CREAM} w={143.13} d={0.15} />
           <T x={251} cy={433.2} className="whitespace-nowrap" style={{ fontSize: 70.4, letterSpacing: "-1.76px", lineHeight: "78.85px", color: CREAM }}>
-            <MLine delay={0.3}><span className="font-light">Una inversión bien</span></MLine>
-            <MLine delay={0.4}><span className="font-light">operada empieza</span></MLine>
-            <MLine delay={0.5}>
-              <span className="font-light">con </span>
-              <span className="font-semibold">mejores</span>
-            </MLine>
+            <MLine delay={0.3}><span className="font-light">Una buena inversión</span></MLine>
+            <MLine delay={0.4}><span className="font-light">comienza con</span></MLine>
+            <MLine delay={0.5}><span className="font-semibold">las mejores</span></MLine>
             <MLine delay={0.6}><span className="font-semibold">decisiones.</span></MLine>
           </T>
           <T x={251} cy={658.49} d={0.85} className="whitespace-nowrap font-normal" style={{ fontSize: 20.8, lineHeight: "32.24px", color: CREAM }}>
