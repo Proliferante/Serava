@@ -436,7 +436,7 @@ export default function HomeCompact() {
                 diferencia entre 1,32 y 1,79 se vea; contra cero, las cinco
                 parecerían iguales. */}
             <In delay={0.16} className="mt-[22px] rounded-[16px] bg-brown-dark p-[20px]">
-              <p className="m-0 text-[12.5px] font-semibold uppercase tracking-[1.4px] text-tan-63">Año a año · base</p>
+              <p className="m-0 text-[12.5px] font-semibold uppercase tracking-[1.4px] text-tan-63">Tu inversión, año a año</p>
               <p className="m-0 mt-[5px] text-[12px] font-light text-[rgba(247,241,229,0.6)]">Escenario base a 5 años · TIR neta estimada: 16,5% anual</p>
 
               <div className="mt-[16px] flex flex-col gap-[13px]">
@@ -460,7 +460,7 @@ export default function HomeCompact() {
                       />
                     </div>
                     <p className="m-0 mt-[4px] text-[12px] font-light text-[rgba(247,241,229,0.6)]">
-                      Renta neta del año ${r.renta}M · valor estimado de mercado ${r.valor.toFixed(2).replace(".", ",")}.000M
+                      Renta neta del año ${r.renta}M · valor estimado de mercado ${r.valor.toFixed(2).replace(".", ",")}MM
                     </p>
                   </div>
                 ))}

@@ -22,7 +22,7 @@ function ScenarioTable() {
   return (
     <div className="w-[1054px] overflow-clip rounded-[14px] border border-solid bg-brown-dark" style={{ borderColor: border }}>
       <div className="border-b border-solid px-[18px] py-[10px]" style={{ borderColor: border }}>
-        <p className="font-semibold text-[12.5px] text-tan-63">Año a año · escenario base</p>
+        <p className="font-semibold text-[12.5px] text-tan-63">Tu inversión, año a año</p>
         <p className="mt-[3px] font-light text-[13.5px]" style={{ color: muted }}>Escenario base a 5 años · TIR neta estimada: 16,5% anual</p>
       </div>
       <div className={`${COLS} border-b border-solid`} style={{ borderColor: border }}>
