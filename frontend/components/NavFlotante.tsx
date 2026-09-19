@@ -4,6 +4,7 @@ import { motion, useMotionValueEvent, useScroll, useSpring } from "framer-motion
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { MARK } from "@/components/brand";
+import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
 import { ENLACES } from "@/components/nav";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -46,6 +47,30 @@ import { ENLACES } from "@/components/nav";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/* ── Iconos de los dos botones ───────────────────────────────────────────
+   Trazo de 1.8 sobre 24, que es el mismo grosor aparente que el resto de
+   iconos del sitio a este tamaño. */
+const trazo = {
+  fill: "none", stroke: "currentColor", strokeWidth: 1.8,
+  strokeLinecap: "round" as const, strokeLinejoin: "round" as const,
+};
+
+/** Entrar: la flecha que se mete por la puerta. */
+const IcoEntrar = () => (
+  <svg width={16} height={16} viewBox="0 0 24 24" {...trazo} aria-hidden>
+    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+    <path d="M10 17l5-5-5-5M15 12H3" />
+  </svg>
+);
+
+/** Portafolio: el maletín, que es lo que se pide al pulsar. */
+const IcoPortafolio = () => (
+  <svg width={16} height={16} viewBox="0 0 24 24" {...trazo} aria-hidden>
+    <rect x="2.5" y="7.5" width="19" height="13" rx="2.5" />
+    <path d="M8.5 7.5V5.5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v2M2.5 12.5h19" />
+  </svg>
+);
+
 /** Alto de la barra de la página, en coordenadas del lienzo de 1920. */
 const NAVBAR_LIENZO = 173;
 
@@ -82,7 +107,7 @@ export default function NavFlotante() {
         style={{ pointerEvents: escondida ? "none" : "auto" }}
       >
         <div
-          className="flex h-[56px] max-w-[1100px] flex-1 items-center gap-[10px] rounded-full pl-[20px] pr-[10px]"
+          className="flex h-[56px] max-w-[1180px] flex-1 items-center gap-[9px] rounded-full pl-[20px] pr-[9px]"
           style={{
             // Translúcida: el marrón de marca al 70 % con desenfoque detrás,
             // para que se lea encima de la foto del hero y de las secciones
@@ -115,12 +140,24 @@ export default function NavFlotante() {
             })}
           </div>
 
+          {/* Dos botones con jerarquía: el portafolio es la acción que la
+              página entera empuja, así que va relleno en crema como el del
+              hero; entrar es para quien ya está dentro y va de contorno. */}
           <a
             href="/login"
-            className="ix-press flex h-[38px] shrink-0 items-center rounded-full border border-solid px-[20px] text-[14px] font-semibold"
+            className="ix-press flex h-[38px] shrink-0 items-center gap-[8px] rounded-full border border-solid px-[18px] text-[14px] font-semibold"
             style={{ borderColor: "rgba(226,205,174,0.55)", color: "#e2cdae" }}
           >
+            <IcoEntrar />
             Iniciar sesión
+          </a>
+          <a
+            href={CTA_PORTAFOLIO_HREF}
+            className="ix-press flex h-[38px] shrink-0 items-center gap-[8px] rounded-full px-[18px] text-[14px] font-semibold"
+            style={{ background: "#e2cdae", color: "#492100", boxShadow: "0 8px 18px -10px rgba(0,0,0,0.6)" }}
+          >
+            <IcoPortafolio />
+            {CTA_PORTAFOLIO}
           </a>
         </div>
       </motion.nav>
