@@ -71,6 +71,22 @@ const IcoPortafolio = () => (
   </svg>
 );
 
+/* ── La rejilla ──────────────────────────────────────────────────────────
+   La isla iba a 1180 px fijos centrados en la ventana, y eso estaba mal: todo
+   lo demás de la página está colocado sobre el lienzo de 1920, que se escala
+   al ancho disponible. Dos rejillas distintas no cuadran nunca, y el desajuste
+   además cambia con el tamaño de la ventana — en /modelo y /hub la isla
+   sobresalía 200 px por cada lado de la columna de contenido.
+
+   Así que la isla se coloca en coordenadas del lienzo, en porcentaje del
+   ancho disponible (que es lo mismo que usa el lienzo para escalarse; `vw`
+   no vale porque incluye la barra de scroll). Toma el hueco exacto de la
+   barra de la página: del filo del wordmark (x=121) al filo del botón de
+   acceso (1591 + 209 = 1800). */
+const LIENZO = 1920;
+const IZQ = (121 / LIENZO) * 100;          // 6.30 %
+const ANCHO = ((1800 - 121) / LIENZO) * 100; // 87.45 %
+
 /** Alto de la barra de la página, en coordenadas del lienzo de 1920. */
 const NAVBAR_LIENZO = 173;
 
@@ -94,7 +110,7 @@ export default function NavFlotante() {
     <>
       <motion.nav
         aria-label="Navegación flotante"
-        className="fixed inset-x-0 top-[14px] z-[70] flex justify-center px-[24px]"
+        className="fixed inset-x-0 top-[14px] z-[70]"
         initial={false}
         /* `visibility` además de la opacidad: con opacidad 0 a secas los
            enlaces siguen siendo enfocables con el tabulador, y se tabula a una
@@ -107,8 +123,10 @@ export default function NavFlotante() {
         style={{ pointerEvents: escondida ? "none" : "auto" }}
       >
         <div
-          className="flex h-[56px] max-w-[1180px] flex-1 items-center gap-[9px] rounded-full pl-[20px] pr-[9px]"
+          className="flex h-[56px] items-center gap-[9px] rounded-full pl-[20px] pr-[9px]"
           style={{
+            marginLeft: `${IZQ}%`,
+            width: `${ANCHO}%`,
             // Translúcida: el marrón de marca al 70 % con desenfoque detrás,
             // para que se lea encima de la foto del hero y de las secciones
             // claras sin taparlas.
@@ -123,7 +141,7 @@ export default function NavFlotante() {
             <img src={MARK} alt="" decoding="async" className="block size-full max-w-none" />
           </a>
 
-          <div className="ml-[18px] flex flex-1 items-center gap-[26px]">
+          <div className="ml-[16px] flex flex-1 items-center gap-[22px]">
             {ENLACES.map((l) => {
               const aqui = pathname === l.href;
               return (
@@ -131,7 +149,7 @@ export default function NavFlotante() {
                   key={l.href}
                   href={l.href}
                   aria-current={aqui ? "page" : undefined}
-                  className="ix-navlink whitespace-nowrap text-[15px] font-medium"
+                  className="ix-navlink whitespace-nowrap text-[14px] font-medium"
                   style={{ color: aqui ? "#c9a877" : "rgba(247,241,229,0.88)" }}
                 >
                   {l.label}
@@ -145,7 +163,7 @@ export default function NavFlotante() {
               hero; entrar es para quien ya está dentro y va de contorno. */}
           <a
             href="/login"
-            className="ix-press flex h-[38px] shrink-0 items-center gap-[8px] rounded-full border border-solid px-[18px] text-[14px] font-semibold"
+            className="ix-press flex h-[38px] shrink-0 items-center gap-[8px] rounded-full border border-solid px-[16px] text-[13.5px] font-semibold"
             style={{ borderColor: "rgba(226,205,174,0.55)", color: "#e2cdae" }}
           >
             <IcoEntrar />
@@ -153,7 +171,7 @@ export default function NavFlotante() {
           </a>
           <a
             href={CTA_PORTAFOLIO_HREF}
-            className="ix-press flex h-[38px] shrink-0 items-center gap-[8px] rounded-full px-[18px] text-[14px] font-semibold"
+            className="ix-press flex h-[38px] shrink-0 items-center gap-[8px] rounded-full px-[16px] text-[13.5px] font-semibold"
             style={{ background: "#e2cdae", color: "#492100", boxShadow: "0 8px 18px -10px rgba(0,0,0,0.6)" }}
           >
             <IcoPortafolio />
