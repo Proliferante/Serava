@@ -2,7 +2,7 @@
 
 import { motion, useMotionValueEvent, useScroll, useSpring } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { MARK } from "@/components/brand";
 import { ENLACES } from "@/components/nav";
 
@@ -16,9 +16,16 @@ import { ENLACES } from "@/components/nav";
    pantallas— y Cómo operamos 7.212. Durante siete de cada ocho pantallas no
    había ninguna forma de navegar.
 
-   En móvil eso ya estaba resuelto (`MobileNav`), y esto es la misma receta
-   para el escritorio: se retira al bajar, vuelve al subir, y la línea de
-   progreso va pegada al filo de la pantalla.
+   CUÁNDO APARECE
+   En cuanto la barra de la página sale de pantalla, y ya no se va. No se
+   retira al bajar como la de móvil: en un móvil la cabecera se come una
+   franja valiosa de una pantalla pequeña y compensa esconderla, pero en un
+   portátil 56 px de 900 no estorban, y tener que volver a subir para que
+   aparezca el menú es exactamente el problema que esto venía a quitar.
+
+   El umbral no es un número fijo: la barra de la página mide 173 px DE
+   LIENZO, y el lienzo se escala al ancho de la ventana. En un portátil de
+   1440 son 130 px reales; en un monitor de 2560, 231. Así que se calcula.
 
    POR QUÉ ES UN COMPONENTE APARTE Y NO LA MISMA BARRA CON `fixed`
    Dos razones. La primera es de tamaño: la de la página mide 173 px de lienzo
@@ -39,37 +46,24 @@ import { ENLACES } from "@/components/nav";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/**
- * A partir de dónde aparece. La barra de la página mide 173 px de lienzo y en
- * un portátil se queda en unos 128; con 200 px se espera a que haya salido del
- * todo, para que no se solapen las dos.
- */
-const APARECE = 200;
+/** Alto de la barra de la página, en coordenadas del lienzo de 1920. */
+const NAVBAR_LIENZO = 173;
+
+/** A partir de qué scroll aparece: cuando la barra de la página ya salió. */
+function umbral() {
+  if (typeof window === "undefined") return NAVBAR_LIENZO;
+  return (NAVBAR_LIENZO * window.innerWidth) / 1920 + 12;
+}
 
 export default function NavFlotante() {
-  const [fuera, setFuera] = useState(true);   // aún no ha aparecido
-  const [oculta, setOculta] = useState(false); // apareció y se retiró al bajar
+  const [escondida, setEscondida] = useState(true);
   const pathname = usePathname();
 
   const { scrollY, scrollYProgress } = useScroll();
-  const ultimo = useRef(0);
 
-  /**
-   * El umbral de 8 px evita que tiemble con el rebote del scroll, el mismo
-   * que usa la barra de móvil.
-   */
-  useMotionValueEvent(scrollY, "change", (y) => {
-    setFuera(y < APARECE);
-    const d = y - ultimo.current;
-    if (Math.abs(d) < 8) return;
-    ultimo.current = y;
-    setOculta(y > APARECE && d > 0);
-  });
+  useMotionValueEvent(scrollY, "change", (y) => setEscondida(y < umbral()));
 
   const progreso = useSpring(scrollYProgress, { stiffness: 120, damping: 26, mass: 0.3 });
-
-  /** Ni ha aparecido todavía, o apareció y se retiró al bajar. */
-  const escondida = fuera || oculta;
 
   return (
     <>
