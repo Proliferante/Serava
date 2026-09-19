@@ -9,7 +9,7 @@ import { tinted, WORDMARK, WORDMARK_RATIO, wordmarkH } from "@/components/brand"
 import MobileNav from "@/components/responsive/MobileNav";
 import MobileFooter from "@/components/responsive/MobileFooter";
 import DiagnosticoTrigger from "@/components/DiagnosticoTrigger";
-import { Parallax, Reveal } from "@/components/responsive/kit";
+import { Eyebrow, Parallax, Reveal } from "@/components/responsive/kit";
 import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -44,17 +44,6 @@ function In({ children, className, style, delay = 0, y = 26 }: { children: React
     >
       {children}
     </motion.div>
-  );
-}
-
-/** Antetítulo con su filete, como el `Rule` + eyebrow del escritorio. */
-function Eyebrow({ children, tone = "laser" }: { children: ReactNode; tone?: "laser" | "brown" }) {
-  const color = tone === "laser" ? "#c9a877" : "#492100";
-  return (
-    <div className="flex items-center gap-[12px]">
-      <span className="block h-px w-[28px] shrink-0 opacity-80" style={{ background: color }} />
-      <span className="text-[11px] font-semibold uppercase tracking-[2.6px]" style={{ color }}>{children}</span>
-    </div>
   );
 }
 

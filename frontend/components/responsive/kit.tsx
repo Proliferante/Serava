@@ -45,14 +45,27 @@ export function In({ children, className, style, delay = 0, y = 26 }: { children
   );
 }
 
-/** Antetítulo con su filete, como el `Rule` + eyebrow del escritorio. */
+/**
+ * Antetítulo. En el escritorio lleva un filete de 34 px delante (`Rule`);
+ * aquí no, y es a propósito (OBS-04).
+ *
+ * El filete cabía cuando los rótulos eran cortos. «Pocas oportunidades. Para
+ * pocos.» mide 296 px, y con el filete y su separación delante el rótulo
+ * ocupaba de x=64 a x=360 dentro de una columna de 342: seis píxeles de aire
+ * a la derecha. Deja de leerse como un adorno y pasa a leerse como un
+ * desajuste — el bloque parece descolocado hacia la derecha.
+ *
+ * Poner otro filete a la derecha, que era la propuesta, no entra: harían
+ * falta 376 px en una columna de 342. Así que en la vista fluida el rótulo va
+ * solo y arranca en el margen, alineado con el titular y con las tarjetas de
+ * debajo. Es además lo que ya hacía Cómo operamos con su propio antetítulo.
+ */
 export function Eyebrow({ children, tone = "laser" }: { children: ReactNode; tone?: "laser" | "brown" }) {
   const color = tone === "laser" ? LASER : BROWN;
   return (
-    <div className="flex items-center gap-[12px]">
-      <span className="block h-px w-[28px] shrink-0 opacity-80" style={{ background: color }} />
-      <span className="text-[11px] font-semibold uppercase leading-[1.4] tracking-[2.6px]" style={{ color }}>{children}</span>
-    </div>
+    <p className="m-0 text-[11px] font-semibold uppercase leading-[1.4] tracking-[2.6px]" style={{ color }}>
+      {children}
+    </p>
   );
 }
 
