@@ -225,7 +225,7 @@ export default function HomeCompact() {
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3, ease: EASE }}
           >
-            <CTA href={CTA_PORTAFOLIO_HREF}>{CTA_PORTAFOLIO}</CTA>
+            <CTA href={CTA_PORTAFOLIO_HREF} tone="olive">{CTA_PORTAFOLIO}</CTA>
           </motion.div>
 
           {/* Las tres cifras. En móvil una debajo de otra con su filete; a
@@ -282,7 +282,7 @@ export default function HomeCompact() {
             <span className="font-light">Así se construye </span>
             <span className="font-semibold">patrimonio.</span>
           </p>
-          <CTA href={CTA_PORTAFOLIO_HREF} tone="brown">{CTA_PORTAFOLIO}</CTA>
+          <CTA href={CTA_PORTAFOLIO_HREF} tone="olive">{CTA_PORTAFOLIO}</CTA>
         </In>
         </div>
       </section>

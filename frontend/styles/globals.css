@@ -84,6 +84,13 @@ body {
 .ix-invert-w:hover * { color: #ffffff; }
 .ix-invert-w:active { transform: scale(0.97); }
 
+/* Botón oliva → oscurece al verdigrís del propio sistema. No reusa
+   `ix-invert`, que va a marrón: dentro de la paleta, un verde que oscurece a
+   verde se lee como el mismo botón; a marrón, como otro botón. */
+.ix-olive { transition: background-color 0.25s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); cursor: pointer; }
+.ix-olive:hover { background-color: #5f6b3e; }
+.ix-olive:active { transform: scale(0.97); }
+
 /* Outline button → fills cream + brown text */
 .ix-fill { transition: background-color 0.25s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); cursor: pointer; }
 .ix-fill * { transition: color 0.25s ease; }

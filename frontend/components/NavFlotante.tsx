@@ -167,8 +167,8 @@ export default function NavFlotante() {
           </a>
           <a
             href={CTA_PORTAFOLIO_HREF}
-            className="ix-press flex h-[38px] shrink-0 items-center gap-[8px] rounded-full px-[16px] text-[13.5px] font-semibold"
-            style={{ background: "#e2cdae", color: "#492100", boxShadow: "0 8px 18px -10px rgba(0,0,0,0.6)" }}
+            className="ix-press ix-olive flex h-[38px] shrink-0 items-center gap-[8px] rounded-full px-[16px] text-[13.5px] font-semibold"
+            style={{ background: "#7f8b57", color: "#f7f1e5", boxShadow: "0 8px 18px -10px rgba(47,55,30,0.75)" }}
           >
             <IcoPortafolio />
             {CTA_PORTAFOLIO}

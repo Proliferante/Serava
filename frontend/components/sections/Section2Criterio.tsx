@@ -74,8 +74,8 @@ export default function Section2Criterio() {
           que oscurecía —lo correcto cuando el botón era crema. */}
       {/* Mismo ensanche que en el hero, y hacia la izquierda: el botón estaba
           pegado al margen derecho del lienzo (1234 + 404 = 1638 de 1920). */}
-      <a href={CTA_PORTAFOLIO_HREF} className="ix-fill ix-pulse-brown absolute bg-brown-dark h-[104px] left-[1200px] overflow-clip rounded-[98px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.25)] top-[865px] w-[470px] flex items-center justify-center">
-        <p className="[word-break:break-word] font-semibold not-italic text-cream text-[24px] text-center leading-[1.15]">
+      <a href={CTA_PORTAFOLIO_HREF} className="ix-olive ix-pulse-green absolute bg-[#7f8b57] h-[104px] left-[1200px] overflow-clip rounded-[98px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.25)] top-[865px] w-[470px] flex items-center justify-center">
+        <p className="[word-break:break-word] font-semibold not-italic text-[#f7f1e5] text-[24px] text-center leading-[1.15]">
           {CTA_PORTAFOLIO}
         </p>
       </a>

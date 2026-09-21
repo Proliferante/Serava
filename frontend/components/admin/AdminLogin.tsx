@@ -40,6 +40,8 @@ const trazo = {
 
 const IcoUser = () => <svg width={19} height={19} viewBox="0 0 24 24" {...trazo} aria-hidden><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6" /></svg>;
 const IcoKey = () => <svg width={19} height={19} viewBox="0 0 24 24" {...trazo} aria-hidden><rect x="4" y="10" width="16" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>;
+const IcoOjo = () => <svg width={19} height={19} viewBox="0 0 24 24" {...trazo} aria-hidden><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>;
+const IcoOjoTachado = () => <svg width={19} height={19} viewBox="0 0 24 24" {...trazo} aria-hidden><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" /><circle cx="12" cy="12" r="3" /><path d="M3 21 21 3" /></svg>;
 const IcoLock = () => <svg width={13} height={13} viewBox="0 0 24 24" {...trazo} strokeWidth={2} aria-hidden><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>;
 
 export default function AdminLogin() {
@@ -48,6 +50,9 @@ export default function AdminLogin() {
   const [clave, setClave] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  /* Ver la contraseña mientras se escribe. Arranca oculta siempre: esta
+     pantalla se abre en reuniones y con pantalla compartida. */
+  const [verClave, setVerClave] = useState(false);
 
   const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,10 +119,28 @@ export default function AdminLogin() {
               <div className="relative">
                 <span className="absolute left-[15px] top-1/2 -translate-y-1/2" style={{ color: "rgba(247,241,229,0.45)" }}><IcoKey /></span>
                 <input
-                  id="ad-pass" type="password" autoComplete="current-password" placeholder="••••••••••••"
+                  id="ad-pass" type={verClave ? "text" : "password"} autoComplete="current-password" placeholder="••••••••••••"
                   value={clave} onChange={(e) => setClave(e.target.value)} disabled={enviando}
-                  className={`ix-field ${CAJA} placeholder:text-[rgba(247,241,229,0.42)]`} style={CAJA_ST}
+                  /* `pr-[52px]` en vez del de `CAJA`: el texto no debe pasar
+                     por debajo del ojo cuando la contraseña es larga. */
+                  className={`ix-field ${CAJA} pr-[52px] placeholder:text-[rgba(247,241,229,0.42)]`} style={CAJA_ST}
                 />
+                <button
+                  type="button"
+                  onClick={() => setVerClave((v) => !v)}
+                  disabled={enviando}
+                  /* `tabIndex={-1}`: al tabular desde la contraseña se espera
+                     llegar a «Entrar», no a un interruptor de vista. Con ratón
+                     y con lector de pantalla sigue siendo alcanzable. */
+                  tabIndex={-1}
+                  aria-pressed={verClave}
+                  aria-label={verClave ? "Ocultar la contraseña" : "Ver la contraseña"}
+                  title={verClave ? "Ocultar la contraseña" : "Ver la contraseña"}
+                  className="ix-nav absolute right-[14px] top-1/2 -translate-y-1/2 flex size-[26px] items-center justify-center"
+                  style={{ color: verClave ? LINEN : "rgba(247,241,229,0.45)" }}
+                >
+                  {verClave ? <IcoOjoTachado /> : <IcoOjo />}
+                </button>
               </div>
 
               {error && (

@@ -115,8 +115,8 @@ export default function Section1Hero() {
       {/* El botón se ensancha de 404 a 470: «Quiero acceder al portafolio» no
           cabe en 404 a 24 px sin partirse en dos renglones dentro de una
           píldora de 104 px de alto. */}
-      <a href={CTA_PORTAFOLIO_HREF} className="ix-invert ix-pulse absolute bg-cream h-[104px] left-[412px] overflow-clip rounded-[98px] top-[713px] w-[470px] flex items-center justify-center">
-        <p className="[word-break:break-word] font-semibold not-italic text-brown-dark text-[24px] text-center leading-[1.15]">
+      <a href={CTA_PORTAFOLIO_HREF} className="ix-olive ix-pulse-green absolute h-[104px] left-[412px] overflow-clip rounded-[98px] top-[713px] w-[470px] flex items-center justify-center" style={{ background: "#7f8b57" }}>
+        <p className="[word-break:break-word] font-semibold not-italic text-[24px] text-center leading-[1.15]" style={{ color: "#f7f1e5" }}>
           {CTA_PORTAFOLIO}
         </p>
       </a>
