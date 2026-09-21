@@ -27,6 +27,24 @@ const CAJA_OSCURA = "h-[54px] w-full rounded-[13px] border border-solid px-[16px
 const CAJA_OSCURA_ST = { background: "rgba(247,241,229,0.06)", borderColor: "rgba(247,241,229,0.18)", color: LINEN } as const;
 const ETIQUETA_OSCURA = "mb-[8px] block text-[13px] font-medium tracking-[0.5px]";
 
+const trazoOjo = {
+  fill: "none", stroke: "currentColor", strokeWidth: 1.7,
+  strokeLinecap: "round" as const, strokeLinejoin: "round" as const,
+};
+const IcoOjo = () => (
+  <svg width={18} height={18} viewBox="0 0 24 24" {...trazoOjo} aria-hidden>
+    <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+const IcoOjoTachado = () => (
+  <svg width={18} height={18} viewBox="0 0 24 24" {...trazoOjo} aria-hidden>
+    <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" />
+    <circle cx="12" cy="12" r="3" />
+    <path d="M3 21 21 3" />
+  </svg>
+);
+
 export default function FormClave({
   estilo, temporal, onHecho, pie,
 }: {
@@ -43,6 +61,10 @@ export default function FormClave({
   const [repetida, setRepetida] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  /* Un ojo por campo, no uno para los tres: aquí se escriben dos contraseñas
+     distintas —la actual y la nueva— y enseñar las dos a la vez no hace
+     falta. Arrancan las tres ocultas. */
+  const [visibles, setVisibles] = useState<Record<string, boolean>>({});
 
   const oscuro = estilo === "oscuro";
 
@@ -91,12 +113,36 @@ export default function FormClave({
       ) : (
         <label htmlFor={id}>{etiqueta}</label>
       )}
-      <input
-        id={id} type="password" autoComplete={autocompletar} placeholder={opciones.marcador}
-        value={valor} onChange={(e) => set(e.target.value)} disabled={enviando}
-        className={oscuro ? `ix-field ${CAJA_OSCURA}` : "t"}
-        style={oscuro ? CAJA_OSCURA_ST : undefined}
-      />
+      <div className="relative">
+        <input
+          id={id} type={visibles[id] ? "text" : "password"} autoComplete={autocompletar}
+          placeholder={opciones.marcador}
+          value={valor} onChange={(e) => set(e.target.value)} disabled={enviando}
+          className={oscuro ? `ix-field ${CAJA_OSCURA}` : "t"}
+          /* Hueco a la derecha para el ojo: sin él, una contraseña larga se
+             mete por debajo del icono. */
+          style={oscuro ? { ...CAJA_OSCURA_ST, paddingRight: 46 } : { paddingRight: 46 }}
+        />
+        <button
+          type="button"
+          onClick={() => setVisibles((v) => ({ ...v, [id]: !v[id] }))}
+          disabled={enviando}
+          /* Fuera del recorrido del tabulador: al tabular entre los tres
+             campos no se espera tropezar con un interruptor de vista. */
+          tabIndex={-1}
+          aria-pressed={!!visibles[id]}
+          aria-label={visibles[id] ? `Ocultar ${etiqueta.toLowerCase()}` : `Ver ${etiqueta.toLowerCase()}`}
+          title={visibles[id] ? "Ocultar" : "Ver"}
+          className="ix-nav absolute right-[14px] top-1/2 flex size-[26px] -translate-y-1/2 items-center justify-center"
+          style={{
+            color: oscuro
+              ? (visibles[id] ? LINEN : "rgba(247,241,229,0.45)")
+              : (visibles[id] ? "#2a1e14" : "#8a7a68"),
+          }}
+        >
+          {visibles[id] ? <IcoOjoTachado /> : <IcoOjo />}
+        </button>
+      </div>
     </>
   );
 
