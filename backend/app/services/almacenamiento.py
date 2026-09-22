@@ -143,7 +143,13 @@ def subir(datos: bytes, ruta: str, tipo: str) -> str:
         # "new row violates row-level security policy"…). Sin él, el equipo
         # sólo vería un 500 y no sabría si falta el bucket o la clave.
         detalle = (r.text or "").strip()[:300]
-        raise ErrorDeSubida(f"El almacén respondió {r.status_code}: {detalle}")
+        # Se nombra el bucket que se intentó: "Bucket not found" a secas no
+        # dice si el que falta es el que crees. Supabase distingue mayúsculas,
+        # y ese ha sido el fallo real más de una vez.
+        raise ErrorDeSubida(
+            f"El almacén respondió {r.status_code} al subir a "
+            f"'{config.SUPABASE_BUCKET}': {detalle}"
+        )
 
     return url_publica(ruta)
 

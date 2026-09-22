@@ -101,7 +101,11 @@ METROCUADRADO_API_KEY = os.environ.get("METROCUADRADO_API_KEY", "").strip()
 # consola sigue funcionando: no se tumba el arranque por esto.
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip().rstrip("/")
 SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
-SUPABASE_BUCKET = os.environ.get("SUPABASE_BUCKET", "fichas").strip()
+# El respaldo es "Fichas" con mayúscula porque así se llama el bucket que hay
+# creado, y Supabase distingue mayúsculas: con "fichas" la subida responde
+# "Bucket not found" sin decir qué nombre probó. Que el respaldo coincida con
+# la realidad evita que olvidar esta variable en el servidor rompa las fotos.
+SUPABASE_BUCKET = os.environ.get("SUPABASE_BUCKET", "Fichas").strip()
 
 # Tope por foto. Las del hero salen de una cámara y llegan a 8-10 MB; por
 # encima de 12 casi siempre es un archivo sin comprimir que no aporta nada y
