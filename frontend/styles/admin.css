@@ -254,6 +254,10 @@
 .adm label{display:block;font-size:.72rem;font-weight:600;color:var(--coffee);margin-bottom:6px;letter-spacing:.02em;}
 .adm input.t, .adm select.t, .adm textarea.t{width:100%;font-family:inherit;font-size:.9rem;color:var(--espresso2);background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:11px 13px;outline:none;transition:border-color .2s;}
 .adm input.t:focus, .adm select.t:focus, .adm textarea.t:focus{border-color:var(--caramel);background:#fff;}
+/* Un campo que ya no se puede tocar —el paso 1 de «Nuevo predio» después
+   de registrar— tiene que verse cerrado, no sólo no responder. */
+.adm input.t:disabled, .adm select.t:disabled, .adm textarea.t:disabled,
+.adm .chip:disabled{opacity:.6;cursor:default;background:var(--paper);}
 .adm textarea.t{resize:vertical;min-height:80px;}
 .adm select.t{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235B4332' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;}
 .adm .full{grid-column:1/-1;}
@@ -264,6 +268,9 @@
 .adm .saverow{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
 .adm .stepper{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;}
 .adm .stg{flex:1;min-width:96px;text-align:center;cursor:pointer;border:none;background:none;font-family:inherit;}
+/* Un paso al que todavía no se puede saltar: en «Nuevo predio» los de la
+   ficha no existen hasta que el predio está registrado. */
+.adm .stg:disabled{cursor:default;opacity:.5;}
 .adm .stg .bar{height:6px;border-radius:999px;background:var(--line);margin-bottom:8px;transition:background .2s;}
 .adm .stg .l{font-size:.72rem;font-weight:500;color:var(--mocha);}
 .adm .stg.done .bar{background:var(--sage-light);}
