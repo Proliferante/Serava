@@ -1052,15 +1052,14 @@ export default function ComoOperamosScreen() {
             <a
               href={CTA_PORTAFOLIO_HREF}
               className="ix-cta relative block overflow-hidden"
-              style={{ width: 320, height: 58.8, background: AVOCADO, borderRadius: 999, boxShadow: "0px 16px 32px -16px rgba(47,55,30,0.6)" }}
+              style={{ width: 320, height: 58.8, background: LINEN, borderRadius: 999, boxShadow: "0px 16px 32px -16px rgba(0,0,0,0.4)" }}
             >
-              <T x={32} cy={28.5} w={222} className="text-center font-semibold" style={{ fontSize: 16, lineHeight: "24.8px", color: LINEN }}>
+              <T x={32} cy={28.5} w={222} className="text-center font-semibold" style={{ fontSize: 16, lineHeight: "24.8px", color: OIL }}>
                 <p>{CTA_PORTAFOLIO}</p>
               </T>
-              {/* La flecha clara, que ahora el relleno es verde. */}
               <Ico
                 size={18}
-                layers={[["50% 20.83% 50% 20.83%", "-0.75px 0", "arrow-cream1.svg"], ["25% 20.83% 25% 54.17%", "-5.89% -23.57% -5.89% -11.79%", "arrow-cream2.svg"]]}
+                layers={[["50% 20.83% 50% 20.83%", "-0.75px 0", "arrow1.svg"], ["25% 20.83% 25% 54.17%", "-5.89% -23.57% -5.89% -11.79%", "arrow2.svg"]]}
                 className="ix-cta-arrow absolute"
                 style={{ left: 270, top: 20.4 }}
               />

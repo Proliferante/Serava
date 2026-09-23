@@ -196,7 +196,7 @@ export default function OportunidadesCompact() {
               </p>
             </In>
             <In delay={0.14} className="flex flex-col items-center">
-              <CTA href={CTA_PORTAFOLIO_HREF} tone="olive">{CTA_PORTAFOLIO}</CTA>
+              <CTA href={CTA_PORTAFOLIO_HREF} tone="linen">{CTA_PORTAFOLIO}</CTA>
               <p className="mt-[18px] text-[13px] font-light" style={{ color: "rgba(247,241,229,0.6)" }}>
                 Portafolio confidencial. Acceso sujeto a evaluación y disponibilidad.
               </p>

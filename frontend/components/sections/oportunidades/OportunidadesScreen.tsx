@@ -694,7 +694,7 @@ export default function OportunidadesScreen() {
             <p>Solicita tu evaluación para conocer oportunidades seleccionadas</p>
             <p>según tu capital, perfil y estrategia de inversión.</p>
           </T>
-          <CTA x={848.915} y={397.515} tone="olive" d={0.7} />
+          <CTA x={848.915} y={397.515} tone="cream" d={0.7} />
           <T x={650} cy={489.72} w={620} d={0.86} className="whitespace-nowrap text-center font-light" style={{ fontSize: 14.5, lineHeight: "22.5px", color: "rgba(247,241,229,0.6)" }}>
             <p>Portafolio confidencial. Acceso sujeto a evaluación y disponibilidad.</p>
           </T>
