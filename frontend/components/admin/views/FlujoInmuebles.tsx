@@ -113,7 +113,6 @@ const IcoVisto = () => <svg viewBox="0 0 24 24" {...trazo}><path d="M9 12l2 2 4-
 const IcoWa = () => <svg viewBox="0 0 24 24" {...trazo}><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 21l2.2-5.3A8.5 8.5 0 1 1 21 11.5z" /></svg>;
 const IcoTel = () => <svg viewBox="0 0 24 24" {...trazo}><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19 19 0 0 1-8.3-3 18.7 18.7 0 0 1-5.7-5.7 19 19 0 0 1-3-8.4A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z" /></svg>;
 const IcoCal = () => <svg viewBox="0 0 24 24" {...trazo}><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M3 9h18M8 2v4M16 2v4" /></svg>;
-const IcoFlecha = () => <svg viewBox="0 0 24 24" {...trazo}><path d="M5 12h14M13 6l6 6-6 6" /></svg>;
 
 function Nota({ ico, children }: { ico: ReactNode; children: ReactNode }) {
   return <div className="auto-note">{ico}<p>{children}</p></div>;
@@ -760,8 +759,8 @@ export default function FlujoInmuebles() {
                 </tbody>
               </Tabla>
               <Hint>
-                Desde aquí se conectan con el proceso de clientes y con el resto de la plataforma,
-                que es el siguiente paso del backend. <IcoFlecha />
+                Desde aquí se conectan con el proceso de clientes y con el resto de la
+                plataforma, que es el siguiente paso del backend.
               </Hint>
             </Card>
           ))}

@@ -246,7 +246,19 @@
   .adm .g2, .adm .g3{grid-template-columns:1fr;}
 }
 .adm .sectitle{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--caramel);font-weight:600;margin-bottom:14px;}
+/* RED DE SEGURIDAD PARA LOS ICONOS.
+   Un <svg> con viewBox y sin width/height no mide 24 px: mide lo que le deje
+   el contenedor. Todas las reglas de iconos de esta hoja son `.adm .algo svg`,
+   así que un icono puesto en un sitio sin regla propia no tenía ninguna talla
+   — y pasó: la flecha del pie de «Publicados» vivía dentro de un `.hint` y se
+   estiró hasta 1105 px, una flecha del tamaño de la pantalla.
+   Esta regla va con menos especificidad (0,1,1) que todas las de abajo
+   (0,2,1), así que no pisa ni una; sólo atrapa a las huérfanas. */
+.adm svg{width:16px;height:16px;flex-shrink:0;}
+
 .adm .hint{font-size:.78rem;color:var(--mocha);font-weight:300;margin-top:10px;}
+/* El icono suelto dentro de una nota va a ras del texto, no sobre la línea. */
+.adm .hint svg{width:14px;height:14px;vertical-align:-2px;}
 .adm .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;}
 @media(max-width:640px){
   .adm .fgrid{grid-template-columns:1fr;}

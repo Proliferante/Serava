@@ -324,16 +324,16 @@ export default function Hub() {
   return (
     <>
       <VHead
-        titulo="Contenido del HUB"
-        fuerte={`${items.length} pieza${items.length === 1 ? "" : "s"}`}
+        titulo="Contenido del"
+        fuerte="HUB"
         acciones={
           <Btn tono="primary" disabled={!opciones} onClick={() => editar(VACIO)}>
             <IcoPlus />Nuevo contenido
           </Btn>
         }
       >
-        Artículos, videos y noticias de la página pública. {publicados} publicado
-        {publicados === 1 ? "" : "s"} de {items.length}.
+        Artículos, videos y noticias de la página pública. {items.length} pieza
+        {items.length === 1 ? "" : "s"}, {publicados} publicada{publicados === 1 ? "" : "s"}.
       </VHead>
 
       {error && <Card style={{ marginBottom: 16 }}><p style={{ color: "#b5542f" }}>{error}</p></Card>}
