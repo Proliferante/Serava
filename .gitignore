@@ -24,3 +24,6 @@ __pycache__/
 # Bases SQLite de corridas antiguas del pipeline (hoy es Postgres, pero un
 # `python script_extract_serava.py` viejo podría dejar una suelta).
 *.db
+
+# Pantallazos de verificación (locales, no son del proyecto)
+.shots/

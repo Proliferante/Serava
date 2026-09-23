@@ -90,7 +90,7 @@ const GRUPOS: { g: string; items: Item[] }[] = [
     g: "Gestión",
     items: [
       { k: "predios", l: "Predios", d: "M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" , muestra: true },
-      { k: "nuevo", l: "Nuevo predio", d: "M12 5v14M5 12h14" , muestra: true },
+      { k: "nuevo", l: "Nuevo predio", d: "M12 5v14M5 12h14" },
       /* Sin badge: el "3" de antes era un número escrito a mano en el
          menú, no una cuenta de nada. Vuelve cuando el comité tenga
          endpoint y pueda decir cuántos hay de verdad. */
@@ -263,7 +263,7 @@ export default function AdminConsole() {
                     />
                   )}
                   {vista === "extraccion" && <Extraccion />}
-                  {vista === "nuevo" && <NuevoPredio onCrear={(p) => setPredios((ps) => [p, ...ps])} />}
+                  {vista === "nuevo" && <NuevoPredio />}
                   {vista === "comite" && <Comite />}
                   {vista === "arq" && <Arquitectura abrirGestion={abrirGestion} />}
                   {vista === "data" && <DataScore />}

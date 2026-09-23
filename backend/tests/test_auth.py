@@ -380,7 +380,15 @@ def test_crear_rechaza_correo_sin_arroba(base):
 #   /api/auth/politica    la pantalla de acceso necesita las reglas de la
 #                         contraseña para no aceptar lo que el servidor
 #                         rechaza, y eso pasa antes de entrar.
-ABIERTAS = {"/api/salud", "/api/auth/login", "/api/auth/politica"}
+#
+# Y las tres de la web pública, que son el producto y las lee cualquiera:
+#   /api/predios          las tarjetas del portafolio.
+#   /api/predios/{slug}   la ficha de un predio publicado.
+#   /api/hub              los artículos, videos y noticias del HUB.
+# Sólo devuelven lo que alguien marcó como publicado; escribir en ellas sigue
+# estando bajo /api/admin, que exige sesión en el `include_router`.
+ABIERTAS = {"/api/salud", "/api/auth/login", "/api/auth/politica",
+            "/api/predios", "/api/predios/{slug}", "/api/hub"}
 
 
 def _rutas_de(aplicacion):

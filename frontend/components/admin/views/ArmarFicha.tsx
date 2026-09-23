@@ -185,8 +185,8 @@ function Control({ c, v, onChange }: { c: Campo; v: unknown; onChange: (x: unkno
 }
 
 /** Un campo con su etiqueta, su ayuda y —si la hay— la propuesta del anuncio. */
-function CampoCaja({ c, v, sugerido, onChange }: {
-  c: Campo; v: unknown; sugerido: unknown; onChange: (x: unknown) => void;
+function CampoCaja({ c, v, sugerido, aMano, onChange }: {
+  c: Campo; v: unknown; sugerido: unknown; aMano: boolean; onChange: (x: unknown) => void;
 }) {
   const ancho = c.ancho === "entero" || c.tipo === "lista" || c.tipo === "tabla" || c.tipo === "parrafo";
   /* La propuesta sólo se ofrece si el campo está vacío. Rellenarlo solo
@@ -204,7 +204,9 @@ function CampoCaja({ c, v, sugerido, onChange }: {
       {c.ayuda && <p className="fic-ayuda">{c.ayuda}</p>}
       {ofrecer && (
         <button type="button" className="fic-sug" onClick={() => onChange(String(sugerido))}>
-          Usar lo del anuncio: <b>{String(sugerido)}</b>
+          {/* Un predio metido a mano no tiene anuncio del que copiar: lo que
+              se propone es lo que alguien tecleó al registrarlo. */}
+          {aMano ? "Usar lo registrado" : "Usar lo del anuncio"}: <b>{String(sugerido)}</b>
         </button>
       )}
     </div>
@@ -514,6 +516,7 @@ export default function ArmarFicha() {
           {actual.bloques.map((b) => (
             <BloqueCaja
               key={b.k} b={b} valores={valores} fotos={fotos} sugeridos={sugeridos}
+              aMano={link.startsWith("manual:")}
               subiendo={subiendo} almacenListo={almacenListo}
               onCampo={set}
               onSubir={subirFoto} onQuitar={quitarFoto}
@@ -535,12 +538,14 @@ export default function ArmarFicha() {
 }
 
 function BloqueCaja({
-  b, valores, fotos, sugeridos, subiendo, almacenListo, onCampo, onSubir, onQuitar,
+  b, valores, fotos, sugeridos, aMano, subiendo, almacenListo, onCampo, onSubir, onQuitar,
 }: {
   b: Bloque;
   valores: Valores;
   fotos: Record<string, string>;
   sugeridos: Record<string, unknown>;
+  /** Predio metido a mano: no hay anuncio del que "usar" nada. */
+  aMano: boolean;
   subiendo: string | null;
   almacenListo: boolean;
   onCampo: (k: string, v: unknown) => void;
@@ -558,6 +563,7 @@ function BloqueCaja({
             <CampoCaja
               key={c.k} c={c} v={valores[c.k]}
               sugerido={c.sug ? sugeridos[c.sug] : undefined}
+              aMano={aMano}
               onChange={(v) => onCampo(c.k, v)}
             />
           ))}

@@ -12,6 +12,7 @@ from app.api.flujo import router as flujo_router
 from app.api.hub import router_admin as hub_admin_router, router_publico as hub_publico_router
 from app.api.inmuebles import router as inmuebles_router
 from app.core import config, sesiones
+from app.services import manual_service
 
 log = logging.getLogger("zequara")
 
@@ -29,6 +30,15 @@ async def _ciclo_de_vida(_: FastAPI):
             log.info("Sesiones vencidas borradas: %s", n)
     except Exception as e:
         log.warning("No se pudieron limpiar las sesiones: %s", e)
+
+    # Las columnas que necesita un predio metido a mano (ubicación y precio,
+    # que un predio de portal saca de `clean_listings`). Aquí y no en cada
+    # petición: el listado público las lee y no tiene por qué poder alterar
+    # tablas. `ADD COLUMN IF NOT EXISTS` hace que repetirlo no cueste nada.
+    try:
+        manual_service.asegurar_columnas()
+    except Exception as e:
+        log.error("No se pudieron asegurar las columnas de predio manual: %s", e)
     yield
 
 

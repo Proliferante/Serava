@@ -12,6 +12,7 @@ Las pantallas del flujo de inmuebles, montado en /api/admin/flujo.
     POST /api/admin/flujo/ficha             guardar el borrador de la ficha
     POST /api/admin/flujo/ficha/foto        subir una foto de la ficha
     POST /api/admin/flujo/ficha/foto/quitar quitar una foto de la ficha
+    POST /api/admin/flujo/manual            registrar un predio a mano
 
 DÓNDE EMPIEZA EL FLUJO
     No en el scraping: en la preselección. El scraping deja miles de
@@ -24,6 +25,10 @@ DÓNDE EMPIEZA EL FLUJO
     son miles de filas y no una bandeja de trabajo. El recorrido del flujo
     es preselección → visita → publicado, y en cualquier punto se puede
     descartar.
+
+    HAY UNA SEGUNDA PUERTA: `POST /manual`. El predio que llega por un
+    contacto o un corredor no tiene anuncio que scrapear, y entra directo en
+    'visita' con una clave propia. Ver `services/manual_service.py`.
 
     Hubo una etapa 'revision' entre el scraping y la preselección, con su
     propia pestaña: aceptar en Extracción dejaba el inmueble ahí y alguien
@@ -85,7 +90,7 @@ from pydantic import BaseModel, Field
 from app.api.auth import usuario_actual
 from app.core import bitacora, config
 from app.core.database import cursor, escribir, tabla_existe
-from app.services import almacenamiento, inmueble_service
+from app.services import almacenamiento, inmueble_service, manual_service
 
 router = APIRouter()
 
@@ -127,8 +132,17 @@ SELECCION = """
     -- quedaba en "(sin título)" después de haberlo escrito a mano.
     COALESCE(d.titulo, c.titulo) AS titulo,
     c.titulo AS titulo_anuncio,
-    c.zona, c.ciudad, c.pais, c.moneda, c.portal,
-    c.tipo_inmueble, c.precio_venta, c.area_m2, c.precio_m2,
+    -- Ubicación y precio con respaldo en lo que se tecleó: un predio metido
+    -- a mano no tiene fila en `clean_listings`, así que sin este COALESCE
+    -- salía sin ciudad en el flujo y empezaba su ficha con la hoja en blanco
+    -- aunque acabaran de escribirle la zona y el precio.
+    COALESCE(c.zona, d.zona)     AS zona,
+    COALESCE(c.ciudad, d.ciudad) AS ciudad,
+    COALESCE(c.pais, d.pais)     AS pais,
+    c.moneda, c.portal,
+    c.tipo_inmueble,
+    COALESCE(c.precio_venta, d.precio_venta) AS precio_venta,
+    c.area_m2, c.precio_m2,
     c.mediana_precio_m2_zona, c.habitaciones, c.banos,
     c.precio_m2_clasificacion, c.fecha_extraccion,
     COALESCE(s.etapa, 'nuevo')             AS etapa,
@@ -782,9 +796,16 @@ def _asegura_slug(con, link: str, titulo: str | None, ficha: dict | None) -> str
     if fila and fila["slug"]:
         return fila["slug"]
 
+    # Un predio manual no está en `clean_listings`: su ubicación es la que
+    # alguien tecleó. Sin este respaldo el slug perdía la zona y quedaba sólo
+    # con el título, que es justo lo que hace que dos se parezcan.
     ubicacion = con.execute(
         "SELECT zona, ciudad FROM clean_listings WHERE link = ? LIMIT 1", (link,)
-    ).fetchone() or {}
+    ).fetchone()
+    if not ubicacion or not (ubicacion["zona"] or ubicacion["ciudad"]):
+        ubicacion = con.execute(
+            "SELECT zona, ciudad FROM inmueble_detalle WHERE url_inmueble = ?", (link,)
+        ).fetchone() or {}
 
     nombre = (ficha or {}).get("hero_titulo") or titulo
     zona = (ficha or {}).get("hero_ubicacion") or ubicacion.get("zona")
@@ -804,8 +825,16 @@ def _lee_detalle(link: str) -> dict:
                       d.ficha_guardada_en, d.ficha_guardada_por,
                       d.titulo, d.habitaciones, d.banos, d.area_confirmada_m2,
                       d.tipo_transformacion, d.notas_visita,
-                      c.titulo AS titulo_anuncio, c.zona, c.ciudad, c.pais,
-                      c.moneda, c.precio_venta, c.area_m2, c.precio_m2,
+                      c.titulo AS titulo_anuncio,
+                      -- Mismo respaldo que en SELECCION: sin esto, la ficha de
+                      -- un predio manual arrancaba sin ubicación ni precio
+                      -- aunque se acabaran de teclear.
+                      COALESCE(c.zona, d.zona)     AS zona,
+                      COALESCE(c.ciudad, d.ciudad) AS ciudad,
+                      COALESCE(c.pais, d.pais)     AS pais,
+                      c.moneda,
+                      COALESCE(c.precio_venta, d.precio_venta) AS precio_venta,
+                      c.area_m2, c.precio_m2,
                       c.habitaciones AS habitaciones_anuncio,
                       c.banos AS banos_anuncio,
                       c.mediana_precio_m2_zona
@@ -1011,3 +1040,48 @@ def quitar_foto(p: PeticionQuitarFoto, u: dict = Depends(usuario_actual)):
 
     bitacora.anotar(u, "flujo-ficha-foto-quitar", f"{p.ranura} · {p.link}")
     return {"ok": True}
+
+
+# ---------------------------------------------------------------------------
+# PREDIO MANUAL
+# ---------------------------------------------------------------------------
+#
+# El circuito nace del scraping, pero a veces el predio bueno llega por otro
+# lado —un contacto, una visita, un corredor— y no hay anuncio que scrapear.
+# Esto es su puerta de entrada. Ver app/services/manual_service.py para por
+# qué se le fabrica una clave `manual:` en vez de escribir en clean_listings.
+
+
+class PeticionManual(BaseModel):
+    titulo: str = Field(min_length=3, max_length=200)
+    ciudad: str = Field(min_length=2, max_length=80)
+    pais: str = Field(default="", max_length=80)
+    zona: str = Field(default="", max_length=120)
+    tipo_transformacion: str = Field(default="", max_length=120)
+    notas: str = Field(default="", max_length=2000)
+    area: float | None = None
+    habitaciones: int | None = None
+    banos: int | None = None
+    parqueaderos: int | None = None
+    precio: float | None = None
+
+
+@router.post("/manual")
+def crear_manual(p: PeticionManual, u: dict = Depends(usuario_actual)):
+    """Registra un predio a mano y devuelve su clave, para armarle la ficha.
+
+    Entra en 'visita' y no en 'nuevo': 'nuevo' es «el scraping lo trajo y
+    nadie lo ha mirado», que además lo dejaría fuera de `_accionables`. Un
+    predio que alguien se sentó a teclear ya está visto, y 'visita' es la
+    etapa desde la que el flujo ofrece «Completar y publicar», que es el paso
+    que le queda. El porqué largo está en `services/manual_service.py`.
+    """
+    responsable = f"{u['nombre']} ({u['rol']})"
+    try:
+        hecho = manual_service.crear(p.model_dump(), responsable=responsable)
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from e
+
+    bitacora.anotar(u, "flujo-predio-manual",
+                    f"{hecho['titulo']} · {hecho['link']}")
+    return hecho

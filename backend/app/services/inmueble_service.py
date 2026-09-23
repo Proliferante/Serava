@@ -87,11 +87,19 @@ def slugs_ocupados(con) -> set[str]:
 # Lo que hace falta para la tarjeta y para la ficha. `c.*` puede venir a nulo:
 # el anuncio del portal desaparece y el predio publicado sigue existiendo, con
 # lo que escribió el equipo, que es lo que de verdad se enseña.
+#
+# Y un predio metido a mano NUNCA tiene fila en `clean_listings` —no salió de
+# ningún portal—, así que la ubicación se busca primero en el anuncio y, si no
+# hay, en lo que se tecleó (`manual_service` añade esas tres columnas a
+# `inmueble_detalle`). Sin este COALESCE la tarjeta de un predio manual salía
+# sin ciudad.
 _SELECCION = """
     d.slug, d.ficha, d.ficha_fotos,
     d.titulo, d.habitaciones, d.banos, d.area_confirmada_m2, d.tipo_transformacion,
     d.ficha_guardada_en,
-    c.zona, c.ciudad, c.pais
+    COALESCE(c.zona, d.zona)     AS zona,
+    COALESCE(c.ciudad, d.ciudad) AS ciudad,
+    COALESCE(c.pais, d.pais)     AS pais
 """
 
 _DESDE = """
