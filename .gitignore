@@ -9,6 +9,8 @@ dist/
 # `backend/.env.example` sí está en el repo, como plantilla.
 .env
 .env.local
+# Credenciales del proyecto de Supabase de destino, para la mudanza.
+.env.destino
 
 # Salida de scripts/crear_usuarios.py: contraseñas temporales en claro.
 # Se reparten y se borra el archivo.
