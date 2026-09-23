@@ -7,6 +7,10 @@ export type CardData = {
   title: [string, string];
   desc: string[];
   meta: string;
+  /** Imagen subida desde la consola. Sin ella se pinta el hueco del diseño. */
+  foto?: string;
+  /** A dónde lleva. Sin él la tarjeta no es un enlace, sólo una tarjeta. */
+  enlace?: string;
 };
 
 const IMAGE_PREFIX: Record<CardType, string> = {
@@ -17,11 +21,25 @@ const IMAGE_PREFIX: Record<CardType, string> = {
 
 /** Content card (Component 4). */
 export default function HubCard({ data }: { data: CardData }) {
-  const { type, imageLabel, category, title, desc, meta } = data;
+  const { type, imageLabel, category, title, desc, meta, foto, enlace } = data;
+  /* Con enlace la tarjeta ES un enlace: así la pulsa el teclado y el ratón
+     sin añadir un `onClick` que sólo funciona con ratón. Sin él se queda en
+     un `div`, que es lo que eran las ocho de muestra. */
+  const Caja = (enlace ? "a" : "div") as "a";
+  const props = enlace ? { href: enlace, target: "_blank" as const, rel: "noopener noreferrer" } : {};
   return (
-    <div className="group ix-lift bg-cream-93 border border-[rgba(165,122,78,0.28)] border-solid flex flex-col overflow-clip rounded-[20px] w-full">
-      {/* Image placeholder */}
+    <Caja
+      {...props}
+      className="group ix-lift bg-cream-93 border border-[rgba(165,122,78,0.28)] border-solid flex flex-col overflow-clip rounded-[20px] w-full"
+    >
+      {/* Imagen, o el hueco del diseño cuando todavía no hay */}
       <div className="relative w-full aspect-[331.33/207.08]" style={{ backgroundImage: "linear-gradient(155deg, #5b4332 0%, #3d2c1e 100%)" }}>
+        {foto ? (
+          <img
+            src={foto} alt={imageLabel} loading="lazy" decoding="async"
+            className="ix-zoom absolute inset-0 size-full object-cover"
+          />
+        ) : (
         <div className="ix-zoom absolute inset-0 flex flex-col gap-[8.195px] items-center justify-center p-[16px]">
           {type === "video" ? (
             <TypeIcon type="video" size={44} style={{ color: "rgba(247,241,229,0.7)" }} />
@@ -33,6 +51,7 @@ export default function HubCard({ data }: { data: CardData }) {
             <p className="leading-[14.4px]">{imageLabel}</p>
           </div>
         </div>
+        )}
         {/* Type badge */}
         <div className="absolute bg-[rgba(201,168,119,0.22)] flex items-center gap-[7px] h-[28.36px] left-[14px] rounded-[999px] top-[14px] px-[12px]">
           <TypeIcon type={type} size={13} className="text-tan-63" />
@@ -54,6 +73,6 @@ export default function HubCard({ data }: { data: CardData }) {
         </div>
         <p className="[word-break:break-word] font-light leading-[19.34px] not-italic text-[#5b4332] text-[12.5px] mt-auto pt-[16px]">{meta}</p>
       </div>
-    </div>
+    </Caja>
   );
 }

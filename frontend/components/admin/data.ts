@@ -13,6 +13,8 @@
 export type VistaKey =
   | "panel" | "predios" | "extraccion" | "flujo" | "nuevo" | "comite"
   | "arq" | "data" | "comercial" | "equipo" | "gestion" | "cuenta"
+  /* Contenido de la página /hub: artículos, videos y noticias. */
+  | "hub"
   /* Armado de la ficha antes de publicar. Como `gestion`, no cuelga del menú:
      se entra desde el flujo de inmuebles y se sale por la miga de pan. */
   | "ficha";

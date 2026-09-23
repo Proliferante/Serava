@@ -10,6 +10,8 @@ import HubFeaturedArticle from "@/components/sections/hub/HubFeaturedArticle";
 import HubNewsletter from "@/components/sections/hub/HubNewsletter";
 import HubCardsGrid from "@/components/sections/hub/HubCardsGrid";
 import Footer from "@/components/sections/Footer";
+import { aTarjeta, conMuestra, contenidoHub } from "@/lib/hub";
+import { CARDS } from "@/components/sections/hub/HubCardsGrid";
 
 const A = "/figma";
 const CANVAS_W = 1920;
@@ -19,11 +21,21 @@ function Layer({ left, top, width, height, children }: { left: number; top: numb
   return <div style={{ position: "absolute", left, top, width, height }}>{children}</div>;
 }
 
+/** Se revalida sola cada minuto, igual que el portafolio. */
+export const revalidate = 60;
+
 /** PAGINA HUB — reproducción exacta del frame de Figma (1920 × 3827). */
-export default function HubPage() {
+export default async function HubPage() {
+  /* Lo publicado manda. Si no hay nada, las ocho de muestra del diseño —
+     mientras el interruptor las deje pasar. */
+  const publicado = await contenidoHub();
+  const cards = publicado.length > 0
+    ? publicado.map(aTarjeta)
+    : (conMuestra() ? CARDS : []);
+
   return (
     <main className="bg-cream">
-      <Compact><HubCompact /></Compact>
+      <Compact><HubCompact cards={cards} /></Compact>
       <Desk>
       <ScaledCanvas width={CANVAS_W} height={CANVAS_H}>
         {/* Hero */}
@@ -43,7 +55,7 @@ export default function HubPage() {
           <Reveal className="absolute left-[436px] top-[677.33px] w-[1048px]"><HubNewsletter /></Reveal>
 
           {/* Cards grid (cards stagger in individually) */}
-          <div className="absolute left-[436px] top-[944.335px] w-[1048px]"><HubCardsGrid /></div>
+          <div className="absolute left-[436px] top-[944.335px] w-[1048px]"><HubCardsGrid cards={cards} /></div>
         </div>
 
         {/* Featured article (painted on top, in the gap between hero and grid) */}

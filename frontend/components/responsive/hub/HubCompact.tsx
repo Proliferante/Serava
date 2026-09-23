@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import MobileNav from "@/components/responsive/MobileNav";
 import MobileFooter from "@/components/responsive/MobileFooter";
 import { CARDS } from "@/components/sections/hub/HubCardsGrid";
+import type { CardData } from "@/components/sections/hub/HubCard";
 import { BROWN, CREAM, In, LASER, MILLBROOK, Parallax, Reveal, WRAP } from "@/components/responsive/kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -31,22 +32,22 @@ const TABS: { label: string; type: string | null }[] = [
   { label: "Noticias", type: "noticia" },
 ];
 
-export default function HubCompact() {
+export default function HubCompact({ cards = CARDS }: { cards?: CardData[] }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string | null>(null);
   const [tipo, setTipo] = useState<string | null>(null);
 
-  const categorias = useMemo(() => [...new Set(CARDS.map((c) => c.category))], []);
+  const categorias = useMemo(() => [...new Set(cards.map((c) => c.category))], [cards]);
 
   const visibles = useMemo(() => {
     const t = q.trim().toLowerCase();
-    return CARDS.filter((c) => {
+    return cards.filter((c) => {
       if (tipo && c.type !== tipo) return false;
       if (cat && c.category !== cat) return false;
       if (!t) return true;
       return [c.title.join(" "), c.desc.join(" "), c.category, TIPO[c.type] ?? ""].join(" ").toLowerCase().includes(t);
     });
-  }, [q, cat, tipo]);
+  }, [cards, q, cat, tipo]);
 
   return (
     <MotionConfig reducedMotion="user">

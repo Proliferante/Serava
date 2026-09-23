@@ -14,6 +14,7 @@ import DataScore from "@/components/admin/views/DataScore";
 import Extraccion from "@/components/admin/views/Extraccion";
 import FlujoInmuebles from "@/components/admin/views/FlujoInmuebles";
 import GestionPredio from "@/components/admin/views/GestionPredio";
+import Hub from "@/components/admin/views/Hub";
 import NuevoPredio from "@/components/admin/views/NuevoPredio";
 import PanelGeneral from "@/components/admin/views/PanelGeneral";
 import Predios from "@/components/admin/views/Predios";
@@ -97,6 +98,15 @@ const GRUPOS: { g: string; items: Item[] }[] = [
       { k: "arq", l: "Arquitectura", d: "M12 3l9 6-9 6-9-6z", d2: "M3 15l9 6 9-6" , muestra: true },
       { k: "data", l: "Data & Score", d: "M3 12l4-4 4 4 4-6 6 8", d2: "M3 20h18" },
       { k: "comercial", l: "Comercial", d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" , muestra: true },
+    ],
+  },
+  {
+    /* Grupo propio: no es captación ni gestión de un inmueble, es lo que se
+       publica en la web pública. Hoy tiene un módulo; cuando haya más
+       (newsletter, casos) caen aquí. */
+    g: "Contenido",
+    items: [
+      { k: "hub", l: "Contenido del HUB", d: "M4 5h16v14H4z", d2: "M4 10h16M9 10v9" },
     ],
   },
   {
@@ -258,6 +268,7 @@ export default function AdminConsole() {
                   {vista === "arq" && <Arquitectura abrirGestion={abrirGestion} />}
                   {vista === "data" && <DataScore />}
                   {vista === "comercial" && <Comercial abrirGestion={abrirGestion} />}
+                  {vista === "hub" && <Hub />}
                   {vista === "equipo" && <Usuarios />}
                   {vista === "cuenta" && <MiCuenta />}
                   {vista === "gestion" && <GestionPredio />}

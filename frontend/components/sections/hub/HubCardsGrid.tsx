@@ -15,8 +15,14 @@ export const CARDS: CardData[] = [
   { type: "video", imageLabel: "análisis de zona", category: "Zonas", title: ["Cómo analizamos una zona", "con tecnología antes de entrar"], desc: ["Demanda firme, oferta limitada: el", "primer filtro del modelo."], meta: "Video · 5:45" },
 ];
 
-/** PAGINA HUB · Grid de 8 tarjetas (3 columnas) con entrada escalonada */
-export default function HubCardsGrid() {
+/**
+ * PAGINA HUB · rejilla de tarjetas en tres columnas, con entrada escalonada.
+ *
+ * `cards` llega de la consola. Mientras no haya nada publicado se pintan las
+ * ocho de muestra del diseño: la página tiene que verse entera desde el
+ * primer día, y el día que haya contenido de verdad desaparecen solas.
+ */
+export default function HubCardsGrid({ cards = CARDS }: { cards?: CardData[] }) {
   return (
     <motion.div
       className="grid grid-cols-3 gap-x-[24px] gap-y-[24px] w-full"
@@ -25,9 +31,9 @@ export default function HubCardsGrid() {
       viewport={{ once: true, amount: 0.1 }}
       variants={{ show: { transition: { staggerChildren: 0.08 } } }}
     >
-      {CARDS.map((c, i) => (
+      {cards.map((c, i) => (
         <motion.div
-          key={i}
+          key={`${c.category}-${c.title[0]}-${i}`}
           variants={{ hidden: { opacity: 0, y: 28 }, show: { opacity: 1, y: 0 } }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >

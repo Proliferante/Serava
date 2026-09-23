@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router, usuario_actual
 from app.api.flujo import router as flujo_router
+from app.api.hub import router_admin as hub_admin_router, router_publico as hub_publico_router
 from app.api.inmuebles import router as inmuebles_router
 from app.core import config, sesiones
 
@@ -187,6 +188,13 @@ app.include_router(flujo_router, prefix="/api/admin/flujo", tags=["flujo"],
 # `dependencies=` con la dependencia que toque y ni el router ni el servicio
 # cambian.
 app.include_router(inmuebles_router, prefix="/api/predios", tags=["predios"])
+
+# El HUB va en dos mitades. La de escritura exige sesión Y rol —la dependencia
+# vive dentro del router, en `exige_editor`, porque no es "hay sesión" sino
+# "este rol concreto"—. La de lectura no exige nada: es lo que pinta la página
+# pública, igual que el portafolio de arriba.
+app.include_router(hub_admin_router, prefix="/api/admin/hub", tags=["hub"])
+app.include_router(hub_publico_router, prefix="/api/hub", tags=["hub"])
 
 # TODO (backend oficial): sumar aquí los routers de dashboard y
 # notificaciones cuando estén — no reemplazar este archivo, sólo añadir.

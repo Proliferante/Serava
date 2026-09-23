@@ -243,6 +243,10 @@ export const PERMISOS: Record<string, Rol[]> = {
   gestion: ROLES_TODOS,
   /* Su propia cuenta la ve cualquiera: son sus datos. */
   cuenta: ROLES_TODOS,
+  /* El HUB sí está cerrado desde hoy, como «Equipo»: publicar ahí es hablar
+     en la web pública con la voz de la empresa, y el backend lo exige con
+     `exige_rol("admin", "comercial")`. */
+  hub: ["admin", "comercial"],
   /* El único cerrado hoy: lo exige también el backend, así que esconderlo no
      es la protección, es no ofrecer una puerta que da 403. */
   equipo: ["admin"],
