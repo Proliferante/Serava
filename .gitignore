@@ -8,9 +8,12 @@ dist/
 # Nunca se suben: DATABASE_URL, JWT_SECRET y las llaves viven aquí.
 # `backend/.env.example` sí está en el repo, como plantilla.
 .env
-.env.local
-# Credenciales del proyecto de Supabase de destino, para la mudanza.
-.env.destino
+# Cualquier variante (.env.local, .env.destino, .env.pgi…) lleva secretos
+# dentro. Se ignoran todas y se salvan a mano las plantillas, que es al revés
+# de como estaba: antes había que acordarse de añadir cada archivo nuevo.
+.env.*
+!.env.example
+!.env.destino.ejemplo
 
 # Salida de scripts/crear_usuarios.py: contraseñas temporales en claro.
 # Se reparten y se borra el archivo.
