@@ -42,10 +42,16 @@ let cache: Promise<Muestra> | null = null;
 /**
  * La muestra se pide una sola vez por sesión y se guarda. Son 93 KB: pedirla
  * en cada cambio de filtro sería absurdo, y meterla en el paquete lo sería
- * más — sólo la necesita quien entre a Extracción sin servidor.
+ * más: la necesita sólo quien entra a Extracción.
  */
 export function muestra(): Promise<Muestra> {
-  if (!cache) cache = fetch("/admin/muestra-extraccion.json").then((r) => r.json());
+  /* Sale de la API y no de `public/`: son anuncios reales, y lo que está en
+     `public/` lo descarga cualquiera sin sesión. Si falla, se olvida la
+     promesa para volver a intentarlo al entrar. */
+  if (!cache) cache = fetch(url("/muestra")).then((r) => {
+    if (!r.ok) throw new Error(String(r.status));
+    return r.json();
+  }).catch((e) => { cache = null; throw e; });
   return cache;
 }
 

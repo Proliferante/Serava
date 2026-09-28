@@ -15,6 +15,8 @@ Variables (ver backend/.env.example):
                       llamar a la API. Por defecto sólo el localhost del
                       frontend en desarrollo.
     METROCUADRADO_API_KEY  llave del portal, para el scraping.
+    PROXY_SECRETO     firma que el frontend pone en cada petición. Sin ella
+                      (en local) no se exige.
     SUPABASE_URL, SUPABASE_SERVICE_KEY, SUPABASE_BUCKET
                       almacén de las fotos de la ficha. Opcionales: sin ellas
                       todo funciona menos subir fotos, que lo dice.
@@ -71,6 +73,19 @@ CORS_ORIGINS = [
 # AL DESPLEGAR: COOKIE_SEGURA=1. Sin eso, la sesión viaja en claro y cualquiera
 # en la misma red puede quedársela.
 COOKIE_SEGURA = os.environ.get("COOKIE_SEGURA", "").strip() in ("1", "true", "sí", "si")
+
+
+# --- firma del frontend ----------------------------------------------------
+# El secreto que comparten el middleware de Next y este backend. Con él, el
+# backend sabe la IP real de quien visita (Railway sólo ve la de Vercel) y
+# rechaza todo lo que no venga del frontend, que es lo que impide saltarse el
+# firewall de Vercel llamando directo a la URL de Railway. Ver core/limites.py.
+#
+# AL DESPLEGAR: la misma cadena larga y al azar en las dos partes —
+# `PROXY_SECRETO` en Railway y en Vercel—. Se genera con
+#     python -c "import secrets; print(secrets.token_urlsafe(32))"
+# En local se deja vacío y no se exige nada.
+PROXY_SECRETO = os.environ.get("PROXY_SECRETO", "").strip()
 
 
 # --- documentación interactiva ---------------------------------------------

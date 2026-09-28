@@ -153,5 +153,5 @@ def publico(respuesta: Response):
     respuesta.headers["Cache-Control"] = "public, s-maxage=60, stale-while-revalidate=600"
     if not tabla_existe("hub_contenido"):
         return {"contenido": [], "total": 0}
-    items = svc.listar(solo_publicados=True)
+    items = [svc.publico(i) for i in svc.listar(solo_publicados=True)]
     return {"contenido": items, "total": len(items)}

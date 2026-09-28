@@ -25,8 +25,12 @@ export default function HubCard({ data }: { data: CardData }) {
   /* Con enlace la tarjeta ES un enlace: así la pulsa el teclado y el ratón
      sin añadir un `onClick` que sólo funciona con ratón. Sin él se queda en
      un `div`, que es lo que eran las ocho de muestra. */
-  const Caja = (enlace ? "a" : "div") as "a";
-  const props = enlace ? { href: enlace, target: "_blank" as const, rel: "noopener noreferrer" } : {};
+  /* El backend ya sólo acepta http(s) o rutas del sitio, pero el `href` es el
+     sitio donde un `javascript:` se ejecutaría, así que se comprueba otra vez
+     aquí: un enlace raro se queda en tarjeta sin enlace. */
+  const seguro = enlace && (/^https?:\/\//i.test(enlace) || /^\/(?!\/)/.test(enlace)) ? enlace : "";
+  const Caja = (seguro ? "a" : "div") as "a";
+  const props = seguro ? { href: seguro, target: "_blank" as const, rel: "noopener noreferrer" } : {};
   return (
     <Caja
       {...props}

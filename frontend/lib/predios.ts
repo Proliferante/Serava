@@ -1,4 +1,5 @@
 import type { Predio } from "@/components/predios/PredioCard";
+import { firma } from "@/lib/firma";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LOS PREDIOS PUBLICADOS — del backend a las páginas del inversionista.
@@ -50,7 +51,7 @@ export function conMuestra() {
 
 async function pedir<T>(ruta: string): Promise<T | null> {
   try {
-    const r = await fetch(`${BACKEND}${ruta}`, { next: { revalidate: REVALIDAR } });
+    const r = await fetch(`${BACKEND}${ruta}`, { headers: firma(), next: { revalidate: REVALIDAR } });
     if (!r.ok) return null;
     return (await r.json()) as T;
   } catch (e) {

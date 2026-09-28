@@ -38,8 +38,10 @@ import logging
 import threading
 import contextlib
 from datetime import datetime
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from app.api.auth import usuario_actual
@@ -117,6 +119,24 @@ def _zonas_config():
         }
         for z in extract.CONFIG_ZONAS
     ]
+
+
+# La muestra de extracción: 420 anuncios reales con su enlace, precio y m², y
+# los agregados por zona. La consola la usa para el catálogo de zonas y para
+# el modo sin pipeline.
+#
+# Vivía en `frontend/public/admin/`, y todo lo que está en `public/` lo sirve
+# Next a cualquiera, sin sesión: bastaba abrir la URL. Aquí, bajo /api/admin,
+# hereda la sesión obligatoria de main.py como el resto del router.
+_MUESTRA = Path(__file__).resolve().parent.parent / "services" / "admin" / "muestra_extraccion.json"
+
+
+@router.get("/muestra")
+def muestra():
+    # `private`: que ni el CDN ni un proxy intermedio guarden una copia que
+    # luego sirvan a quien no tiene sesión.
+    return FileResponse(_MUESTRA, media_type="application/json",
+                        headers={"Cache-Control": "private, max-age=3600"})
 
 
 @router.get("/config")

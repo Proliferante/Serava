@@ -12,6 +12,7 @@ from app.api.flujo import router as flujo_router
 from app.api.hub import router_admin as hub_admin_router, router_publico as hub_publico_router
 from app.api.inmuebles import router as inmuebles_router
 from app.core import config, sesiones
+from app.core.limites import Frenos
 from app.services import manual_service
 
 log = logging.getLogger("zequara")
@@ -148,6 +149,11 @@ async def _cabeceras_y_origen(peticion: Request, siguiente):
     return r
 
 
+# Los frenos (firma del frontend, tamaño del cuerpo, peticiones por minuto) van
+# los PRIMEROS en recibir la petición, y por eso se añaden los últimos: en
+# Starlette el último middleware añadido es el de fuera. Así una petición que
+# no pasa ni llega a CORS ni a la base. Ver core/limites.py.
+app.add_middleware(Frenos)
 
 
 # Sesión y usuarios internos.

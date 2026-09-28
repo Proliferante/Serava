@@ -32,7 +32,9 @@ from __future__ import annotations
 import re
 import unicodedata
 from datetime import datetime, timezone
+from urllib.parse import urlparse
 
+from app.core import config
 from app.core.database import cursor, escribir
 
 # Los tres tipos del diseño. La clave es la que usa el frontend; el valor, lo
@@ -132,6 +134,51 @@ def _validar(d: dict) -> None:
         raise ValueError(f"Categoría inválida. Válidas: {', '.join(CATEGORIAS)}")
     if not (d.get("titulo") or "").strip():
         raise ValueError("El título no puede estar vacío.")
+    d["enlace"] = _enlace_seguro(d.get("enlace") or "")
+    d["foto"] = _foto_segura(d.get("foto"))
+
+
+def _enlace_seguro(enlace: str) -> str:
+    """El enlace de la tarjeta se pinta como `href` en la página pública.
+
+    Sin esto cabía `javascript:…`, y la página pública comparte origen con la
+    consola: un clic de un admin en esa tarjeta ejecutaría código con SU
+    sesión —crear un usuario admin, por ejemplo—. Sólo http(s) a un dominio,
+    o una ruta del propio sitio.
+    """
+    enlace = enlace.strip()
+    if not enlace:
+        return ""
+    if enlace.startswith("/") and not enlace.startswith("//"):
+        return enlace
+    u = urlparse(enlace)
+    if u.scheme in ("http", "https") and u.netloc:
+        return enlace
+    raise ValueError("El enlace tiene que empezar por https:// o ser una ruta del sitio (/...).")
+
+
+def _foto_segura(foto: str | None) -> str | None:
+    """La foto sólo puede ser una que se subió al almacén del proyecto.
+
+    Una URL cualquiera en un `<img>` de la página pública le dice a su dueño
+    quién visita el sitio, desde dónde y cuándo.
+    """
+    foto = (foto or "").strip()
+    if not foto:
+        return None
+    base = f"{config.SUPABASE_URL}/storage/v1/object/public/" if config.SUPABASE_URL else ""
+    if base and foto.startswith(base):
+        return foto
+    raise ValueError("La imagen tiene que subirse desde la consola.")
+
+
+# Lo que la página pública no necesita saber: quién del equipo lo escribió
+# —nombre y rol— ni el id interno de la fila.
+_INTERNOS = ("creado_por", "id", "publicado")
+
+
+def publico(item: dict) -> dict:
+    return {k: v for k, v in item.items() if k not in _INTERNOS}
 
 
 def crear(d: dict, quien: str = "") -> dict:
