@@ -593,11 +593,15 @@ export default function ComoOperamosScreen() {
               <span> es un modelo especializado que identifica zonas consolidadas de alta demanda, oferta limitada y activos con potencial de transformación.</span>
             </p>
           </P>
-          <P x={440} cy={501.63} w={484} color={LINEN80} d={0.42}>
+          {/* Con la fuente real los dos párrafos ocupan una línea más que en
+              Figma (4 y 5) y el segundo se montaba sobre el primero. Se apilan
+              con 8 px entre ellos, y el recuadro baja lo mismo. */}
+          <P x={440} cy={519.05} w={484} color={LINEN80} d={0.42}>
             <p>Buscamos mercados donde el diseño, la remodelación y una mejor operación pueden ampliar la diferencia entre el valor de entrada y el valor que el mercado reconoce después de la intervención.</p>
           </P>
-          <Callout x={440} y={586.07} w={484} h={79.63} dark icon={CK_DARK} textCy={39.4} textW={410}>
-            <p>Solo las zonas que cumplen los criterios del modelo</p>
+          <Callout x={440} y={606} w={484} h={79.63} dark icon={CK_DARK} textCy={39.4} textW={410}>
+            {/* Sin nowrap partía en «…del / modelo / avanzan…»: tres líneas. */}
+            <p className="whitespace-nowrap">Solo las zonas que cumplen los criterios del modelo</p>
             <p>avanzan a selección de inmuebles.</p>
           </Callout>
         </Sec>
@@ -708,7 +712,9 @@ export default function ComoOperamosScreen() {
             <p>alcance, contrato y estructura de honorarios.</p>
           </P>
 
-          <L x={440} y={398.945} w={1040} h={197}>
+          {/* Las tarjetas y el recuadro bajan 16 px: el párrafo de cuatro líneas
+              acababa en 401 y las tarjetas empezaban en 399, pegadas a él. */}
+          <L x={440} y={414.945} w={1040} h={197}>
             <Card x={0} icon={[["33.33% 20.83% 12.5% 12.5%", "-9.25% -7.51% -6.54% 0", "ic-d1.svg"]]} title="Diseño y remodelación" delay={0}>
               Intervención del activo a alcance y costo cerrado.
             </Card>
@@ -720,9 +726,12 @@ export default function ComoOperamosScreen() {
             </Card>
           </L>
 
-          <Callout x={440} y={623.945} w={602.88} h={79.63} icon={CK_LIGHT} textCy={39.4} textW={528.88} d={0.4}>
+          {/* «servicio.» sobraba: era el final de la frase anterior («…antes
+              de aprobar cada / servicio.») y se quedó colgando al cambiarla.
+              Con una línea el recuadro pasa al alto de los otros de una (57),
+              y el texto queda a la altura del icono. */}
+          <Callout x={440} y={639.945} w={602.88} h={57} icon={CK_LIGHT} textCy={28.5} textW={528.88} d={0.4}>
             <p className="whitespace-nowrap">Conoces los costos y las condiciones de antemano.</p>
-            <p>servicio.</p>
           </Callout>
         </Sec>
 
@@ -816,25 +825,29 @@ export default function ComoOperamosScreen() {
           </H3>
 
           {/* Línea de tiempo (Line 12 + Ellipse 19/20/21) */}
-          <Draw style={{ left: 1119, top: 193.98, width: 3, height: 351.036, backgroundImage: `linear-gradient(to bottom, ${BROWN}, ${CREAM})` }} delay={0.28} dur={1.3} />
-          <Svg src="dot16.svg" x={1111} y={229} w={16} d={0.5} />
-          <Svg src="dot16.svg" x={1111} y={349} w={16} d={0.72} />
-          <Svg src="dot16.svg" x={1111} y={470} w={16} d={0.94} />
+          {/* Cada paso ocupa cuatro líneas (119,6 px) y los centros de Figma
+              iban a 117 y 127 entre sí: «Primero» se metía bajo el título y el
+              primer paso pisaba al segundo. Se apilan desde 195 (14 px bajo el
+              título) con 4 px entre ellos; línea, puntos y recuadro los siguen. */}
+          <Draw style={{ left: 1119, top: 213, width: 3, height: 351.036, backgroundImage: `linear-gradient(to bottom, ${BROWN}, ${CREAM})` }} delay={0.28} dur={1.3} />
+          <Svg src="dot16.svg" x={1111} y={251.4} w={16} d={0.5} />
+          <Svg src="dot16.svg" x={1111} y={375} w={16} d={0.72} />
+          <Svg src="dot16.svg" x={1111} y={498.6} w={16} d={0.94} />
 
-          <P x={1162} cy={232.39} w={484} color={MILLBROOK} d={0.4}>
+          <P x={1162} cy={254.8} w={484} color={MILLBROOK} d={0.4}>
             <p className="font-bold" style={{ color: BROWN }}>Primero</p>
             <p>Antes de remodelar, definimos a qué tipo de habitante se dirige el inmueble y qué características valora.</p>
           </P>
-          <P x={1162} cy={349.385} w={484} color={MILLBROOK} d={0.62}>
+          <P x={1162} cy={378.4} w={484} color={MILLBROOK} d={0.62}>
             <p className="font-bold" style={{ color: BROWN }}>Después</p>
             <p>La distribución, los materiales, el mobiliario y el canon se proyectan según la demanda de cada microzona y el perfil del arrendatario objetivo.</p>
           </P>
-          <P x={1162} cy={476.385} w={484} color={MILLBROOK} d={0.84}>
+          <P x={1162} cy={502} w={484} color={MILLBROOK} d={0.84}>
             <p className="font-bold" style={{ color: BROWN }}>Finalmente</p>
             <p>Una vez disponible, Zequara gestiona la comercialización, las visitas, la selección del arrendatario y la operación del activo.</p>
           </P>
 
-          <Callout x={1162} y={576} w={484} h={79.63} icon={CK_R} textCy={39.4} textW={410} d={1}>
+          <Callout x={1162} y={578} w={484} h={79.63} icon={CK_R} textCy={39.4} textW={410} d={1}>
             <p>Cada oportunidad incluye una hipótesis de demanda, canon y ocupación.</p>
           </Callout>
         </Sec>
@@ -1054,7 +1067,8 @@ export default function ComoOperamosScreen() {
               className="ix-cta relative block overflow-hidden"
               style={{ width: 320, height: 58.8, background: LINEN, borderRadius: 999, boxShadow: "0px 16px 32px -16px rgba(0,0,0,0.4)" }}
             >
-              <T x={32} cy={28.5} w={222} className="text-center font-semibold" style={{ fontSize: 16, lineHeight: "24.8px", color: OIL }}>
+              {/* En una línea, como en /proyectos: a 222 partía «portafolio». */}
+              <T x={32} cy={28.5} w={232} className="whitespace-nowrap text-center font-semibold" style={{ fontSize: 16, lineHeight: "24.8px", color: OIL }}>
                 <p>{CTA_PORTAFOLIO}</p>
               </T>
               <Ico
