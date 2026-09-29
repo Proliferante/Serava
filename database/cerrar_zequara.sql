@@ -64,13 +64,21 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public REVOKE ALL ON FUNCTI
 --
 -- Un disparador de eventos que activa RLS en cada tabla nueva de `public`.
 -- Es el que recomienda la documentación de Supabase para este aviso.
+--
+-- Sin `WHEN TAG IN (...)` y con `LIKE 'CREATE%'` a propósito: el SQL Editor
+-- de Supabase busca en el texto la frase «crear tabla + nombre» y toma lo
+-- que venga detrás por el nombre de una tabla. Con el tag del CREATE… AS
+-- escrito entero, leía `AS` y fallaba todo el script con `relation "AS" does
+-- not exist`. El filtro va dentro de la función; `object_type = 'table'` deja
+-- fuera índices y vistas, y excluir ALTER evita que el propio ALTER de abajo
+-- vuelva a disparar el evento.
 
 CREATE OR REPLACE FUNCTION public.rls_en_tablas_nuevas()
 RETURNS event_trigger LANGUAGE plpgsql AS $$
 DECLARE obj record;
 BEGIN
   FOR obj IN SELECT * FROM pg_event_trigger_ddl_commands()
-             WHERE command_tag IN ('CREATE TABLE', 'CREATE TABLE AS', 'SELECT INTO')
+             WHERE (command_tag LIKE 'CREATE%' OR command_tag = 'SELECT INTO')
                AND object_type = 'table' AND schema_name = 'public'
   LOOP
     EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', obj.object_identity);
@@ -81,7 +89,6 @@ REVOKE ALL ON FUNCTION public.rls_en_tablas_nuevas() FROM anon, authenticated, p
 
 DROP EVENT TRIGGER IF EXISTS rls_en_tablas_nuevas;
 CREATE EVENT TRIGGER rls_en_tablas_nuevas ON ddl_command_end
-  WHEN TAG IN ('CREATE TABLE', 'CREATE TABLE AS', 'SELECT INTO')
   EXECUTE FUNCTION public.rls_en_tablas_nuevas();
 
 
