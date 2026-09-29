@@ -373,7 +373,7 @@ export default function Oportunidad() {
           </motion.div>
         ))}
 
-        <a href="/modelo" className="ix-nav absolute whitespace-nowrap font-semibold" style={{ left: 174, top: 523, fontSize: 20, lineHeight: "30px", color: "#a57a4e" }}>Conoce cómo funciona →</a>
+        <a href="/como-operamos" className="ix-nav absolute whitespace-nowrap font-semibold" style={{ left: 174, top: 523, fontSize: 20, lineHeight: "30px", color: "#a57a4e" }}>Conoce cómo funciona →</a>
       </Band>
 
       {/* ── Ubicación y entorno + CTA ── */}

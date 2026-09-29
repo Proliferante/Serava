@@ -212,7 +212,7 @@ export default function OportunidadCompact() {
             </div>
 
             <In delay={0.1}>
-              <a href="/modelo" className="ix-nav mt-[20px] inline-block text-[15px] font-semibold" style={{ color: "#a57a4e" }}>Conoce cómo funciona →</a>
+              <a href="/como-operamos" className="ix-nav mt-[20px] inline-block text-[15px] font-semibold" style={{ color: "#a57a4e" }}>Conoce cómo funciona →</a>
             </In>
           </div>
         </Band>

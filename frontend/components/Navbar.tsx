@@ -39,8 +39,8 @@ export default function Navbar() {
       {/* Los cuatro se recolocan porque «Proyectos realizados» es bastante
           más largo que «Oportunidades» y se comía al siguiente (OBS-48). */}
       <NavLink href="/" left={470} top={64}>Inicio</NavLink>
-      <NavLink href="/modelo" left={640} top={63}>¿Cómo operamos?</NavLink>
-      <NavLink href="/oportunidades" left={990} top={64}>Proyectos realizados</NavLink>
+      <NavLink href="/como-operamos" left={640} top={63}>¿Cómo operamos?</NavLink>
+      <NavLink href="/proyectos" left={990} top={64}>Proyectos realizados</NavLink>
       <NavLink href="/hub" left={1440} top={64}>HUB</NavLink>
 
       {/* Registro btn (426:1127) */}
