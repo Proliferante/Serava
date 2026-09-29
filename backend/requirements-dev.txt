@@ -1,0 +1,9 @@
+# Lo que hace falta para correr las pruebas, además de lo de producción.
+# No entra en la imagen de Docker: sólo lo instala quien prueba (tú en local,
+# y GitHub Actions en cada Pull Request).
+#
+#     pip install -r requirements.txt -r requirements-dev.txt
+#     python -m pytest tests -q
+pytest
+# Lo pide el TestClient de FastAPI.
+httpx
