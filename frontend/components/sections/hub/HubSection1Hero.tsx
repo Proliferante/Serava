@@ -33,9 +33,10 @@ export default function HubSection1Hero() {
       <div className="absolute bg-[rgba(73,33,0,0.6)] h-[934px] left-0 top-0 w-[1920px]" />
 
 
-      {/* Eyebrow */}
+      {/* Eyebrow — en una línea: con el tracking de 3,5 no cabía en los 202 de
+          Figma y partía en «CONOCIMIENTO / ZEQUARA», con la raya a media altura. */}
       <div className="absolute bg-tan-63 h-px left-[450px] opacity-80 top-[279.42px] w-[36px]" />
-      <p className="[word-break:break-word] absolute font-semibold leading-[17.86px] left-[498px] not-italic text-tan-63 text-[11.5px] top-[270px] tracking-[3.456px] uppercase w-[202.17px]">Conocimiento Zequara</p>
+      <p className="absolute whitespace-nowrap font-semibold leading-[17.86px] left-[498px] not-italic text-tan-63 text-[11.5px] top-[270px] tracking-[3.456px] uppercase">Conocimiento Zequara</p>
 
       {/* Heading */}
       <p className="[word-break:break-word] absolute font-medium leading-[88px] left-[450px] not-italic text-cream-93 text-[80px] top-[305px] tracking-[-2px] w-[1123px]">Criterio para invertir mejor en finca raíz</p>

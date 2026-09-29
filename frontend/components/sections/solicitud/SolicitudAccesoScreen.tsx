@@ -459,7 +459,9 @@ export default function SolicitudAccesoScreen() {
             <MLine delay={0.12}><span className="font-light">Cuéntanos cómo</span></MLine>
             <MLine delay={0.24}><span className="font-semibold">quieres invertir.</span></MLine>
           </T>
-          <T x={460} cy={336.02} w={399.5} d={0.4} className="font-light" style={{ fontSize: 17.6, lineHeight: "27.28px", color: CREAM }}>
+          {/* 12 px más abajo: el título acaba en 295,7 y el párrafo empezaba en
+              295,1, así que la primera línea se pegaba a los descendentes. */}
+          <T x={460} cy={348} w={399.5} d={0.4} className="font-light" style={{ fontSize: 17.6, lineHeight: "27.28px", color: CREAM }}>
             <p>Tus respuestas nos ayudan a preparar una</p>
             <p>conversación más útil desde el primer</p>
             <p>contacto.</p>
