@@ -10,6 +10,8 @@ import {
 /* Los controles los dibuja `ficha/Campos.tsx`, que comparte con «Nuevo
    predio»: ver la cabecera de ese archivo. */
 import { BloqueCaja } from "@/components/admin/ficha/Campos";
+/* Las cifras de Finanzas salen del modelo: ver la cabecera de ese archivo. */
+import { CalcularFinanzas, type CalculoBase, type ZonasCalculo } from "@/components/admin/ficha/CalcularFinanzas";
 import { Btn, Card, Hint, IcoBack, IcoCheck, IcoExt, SecTitle } from "@/components/admin/ui";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -54,6 +56,8 @@ type Respuesta = {
   guardada_por: string | null;
   sugeridos: Record<string, unknown>;
   almacen_listo: boolean;
+  calculo_base?: CalculoBase;
+  calculo_zonas?: ZonasCalculo;
 };
 
 const trazo = {
@@ -78,6 +82,8 @@ export default function ArmarFicha() {
   const [almacenListo, setAlmacenListo] = useState(true);
   const [publicada, setPublicada] = useState(false);
   const [guardadaPor, setGuardadaPor] = useState<string | null>(null);
+  const [calculoBase, setCalculoBase] = useState<CalculoBase | null>(null);
+  const [calculoZonas, setCalculoZonas] = useState<ZonasCalculo>({});
 
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -99,6 +105,8 @@ export default function ArmarFicha() {
         setAlmacenListo(d.almacen_listo);
         setPublicada(d.publicada);
         setGuardadaPor(d.guardada_por);
+        setCalculoBase(d.calculo_base ?? null);
+        setCalculoZonas(d.calculo_zonas ?? {});
         setSucio(false);
       })
       .catch((e) => { if (vivo) setError((e as Error).message); })
@@ -137,6 +145,14 @@ export default function ArmarFicha() {
       setGuardando(false);
     }
   };
+
+  /* Las cifras del modelo entran como si se hubieran escrito: quedan en el
+     formulario, marcan la ficha como sin guardar y se pueden corregir. */
+  const aplicarCalculo = useCallback((v: Valores) => {
+    setValores((prev) => ({ ...prev, ...v }));
+    setSucio(true);
+    av(`${Object.keys(v).length} cifras del modelo en el formulario: revísalas y guarda`);
+  }, [av]);
 
   const falta = useMemo(() => faltantes(valores, fotos), [valores, fotos]);
 
@@ -289,6 +305,13 @@ export default function ArmarFicha() {
           </div>
         )}
       </Card>
+
+      {!cargando && !error && (
+        <CalcularFinanzas
+          link={link} base={calculoBase} zonas={calculoZonas} valores={valores}
+          pedir={pedir} onAplicar={aplicarCalculo}
+        />
+      )}
 
       <div className="flow-tabs">
         {FICHA.map((p) => (

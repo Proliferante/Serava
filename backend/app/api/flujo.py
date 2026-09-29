@@ -12,6 +12,7 @@ Las pantallas del flujo de inmuebles, montado en /api/admin/flujo.
     POST /api/admin/flujo/ficha             guardar el borrador de la ficha
     POST /api/admin/flujo/ficha/foto        subir una foto de la ficha
     POST /api/admin/flujo/ficha/foto/quitar quitar una foto de la ficha
+    POST /api/admin/flujo/ficha/calcular    las finanzas de la ficha, con el modelo
     POST /api/admin/flujo/manual            registrar un predio a mano
 
 DÓNDE EMPIEZA EL FLUJO
@@ -90,7 +91,7 @@ from pydantic import BaseModel, Field
 from app.api.auth import usuario_actual
 from app.core import bitacora, config
 from app.core.database import cursor, escribir, tabla_existe
-from app.services import almacenamiento, inmueble_service, manual_service
+from app.services import almacenamiento, fichas, inmueble_service, manual_service
 
 router = APIRouter()
 
@@ -837,7 +838,12 @@ def _lee_detalle(link: str) -> dict:
                       c.area_m2, c.precio_m2,
                       c.habitaciones AS habitaciones_anuncio,
                       c.banos AS banos_anuncio,
-                      c.mediana_precio_m2_zona
+                      c.mediana_precio_m2_zona,
+                      -- Lo que necesita el cálculo de las finanzas de la ficha
+                      -- (POST /ficha/calcular): el segmento de mercado es
+                      -- zona × tipo × tamaño, y el score veta lo que está
+                      -- fuera del polígono de su zona.
+                      c.tipo_inmueble, c.administracion, c.dentro_poligono_real
                  FROM seguimiento_propiedades s
                  LEFT JOIN inmueble_detalle d ON d.url_inmueble = s.url_inmueble
                  LEFT JOIN clean_listings   c ON c.link = s.url_inmueble
@@ -896,6 +902,25 @@ def leer_ficha(link: str = Query(max_length=LIMITE_LINK),
         "guardada_por": d.get("ficha_guardada_por"),
         "sugeridos": _sugeridos(d),
         "almacen_listo": almacenamiento.disponible(),
+        "calculo_base": _calculo_base(d),
+        "calculo_zonas": fichas.zonas_disponibles(),
+    }
+
+
+def _calculo_base(d: dict) -> dict:
+    """Lo que el anuncio ya dice para calcular las finanzas: el punto de partida
+    del panel «Calcular finanzas». Se puede corregir todo antes de calcular."""
+    def num(v):
+        return None if v is None else float(v)
+
+    return {
+        "zona": d.get("zona"),
+        "ciudad": d.get("ciudad"),
+        "tipo": d.get("tipo_inmueble"),
+        "area": num(d.get("area_confirmada_m2")) or num(d.get("area_m2")),
+        "publicado": num(d.get("precio_venta")),
+        "administracion": num(d.get("administracion")),
+        "dentro_poligono": d.get("dentro_poligono_real"),
     }
 
 
@@ -1040,6 +1065,51 @@ def quitar_foto(p: PeticionQuitarFoto, u: dict = Depends(usuario_actual)):
 
     bitacora.anotar(u, "flujo-ficha-foto-quitar", f"{p.ranura} · {p.link}")
     return {"ok": True}
+
+
+# ---------------------------------------------------------------------------
+# FINANZAS AUTOMÁTICAS DE LA FICHA
+# ---------------------------------------------------------------------------
+#
+# Paola, 28-sep-2026: «la creación de fichas ya está, pero falta la parte
+# financiera. ¿Cómo se logran estas tablas? ¿Con qué datos?». La pestaña
+# Finanzas son unas cuarenta cifras que había que escribir a mano. Esto las
+# calcula con el modelo de las fichas del evento (services/fichas) y las
+# devuelve como propuesta: NO escribe nada. La consola llena el formulario y
+# quien arma la ficha revisa, corrige y guarda o publica como siempre.
+
+
+class PeticionCalculo(BaseModel):
+    link: str = Field(max_length=LIMITE_LINK)
+    # Todo opcional: lo que no venga se toma del anuncio (_calculo_base).
+    zona: str | None = Field(default=None, max_length=120)
+    ciudad: str | None = Field(default=None, max_length=80)
+    tipo: str | None = Field(default=None, max_length=40)
+    area: float | None = Field(default=None, gt=0, lt=100_000)
+    publicado: float | None = Field(default=None, gt=0)
+    negociado: float | None = Field(default=None, gt=0)
+    remodelacion_m2: float | None = Field(default=None, gt=0)
+    administracion: float | None = Field(default=None, ge=0)
+    canon_m2: float | None = Field(default=None, gt=0)
+    valor_remodelado_m2: float | None = Field(default=None, gt=0)
+    rasgos: list[str] = Field(default_factory=list, max_length=6)
+
+
+@router.post("/ficha/calcular")
+def calcular_ficha(p: PeticionCalculo, u: dict = Depends(usuario_actual)):
+    """Las cifras de la ficha calculadas con el modelo, sin guardar nada."""
+    _exige_pipeline()
+    d = _lee_detalle(p.link)
+    if not d:
+        raise HTTPException(404, "Ese inmueble no está en el flujo.")
+    entradas = _calculo_base(d) | {k: v for k, v in p.model_dump(exclude={"link"}).items()
+                                   if v not in (None, "", [])}
+    try:
+        r = fichas.calcular_ficha(entradas)
+    except fichas.DatosInsuficientes as e:
+        raise HTTPException(422, str(e)) from e
+    bitacora.anotar(u, "flujo-ficha-calcular", p.link)
+    return r | {"entradas": entradas}
 
 
 # ---------------------------------------------------------------------------

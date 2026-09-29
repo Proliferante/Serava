@@ -1,0 +1,186 @@
+{
+ "_nota": "Entradas y resultados de las fichas del evento (tarea_8dias, 29-sep-2026, CDT 12,03 % e IPC 6,24 %). El backend tiene que dar lo mismo.",
+ "SN001": {
+  "entradas": {
+   "zona": "La Cabrera",
+   "ciudad": "Bogotá",
+   "tipo": "Apartamento",
+   "area": 305.35,
+   "publicado": 1995000000,
+   "negociado": 1830000000,
+   "administracion": 2530000,
+   "dentro_poligono": true,
+   "rasgos": [
+    "vista panorámica",
+    "piso alto"
+   ],
+   "factores": {
+    "vista": 2,
+    "iluminacion": 1,
+    "ruido": 0
+   }
+  },
+  "esperado": {
+   "allin": 2813185000.0,
+   "noi": 152039733.01500002,
+   "mensual": 20938154.85,
+   "tir": {
+    "conservador": 0.10110967057162179,
+    "base": 0.1589313430192444,
+    "alto": 0.21549343870797044
+   },
+   "multiplo": 1.9840449400199724,
+   "score": 73.1,
+   "notas": {
+    "spread": 90,
+    "valorizacion": 65,
+    "carry": 80,
+    "yield": 80,
+    "unicidad": 80,
+    "arquitectura": 58.25,
+    "demanda": 90,
+    "pipeline": 80,
+    "liquidez": 80,
+    "regulatorio": 80,
+    "esg": 90
+   }
+  }
+ },
+ "SN002": {
+  "entradas": {
+   "zona": "Chicó",
+   "ciudad": "Bogotá",
+   "tipo": "Apartamento",
+   "area": 167.0,
+   "publicado": 990000000,
+   "negociado": 891000000.0,
+   "administracion": 1530000.0,
+   "dentro_poligono": true,
+   "rasgos": [
+    "piso alto (6) con ascensor",
+    "3 garajes"
+   ],
+   "factores": {
+    "iluminacion": 1,
+    "vista": 0,
+    "zonas_comunes_ascensores": 1
+   }
+  },
+  "esperado": {
+   "allin": 1426520000.0,
+   "noi": 89761949.1,
+   "mensual": 12145409.0,
+   "tir": {
+    "conservador": 0.10814285428274018,
+    "base": 0.14721076553893153,
+    "alto": 0.20426192303269464
+   },
+   "multiplo": 1.8733773112555598,
+   "score": 68.9,
+   "notas": {
+    "spread": 70,
+    "valorizacion": 65,
+    "carry": 100,
+    "yield": 65,
+    "unicidad": 80,
+    "arquitectura": 55.75,
+    "demanda": 80,
+    "pipeline": 70,
+    "liquidez": 80,
+    "regulatorio": 80,
+    "esg": 90
+   }
+  }
+ },
+ "SN003": {
+  "entradas": {
+   "zona": "El Poblado",
+   "ciudad": "Medellín",
+   "tipo": "Apartamento",
+   "area": 121.0,
+   "publicado": 650000000,
+   "negociado": 585000000.0,
+   "administracion": 700000.0,
+   "dentro_poligono": true,
+   "rasgos": [
+    "dúplex en dos niveles"
+   ],
+   "factores": {
+    "vista": -1,
+    "zonas_comunes_ascensores": -1
+   }
+  },
+  "esperado": {
+   "allin": 971800000.0,
+   "noi": 46893120.0,
+   "mensual": 6388800.0,
+   "tir": {
+    "conservador": 0.07520670962503428,
+    "base": 0.12364494676802884,
+    "alto": 0.17381213202957657
+   },
+   "multiplo": 1.7196186590482656,
+   "score": 59.6,
+   "notas": {
+    "spread": 60,
+    "valorizacion": 65,
+    "carry": 80,
+    "yield": 50,
+    "unicidad": 55,
+    "arquitectura": 45.0,
+    "demanda": 80,
+    "pipeline": 50,
+    "liquidez": 70,
+    "regulatorio": 80,
+    "esg": 90
+   }
+  }
+ },
+ "SN004": {
+  "entradas": {
+   "zona": "El Poblado",
+   "ciudad": "Medellín",
+   "tipo": "Apartamento",
+   "area": 280.0,
+   "publicado": 870000000,
+   "negociado": 783000000.0,
+   "administracion": 1388000,
+   "dentro_poligono": true,
+   "rasgos": [
+    "dos matrículas (divisible en dos unidades)",
+    "terraza sobre zona verde"
+   ],
+   "factores": {
+    "vista": 1,
+    "iluminacion": 1,
+    "ruido": 1,
+    "zonas_comunes_ascensores": 1
+   }
+  },
+  "esperado": {
+   "allin": 1666660000.0,
+   "noi": 118995816.0,
+   "mensual": 14777840.0,
+   "tir": {
+    "conservador": 0.11247925111385426,
+    "base": 0.16638410876239373,
+    "alto": 0.24353959503954414
+   },
+   "multiplo": 2.010226955873609,
+   "score": 71.3,
+   "notas": {
+    "spread": 80,
+    "valorizacion": 65,
+    "carry": 100,
+    "yield": 80,
+    "unicidad": 95,
+    "arquitectura": 60.5,
+    "demanda": 80,
+    "pipeline": 50,
+    "liquidez": 70,
+    "regulatorio": 80,
+    "esg": 90
+   }
+  }
+ }
+}
