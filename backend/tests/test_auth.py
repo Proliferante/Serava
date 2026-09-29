@@ -406,7 +406,7 @@ def _rutas_de(aplicacion):
                 yield metodo.upper(), ruta
 
 
-def test_ninguna_ruta_nueva_queda_abierta_por_descuido():
+def test_ninguna_ruta_nueva_queda_abierta_por_descuido(monkeypatch):
     """Sin cookie, toda ruta responde 401 salvo las tres de `ABIERTAS`.
 
     Esta prueba existe por un fallo real: los siete endpoints de
@@ -422,6 +422,12 @@ def test_ninguna_ruta_nueva_queda_abierta_por_descuido():
     (ver la nota de los imports en `app/api/admin.py`).
     """
     from app.main import app as aplicacion
+
+    # Que haya tabla de sesiones se da por hecho: sin esto, comprobarlo va a
+    # la base, y donde no hay base (GitHub Actions) todas las rutas con sesión
+    # contestarían 503 en vez de 401 y la prueba no diría nada útil. Sin
+    # cookie, `validar` responde None sin consultar nada.
+    monkeypatch.setattr(sesiones, "disponible", lambda: True)
 
     sin_sesion = TestClient(aplicacion)
     sin_sesion.cookies.clear()
