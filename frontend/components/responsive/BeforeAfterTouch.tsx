@@ -50,15 +50,19 @@ export default function BeforeAfterTouch({ slug, alt }: { slug: string; alt: str
       <span className="pointer-events-none absolute left-[12px] top-[12px] rounded-[8px] px-[10px] py-[5px] text-[10px] font-bold uppercase tracking-[0.6px]" style={{ background: "rgba(42,30,20,0.6)", color: LINEN }}>Antes</span>
       <span className="pointer-events-none absolute right-[12px] top-[12px] rounded-[8px] px-[10px] py-[5px] text-[10px] font-bold uppercase tracking-[0.6px]" style={{ background: "rgba(127,139,87,0.85)", color: LINEN }}>Después</span>
 
-      <motion.span
-        className="pointer-events-none absolute inset-x-0 bottom-[12px] text-center text-[12px]"
-        style={{ color: "rgba(247,241,229,0.85)" }}
-        initial={{ opacity: 0.9 }}
-        animate={{ opacity: [0.9, 0.45, 0.9] }}
-        transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-      >
-        Desliza para comparar
-      </motion.span>
+      {/* Sobre el mismo velo que el tirador: suelto, la guía lo cruzaba por
+          la mitad («Desliza para|comparar») y en las fotos claras no se leía. */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-[12px] flex justify-center">
+        <motion.span
+          className="rounded-full px-[10px] py-[3px] text-[12px]"
+          style={{ color: "rgba(247,241,229,0.9)", background: "rgba(42,30,20,0.55)", backdropFilter: "blur(2px)" }}
+          initial={{ opacity: 0.9 }}
+          animate={{ opacity: [0.9, 0.55, 0.9] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+        >
+          Desliza para comparar
+        </motion.span>
+      </div>
 
       <input
         type="range" min={0} max={100} value={pos}
