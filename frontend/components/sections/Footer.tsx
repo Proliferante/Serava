@@ -31,6 +31,13 @@ export default function Footer() {
         <p className="leading-[2.27]"><a href="/hub" className="hover:underline">HUB</a></p>
       </div>
 
+      {/* Legal, bajo CUENTA: es la única columna con hueco debajo (NAVEGA
+          llega hasta abajo con sus cuatro enlaces). Cuando esté la Política de
+          Privacidad, va en la línea de abajo. */}
+      <p className="absolute font-light leading-[1.5] left-[1460px] top-[262px] text-[15px] text-[rgba(226,205,174,0.6)] whitespace-nowrap">
+        <a href="/terminos" className="hover:text-cream hover:underline">Términos y condiciones</a>
+      </p>
+
       {/* Cuenta column */}
       <p className="[word-break:break-word] absolute font-extralight leading-[1.137] left-[1460px] not-italic text-[#cd9a64] text-[26px] top-[78px] tracking-[9.36px] whitespace-nowrap">CUENTA</p>
       <div className="[word-break:break-word] absolute font-light leading-[0] left-[1459px] not-italic text-[20px] text-white top-[147px] whitespace-nowrap">
