@@ -144,6 +144,14 @@ class _Contador:
 contador = _Contador()
 
 
+def _ahora() -> float:
+    """El reloj de los topes. Aparte para que las pruebas lo puedan parar: si
+    no, cien peticiones seguidas que caen a caballo de un cambio de minuto
+    mueven la ventana y la prueba falla una de cada tantas sin que nada esté
+    mal."""
+    return time.time()
+
+
 def _cabecera(scope, nombre: bytes) -> str | None:
     for k, v in scope.get("headers") or ():
         if k == nombre:
@@ -257,7 +265,7 @@ class Frenos:
         # 3. La frecuencia.
         ip = ip_real(scope)
         scope.setdefault("state", {})["ip"] = ip
-        ahora = time.time()
+        ahora = _ahora()
         if del_proxy(scope) and not _cabecera(scope, b"x-zq-cliente"):
             cubetas = [("srv", SERVIDOR)]
         else:
