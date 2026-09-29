@@ -12,7 +12,7 @@ export default function Footer() {
       </a>
 
       {/* Tagline */}
-      <div className="[word-break:break-word] absolute font-normal leading-[0] left-[427px] not-italic text-[26px] text-white top-[182px] w-[405px] whitespace-pre-wrap">
+      <div className="[word-break:break-word] absolute font-normal leading-[0] left-[427px] not-italic text-[26px] text-white top-[182px] w-[560px] whitespace-pre-wrap">
         <p className="font-extrabold leading-[1.66] mb-0">Tú sumas un inmueble a tu patrimonio. </p>
         <p className="font-normal italic leading-[1.66] text-[#c1986c]">Nosotros hacemos el resto.</p>
       </div>
