@@ -125,7 +125,7 @@ export default function ConfiguracionScreen() {
       <Card {...C4} delay={0.42}>
         <SecTitle x={PAD} y={24} w={GRID_W}>Sesión</SecTitle>
         <SecSub x={PAD} y={48} w={GRID_W}>Cierra tu sesión en este dispositivo.</SecSub>
-        <Btn x={PAD} y={85.99} w={169} h={49} tono="danger" href="/login" icon={<IcoSalir />}>Cerrar sesión</Btn>
+        <Btn x={PAD} y={85.99} w={169} h={49} tono="danger" href="/salir" icon={<IcoSalir />}>Cerrar sesión</Btn>
       </Card>
 
       <Toast y={1529.7} visible={acuse} />

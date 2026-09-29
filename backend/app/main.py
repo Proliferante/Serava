@@ -11,6 +11,7 @@ from app.api.auth import router as auth_router, usuario_actual
 from app.api.flujo import router as flujo_router
 from app.api.hub import router_admin as hub_admin_router, router_publico as hub_publico_router
 from app.api.inmuebles import router as inmuebles_router
+from app.api.inversor import inversor_actual, router as inversor_router
 from app.core import config, sesiones
 from app.core.limites import Frenos
 from app.services import manual_service
@@ -36,6 +37,14 @@ async def _ciclo_de_vida(_: FastAPI):
     # que un predio de portal saca de `clean_listings`). Aquí y no en cada
     # petición: el listado público las lee y no tiene por qué poder alterar
     # tablas. `ADD COLUMN IF NOT EXISTS` hace que repetirlo no cueste nada.
+    # La columna que separa las sesiones de la consola de las del portafolio.
+    # Sin ella, `validar` falla en todas las peticiones con sesión: se avisa
+    # alto en el registro.
+    try:
+        sesiones.asegurar_ambito()
+    except Exception as e:
+        log.error("No se pudo asegurar la columna `ambito` de sesiones: %s", e)
+
     try:
         manual_service.asegurar_columnas()
     except Exception as e:
@@ -188,22 +197,22 @@ app.include_router(admin_router, prefix="/api/admin", tags=["admin"],
 app.include_router(flujo_router, prefix="/api/admin/flujo", tags=["flujo"],
                    dependencies=SESION)
 
-# Los predios publicados, para la web del inversionista.
+# La sesión del área privada de la web. Va sin dependencia: es la puerta.
+app.include_router(inversor_router, prefix="/api/inversor", tags=["inversor"])
+
+# Los predios publicados, para el área privada del inversionista.
 #
-# VA SIN `SESION`, Y ESO ES UNA DECISIÓN, NO UN OLVIDO.
-# La página `/predios` del sitio hoy no tiene nada delante: no hay
-# middleware, y la autenticación de inversionista no existe todavía (la de
-# `usuarios` es la del equipo). Cerrar la API mientras la página sigue
-# abierta no protegería el portafolio y sólo dejaría la página en blanco.
+# Exige sesión de inversionista (api/inversor.py). Antes iba abierta porque
+# la página `/predios` no tenía nada delante y cerrar la API sólo la habría
+# dejado en blanco; desde que existe el login del portafolio, la página
+# exige sesión y la API también. La web los pide desde el servidor de Next
+# reenviando la cookie del visitante (frontend/lib/predios.ts).
 #
-# Lo que este router expone es únicamente lo publicado y sólo sus campos de
-# portafolio — nunca el anuncio original, el contacto del vendedor ni lo que
-# está a medio camino. Ver app/api/inmuebles.py.
-#
-# El día que haya acceso de inversionista, se cierra AQUÍ: se le añade
-# `dependencies=` con la dependencia que toque y ni el router ni el servicio
-# cambian.
-app.include_router(inmuebles_router, prefix="/api/predios", tags=["predios"])
+# Aun así sólo expone lo publicado y sólo sus campos de portafolio — nunca el
+# anuncio original, el contacto del vendedor ni lo que está a medio camino.
+# Ver app/api/inmuebles.py.
+app.include_router(inmuebles_router, prefix="/api/predios", tags=["predios"],
+                   dependencies=[Depends(inversor_actual)])
 
 # El HUB va en dos mitades. La de escritura exige sesión Y rol —la dependencia
 # vive dentro del router, en `exige_editor`, porque no es "hay sesión" sino
