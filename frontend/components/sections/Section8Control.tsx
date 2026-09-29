@@ -44,9 +44,11 @@ export default function Section8Control() {
       {/* Column 2 */}
       <p className="[word-break:break-word] absolute font-black leading-[normal] left-[783px] not-italic text-brown-dark text-[25px] top-[322px] w-[434px]">Cómo van los números </p>
       <p className="[word-break:break-word] absolute font-normal leading-[normal] left-[783px] not-italic text-brown-dark text-[20px] top-[378px] w-[399px]">Cuánto se ha invertido, cuánto te renta y cuánto vale tu inmueble hoy.</p>
-      {/* Column 3 */}
-      <p className="[word-break:break-word] absolute font-black leading-[normal] left-[1245px] not-italic text-brown-dark text-[25px] top-[322px] w-[434px]">Cómo va tu zona</p>
-      <p className="[word-break:break-word] absolute font-normal leading-[normal] left-[1238px] not-italic text-brown-dark text-[20px] top-[367px] w-[282px]">Si la demanda sigue firme y cómo se mueve el valor de tu predio, mes a mes.</p>
+      {/* Column 3 — título y texto van a la misma distancia del divisor que en
+          la columna 2 (39 px), y el texto a la misma altura que los otros dos:
+          antes el título y el párrafo no casaban entre sí ni con sus vecinos. */}
+      <p className="[word-break:break-word] absolute font-black leading-[normal] left-[1256px] not-italic text-brown-dark text-[25px] top-[322px] w-[300px]">Cómo va tu zona</p>
+      <p className="[word-break:break-word] absolute font-normal leading-[normal] left-[1256px] not-italic text-brown-dark text-[20px] top-[378px] w-[282px]">Si la demanda sigue firme y cómo se mueve el valor de tu predio, mes a mes.</p>
 
       {/* Dashboard image (351:1107) — el hueco del diseño es 810 × 612 en 555,520.
           El mockup anterior venía en un marco de iPad y con la marca Serava; se
@@ -66,11 +68,15 @@ export default function Section8Control() {
 
       {/* Badge under image */}
       <div className="absolute bg-[#c1986c] h-[86px] left-[1234px] rounded-bl-[61px] rounded-tr-[60px] shadow-[8px_5px_4.4px_0px_rgba(0,0,0,0.25)] top-[1066px] w-[302px]" />
-      <div className="[word-break:break-word] absolute font-normal leading-[0] left-[1275px] not-italic text-[0px] text-white top-[1081px] w-[310px]">
+      {/* El texto medía 310 dentro de una pastilla de 302 que empieza 41 px
+          antes: «es el que» se salía por la derecha. Va en tres líneas fijas,
+          que caben en el ancho y en los 86 de alto con el mismo margen arriba
+          y abajo. */}
+      <div className="absolute font-normal leading-[0] left-[1275px] not-italic text-[0px] text-white top-[1081px] w-[240px]">
         <p className="font-extrabold leading-[1.137] mb-0 text-brown-dark text-[16px]">Así se ve tu inversión</p>
         <p className="text-[16px]">
-          <span className="leading-[1.137]">El mismo equipo que lo eligió </span>
-          <span className="[word-break:break-word] font-extrabold leading-[1.137] not-italic">es el que lo administra.</span>
+          <span className="block whitespace-nowrap leading-[1.137]">El mismo equipo que lo eligió</span>
+          <span className="block whitespace-nowrap font-extrabold leading-[1.137] not-italic">es el que lo administra.</span>
         </p>
       </div>
     </div>

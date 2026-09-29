@@ -177,15 +177,19 @@ export default function Section4Caso() {
           Un inmueble que compramos, remodelamos y hoy renta. Cifras <span className="font-extrabold">medidas</span> del proyecto, proyectadas en tres escenarios <span className="font-extrabold">estimados</span> de valorización.
         </p>
 
-        {/* Stats bar */}
+        {/* Stats bar
+            Las cuatro celdas medían lo mismo (~264), pero «Valor de mercado 9
+            meses después» mide 225 y arranca en 84: se salía 44 px y pisaba la
+            celda del canon. La segunda crece a 334 a costa del aire que les
+            sobraba a las otras tres, cuyos iconos se acercan un poco al borde. */}
         <div className="absolute bg-brown-dark h-[96.42px] left-[56px] overflow-clip rounded-[12px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-[274px] w-[1060px]">
-          <Metric left={1} width={263.75} iconX={16} iconY={24} textX={70} labelY={11} valueY={27.34} subY={60.55}
+          <Metric left={1} width={252} iconX={12} iconY={24} textX={66} labelY={11} valueY={27.34} subY={60.55}
             label="Inversión total" sub="compra + remodelación" icon={<IcoHome />}><CountUp value={3100} prefix="$" suffix="M COP" grouping /></Metric>
-          <Metric left={265} width={265} iconX={6} iconY={26} arrowX={68} textX={83.75} labelY={15} valueY={35} subY={64.55}
+          <Metric left={254} width={334} iconX={6} iconY={26} arrowX={68} textX={83.75} labelY={15} valueY={35} subY={64.55}
             label="Valor de mercado 9 meses después" sub="~22% sobre lo invertido" icon={<IcoGrowth />}><CountUp value={3776} prefix="$" suffix="M COP" grouping /></Metric>
-          <Metric left={530.5} width={263.75} iconX={20.5} iconY={26} arrowX={81.5} textX={97} labelY={15} valueY={31.34} subY={64.55}
+          <Metric left={589} width={234} iconX={10} iconY={26} arrowX={71} textX={86.5} labelY={15} valueY={31.34} subY={64.55}
             label="Canon mensual" sub="+54% tras la obra" icon={<IcoGrowth />}><CountUp value={17} prefix="$" suffix="M COP" /></Metric>
-          <Metric left={795.25} width={263.75} iconX={12.75} iconY={23} textX={58.75} labelY={15} valueY={31.34} subY={64.55}
+          <Metric left={824} width={235} iconX={8} iconY={23} textX={54} labelY={15} valueY={31.34} subY={64.55}
             label="Yield bruto" sub="renta anual / inversión" icon={<IcoPercent />}><CountUp value={6.6} suffix="%" decimals={1} comma /></Metric>
         </div>
 
