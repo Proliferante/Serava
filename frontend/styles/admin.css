@@ -608,3 +608,7 @@
 .adm .fic-calc-kpis b{font-size:.95rem;color:var(--espresso2);}
 .adm .fic-calc-fuentes{margin-top:12px;font-size:.74rem;font-weight:300;color:var(--mocha);line-height:1.5;list-style:none;padding:0;}
 .adm .fic-calc-fuentes b{font-weight:600;}
+
+/* Aviso de una cifra que no cuadra (lib/revisar-ficha.ts). Terracota como lo
+   obligatorio que falta, pero no bloquea: es para leerlo antes de publicar. */
+.adm .fic-aviso{margin:6px 0 0;padding:7px 10px;border-radius:8px;font-size:.76rem;line-height:1.45;color:#8a3d1f;background:rgba(181,84,47,.1);border:1px solid rgba(181,84,47,.28);}

@@ -10,6 +10,7 @@ import {
 /* Los controles los dibuja `ficha/Campos.tsx`, que comparte con «Nuevo
    predio»: ver la cabecera de ese archivo. */
 import { BloqueCaja } from "@/components/admin/ficha/Campos";
+import { revisarFicha } from "@/lib/revisar-ficha";
 /* Las cifras de Finanzas salen del modelo: ver la cabecera de ese archivo. */
 import { CalcularFinanzas, type CalculoBase, type ZonasCalculo } from "@/components/admin/ficha/CalcularFinanzas";
 import { Btn, Card, Hint, IcoBack, IcoCheck, IcoExt, SecTitle } from "@/components/admin/ui";
@@ -155,9 +156,16 @@ export default function ArmarFicha() {
   }, [av]);
 
   const falta = useMemo(() => faltantes(valores, fotos), [valores, fotos]);
+  /* Lo que no cuadra: sale bajo cada campo y se repite antes de publicar. */
+  const avisos = useMemo(() => revisarFicha(valores), [valores]);
 
   const publicar = async () => {
     if (guardando || falta.length) return;
+    const n = Object.keys(avisos).length;
+    if (n && !window.confirm(
+      `Hay ${n} ${n === 1 ? "cifra que no cuadra" : "cifras que no cuadran"} (están marcadas en el formulario). ` +
+      "El inversionista las verá así. ¿Publicar de todos modos?",
+    )) return;
     setGuardando(true);
     try {
       await pedir("/api/admin/flujo/completar", {
@@ -344,6 +352,7 @@ export default function ArmarFicha() {
               key={b.k} b={b} valores={valores} fotos={fotos} sugeridos={sugeridos}
               aMano={link.startsWith("manual:")}
               subiendo={subiendo} almacenListo={almacenListo}
+              avisos={avisos}
               onCampo={set}
               onSubir={subirFoto} onQuitar={quitarFoto}
             />
