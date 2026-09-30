@@ -29,6 +29,15 @@ class ErrorAuth(Exception):
     """Fallo esperado (correo repetido, rol inválido…), no un error de programa."""
 
 
+class ClaveIncorrecta(ErrorAuth):
+    """La contraseña actual no coincide, en un cambio de clave o de correo.
+
+    Aparte del resto para que el endpoint la cuente como intento fallido:
+    quien se lleva una sesión abierta podría, si no, probar contraseñas aquí
+    sin el freno que tiene el login, y con la buena quedarse la cuenta.
+    """
+
+
 def _sin_tildes(t: str) -> str:
     """Para comparar contra la lista de prohibidas sin que una tilde la esquive."""
     return "".join(c for c in unicodedata.normalize("NFD", t.lower())
@@ -265,7 +274,7 @@ def cambiar_clave(usuario_id: int, clave_actual: str, clave_nueva: str,
             "SELECT clave_hash FROM usuarios WHERE id = ?", (usuario_id,)
         ).fetchone()
     if not fila or not security.verificar(clave_actual, fila["clave_hash"]):
-        raise ErrorAuth("La contraseña actual no es correcta.")
+        raise ClaveIncorrecta("La contraseña actual no es correcta.")
 
     with escribir() as con:
         con.execute(
@@ -318,7 +327,7 @@ def cambiar_correo(usuario_id: int, correo_nuevo: str, clave_actual: str) -> dic
     if not fila:
         raise ErrorAuth("No existe ese usuario.")
     if not security.verificar(clave_actual, fila["clave_hash"]):
-        raise ErrorAuth("La contraseña no es correcta.")
+        raise ClaveIncorrecta("La contraseña no es correcta.")
     if fila["correo"] == correo_nuevo:
         raise ErrorAuth("Ese ya es tu correo.")
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, MotionConfig } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { WORDMARK, wordmarkH } from "@/components/brand";
 import { useSesion } from "@/components/admin/sesion";
 import { EASE, LASER } from "@/components/responsive/kit";
@@ -53,6 +53,19 @@ export default function AdminLogin() {
   /* Ver la contraseña mientras se escribe. Arranca oculta siempre: esta
      pantalla se abre en reuniones y con pantalla compartida. */
   const [verClave, setVerClave] = useState(false);
+
+  /* En el subdominio de la consola (`admin.zequara.com`) `/login` no existe:
+     el middleware manda cualquier ruta de ahí a la consola, y el enlace
+     devolvería al inversionista a esta misma pantalla. Se apunta al dominio
+     público quitándole el `admin.` al host. En `/admin` del dominio público
+     (local, vistas previas) se queda la ruta relativa. */
+  const [loginInversor, setLoginInversor] = useState("/login");
+  useEffect(() => {
+    const { protocol, hostname, port } = window.location;
+    if (hostname.startsWith("admin.")) {
+      setLoginInversor(`${protocol}//${hostname.slice(6)}${port ? ":" + port : ""}/login`);
+    }
+  }, []);
 
   const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -169,7 +182,7 @@ export default function AdminLogin() {
           </div>
 
           <a
-            href="/login"
+            href={loginInversor}
             className="ix-nav mx-auto mt-[20px] block text-center text-[13.5px] font-medium"
             style={{ color: "rgba(247,241,229,0.55)" }}
           >

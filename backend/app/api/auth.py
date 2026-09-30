@@ -221,6 +221,15 @@ def cambiar_nombre(p: PeticionNombre, peticion: Request, u: dict = Depends(usuar
     return {"ok": True, "usuario": actualizado}
 
 
+def _frena_clave(u: dict, ip: str | None) -> None:
+    """El mismo freno del login para los endpoints que piden la contraseña
+    actual. Cuenta en la misma cubeta —por correo—, así que cinco fallos entre
+    el login y aquí bloquean la cuenta igual."""
+    motivo = intentos.bloqueado(u["correo"], None)
+    if motivo:
+        raise HTTPException(429, motivo)
+
+
 class PeticionCorreo(BaseModel):
     correo: str = Field(max_length=LIMITE_CORREO)
     clave_actual: str = Field(max_length=LIMITE_CLAVE)
@@ -234,8 +243,13 @@ def cambiar_correo(p: PeticionCorreo, peticion: Request, u: dict = Depends(usuar
     ahora, así que las sesiones abiertas con el anterior no deberían seguir.
     """
     anterior = u["correo"]
+    ip = intentos.ip_de(peticion)
+    _frena_clave(u, ip)
     try:
         actualizado = svc.cambiar_correo(u["id"], p.correo, p.clave_actual)
+    except svc.ClaveIncorrecta as e:
+        intentos.registrar(u["correo"], ip, False, "clave-actual-correo")
+        raise HTTPException(400, str(e)) from e
     except svc.ErrorAuth as e:
         raise HTTPException(400, str(e)) from e
 
@@ -252,8 +266,14 @@ class PeticionClave(BaseModel):
 
 @router.post("/cambiar-clave")
 def cambiar_clave(p: PeticionClave, peticion: Request, u: dict = Depends(usuario_actual)):
+    ip = intentos.ip_de(peticion)
+    _frena_clave(u, ip)
     try:
-        svc.cambiar_clave(u["id"], p.clave_actual, p.clave_nueva, correo=u["correo"])
+        svc.cambiar_clave(u["id"], p.clave_actual, p.clave_nueva,
+                          correo=u["correo"], nombre=u["nombre"])
+    except svc.ClaveIncorrecta as e:
+        intentos.registrar(u["correo"], ip, False, "clave-actual")
+        raise HTTPException(400, str(e)) from e
     except svc.ErrorAuth as e:
         raise HTTPException(400, str(e)) from e
 

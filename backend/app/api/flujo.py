@@ -363,6 +363,16 @@ CSV_CABECERA = ("Titulo", "Zona", "Ciudad", "Precio", "Area m2",
                 "Precio m2", "Publicacion")
 
 
+def _celda(texto: str) -> str:
+    """Un texto que empieza por `=`, `+`, `-` o `@` Excel lo toma por fórmula.
+
+    Los títulos vienen del scraping —los escribe quien publica el anuncio en
+    el portal—, así que un `=HYPERLINK(...)` en un título se ejecutaría al
+    abrir el CSV. El apóstrofo delante lo deja como texto y Excel no lo pinta.
+    """
+    return "'" + texto if texto[:1] in ("=", "+", "-", "@", "\t", "\r") else texto
+
+
 @router.get("/csv")
 def csv_de_etapa(
     etapa: str = Query("preseleccion", description="preseleccion|visita|publicado|descartado|nuevo"),
@@ -404,12 +414,12 @@ def csv_de_etapa(
     escritor.writerow(CSV_CABECERA)
     for f in filas:
         escritor.writerow([
-            f["titulo"] or _titulo_del_enlace(f["link"]) or "",
-            f["zona"] or "", f["ciudad"] or "",
+            _celda(f["titulo"] or _titulo_del_enlace(f["link"]) or ""),
+            _celda(f["zona"] or ""), _celda(f["ciudad"] or ""),
             f["precio_venta"] if f["precio_venta"] is not None else "",
             f["area_m2"] if f["area_m2"] is not None else "",
             f["precio_m2"] if f["precio_m2"] is not None else "",
-            f["link"] or "",
+            _celda(f["link"] or ""),
         ])
 
     nombre = f"zequara_{etapa}.csv"
@@ -1045,6 +1055,11 @@ def quitar_foto(p: PeticionQuitarFoto, u: dict = Depends(usuario_actual)):
     registros de acceso de cada salto del camino. En el cuerpo, no.
     """
     _exige_pipeline()
+    # La misma comprobación que subir foto y guardar la ficha. Era la única de
+    # las tres que no la hacía, y aceptaba cualquier link que se mandara a
+    # mano, estuviera o no en el circuito.
+    if p.link not in _accionables([p.link]):
+        raise HTTPException(400, "Ese inmueble ya no está en el listado.")
     actual = (_lee_detalle(p.link).get("ficha_fotos") or {}).get(p.ranura)
 
     ahora = datetime.now(timezone.utc)

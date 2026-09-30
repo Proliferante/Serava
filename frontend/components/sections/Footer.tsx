@@ -12,7 +12,7 @@ export default function Footer() {
       </a>
 
       {/* Tagline */}
-      <div className="[word-break:break-word] absolute font-normal leading-[0] left-[427px] not-italic text-[26px] text-white top-[182px] w-[405px] whitespace-pre-wrap">
+      <div className="[word-break:break-word] absolute font-normal leading-[0] left-[427px] not-italic text-[26px] text-white top-[182px] w-[560px] whitespace-pre-wrap">
         <p className="font-extrabold leading-[1.66] mb-0">Tú sumas un inmueble a tu patrimonio. </p>
         <p className="font-normal italic leading-[1.66] text-[#c1986c]">Nosotros hacemos el resto.</p>
       </div>
@@ -30,6 +30,13 @@ export default function Footer() {
         <p className="leading-[2.27] mb-0"><a href="/oportunidades" className="hover:underline">Proyectos realizados</a></p>
         <p className="leading-[2.27]"><a href="/hub" className="hover:underline">HUB</a></p>
       </div>
+
+      {/* Legal, bajo CUENTA: es la única columna con hueco debajo (NAVEGA
+          llega hasta abajo con sus cuatro enlaces). Cuando esté la Política de
+          Privacidad, va en la línea de abajo. */}
+      <p className="absolute font-light leading-[1.5] left-[1460px] top-[262px] text-[15px] text-[rgba(226,205,174,0.6)] whitespace-nowrap">
+        <a href="/terminos" className="hover:text-cream hover:underline">Términos y condiciones</a>
+      </p>
 
       {/* Cuenta column */}
       <p className="[word-break:break-word] absolute font-extralight leading-[1.137] left-[1460px] not-italic text-[#cd9a64] text-[26px] top-[78px] tracking-[9.36px] whitespace-nowrap">CUENTA</p>

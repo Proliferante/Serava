@@ -77,6 +77,10 @@ export default function MobileFooter() {
           {DISCLAIMER}
         </p>
 
+        <p className="mt-[18px] text-[13.5px] font-light">
+          <a href="/terminos" className="text-sand underline decoration-[rgba(223,197,159,0.35)] underline-offset-[3px]">Términos y condiciones</a>
+        </p>
+
         <p className="mt-[14px] text-[12.5px] font-light leading-[1.5] text-[rgba(226,205,174,0.5)]">
           © {new Date().getFullYear()} Zequara. Portafolio reservado para un grupo limitado de inversionistas. Acceso sujeto a evaluación.
         </p>

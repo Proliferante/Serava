@@ -485,3 +485,14 @@ body {
   .ix-cta:hover .ix-cta-circle, .ix-cta:hover .ix-cta-arrow { transform: none; }
   .ix-cta-shine { display: none; }
 }
+
+/* ── Páginas legales (components/legal/LegalPage.tsx) ─────────────────────
+   Foco visible en todos sus enlaces: es texto largo que se recorre con el
+   teclado, y el foco por defecto del navegador casi no se ve sobre el crema. */
+.legal-enlace:focus-visible {
+  outline: 2px solid #8b5e34;
+  outline-offset: 3px;
+}
+.legal-indice summary::-webkit-details-marker { display: none; }
+.legal-flecha { transition: transform 0.2s ease; }
+.legal-indice[open] .legal-flecha { transform: rotate(180deg); }

@@ -142,7 +142,17 @@ def ip_de(peticion) -> str | None:
     eso el tope por IP se sostiene ahí. Si el backend se mueve a un sitio que
     lo deje pasar, el tope por IP se vuelve esquivable —el de por correo, que
     es el que de verdad protege una cuenta concreta, no—.
+
+    ACTUALIZACIÓN: esa comprobación se hizo llamando a Railway directo. A
+    través de Vercel, quien se conecta a Railway es Vercel, así que la IP con
+    la que reescribe el encabezado puede ser la de Vercel y no la del
+    visitante. Por eso, si el
+    middleware de frenos ya resolvió la IP firmada por el frontend
+    (core/limites.py), se usa esa y esto de abajo queda de respaldo.
     """
+    resuelta = ((getattr(peticion, "scope", None) or {}).get("state") or {}).get("ip")
+    if resuelta:
+        return resuelta
     reenviada = (peticion.headers.get("x-forwarded-for") or "").split(",")[0].strip()
     if reenviada:
         return reenviada[:64]

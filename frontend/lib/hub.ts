@@ -1,5 +1,6 @@
 import type { CardData } from "@/components/sections/hub/HubCard";
 import type { CardType } from "@/components/sections/hub/icons";
+import { firma } from "@/lib/firma";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    EL CONTENIDO DEL HUB — de la consola a la página.
@@ -96,7 +97,7 @@ export function aTarjeta(c: ContenidoHub): CardData {
 
 export async function contenidoHub(): Promise<ContenidoHub[]> {
   try {
-    const r = await fetch(`${BACKEND}/api/hub`, { next: { revalidate: REVALIDAR } });
+    const r = await fetch(`${BACKEND}/api/hub`, { headers: firma(), next: { revalidate: REVALIDAR } });
     if (!r.ok) return [];
     const d = (await r.json()) as { contenido: ContenidoHub[] };
     return d.contenido ?? [];
