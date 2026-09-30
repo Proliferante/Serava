@@ -14,7 +14,9 @@ export const FILTERS = [
   { label: "Zona", value: "Todas", x: 800, w: 157 },
   { label: "Capital requerido", value: "Cualquiera", x: 984, w: 170 },
   { label: "Tipo de transformación", value: "Todas", x: 1181, w: 264 },
-  { label: "Ordenar por", value: "Mayor Score Zequara", x: 1472, w: 198 },
+  /* 214 y no 198: «Mayor Score Zequara» llenaba el hueco y el chevrón quedaba
+     pegado a la «a». Quedan 18 px hasta «Limpiar filtros» (1704). */
+  { label: "Ordenar por", value: "Mayor Score Zequara", x: 1472, w: 214 },
 ];
 
 export const PREDIOS: Predio[] = [

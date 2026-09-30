@@ -108,12 +108,12 @@ export default function ConfirmacionContenido() {
           Light: llevaba los valores del párrafo de abajo (311:5007), que sí
           es 17,6 Light. Por eso se veía más pequeño que en el diseño. */}
       <T x={0} cy={284.42} w={CONF_W} d={0.9} className="whitespace-nowrap text-center font-medium" style={{ fontSize: 20, lineHeight: "28px", color: "rgba(247,241,229,0.82)" }}>
+        {/* «sesión virtual» baja a la tercera línea: con ella, la segunda medía
+            ~545 dentro de 498 y, al no poder partir, se salía por la derecha y
+            quedaba descentrada respecto de las otras dos. */}
         <p>El equipo Zequara revisará tu información y se</p>
-        <p>
-          <span>comunicará contigo para coordinar una </span>
-          <span className="font-medium" style={{ color: LINEN }}>sesión virtual</span>
-        </p>
-        <p className="font-medium" style={{ color: LINEN }}>de conocimiento mutuo.</p>
+        <p>comunicará contigo para coordinar una</p>
+        <p className="font-medium" style={{ color: LINEN }}>sesión virtual de conocimiento mutuo.</p>
       </T>
       <T x={0} cy={367.42} w={CONF_W} d={1.02} className="whitespace-nowrap text-center font-light" style={{ fontSize: 17.6, lineHeight: "27.28px", color: "rgba(247,241,229,0.82)" }}>
         <p>Después de esa conversación confirmaremos si</p>

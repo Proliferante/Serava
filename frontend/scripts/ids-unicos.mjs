@@ -41,7 +41,7 @@ const CARPETAS = ["app", "components"];
 
 /** Las rutas públicas, que son las que montan los dos árboles. */
 const RUTAS = [
-  "/", "/modelo", "/oportunidades", "/solicitud-acceso", "/login",
+  "/", "/como-operamos", "/proyectos", "/solicitud-acceso", "/login",
   "/predios", "/predios/ficha", "/predios/mis-propiedades", "/hub",
 ];
 

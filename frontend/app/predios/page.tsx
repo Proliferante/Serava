@@ -77,7 +77,7 @@ function Select({ label, value, x, w }: (typeof FILTERS)[number]) {
       </span>
       <button
         type="button"
-        className="ix-press mt-[6px] flex h-[38px] w-full items-center justify-between rounded-[11px] border border-solid px-[15px]"
+        className="ix-press mt-[6px] flex h-[38px] w-full items-center justify-between gap-[8px] rounded-[11px] border border-solid px-[15px]"
         style={{ borderColor: LINE, background: "#efe6d5" }}
       >
         <span className="truncate" style={{ fontSize: 14, color: "#2a1e14" }}>{value}</span>

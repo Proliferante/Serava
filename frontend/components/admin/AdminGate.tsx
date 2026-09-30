@@ -3,6 +3,7 @@
 import AdminConsole from "@/components/admin/AdminConsole";
 import AdminLogin from "@/components/admin/AdminLogin";
 import CambiarClave from "@/components/admin/CambiarClave";
+import Instalable from "@/components/admin/Instalable";
 import { SesionProvider, useSesion } from "@/components/admin/sesion";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -29,7 +30,14 @@ function Puerta() {
   if (!listo) return <div style={{ minHeight: "100vh", background: "#2a1e14" }} />;
   if (!usuario) return <AdminLogin />;
   if (usuario.debe_cambiar_clave) return <CambiarClave />;
-  return <AdminConsole />;
+  /* `Instalable` va sólo aquí, con la sesión dentro: en el login no se
+     ofrece instalar nada. */
+  return (
+    <>
+      <Instalable />
+      <AdminConsole />
+    </>
+  );
 }
 
 export default function AdminGate() {
