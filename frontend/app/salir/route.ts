@@ -18,6 +18,16 @@ const BACKEND = process.env.BACKEND_URL || "http://127.0.0.1:8000";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  /* Sólo se sale desde la propia web. Un enlace a /salir puesto en otra
+     página no traería la cookie (SameSite=Strict), así que no cerraría la
+     sesión en el backend, pero sí borraba la del navegador: sacaba al
+     inversionista sin cerrar nada de verdad. Si la petición no nace aquí,
+     se vuelve al portafolio sin tocar nada. */
+  const sitio = request.headers.get("sec-fetch-site");
+  if (sitio && sitio !== "same-origin" && sitio !== "none") {
+    return NextResponse.redirect(new URL("/predios", request.url));
+  }
+
   const galleta = cookieInversor();
   if (galleta.cookie) {
     try {
