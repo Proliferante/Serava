@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useConsola } from "@/components/admin/ctx";
 import { useSesion } from "@/components/admin/sesion";
 import { BloqueCaja, cifraEnMillones } from "@/components/admin/ficha/Campos";
+import { revisarFicha } from "@/lib/revisar-ficha";
 import {
   avance, faltantes, FICHA, type Valores,
 } from "@/components/admin/ficha/esquema";
@@ -232,9 +233,16 @@ export default function NuevoPredio() {
 
   const falta = useMemo(() => faltantes(valores, fotos), [valores, fotos]);
   const total = avance(valores, fotos);
+  /* Lo que no cuadra: sale bajo cada campo y se repite antes de publicar. */
+  const avisos = useMemo(() => revisarFicha(valores), [valores]);
 
   const publicar = async () => {
     if (ocupado || falta.length || !link) return;
+    const n = Object.keys(avisos).length;
+    if (n && !window.confirm(
+      `Hay ${n} ${n === 1 ? "cifra que no cuadra" : "cifras que no cuadran"} (están marcadas en el formulario). ` +
+      "El inversionista las verá así. ¿Publicar de todos modos?",
+    )) return;
     setOcupado(true);
     try {
       const r = await pedir<{ slug: string }>("/api/admin/flujo/completar", {
@@ -425,6 +433,7 @@ export default function NuevoPredio() {
             <BloqueCaja
               key={b.k} b={b} valores={valores} fotos={fotos} sugeridos={sugeridos}
               aMano subiendo={subiendo} almacenListo={almacenListo}
+              avisos={avisos}
               onCampo={set} onSubir={subirFoto} onQuitar={quitarFoto}
             />
           ))}

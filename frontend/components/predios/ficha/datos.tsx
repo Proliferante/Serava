@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
+import { formatearFicha } from "@/lib/cifras";
+
 /* ═══════════════════════════════════════════════════════════════════════════
    LOS DATOS DE LA FICHA — de la base a las tres pestañas.
 
@@ -51,7 +53,11 @@ const VACIO: FichaDatos = { valores: {}, fotos: {} };
 const C = createContext<FichaDatos>(VACIO);
 
 export function FichaProvider({ datos, children }: { datos: FichaDatos; children: ReactNode }) {
-  return <C.Provider value={datos}>{children}</C.Provider>;
+  /* Las cifras escritas sin formato («2775500000», «15») se pintan con el de
+     su campo («$2.776M», «15%»). Sólo al pintar: lo guardado no cambia. Ver
+     lib/cifras.ts. */
+  const valor = useMemo(() => ({ ...datos, valores: formatearFicha(datos.valores) }), [datos]);
+  return <C.Provider value={valor}>{children}</C.Provider>;
 }
 
 function limpio(v: unknown): string | null {
