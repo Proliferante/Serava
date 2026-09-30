@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Cargando from "@/components/Cargando";
 import { MCuerpo, MPie, useConsola } from "@/components/admin/ctx";
 import { useSesion, type Rol, type Usuario } from "@/components/admin/sesion";
 import { AREA_DESC } from "@/components/admin/data";
@@ -173,7 +174,7 @@ export default function Usuarios() {
       <Card style={{ padding: "6px 6px 2px" }}>
         <div style={{ padding: "14px 12px 0" }}><SecTitle>Usuarios</SecTitle></div>
 
-        {cargando ? <div className="empty">Cargando…</div>
+        {cargando ? <Cargando texto="Cargando el equipo…" />
           : error ? (
             <div className="empty">
               <b style={{ color: "var(--terra)" }}>No se pudo leer la lista.</b><br />{error}

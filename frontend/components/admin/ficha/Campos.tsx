@@ -160,16 +160,19 @@ function Control({ c, v, area, onChange }: {
     ? () => {
       if (!texto.trim()) return;
       const f = formatear(c.k, texto, area);
-      if (f === texto) return;
-      /* El termómetro es un <input type="number">: necesita el número con
-         punto decimal, no «6,5». */
-      onChange(c.tipo === "numero" ? String(Number(f.replace(/\./g, "").replace(",", "."))) : f);
+      if (f !== texto) onChange(f);
     }
     : undefined;
 
+  /* El termómetro va en millones por m² con decimal («6,5»), y un
+     <input type="number"> obliga al punto —«6.5», que aquí se lee como
+     sesenta y cinco—: va como texto, con teclado decimal en el celular. */
+  const decimal = UNIDAD[c.k] === "millones_m2";
+
   return (
     <input
-      className="t" id={id} type={c.tipo === "numero" ? "number" : "text"}
+      className="t" id={id} type={c.tipo === "numero" && !decimal ? "number" : "text"}
+      inputMode={decimal ? "decimal" : undefined}
       value={texto} placeholder={c.ej}
       onChange={(e) => onChange(e.target.value)}
       onBlur={alSalir}

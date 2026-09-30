@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Cargando from "@/components/Cargando";
 import { MCuerpo, MPie, useConsola } from "@/components/admin/ctx";
 import { useSesion } from "@/components/admin/sesion";
 import {
@@ -340,7 +341,7 @@ export default function Hub() {
 
       <Card>
         {cargando ? (
-          <p style={{ color: "var(--mocha)" }}>Cargando…</p>
+          <Cargando texto="Cargando el contenido del HUB…" />
         ) : items.length === 0 ? (
           <div style={{ textAlign: "center", padding: "28px 0" }}>
             <p style={{ fontWeight: 600 }}>Todavía no hay contenido.</p>

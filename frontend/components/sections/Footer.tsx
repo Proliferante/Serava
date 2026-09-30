@@ -33,9 +33,18 @@ export default function Footer() {
 
       {/* Legal, bajo CUENTA: es la única columna con hueco debajo (NAVEGA
           llega hasta abajo con sus cuatro enlaces). Cuando esté la Política de
-          Privacidad, va en la línea de abajo. */}
-      <p className="absolute font-light leading-[1.5] left-[1460px] top-[262px] text-[15px] text-[rgba(226,205,174,0.6)] whitespace-nowrap">
-        <a href="/terminos" className="hover:text-cream hover:underline">Términos y condiciones</a>
+          Privacidad, va en la línea de abajo. Un filete corto en el cobre de
+          los antetítulos lo separa de los dos enlaces de cuenta, y el icono
+          de documento dice qué es sin tener que subirle el tamaño. */}
+      <span aria-hidden className="absolute h-px left-[1460px] top-[256px] w-[36px] bg-[#cd9a64] opacity-60" />
+      <p className="absolute leading-[1.5] left-[1460px] top-[272px] whitespace-nowrap">
+        <a href="/terminos" className="group inline-flex items-center gap-[10px] font-light text-[16px] text-[rgba(226,205,174,0.82)] transition-colors hover:text-cream">
+          <svg width={17} height={17} viewBox="0 0 24 24" fill="none" stroke="#cd9a64" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z" />
+            <path d="M14 3v5h5M9 13h6M9 17h4" />
+          </svg>
+          <span className="underline decoration-[rgba(205,154,100,0.45)] decoration-1 underline-offset-[5px] group-hover:decoration-cream">Términos y condiciones</span>
+        </a>
       </p>
 
       {/* Cuenta column */}

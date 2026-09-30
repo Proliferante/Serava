@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Cargando from "@/components/Cargando";
 import { useConsola } from "@/components/admin/ctx";
 import FormClave from "@/components/admin/FormClave";
 import { useSesion, type Rol } from "@/components/admin/sesion";
@@ -292,7 +293,7 @@ export default function MiCuenta() {
           </SecTitle>
 
           {sesiones === null ? (
-            <Hint style={{ margin: 0 }}>Cargando…</Hint>
+            <Cargando texto="Cargando tus sesiones…" />
           ) : sesiones.length === 0 ? (
             <Hint style={{ margin: 0 }}>No se pudieron leer tus sesiones.</Hint>
           ) : (

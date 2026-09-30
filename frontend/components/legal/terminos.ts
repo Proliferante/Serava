@@ -11,6 +11,7 @@ import type { DocumentoLegal } from "@/components/legal/LegalPage";
 
 export const TERMINOS: DocumentoLegal = {
   titulo: "Términos y Condiciones de Uso",
+  destacado: "Condiciones",
   bajada: "Documento público para el sitio web y la plataforma privada de gestión de inversión en finca raíz.",
   empresa: "SAVVY BRIDGE S.A.S. · NIT 901786091-1",
   actualizado: "Septiembre de 2026",
