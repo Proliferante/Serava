@@ -197,7 +197,7 @@ def _huella(sid: str) -> str:
 def topes_de(metodo: str, ruta: str, ip: str | None, sid: str | None) -> list[tuple[str, Tope]]:
     """Las cubetas por las que pasa una petición."""
     quien_ip = f"ip:{ip or '?'}"
-    if metodo == "POST" and ruta == "/api/auth/login":
+    if metodo == "POST" and ruta in ("/api/auth/login", "/api/inversor/login"):
         return [(quien_ip, LOGIN)]
 
     escribe = metodo in ("POST", "PUT", "PATCH", "DELETE")
@@ -261,7 +261,8 @@ class Frenos:
         if del_proxy(scope) and not _cabecera(scope, b"x-zq-cliente"):
             cubetas = [("srv", SERVIDOR)]
         else:
-            cubetas = topes_de(metodo, ruta, ip, _cookie(scope, "zq_sesion"))
+            sid = _cookie(scope, "zq_sesion") or _cookie(scope, "zq_inversor")
+            cubetas = topes_de(metodo, ruta, ip, sid)
         for clave, tope in cubetas:
             espera = contador.pasar(f"{tope.nombre}|{clave}", tope, ahora)
             if espera:

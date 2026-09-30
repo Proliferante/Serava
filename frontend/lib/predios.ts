@@ -1,6 +1,7 @@
 import type { Predio } from "@/components/predios/PredioCard";
 import { formatear } from "@/lib/cifras";
 import { firma } from "@/lib/firma";
+import { cookieInversor } from "@/lib/inversor";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LOS PREDIOS PUBLICADOS — del backend a las páginas del inversionista.
@@ -27,9 +28,6 @@ import { firma } from "@/lib/firma";
 
 const BACKEND = process.env.BACKEND_URL || "http://127.0.0.1:8000";
 
-/** Se revalida solo cada minuto: publicar un predio no es algo de cada hora. */
-const REVALIDAR = 60;
-
 export type PredioPublicado = Predio & { slug: string; foto?: string | null };
 
 export type Listado = {
@@ -52,7 +50,13 @@ export function conMuestra() {
 
 async function pedir<T>(ruta: string): Promise<T | null> {
   try {
-    const r = await fetch(`${BACKEND}${ruta}`, { headers: firma(), next: { revalidate: REVALIDAR } });
+    /* Con la cookie del visitante y sin caché: `/api/predios` exige sesión
+       de inversionista, y una respuesta guardada por Next se le serviría al
+       siguiente que llegara, tuviera sesión o no. */
+    const r = await fetch(`${BACKEND}${ruta}`, {
+      headers: { ...firma(), ...cookieInversor() },
+      cache: "no-store",
+    });
     if (!r.ok) return null;
     return (await r.json()) as T;
   } catch (e) {

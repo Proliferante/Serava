@@ -95,7 +95,7 @@ export default function ConfiguracionCompact() {
 
           {/* ══════════ SESIÓN ══════════ */}
           <AcctCard titulo="Sesión" sub="Cierra tu sesión en este dispositivo." delay={0.16}>
-            <ABtn tono="danger" href="/login" icon={<IcoSalir />}>Cerrar sesión</ABtn>
+            <ABtn tono="danger" href="/salir" icon={<IcoSalir />}>Cerrar sesión</ABtn>
           </AcctCard>
         </section>
 

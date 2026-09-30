@@ -1,11 +1,11 @@
 "use client";
 
 import { MotionConfig, motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { WORDMARK, wordmarkH } from "@/components/brand";
 import { EASE, LASER, Volver, WRAP } from "@/components/responsive/kit";
 import { CTA_PORTAFOLIO, CTA_PORTAFOLIO_HREF } from "@/components/copy";
+import { useEntrarInversor } from "@/lib/useEntrarInversor";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LOGIN — vista fluida para móvil y tablet (por debajo de 1280).
@@ -34,15 +34,13 @@ function LockIcon() {
 }
 
 export default function LoginCompact() {
-  const router = useRouter();
   const [usuario, setUsuario] = useState("");
   const [clave, setClave] = useState("");
+  const { entrar, error, enviando } = useEntrarInversor();
 
-  /** Todavía no hay backend: el prototipo entra directo al área privada. */
   const submit = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!usuario.trim() || !clave) return;
-    router.push("/predios");
+    entrar(usuario, clave);
   };
 
   const wm = 170;
@@ -100,15 +98,15 @@ export default function LoginCompact() {
               Bienvenido de vuelta.
             </h1>
             <p className="mt-[12px] text-[15.5px] font-light leading-[1.55]" style={{ color: "rgba(247,241,229,0.72)" }}>
-              Ingresa el usuario y contraseña que fueron enviados a tu correo electrónico.
+              Ingresa tu correo electrónico y la contraseña que te enviamos.
             </p>
 
             <form className="mt-[28px]" onSubmit={submit}>
-              <label className={LABEL} style={LABEL_ST} htmlFor="lc-user">Nombre de usuario</label>
+              <label className={LABEL} style={LABEL_ST} htmlFor="lc-user">Correo electrónico</label>
               <div className="relative">
                 <span className="absolute left-[16px] top-1/2 -translate-y-1/2" style={{ color: "rgba(247,241,229,0.45)" }}><UserIcon /></span>
                 <input
-                  id="lc-user" type="text" autoComplete="username" placeholder="@usuario"
+                  id="lc-user" type="email" autoComplete="username" placeholder="tu@correo.com"
                   value={usuario} onChange={(e) => setUsuario(e.target.value)}
                   className={`ix-field ${INPUT} placeholder:text-[rgba(247,241,229,0.45)]`} style={INPUT_ST}
                 />
@@ -124,8 +122,12 @@ export default function LoginCompact() {
                 />
               </div>
 
-              <button type="submit" className="ix-press mt-[24px] flex h-[58px] w-full items-center justify-center gap-[10px] rounded-full text-[16px] font-semibold" style={{ background: "#687540", color: "#f7f1e5" }}>
-                Ingresar
+              {error && (
+                <p role="alert" className="mt-[16px] text-[14px] leading-[1.5]" style={{ color: "#f2b8a2" }}>{error}</p>
+              )}
+
+              <button type="submit" disabled={enviando} aria-busy={enviando} className="ix-press disabled:opacity-70 mt-[24px] flex h-[58px] w-full items-center justify-center gap-[10px] rounded-full text-[16px] font-semibold" style={{ background: "#687540", color: "#f7f1e5" }}>
+                {enviando ? "Ingresando…" : "Ingresar"}
                 <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </button>
             </form>

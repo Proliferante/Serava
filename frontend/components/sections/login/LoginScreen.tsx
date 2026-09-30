@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import VolverAlInicio from "@/components/VolverAlInicio";
 import { WORDMARK, wordmarkH } from "@/components/brand";
 import CanvasImage from "@/components/CanvasImage";
+import { useEntrarInversor } from "@/lib/useEntrarInversor";
 
 const A = "/figma";
 
@@ -66,15 +66,10 @@ const LABEL_ST = { color: "rgba(247,241,229,0.85)" } as const;
  * suyos con posición propia: por eso salía 86 px más abajo de lo que toca.
  */
 export default function LoginScreen() {
-  const router = useRouter();
   const [usuario, setUsuario] = useState("");
   const [clave, setClave] = useState("");
-
-  /** Todavía no hay backend: el prototipo entra directo al área privada. */
-  const submit = () => {
-    if (!usuario.trim() || !clave) return;
-    router.push("/predios");
-  };
+  const { entrar, error, enviando } = useEntrarInversor();
+  const submit = () => entrar(usuario, clave);
 
   return (
     <div className="relative size-full" style={{ background: "#2a1e14" }} data-name="LOGIN">
@@ -133,19 +128,24 @@ export default function LoginScreen() {
 
         {/* Subtítulo (99:406). Parte solo en los 430 de la caja, como el frame. */}
         <p className="[word-break:break-word] absolute left-[241px] top-[287.94px] w-[430px] font-light leading-[24.8px] not-italic text-[16px]" style={{ color: "rgba(247,241,229,0.72)" }}>
-          Ingresa el usuario y contraseña que fueron enviados a tu correo electrónico
+          {/* El error va en el sitio del subtítulo: el lienzo es de medidas
+              fijas y no hay hueco libre entre los campos y el botón. */}
+          {error
+            ? <span role="alert" style={{ color: "#f2b8a2" }}>{error}</span>
+            : "Ingresa tu correo electrónico y la contraseña que te enviamos."}
         </p>
 
-        {/* Nombre de usuario (657:3147 + 657:3143) */}
-        <p className={`${LABEL} top-[356.33px]`} style={LABEL_ST}>Nombre de usuario</p>
+        {/* Correo (657:3147 + 657:3143). En el diseño era «Nombre de usuario»,
+            pero se entra con el correo: es el identificador de la cuenta. */}
+        <p className={`${LABEL} top-[356.33px]`} style={LABEL_ST}>Correo electrónico</p>
         <div className={`${INPUT_BOX} left-[241px] top-[384px]`} style={INPUT_ST}>
           <span className="absolute left-[18px]" style={{ color: "rgba(247,241,229,0.45)" }}><UserIcon /></span>
           <input
-            type="text" autoComplete="username" aria-label="Nombre de usuario"
+            type="email" autoComplete="username" aria-label="Correo electrónico"
             value={usuario}
             onChange={(e) => setUsuario(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && submit()}
-            placeholder="@usuario"
+            placeholder="tu@correo.com"
             className={INPUT_TXT}
           />
         </div>
@@ -165,8 +165,8 @@ export default function LoginScreen() {
         </div>
 
         {/* Ingresar (100:516) */}
-        <button type="button" onClick={submit} className="ix-press ix-pulse-green absolute left-[241px] top-[572px] w-[430px] bg-[#687540] flex gap-[11px] items-center justify-center px-[28px] py-[18px] rounded-[999px]">
-          <span className="font-semibold leading-[normal] not-italic text-cream-93 text-[16px] text-center whitespace-nowrap">Ingresar</span>
+        <button type="button" onClick={submit} disabled={enviando} aria-busy={enviando} className="ix-press disabled:opacity-70 ix-pulse-green absolute left-[241px] top-[572px] w-[430px] bg-[#687540] flex gap-[11px] items-center justify-center px-[28px] py-[18px] rounded-[999px]">
+          <span className="font-semibold leading-[normal] not-italic text-cream-93 text-[16px] text-center whitespace-nowrap">{enviando ? "Ingresando…" : "Ingresar"}</span>
           <span className="text-cream-93"><ArrowIcon /></span>
         </button>
 
