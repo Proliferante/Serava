@@ -69,8 +69,22 @@ function aLaApi(request: NextRequest) {
   return NextResponse.next({ request: { headers: cabeceras } });
 }
 
+/** La ruta como la va a leer el backend. uvicorn decodifica `%xx` antes de
+ *  buscar el endpoint, así que `/api/%61uth/login` ES `/api/auth/login` al
+ *  llegar; comparar la ruta sin decodificar dejaba entrar al login de la
+ *  consola desde www escribiendo una letra en código. Se decodifica y se pasa
+ *  a minúsculas, y una ruta que no se puede decodificar no se toma por buena. */
+function rutaReal(ruta: string): string | null {
+  try {
+    return decodeURIComponent(ruta).toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
 export function middleware(request: NextRequest) {
-  const ruta = request.nextUrl.pathname;
+  const ruta = rutaReal(request.nextUrl.pathname);
+  if (ruta === null) return NextResponse.json({ detail: "Not Found" }, { status: 404 });
   const esApi = empieza(ruta, "/api");
 
   if (!ADMIN_HOST) return esApi ? aLaApi(request) : NextResponse.next();
