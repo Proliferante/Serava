@@ -217,7 +217,7 @@ export default function FinanzasCompact() {
                 <div className={`${WRAP} mt-[14px]`}>
                   <div className="grid grid-cols-1 gap-[10px] sm:grid-cols-2">
                     <MiniClara t="Costo total (All-in)" v={d.t("puente_allin", "$3.450M")} badge={d.t("puente_allin_m2", "$10,8M / m²")} />
-                    <MiniClara t="Media mercado remodelado" v={d.t("ft_mercado_total", "$3.776M")} badge={d.t("puente_mercado_m2", "$11,8M / m²")} delay={0.06} />
+                    <MiniClara t="Mercado remodelado" v={d.t("ft_mercado_total", "$3.776M")} badge={d.t("puente_mercado_m2", "$11,8M / m²")} delay={0.06} />
                     <MiniClara t="Spread de valor" v={d.t("ft_spread", "+9%")} vc={VERD} delay={0.1} />
                     <MiniClara t="Valor creado hoy" v={d.t("valor_creado", "+$326M")} vc={VERD} delay={0.14} bg="linear-gradient(154.622deg, rgb(226,231,209) 0%, rgb(215,221,196) 100%)" />
                   </div>

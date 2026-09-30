@@ -634,7 +634,7 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
             <div className="absolute" style={{ left: COL + 638, top: 347, width: 469.57, height: 288.69 }}>
               {[
                 { t: "Costo total (All-in)", v: d.t("puente_allin", "$3.450M"), badge: d.t("puente_allin_m2", "$10,8M / m²"), vc: "#3d2c1e" },
-                { t: "Media mercado remodelado", v: d.t("ft_mercado_total", "$3.776M"), badge: d.t("puente_mercado_m2", "$11,8M / m²"), vc: "#3d2c1e" },
+                { t: "Mercado remodelado", v: d.t("ft_mercado_total", "$3.776M"), badge: d.t("puente_mercado_m2", "$11,8M / m²"), vc: "#3d2c1e" },
               ].map((c, i) => (
                 <Reveal key={c.t} left={i * 242.8} top={0} width={226.8} height={124.26} delay={0.08 + i * 0.07}>
                   <div className="relative size-full" style={{ backgroundColor: HUESO, border: `1px solid ${HAIRLINE}`, borderRadius: 12 }}>
