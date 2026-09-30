@@ -189,7 +189,7 @@ export default function FinanzasCompact() {
                       />
                     </div>
                     <div className="mt-[22px]">
-                      <Mini t="Tasa de vacancia estimada" v={d.t("ft_vacancia", "~4%")} pie="de la zona" delay={0.12} />
+                      <Mini t="Tasa de vacancia estimada" v={d.t("ft_vacancia", "~4%")} pie="supuesto de referencia" delay={0.12} />
                     </div>
                   </In>
                 </div>

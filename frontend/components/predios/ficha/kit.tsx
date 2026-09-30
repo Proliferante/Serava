@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNod
 import { animate, motion, useInView, useReducedMotion } from "framer-motion";
 import CanvasImage from "@/components/CanvasImage";
 import { rutas, useFicha } from "./datos";
+import { useReserva, viendoAhora } from "./reserva";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA DE PREDIO — piezas que comparten las tres pestañas.
@@ -625,22 +626,11 @@ export function HeroFicha({
 /* ── Sidebar de reserva ────────────────────────────────────────────────────
    334 × 485. Va dentro del hero, pegado a la derecha, en las tres pestañas. */
 
-function useCountdown(startSeconds: number) {
-  const [s, setS] = useState(startSeconds);
-  useEffect(() => {
-    const id = window.setInterval(() => setS((v) => (v > 0 ? v - 1 : 0)), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${p(Math.floor(s / 3600))}:${p(Math.floor((s % 3600) / 60))}:${p(s % 60)}`;
-}
-
 export function SidebarReserva() {
   const d = useFicha();
-  /* Las horas salen de la ficha; los 59:38 de propina son los del diseño, y
-     dan la sensación de una cuenta ya empezada en vez de un reloj recién
-     puesto en marcha. */
-  const time = useCountdown(d.n("reserva_horas", 2) * 3600 + 59 * 60 + 38);
+  /* La cuenta atrás y quién mira: ver reserva.ts. */
+  const reserva = useReserva(d);
+  const viendo = viendoAhora(d);
   const BORDER = "rgba(90,67,50,0.16)";
 
   return (
@@ -680,13 +670,13 @@ export function SidebarReserva() {
         </div>
 
         {/* Cuenta atrás */}
-        <div className="absolute flex items-center gap-[10px]" style={{ left: 22, right: 22, top: 204.65, padding: "12px 14px", borderRadius: 12, backgroundColor: "rgba(181,84,47,0.08)", border: "1px solid rgba(181,84,47,0.25)" }}>
+        {reserva && <div className="absolute flex items-center gap-[10px]" style={{ left: 22, right: 22, top: 204.65, padding: "12px 14px", borderRadius: 12, backgroundColor: "rgba(181,84,47,0.08)", border: "1px solid rgba(181,84,47,0.25)" }}>
           <IcClock className="shrink-0" style={{ color: "#b5542f" }} />
           <div className="relative" style={{ width: 131.19, height: 45.11 }}>
-            <span className="absolute whitespace-nowrap" style={{ left: 0, top: -1, fontSize: 11.5, lineHeight: "17.86px", color: "#5b4332" }}>Reserva disponible por</span>
-            <span className="absolute whitespace-nowrap font-bold tabular-nums" style={{ left: 0, top: 16.85, fontSize: 17.6, lineHeight: "27.28px", color: "#b5542f" }}>{time}</span>
+            <span className="absolute whitespace-nowrap" style={{ left: 0, top: -1, fontSize: 11.5, lineHeight: "17.86px", color: "#5b4332" }}>{reserva.etiqueta}</span>
+            <span className="absolute whitespace-nowrap font-bold tabular-nums" style={{ left: 0, top: 16.85, fontSize: 17.6, lineHeight: "27.28px", color: "#b5542f" }}>{reserva.valor}</span>
           </div>
-        </div>
+        </div>}
 
         {/* Reservar */}
         <button
@@ -698,10 +688,12 @@ export function SidebarReserva() {
           Reservar ahora
         </button>
 
-        {/* Viendo ahora */}
-        <p className="absolute text-center font-medium" style={{ left: 22, right: 22, top: 358.65, fontSize: 12.2, lineHeight: "18.85px", color: "#b5542f" }}>
-          <span className="motion-safe:animate-pulse">●</span> {d.t("viendo_ahora", "5")} inversionistas viendo este predio
-        </p>
+        {/* Viendo ahora: sólo si el equipo lo escribió */}
+        {viendo && (
+          <p className="absolute text-center font-medium" style={{ left: 22, right: 22, top: 358.65, fontSize: 12.2, lineHeight: "18.85px", color: "#b5542f" }}>
+            <span className="motion-safe:animate-pulse">●</span> {viendo}
+          </p>
+        )}
 
         {/* Aviso de bloqueo */}
         <p className="absolute text-center font-light" style={{ left: 22, right: 22, top: 387.62, fontSize: 11.5, lineHeight: "17.28px", color: "#5b4332" }}>

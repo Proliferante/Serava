@@ -54,7 +54,7 @@ export const ESENCIAL = [
   { k: "fin_renta_mensual", kn: "fin_renta_nota", left: 405.9, top: 20, h: 112.4, t: "Renta mensual estimada", v: "$18,6M", vSize: 30.4, vLh: 31.92, vTop: 40.49, note: "arriendo remodelado de referencia", nTop: 75.41 },
   { k: "fin_rentabilidad", kn: "fin_rentabilidad_nota", left: 760.95, top: 20, h: 112.4, t: "Rentabilidad anual neta", v: "4,6%", vSize: 30.4, vLh: 31.92, vTop: 40.49, note: "yield neto sobre el All-in", nTop: 75.41 },
   { k: "fin_rango_inversion", kn: "", left: 405.9, top: 148.98, h: 113.22, t: "Rango de inversión", v: "$3.100M–$3.450M", vSize: 24, vLh: 25.2, vTop: 41.5, note: "monto de entrada", nTop: 69.5 },
-  { k: "fin_colocacion", kn: "", left: 760.95, top: 148.98, h: 112.41, t: "Colocación en arriendo", v: "~30 días", vSize: 30.4, vLh: 31.92, vTop: 40.5, note: "tiempo promedio en la zona", nTop: 75.42, reloj: true },
+  { k: "fin_colocacion", kn: "", left: 760.95, top: 148.98, h: 112.41, t: "Colocación en arriendo", v: "~30 días", vSize: 30.4, vLh: 31.92, vTop: 40.5, note: "supuesto de referencia", nTop: 75.42, reloj: true },
 ];
 
 /** Renta neta acumulada: barras verdes. `x`/`w` y alto salen del frame. */
@@ -613,7 +613,7 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
                 <div className="absolute" style={{ left: 22, top: 122, width: 496, height: 118, backgroundColor: VELO, border: VELO_BORDE, borderRadius: 12 }}>
                   <span className="absolute" style={{ left: 20, right: 20, top: 17, fontSize: 15, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>Tasa de vacancia estimada</span>
                   <Cifra v={d.t("ft_vacancia", "~4%")} dur={1} className="absolute whitespace-nowrap font-semibold" style={{ left: 20, top: 34, fontSize: 30, lineHeight: "43.2px", color: ARENA }} />
-                  <span className="absolute" style={{ left: 20, top: 80, fontSize: 11.5, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>de la zona</span>
+                  <span className="absolute" style={{ left: 20, top: 80, fontSize: 11.5, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>supuesto de referencia</span>
                 </div>
               </div>
             </Reveal>

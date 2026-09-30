@@ -76,9 +76,14 @@ def campos(r: dict, x: dict) -> dict:
 
     # ── Cabecera: termómetro y tarjeta de reserva ─────────────────────────
     v["termo_actual"] = round(co["compra_m2"] / 1e6, 1)
-    # Si la compra cae por debajo del p10 del segmento (pasa: SN001 compra 47 % bajo la
-    # mediana), el carril arranca en la compra; si no, la marca se pega al borde.
-    v["termo_min"] = round(min(venta["p10"], co["compra_m2"]) / 1e6, 1)
+    # El carril va del p10 al p90 del segmento. Si la compra cae por debajo del p10
+    # (pasa: SN001 compra 47 % bajo la mediana), arranca un poco antes de la compra:
+    # arrancar justo en ella dejaba la marca pegada al borde, con el rótulo del
+    # mínimo repitiendo el precio del activo, y la franja no enseñaba nada.
+    minimo = venta["p10"]
+    if co["compra_m2"] <= minimo:
+        minimo = co["compra_m2"] - 0.08 * (venta["p90"] - co["compra_m2"])
+    v["termo_min"] = round(max(minimo, 0) / 1e6, 1)
     v["termo_max"] = round(venta["p90"] / 1e6, 1)
     v["termo_max_rotulo"] = f"Mercado p90 {M2(venta['p90'])}"
     v["termo_nota"] = (f"Compra a {M2(co['compra_m2'])}/m², {num(abs(vs) * 100)}% "
@@ -172,8 +177,10 @@ def campos(r: dict, x: dict) -> dict:
     v["ft_payback_renta"] = (f"~{num(re_['payback'])} años" if re_["payback"] is not None
                              else "No se recupera con la renta")
     pv = base["payback_valorizacion"]
-    # «inmediato» = al entregar la obra, vender ya devuelve el All-in. Corto: la tarjeta no admite más.
-    v["ft_payback_valorizacion"] = ("inmediato" if pv == 0 else f"~{pv} año{'s' if pv != 1 else ''}"
+    # «al entregar» = al terminar la obra, vender ya devuelve el All-in. Decía «inmediato»,
+    # que a un inversionista le suena a recuperar la plata el día que la pone. Corto: la
+    # tarjeta no admite más.
+    v["ft_payback_valorizacion"] = ("al entregar" if pv == 0 else f"~{pv} año{'s' if pv != 1 else ''}"
                                     if pv is not None else "más de 5 años")
     v["ft_comision_venta"] = f"~{M(base['comision'])}"
     v["ft_impuesto_venta"] = f"~{M(r['salida']['impuesto_ref'])}"

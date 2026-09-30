@@ -143,6 +143,9 @@ function Control({ c, v, onChange }: { c: Campo; v: unknown; onChange: (x: unkno
       </select>
     );
   }
+  if (c.tipo === "fechahora") {
+    return <input className="t" id={id} type="datetime-local" value={texto} onChange={(e) => onChange(e.target.value)} />;
+  }
   return (
     <input
       className="t" id={id} type={c.tipo === "numero" ? "number" : "text"}

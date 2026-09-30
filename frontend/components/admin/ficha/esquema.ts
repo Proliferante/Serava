@@ -44,7 +44,9 @@ export type TipoCampo =
   /** Lista de líneas: las viñetas de la ficha. */
   | "lista"
   /** Rejilla de filas y columnas: la proyección año a año, el cronograma. */
-  | "tabla";
+  | "tabla"
+  /** Fecha y hora de Colombia («2026-10-05T18:00»): el cierre de la reserva. */
+  | "fechahora";
 
 export type Campo = {
   /** Clave en el JSON guardado. Ver «LAS CLAVES SON CONTRATO». */
@@ -145,8 +147,9 @@ const COMUN: Bloque[] = [
       { k: "prioridad", l: "Prioridad", tipo: "opcion", opciones: ["Prioridad alta", "Prioridad media", "Prioridad baja"], ej: "Prioridad alta" },
       { k: "inversion_total", l: "Inversión total", tipo: "cifra", req: true, ej: "$3.100M", ayuda: "Compra + remodelación. Es también el precio que sale en el listado de predios." },
       { k: "roi_estimado", l: "ROI estimado", tipo: "cifra", ej: "~22%" },
-      { k: "reserva_horas", l: "Horas de bloqueo de la reserva", tipo: "numero", ej: "3", ayuda: "De dónde sale la cuenta atrás." },
-      { k: "viendo_ahora", l: "Inversionistas viendo el predio", tipo: "numero", ej: "5" },
+      { k: "reserva_hasta", l: "La reserva cierra (hora de Colombia)", tipo: "fechahora", ayuda: "La cuenta atrás llega a cero en este momento, igual para todos. Vacío: no cuenta y dice cuánto dura la reserva." },
+      { k: "reserva_horas", l: "Horas de bloqueo de la reserva", tipo: "numero", ej: "48", ayuda: "Cuánto queda bloqueado el predio para quien reserva." },
+      { k: "viendo_ahora", l: "Inversionistas viendo el predio", tipo: "numero", ej: "2", ayuda: "Sólo si es real. Vacío: la frase no sale." },
     ],
   },
 ];
