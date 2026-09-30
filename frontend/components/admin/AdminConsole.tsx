@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { MARK } from "@/components/brand";
 import AvisoPantalla from "@/components/responsive/AvisoPantalla";
 import { ConsolaProvider } from "@/components/admin/ctx";
+import { useInstalar } from "@/components/admin/useInstalar";
 import { puedeVer, useSesion } from "@/components/admin/sesion";
 import { PREDIOS_SEED, type Predio, type VistaKey } from "@/components/admin/data";
 import ArmarFicha from "@/components/admin/views/ArmarFicha";
@@ -122,6 +123,63 @@ const GRUPOS: { g: string; items: Item[] }[] = [
 ];
 
 /** Iniciales para el avatar de la barra: "Nati C." → "NC". */
+/* ── La vista en la dirección ─────────────────────────────────────────────
+   Cada módulo tiene su ruta: `admin.zequara.com/predios`, `/data`, `/flujo`.
+   Antes la vista vivía sólo en el estado de React, así que la barra de
+   direcciones no cambiaba nunca, recargar devolvía siempre al flujo y el
+   botón «atrás» del navegador sacaba de la consola.
+
+   En el subdominio la ruta es la vista, porque el middleware sirve la
+   consola en cualquier ruta de ahí. Fuera de él (en local y en las vistas
+   previas de Vercel la consola vive en `/admin`, y `/admin/predios` no
+   existe) va en `?vista=`.
+
+   Es navegación y no permiso: una ruta de un módulo que tu rol no ve lleva
+   al aviso de acceso, igual que antes, y quien de verdad corta es el
+   backend. */
+const RUTA: Record<VistaKey, string> = {
+  panel: "panel", predios: "predios", extraccion: "extraccion", flujo: "flujo",
+  nuevo: "nuevo-predio", comite: "comite", arq: "arquitectura", data: "data",
+  comercial: "comercial", equipo: "equipo", gestion: "gestion", cuenta: "mi-cuenta",
+  hub: "hub", ficha: "ficha",
+};
+const DE_RUTA = Object.fromEntries(
+  Object.entries(RUTA).map(([v, r]) => [r, v]),
+) as Record<string, VistaKey>;
+
+/* Vistas que dependen de algo elegido antes —la ficha que se está armando,
+   el predio que se gestiona— y que no está en la dirección. Tienen su ruta
+   mientras se usan, pero al entrar a ellas de cero se cae al flujo, que es
+   desde donde se abren. */
+const CON_CONTEXTO: VistaKey[] = ["ficha", "gestion"];
+
+const INICIAL: VistaKey = "flujo";
+
+/* La dirección se cambia con el `pushState` original del navegador, no con
+   el que Next le pone encima a `window.history`. El de Next trata el cambio
+   como una navegación entre páginas: `usePathname` cambia, la transición de
+   `PageTransition` (que va con la ruta como clave) desmonta la consola entera
+   y se pierde todo lo que había en pantalla. Con el original Next no se
+   entera, y en el «atrás» ignora las entradas que no son suyas —su
+   `onPopState` sale si el estado viene vacío—, así que el `popstate` de aquí
+   abajo es el único que responde. */
+const escribir = (modo: "pushState" | "replaceState", url: string) =>
+  History.prototype[modo].call(window.history, null, "", url);
+
+const enSubdominio = () => window.location.hostname.startsWith("admin.");
+
+function direccionDe(v: VistaKey) {
+  return enSubdominio() ? `/${RUTA[v]}` : `/admin?vista=${RUTA[v]}`;
+}
+
+function vistaDeLaDireccion(): VistaKey {
+  const ruta = enSubdominio()
+    ? window.location.pathname.split("/")[1] ?? ""
+    : new URLSearchParams(window.location.search).get("vista") ?? "";
+  const v = DE_RUTA[ruta];
+  return v && !CON_CONTEXTO.includes(v) ? v : INICIAL;
+}
+
 function iniciales(nombre: string) {
   return nombre.trim().split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase();
 }
@@ -135,12 +193,35 @@ const ROL_ETIQUETA: Record<string, string> = {
 
 export default function AdminConsole() {
   const { usuario, salir } = useSesion();
-  const [vista, setVista] = useState<VistaKey>("flujo");
+  const app = useInstalar();
+  const [ayudaIos, setAyudaIos] = useState(false);
+  const [vista, setVista] = useState<VistaKey>(INICIAL);
   const [cajon, setCajon] = useState(false);
   const [predios, setPredios] = useState<Predio[]>(PREDIOS_SEED);
 
   const rol = usuario?.rol;
-  const ir = (v: VistaKey) => { setVista(v); setCajon(false); };
+  const ir = useCallback((v: VistaKey) => {
+    setVista(v);
+    setCajon(false);
+    const destino = direccionDe(v);
+    if (destino !== window.location.pathname + window.location.search) {
+      escribir("pushState", destino);
+    }
+  }, []);
+
+  /* Al entrar se lee la vista de la dirección, y se deja la dirección
+     escrita como debe (entrar por `/` la deja en `/flujo`). Va en un efecto
+     y no en el valor inicial del estado: en el servidor no hay dirección, y
+     leerla ahí haría que el HTML no coincidiera con el del navegador. Los
+     botones atrás/adelante vuelven a leerla. */
+  useEffect(() => {
+    const leer = () => setVista(vistaDeLaDireccion());
+    const v = vistaDeLaDireccion();
+    setVista(v);
+    escribir("replaceState", direccionDe(v));
+    window.addEventListener("popstate", leer);
+    return () => window.removeEventListener("popstate", leer);
+  }, []);
   const abrirGestion = () => ir("gestion");
 
   /* Los grupos ya filtrados por rol. Un grupo cuyos módulos no puede ver
@@ -204,12 +285,41 @@ export default function AdminConsole() {
               </div>
             ))}
 
+            {/* Pie del menú. «Cerrar sesión» era un enlacito gris del mismo
+                tamaño que la nota de versión y nadie lo encontraba: ahora es
+                un botón de verdad, con icono y el color de lo que termina
+                algo, y arriba de él «Instalar app» cuando se puede. */}
             <div className="foot">
-              ZEQUARA · v0.1 interna<br />Acceso restringido al equipo.
-              <br />
-              <button type="button" className="pnl-link" style={{ marginTop: 6, color: "var(--sand)" }} onClick={() => void salir()}>
+              {app.modo === "navegador" && (
+                <button type="button" className="foot-btn instalar" onClick={() => void app.instalar()}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M12 3v12M7 10l5 5 5-5M4 19h16" />
+                  </svg>
+                  Instalar app
+                </button>
+              )}
+              {app.modo === "ios" && (
+                <>
+                  <button type="button" className="foot-btn instalar" aria-expanded={ayudaIos} onClick={() => setAyudaIos((v) => !v)}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M12 3v12M7 10l5 5 5-5M4 19h16" />
+                  </svg>
+                    Instalar app
+                  </button>
+                  {ayudaIos && (
+                    <p className="foot-ayuda">
+                      En Safari, toca <b>Compartir</b> (el cuadro con la flecha hacia arriba) y luego <b>Agregar a inicio</b>.
+                    </p>
+                  )}
+                </>
+              )}
+              <button type="button" className="foot-btn salir" onClick={() => void salir()}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4" />
+                </svg>
                 Cerrar sesión
               </button>
+              <p className="foot-nota">ZEQUARA · v0.1 interna<br />Acceso restringido al equipo.</p>
             </div>
           </aside>
 

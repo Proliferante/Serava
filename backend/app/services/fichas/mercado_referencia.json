@@ -1,0 +1,1620 @@
+{
+ "_nota": "Fotografía de mercado para calcular las finanzas de la ficha. Generada con tarea_8dias/fichas_evento/exportar_mercado_referencia.py (misma lógica que las fichas del evento). Precios en COP por m²; arriendo en COP por m² al mes. Se reemplaza cuando el Motor de Inteligencia produzca la fotografía semanal en la base.",
+ "bandas": {
+  "cortes_m2": [
+   60,
+   100,
+   200,
+   400
+  ],
+  "etiquetas": [
+   "60-100",
+   "100-200",
+   "200-400",
+   ">400"
+  ]
+ },
+ "min_n": 20,
+ "zonas": {
+  "La Cabrera": {
+   "ciudad": "Bogotá",
+   "moneda": "COP",
+   "fecha": "2026-09-27",
+   "texto_fecha": "27 de septiembre de 2026",
+   "con_antiguedad": true,
+   "fuente": "Metrocuadrado, corrida del 27 de septiembre de 2026 (venta y arriendo), dentro del polígono de la zona",
+   "tipos": {
+    "Apartamento": {
+     "general": {
+      "p10": 8159706.2,
+      "p25": 9544120.5,
+      "p50": 11342282.0,
+      "p65": 13613509.7,
+      "p75": 15627851.5,
+      "p90": 19575030.2,
+      "n": 267
+     },
+     "area": {
+      "p50": 232.0,
+      "p75": 311.0,
+      "p90": 380.2,
+      "n": 267
+     },
+     "bandas": {
+      "60-100": {
+       "venta": {
+        "p10": 9692308.0,
+        "p25": 15952381.0,
+        "p50": 19012642.0,
+        "p65": 19095745.0,
+        "p75": 19156328.0,
+        "p90": 21666667.0,
+        "n": 21
+       },
+       "post_remodelacion": {
+        "p25": 15952381.0,
+        "p50": 19012642.0,
+        "p75": 19156328.0,
+        "n": 21,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "nuevo_m2": 19095745.0,
+       "por_edad": {
+        "Entre 0 y 5 años": {
+         "p25": 18942094.5,
+         "p50": 19095745.0,
+         "p75": 19692319.0,
+         "n": 15
+        }
+       },
+       "arriendo": {
+        "p10": 63999.8,
+        "p25": 71825.5,
+        "p50": 89011.0,
+        "p65": 101064.0,
+        "p75": 104444.5,
+        "p90": 114801.0,
+        "n": 23,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "celda_remodelada": null
+      },
+      "100-200": {
+       "venta": {
+        "p10": 8424766.1,
+        "p25": 9954460.5,
+        "p50": 11578373.0,
+        "p65": 15869784.3,
+        "p75": 17094017.0,
+        "p90": 20769231.0,
+        "n": 84
+       },
+       "post_remodelacion": {
+        "p25": 10562500.0,
+        "p50": 15436242.0,
+        "p75": 16666667.0,
+        "n": 29,
+        "base_muestra": "Remodelados y de 5 a 20 años"
+       },
+       "nuevo_m2": 19603252.0,
+       "por_edad": {
+        "Entre 0 y 5 años": {
+         "p25": 16009167.2,
+         "p50": 19603252.0,
+         "p75": 20769231.0,
+         "n": 24
+        },
+        "Entre 10 y 20 años": {
+         "p25": 9407407.5,
+         "p50": 10661765.0,
+         "p75": 13306878.5,
+         "n": 7
+        },
+        "Entre 5 y 10 años": {
+         "p25": 15551454.5,
+         "p50": 16279070.0,
+         "p75": 17469164.0,
+         "n": 15
+        },
+        "Más de 20 años": {
+         "p25": 8531609.0,
+         "p50": 10000000.0,
+         "p75": 11040268.5,
+         "n": 31
+        },
+        "Remodelado": {
+         "p25": 9767755.0,
+         "p50": 10562500.0,
+         "p75": 12061905.0,
+         "n": 7
+        }
+       },
+       "arriendo": {
+        "p10": 51339.9,
+        "p25": 67762.8,
+        "p50": 87062.5,
+        "p65": 92318.7,
+        "p75": 98667.0,
+        "p90": 113570.8,
+        "n": 44,
+        "base_muestra": "remodelados o de 5 a 20 años"
+       },
+       "celda_remodelada": {
+        "venta_p50": 15436242.0,
+        "arriendo_p50": 87062.5
+       }
+      },
+      "200-400": {
+       "venta": {
+        "p10": 8136206.7,
+        "p25": 9292582.5,
+        "p50": 11053174.0,
+        "p65": 11938095.3,
+        "p75": 13343948.8,
+        "p90": 16046232.3,
+        "n": 140
+       },
+       "post_remodelacion": {
+        "p25": 9691780.8,
+        "p50": 11774982.5,
+        "p75": 13947275.2,
+        "n": 74,
+        "base_muestra": "Remodelados y de 5 a 20 años"
+       },
+       "nuevo_m2": 17714844.0,
+       "por_edad": {
+        "Entre 0 y 5 años": {
+         "p25": 14315625.0,
+         "p50": 17714844.0,
+         "p75": 20250189.5,
+         "n": 12
+        },
+        "Entre 10 y 20 años": {
+         "p25": 10493965.5,
+         "p50": 11878307.0,
+         "p75": 13825315.2,
+         "n": 38
+        },
+        "Entre 5 y 10 años": {
+         "p25": 11370656.0,
+         "p50": 13598484.5,
+         "p75": 16337599.2,
+         "n": 20
+        },
+        "Más de 20 años": {
+         "p25": 8974359.0,
+         "p50": 9615385.0,
+         "p75": 11006289.0,
+         "n": 53
+        },
+        "Remodelado": {
+         "p25": 8837784.0,
+         "p50": 9041096.0,
+         "p75": 10661703.0,
+         "n": 16
+        }
+       },
+       "arriendo": {
+        "p10": 53704.0,
+        "p25": 59259.0,
+        "p50": 68571.0,
+        "p65": 75217.0,
+        "p75": 78125.0,
+        "p90": 91743.0,
+        "n": 51,
+        "base_muestra": "remodelados o de 5 a 20 años"
+       },
+       "celda_remodelada": {
+        "venta_p50": 11774982.5,
+        "arriendo_p50": 68571.0
+       }
+      },
+      ">400": {
+       "venta": {
+        "p10": 3747761.2,
+        "p25": 8979591.5,
+        "p50": 11125000.0,
+        "p65": 11839228.3,
+        "p75": 11896103.2,
+        "p90": 14016666.7,
+        "n": 20
+       },
+       "post_remodelacion": {
+        "p25": 8979591.5,
+        "p50": 11125000.0,
+        "p75": 11896103.2,
+        "n": 20,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {
+        "Entre 10 y 20 años": {
+         "p25": 10341836.8,
+         "p50": 11571608.5,
+         "p75": 12428571.5,
+         "n": 8
+        },
+        "Más de 20 años": {
+         "p25": 5107844.5,
+         "p50": 10161905.0,
+         "p75": 11819050.5,
+         "n": 10
+        }
+       },
+       "arriendo": {
+        "p10": 44630.8,
+        "p25": 52500.0,
+        "p50": 60000.0,
+        "p65": 64000.0,
+        "p75": 70175.0,
+        "p90": 86048.4,
+        "n": 25,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "celda_remodelada": null
+      }
+     }
+    }
+   }
+  },
+  "Chicó": {
+   "ciudad": "Bogotá",
+   "moneda": "COP",
+   "fecha": "2026-09-27",
+   "texto_fecha": "27 de septiembre de 2026",
+   "con_antiguedad": true,
+   "fuente": "Metrocuadrado, corrida del 27 de septiembre de 2026 (venta y arriendo), dentro del polígono de la zona",
+   "tipos": {
+    "Apartamento": {
+     "general": {
+      "p10": 6127451.0,
+      "p25": 7412545.5,
+      "p50": 9720280.0,
+      "p65": 10992424.0,
+      "p75": 12272453.5,
+      "p90": 15157876.0,
+      "n": 1391
+     },
+     "area": {
+      "p50": 156.2,
+      "p75": 227.1,
+      "p90": 299.0,
+      "n": 1391
+     },
+     "bandas": {
+      "60-100": {
+       "venta": {
+        "p10": 7568371.2,
+        "p25": 9000000.0,
+        "p50": 10588235.0,
+        "p65": 11558294.6,
+        "p75": 12686567.0,
+        "p90": 14960658.0,
+        "n": 205
+       },
+       "post_remodelacion": {
+        "p25": 9283730.0,
+        "p50": 10563899.0,
+        "p75": 11832477.2,
+        "n": 88,
+        "base_muestra": "Remodelados y de 5 a 20 años"
+       },
+       "nuevo_m2": 13914676.0,
+       "por_edad": {
+        "Entre 0 y 5 años": {
+         "p25": 12546641.8,
+         "p50": 13914676.0,
+         "p75": 15661446.2,
+         "n": 46
+        },
+        "Entre 10 y 20 años": {
+         "p25": 9192452.0,
+         "p50": 9988070.5,
+         "p75": 11203696.0,
+         "n": 50
+        },
+        "Entre 5 y 10 años": {
+         "p25": 10492815.0,
+         "p50": 11337580.0,
+         "p75": 12875375.5,
+         "n": 31
+        },
+        "Más de 20 años": {
+         "p25": 8010416.5,
+         "p50": 9000000.0,
+         "p75": 10398551.0,
+         "n": 71
+        },
+        "Remodelado": {
+         "p25": 9891856.0,
+         "p50": 11181818.0,
+         "p75": 11486111.0,
+         "n": 7
+        }
+       },
+       "arriendo": {
+        "p10": 58333.0,
+        "p25": 65000.0,
+        "p50": 77381.0,
+        "p65": 84076.9,
+        "p75": 92445.5,
+        "p90": 100000.0,
+        "n": 215,
+        "base_muestra": "remodelados o de 5 a 20 años"
+       },
+       "celda_remodelada": {
+        "venta_p50": 10563899.0,
+        "arriendo_p50": 77381.0
+       }
+      },
+      "100-200": {
+       "venta": {
+        "p10": 5914884.0,
+        "p25": 6844376.8,
+        "p50": 8877539.5,
+        "p65": 9743055.0,
+        "p75": 10681334.0,
+        "p90": 13313175.1,
+        "n": 562
+       },
+       "post_remodelacion": {
+        "p25": 8883685.2,
+        "p50": 9870188.0,
+        "p75": 11843502.8,
+        "n": 236,
+        "base_muestra": "Remodelados y de 5 a 20 años"
+       },
+       "nuevo_m2": 14000000.0,
+       "por_edad": {
+        "Entre 0 y 5 años": {
+         "p25": 12121212.0,
+         "p50": 14000000.0,
+         "p75": 15350877.0,
+         "n": 49
+        },
+        "Entre 10 y 20 años": {
+         "p25": 8333333.0,
+         "p50": 9787140.0,
+         "p75": 11207412.5,
+         "n": 122
+        },
+        "Entre 5 y 10 años": {
+         "p25": 9720280.0,
+         "p50": 11250000.0,
+         "p75": 12761438.0,
+         "n": 83
+        },
+        "Más de 20 años": {
+         "p25": 6153846.0,
+         "p50": 7102273.0,
+         "p75": 8453552.0,
+         "n": 277
+        },
+        "Remodelado": {
+         "p25": 6565631.0,
+         "p50": 8947368.0,
+         "p75": 9727273.0,
+         "n": 31
+        }
+       },
+       "arriendo": {
+        "p10": 52000.0,
+        "p25": 60667.0,
+        "p50": 72727.0,
+        "p65": 78843.5,
+        "p75": 86595.0,
+        "p90": 104167.0,
+        "n": 311,
+        "base_muestra": "remodelados o de 5 a 20 años"
+       },
+       "celda_remodelada": {
+        "venta_p50": 9870188.0,
+        "arriendo_p50": 72727.0
+       }
+      },
+      "200-400": {
+       "venta": {
+        "p10": 5940839.1,
+        "p25": 6882130.2,
+        "p50": 9436507.5,
+        "p65": 10692320.5,
+        "p75": 11432890.8,
+        "p90": 14598576.9,
+        "n": 418
+       },
+       "post_remodelacion": {
+        "p25": 9414456.8,
+        "p50": 11115627.5,
+        "p75": 12927973.2,
+        "n": 164,
+        "base_muestra": "Remodelados y de 5 a 20 años"
+       },
+       "nuevo_m2": 15068493.0,
+       "por_edad": {
+        "Entre 0 y 5 años": {
+         "p25": 9629630.0,
+         "p50": 15068493.0,
+         "p75": 17324521.0,
+         "n": 41
+        },
+        "Entre 10 y 20 años": {
+         "p25": 9216839.0,
+         "p50": 10868797.0,
+         "p75": 12098837.2,
+         "n": 102
+        },
+        "Entre 5 y 10 años": {
+         "p25": 10122699.0,
+         "p50": 11483254.0,
+         "p75": 13524590.0,
+         "n": 49
+        },
+        "Más de 20 años": {
+         "p25": 6244898.0,
+         "p50": 7272727.0,
+         "p75": 9473684.0,
+         "n": 213
+        },
+        "Remodelado": {
+         "p25": 8260870.0,
+         "p50": 9956522.0,
+         "p75": 12500000.0,
+         "n": 13
+        }
+       },
+       "arriendo": {
+        "p10": 47743.5,
+        "p25": 55000.0,
+        "p50": 68565.0,
+        "p65": 74194.0,
+        "p75": 79332.0,
+        "p90": 99010.0,
+        "n": 172,
+        "base_muestra": "remodelados o de 5 a 20 años"
+       },
+       "celda_remodelada": {
+        "venta_p50": 11115627.5,
+        "arriendo_p50": 68565.0
+       }
+      },
+      ">400": {
+       "venta": {
+        "p10": 4710192.0,
+        "p25": 7797166.5,
+        "p50": 9090909.0,
+        "p65": 10116974.0,
+        "p75": 12264929.5,
+        "p90": 14545455.0,
+        "n": 51
+       },
+       "post_remodelacion": {
+        "p25": 9000000.0,
+        "p50": 9302512.0,
+        "p75": 12167488.0,
+        "n": 27,
+        "base_muestra": "Remodelados y de 5 a 20 años"
+       },
+       "nuevo_m2": null,
+       "por_edad": {
+        "Entre 10 y 20 años": {
+         "p25": 9000000.0,
+         "p50": 9000000.0,
+         "p75": 10233948.0,
+         "n": 21
+        },
+        "Entre 5 y 10 años": {
+         "p25": 10182012.2,
+         "p50": 13228438.5,
+         "p75": 14318182.2,
+         "n": 6
+        },
+        "Más de 20 años": {
+         "p25": 5869565.0,
+         "p50": 8495146.0,
+         "p75": 12355946.0,
+         "n": 21
+        }
+       },
+       "arriendo": {
+        "p10": 35885.0,
+        "p25": 42345.0,
+        "p50": 54118.0,
+        "p65": 60227.0,
+        "p75": 64401.0,
+        "p90": 72500.0,
+        "n": 31,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "celda_remodelada": null
+      }
+     }
+    },
+    "Casa": {
+     "general": {
+      "p10": 6035552.7,
+      "p25": 7410640.8,
+      "p50": 8701758.5,
+      "p65": 9643563.7,
+      "p75": 10040242.8,
+      "p90": 13144055.7,
+      "n": 32
+     },
+     "area": {
+      "p50": 355.0,
+      "p75": 645.2,
+      "p90": 731.2,
+      "n": 32
+     },
+     "bandas": {
+      "200-400": {
+       "venta": {
+        "p10": 5911271.6,
+        "p25": 7258256.5,
+        "p50": 8333333.0,
+        "p65": 9334460.7,
+        "p75": 9886590.5,
+        "p90": 12875257.8,
+        "n": 15
+       },
+       "post_remodelacion": {
+        "p25": 7258256.5,
+        "p50": 8333333.0,
+        "p75": 9886590.5,
+        "n": 15,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {
+        "Más de 20 años": {
+         "p25": 6953488.0,
+         "p50": 8333333.0,
+         "p75": 9773181.0,
+         "n": 13
+        }
+       },
+       "arriendo": {
+        "p10": 47743.5,
+        "p25": 55000.0,
+        "p50": 68565.0,
+        "p65": 74194.0,
+        "p75": 79332.0,
+        "p90": 99010.0,
+        "n": 172,
+        "base_muestra": "remodelados o de 5 a 20 años"
+       },
+       "celda_remodelada": {
+        "venta_p50": 11115627.5,
+        "arriendo_p50": 68565.0
+       }
+      },
+      ">400": {
+       "venta": {
+        "p10": 6061840.1,
+        "p25": 6975975.8,
+        "p50": 9155847.0,
+        "p65": 9713345.0,
+        "p75": 11153782.5,
+        "p90": 13759437.5,
+        "n": 14
+       },
+       "post_remodelacion": {
+        "p25": 6975975.8,
+        "p50": 9155847.0,
+        "p75": 11153782.5,
+        "n": 14,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {
+        "Más de 20 años": {
+         "p25": 8120814.0,
+         "p50": 9566442.5,
+         "p75": 11691321.0,
+         "n": 12
+        }
+       },
+       "arriendo": {
+        "p10": 35885.0,
+        "p25": 42345.0,
+        "p50": 54118.0,
+        "p65": 60227.0,
+        "p75": 64401.0,
+        "p90": 72500.0,
+        "n": 31,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "celda_remodelada": null
+      }
+     }
+    }
+   }
+  },
+  "El Poblado": {
+   "ciudad": "Medellín",
+   "moneda": "COP",
+   "fecha": "2026-09-27",
+   "texto_fecha": "27 de septiembre de 2026",
+   "con_antiguedad": true,
+   "fuente": "Metrocuadrado, corrida del 27 de septiembre de 2026 (venta y arriendo), dentro del polígono de la zona",
+   "tipos": {
+    "Apartamento": {
+     "general": {
+      "p10": 5384128.2,
+      "p25": 6564867.8,
+      "p50": 8186147.0,
+      "p65": 9301081.9,
+      "p75": 10110041.8,
+      "p90": 11833823.2,
+      "n": 1700
+     },
+     "area": {
+      "p50": 167.6,
+      "p75": 227.1,
+      "p90": 296.0,
+      "n": 1700
+     },
+     "bandas": {
+      "60-100": {
+       "venta": {
+        "p10": 7196605.0,
+        "p25": 8149014.2,
+        "p50": 9824393.0,
+        "p65": 10639893.5,
+        "p75": 11131584.2,
+        "p90": 12871870.5,
+        "n": 216
+       },
+       "post_remodelacion": {
+        "p25": 8834085.5,
+        "p50": 9888889.0,
+        "p75": 11364341.0,
+        "n": 115,
+        "base_muestra": "Remodelados y de 5 a 20 años"
+       },
+       "nuevo_m2": 10825397.0,
+       "por_edad": {
+        "Entre 0 y 5 años": {
+         "p25": 10082417.5,
+         "p50": 10825397.0,
+         "p75": 12140839.5,
+         "n": 44
+        },
+        "Entre 10 y 20 años": {
+         "p25": 8673469.0,
+         "p50": 9857143.0,
+         "p75": 11176471.0,
+         "n": 61
+        },
+        "Entre 5 y 10 años": {
+         "p25": 8896636.0,
+         "p50": 10094449.0,
+         "p75": 11621765.2,
+         "n": 48
+        },
+        "Más de 20 años": {
+         "p25": 7549421.2,
+         "p50": 8069767.5,
+         "p75": 9093750.0,
+         "n": 56
+        },
+        "Remodelado": {
+         "p25": 11066908.8,
+         "p50": 11268755.5,
+         "p75": 12658462.0,
+         "n": 6
+        }
+       },
+       "arriendo": {
+        "p10": 46308.2,
+        "p25": 51299.0,
+        "p50": 58442.0,
+        "p65": 63847.8,
+        "p75": 69853.0,
+        "p90": 85274.6,
+        "n": 549,
+        "base_muestra": "remodelados o de 5 a 20 años"
+       },
+       "celda_remodelada": {
+        "venta_p50": 9888889.0,
+        "arriendo_p50": 58442.0
+       }
+      },
+      "100-200": {
+       "venta": {
+        "p10": 5894999.9,
+        "p25": 7093271.5,
+        "p50": 8453540.0,
+        "p65": 9357966.9,
+        "p75": 10000000.0,
+        "p90": 11650639.5,
+        "n": 874
+       },
+       "post_remodelacion": {
+        "p25": 7594480.2,
+        "p50": 8847856.0,
+        "p75": 10247555.2,
+        "n": 466,
+        "base_muestra": "Remodelados y de 5 a 20 años"
+       },
+       "nuevo_m2": 10221648.0,
+       "por_edad": {
+        "Entre 0 y 5 años": {
+         "p25": 8502674.0,
+         "p50": 9918033.0,
+         "p75": 11969697.0,
+         "n": 133
+        },
+        "Entre 10 y 20 años": {
+         "p25": 7548387.0,
+         "p50": 8827586.0,
+         "p75": 10172414.0,
+         "n": 201
+        },
+        "Entre 5 y 10 años": {
+         "p25": 7674279.0,
+         "p50": 8911565.0,
+         "p75": 10316958.0,
+         "n": 263
+        },
+        "Más de 20 años": {
+         "p25": 6399038.2,
+         "p50": 7276069.5,
+         "p75": 8188338.2,
+         "n": 266
+        },
+        "Sobre planos": {
+         "p25": 14038485.0,
+         "p50": 15050000.0,
+         "p75": 15100657.0,
+         "n": 9
+        }
+       },
+       "arriendo": {
+        "p10": 38852.4,
+        "p25": 44531.0,
+        "p50": 52800.0,
+        "p65": 57955.8,
+        "p75": 63025.0,
+        "p90": 73913.0,
+        "n": 833,
+        "base_muestra": "remodelados o de 5 a 20 años"
+       },
+       "celda_remodelada": {
+        "venta_p50": 8847856.0,
+        "arriendo_p50": 52800.0
+       }
+      },
+      "200-400": {
+       "venta": {
+        "p10": 4717633.9,
+        "p25": 5709481.2,
+        "p50": 6924573.5,
+        "p65": 7928161.2,
+        "p75": 9041680.5,
+        "p90": 11303845.6,
+        "n": 524
+       },
+       "post_remodelacion": {
+        "p25": 6040268.0,
+        "p50": 7280702.0,
+        "p75": 9589041.0,
+        "n": 277,
+        "base_muestra": "Remodelados y de 5 a 20 años"
+       },
+       "nuevo_m2": 9500000.0,
+       "por_edad": {
+        "Entre 0 y 5 años": {
+         "p25": 7318534.0,
+         "p50": 9500000.0,
+         "p75": 12540584.0,
+         "n": 59
+        },
+        "Entre 10 y 20 años": {
+         "p25": 5880927.2,
+         "p50": 6890976.0,
+         "p75": 8700558.5,
+         "n": 124
+        },
+        "Entre 5 y 10 años": {
+         "p25": 6183206.0,
+         "p50": 8173913.0,
+         "p75": 10078740.0,
+         "n": 149
+        },
+        "Más de 20 años": {
+         "p25": 5150288.5,
+         "p50": 6085851.5,
+         "p75": 7169258.5,
+         "n": 188
+        }
+       },
+       "arriendo": {
+        "p10": 31520.5,
+        "p25": 41992.2,
+        "p50": 52778.0,
+        "p65": 59233.8,
+        "p75": 63580.8,
+        "p90": 83510.7,
+        "n": 210,
+        "base_muestra": "remodelados o de 5 a 20 años"
+       },
+       "celda_remodelada": {
+        "venta_p50": 7280702.0,
+        "arriendo_p50": 52778.0
+       }
+      },
+      ">400": {
+       "venta": {
+        "p10": 4266391.5,
+        "p25": 5281250.0,
+        "p50": 6799920.0,
+        "p65": 7581250.2,
+        "p75": 8333333.0,
+        "p90": 10788461.5,
+        "n": 66
+       },
+       "post_remodelacion": {
+        "p25": 5238281.2,
+        "p50": 7069078.0,
+        "p75": 8952145.2,
+        "n": 38,
+        "base_muestra": "Remodelados y de 5 a 20 años"
+       },
+       "nuevo_m2": 7900000.0,
+       "por_edad": {
+        "Entre 0 y 5 años": {
+         "p25": 4789445.8,
+         "p50": 7900000.0,
+         "p75": 11553571.5,
+         "n": 8
+        },
+        "Entre 10 y 20 años": {
+         "p25": 5491991.0,
+         "p50": 6947891.0,
+         "p75": 8333333.0,
+         "n": 25
+        },
+        "Entre 5 y 10 años": {
+         "p25": 5109905.2,
+         "p50": 6471238.5,
+         "p75": 9411105.2,
+         "n": 12
+        },
+        "Más de 20 años": {
+         "p25": 5504708.0,
+         "p50": 5945812.0,
+         "p75": 7014706.0,
+         "n": 20
+        }
+       },
+       "arriendo": {
+        "p10": 36250.0,
+        "p25": 38902.0,
+        "p50": 48077.0,
+        "p65": 50109.0,
+        "p75": 56416.0,
+        "p90": 78571.0,
+        "n": 21,
+        "base_muestra": "remodelados o de 5 a 20 años"
+       },
+       "celda_remodelada": {
+        "venta_p50": 7069078.0,
+        "arriendo_p50": 48077.0
+       }
+      }
+     }
+    },
+    "Casa": {
+     "general": {
+      "p10": 4204280.0,
+      "p25": 5055556.0,
+      "p50": 6111111.0,
+      "p65": 6708710.8,
+      "p75": 7123656.0,
+      "p90": 9154545.4,
+      "n": 409
+     },
+     "area": {
+      "p50": 300.0,
+      "p75": 430.0,
+      "p90": 650.0,
+      "n": 409
+     },
+     "bandas": {
+      "100-200": {
+       "venta": {
+        "p10": 5087934.8,
+        "p25": 6080031.0,
+        "p50": 6648936.0,
+        "p65": 6936542.1,
+        "p75": 7505376.0,
+        "p90": 8514521.6,
+        "n": 39
+       },
+       "post_remodelacion": {
+        "p25": 6080031.0,
+        "p50": 6648936.0,
+        "p75": 7505376.0,
+        "n": 39,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {
+        "Entre 10 y 20 años": {
+         "p25": 6054220.2,
+         "p50": 6681611.0,
+         "p75": 7255020.2,
+         "n": 8
+        },
+        "Entre 5 y 10 años": {
+         "p25": 6631579.0,
+         "p50": 6934307.0,
+         "p75": 7252747.0,
+         "n": 9
+        },
+        "Más de 20 años": {
+         "p25": 5724359.2,
+         "p50": 6469502.5,
+         "p75": 7928191.5,
+         "n": 22
+        }
+       },
+       "arriendo": {
+        "p10": 30752.8,
+        "p25": 37632.0,
+        "p50": 47222.0,
+        "p65": 50482.0,
+        "p75": 55135.0,
+        "p90": 71191.8,
+        "n": 29,
+        "base_muestra": "remodelados o de 5 a 20 años"
+       },
+       "celda_remodelada": {
+        "venta_p50": 8847856.0,
+        "arriendo_p50": 52800.0
+       }
+      },
+      "200-400": {
+       "venta": {
+        "p10": 4269463.7,
+        "p25": 4975436.0,
+        "p50": 5951066.0,
+        "p65": 6445314.3,
+        "p75": 6939350.2,
+        "p90": 8015858.9,
+        "n": 242
+       },
+       "post_remodelacion": {
+        "p25": 5323114.0,
+        "p50": 6147541.0,
+        "p75": 7045455.0,
+        "n": 111,
+        "base_muestra": "Remodelados y de 5 a 20 años"
+       },
+       "nuevo_m2": 5797101.0,
+       "por_edad": {
+        "Entre 0 y 5 años": {
+         "p25": 5424242.0,
+         "p50": 5797101.0,
+         "p75": 5833333.0,
+         "n": 5
+        },
+        "Entre 10 y 20 años": {
+         "p25": 5697802.5,
+         "p50": 6399121.0,
+         "p75": 7055481.8,
+         "n": 58
+        },
+        "Entre 5 y 10 años": {
+         "p25": 4838710.0,
+         "p50": 5760000.0,
+         "p75": 7008310.0,
+         "n": 53
+        },
+        "Más de 20 años": {
+         "p25": 4741244.5,
+         "p50": 5741338.0,
+         "p75": 6813636.5,
+         "n": 126
+        }
+       },
+       "arriendo": {
+        "p10": 28905.6,
+        "p25": 32857.0,
+        "p50": 40956.0,
+        "p65": 44104.4,
+        "p75": 48077.0,
+        "p90": 60484.8,
+        "n": 143,
+        "base_muestra": "remodelados o de 5 a 20 años"
+       },
+       "celda_remodelada": {
+        "venta_p50": 7280702.0,
+        "arriendo_p50": 52778.0
+       }
+      },
+      ">400": {
+       "venta": {
+        "p10": 4037216.8,
+        "p25": 5000000.0,
+        "p50": 6194690.0,
+        "p65": 7109999.9,
+        "p75": 8237547.5,
+        "p90": 9759826.0,
+        "n": 127
+       },
+       "post_remodelacion": {
+        "p25": 5314605.0,
+        "p50": 6362500.0,
+        "p75": 8695652.0,
+        "n": 84,
+        "base_muestra": "Remodelados y de 5 a 20 años"
+       },
+       "nuevo_m2": 5833333.0,
+       "por_edad": {
+        "Entre 0 y 5 años": {
+         "p25": 5052606.5,
+         "p50": 5833333.0,
+         "p75": 8203991.0,
+         "n": 7
+        },
+        "Entre 10 y 20 años": {
+         "p25": 5428571.0,
+         "p50": 6400000.0,
+         "p75": 7777778.0,
+         "n": 45
+        },
+        "Entre 5 y 10 años": {
+         "p25": 4926470.5,
+         "p50": 6495833.5,
+         "p75": 9660270.2,
+         "n": 36
+        },
+        "Más de 20 años": {
+         "p25": 4758196.2,
+         "p50": 5833879.0,
+         "p75": 7625287.2,
+         "n": 36
+        }
+       },
+       "arriendo": {
+        "p10": 22557.8,
+        "p25": 31337.5,
+        "p50": 39535.0,
+        "p65": 45907.9,
+        "p75": 52672.5,
+        "p90": 65318.2,
+        "n": 90,
+        "base_muestra": "remodelados o de 5 a 20 años"
+       },
+       "celda_remodelada": {
+        "venta_p50": 7069078.0,
+        "arriendo_p50": 48077.0
+       }
+      }
+     }
+    }
+   }
+  },
+  "El Retiro": {
+   "ciudad": "Bogotá",
+   "moneda": "COP",
+   "fecha": "2026-09-13",
+   "texto_fecha": "13 de septiembre de 2026",
+   "con_antiguedad": false,
+   "fuente": "Metrocuadrado, corrida del 13 de septiembre de 2026 (venta y arriendo), dentro del polígono de la zona",
+   "tipos": {
+    "Apartamento": {
+     "general": {
+      "p10": 7172414.0,
+      "p25": 7894737.0,
+      "p50": 8684211.0,
+      "p65": 9090909.0,
+      "p75": 10869565.0,
+      "p90": 12236241.0,
+      "n": 21
+     },
+     "area": {
+      "p50": 224.0,
+      "p75": 286.0,
+      "p90": 330.0,
+      "n": 21
+     },
+     "bandas": {
+      "100-200": {
+       "venta": {
+        "p10": 7172414.0,
+        "p25": 7419802.8,
+        "p50": 8351099.5,
+        "p65": 8663224.9,
+        "p75": 8937969.8,
+        "p90": 9339712.8,
+        "n": 10
+       },
+       "post_remodelacion": {
+        "p25": 7419802.8,
+        "p50": 8351099.5,
+        "p75": 8937969.8,
+        "n": 10,
+        "base_muestra": "todas las antigüedades (esta fotografía no tiene la antigüedad de los anuncios)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {},
+       "arriendo": {
+        "p10": 48079.2,
+        "p25": 51041.5,
+        "p50": 63333.0,
+        "p65": 69012.0,
+        "p75": 77321.5,
+        "p90": 87736.4,
+        "n": 7,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "celda_remodelada": null
+      },
+      "200-400": {
+       "venta": {
+        "p10": 7894737.0,
+        "p25": 8330039.5,
+        "p50": 9598214.0,
+        "p65": 11268116.0,
+        "p75": 11951454.0,
+        "p90": 12307692.0,
+        "n": 11
+       },
+       "post_remodelacion": {
+        "p25": 8330039.5,
+        "p50": 9598214.0,
+        "p75": 11951454.0,
+        "n": 11,
+        "base_muestra": "todas las antigüedades (esta fotografía no tiene la antigüedad de los anuncios)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {},
+       "arriendo": {
+        "p10": 55234.4,
+        "p25": 59227.0,
+        "p50": 68093.0,
+        "p65": 68093.0,
+        "p75": 70946.0,
+        "p90": 81598.8,
+        "n": 13,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "celda_remodelada": null
+      }
+     }
+    }
+   }
+  },
+  "Laureles": {
+   "ciudad": "Medellín",
+   "moneda": "COP",
+   "fecha": "2026-09-13",
+   "texto_fecha": "13 de septiembre de 2026",
+   "con_antiguedad": false,
+   "fuente": "Metrocuadrado, corrida del 13 de septiembre de 2026 (venta y arriendo), dentro del polígono de la zona",
+   "tipos": {
+    "Apartamento": {
+     "general": {
+      "p10": 4800000.0,
+      "p25": 5539291.5,
+      "p50": 6586240.0,
+      "p65": 7288136.0,
+      "p75": 7993303.2,
+      "p90": 9375000.0,
+      "n": 932
+     },
+     "area": {
+      "p50": 133.0,
+      "p75": 166.0,
+      "p90": 204.0,
+      "n": 932
+     },
+     "bandas": {
+      "60-100": {
+       "venta": {
+        "p10": 5939897.8,
+        "p25": 6701493.0,
+        "p50": 7386364.0,
+        "p65": 7995905.0,
+        "p75": 8560606.0,
+        "p90": 10382353.2,
+        "n": 137
+       },
+       "post_remodelacion": {
+        "p25": 6701493.0,
+        "p50": 7386364.0,
+        "p75": 8560606.0,
+        "n": 137,
+        "base_muestra": "todas las antigüedades (esta fotografía no tiene la antigüedad de los anuncios)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {},
+       "arriendo": {
+        "p10": 35272.3,
+        "p25": 40000.0,
+        "p50": 44444.0,
+        "p65": 48225.9,
+        "p75": 52098.0,
+        "p90": 62084.7,
+        "n": 224,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "celda_remodelada": null
+      },
+      "100-200": {
+       "venta": {
+        "p10": 4860897.5,
+        "p25": 5540218.2,
+        "p50": 6430952.0,
+        "p65": 7085227.0,
+        "p75": 7844842.8,
+        "p90": 9047619.0,
+        "n": 646
+       },
+       "post_remodelacion": {
+        "p25": 5540218.2,
+        "p50": 6430952.0,
+        "p75": 7844842.8,
+        "n": 646,
+        "base_muestra": "todas las antigüedades (esta fotografía no tiene la antigüedad de los anuncios)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {},
+       "arriendo": {
+        "p10": 28184.3,
+        "p25": 32872.0,
+        "p50": 40000.0,
+        "p65": 43538.5,
+        "p75": 45276.0,
+        "p90": 52000.0,
+        "n": 422,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "celda_remodelada": null
+      },
+      "200-400": {
+       "venta": {
+        "p10": 3909091.0,
+        "p25": 4679803.0,
+        "p50": 5476190.0,
+        "p65": 5944668.2,
+        "p75": 6329114.0,
+        "p90": 7043902.6,
+        "n": 105
+       },
+       "post_remodelacion": {
+        "p25": 4679803.0,
+        "p50": 5476190.0,
+        "p75": 6329114.0,
+        "n": 105,
+        "base_muestra": "todas las antigüedades (esta fotografía no tiene la antigüedad de los anuncios)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {},
+       "arriendo": {
+        "p10": 24928.6,
+        "p25": 28333.0,
+        "p50": 28333.0,
+        "p65": 30944.2,
+        "p75": 36928.5,
+        "p90": 45324.9,
+        "n": 58,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "celda_remodelada": null
+      },
+      ">400": {
+       "venta": {
+        "p10": 3814201.6,
+        "p25": 4250324.0,
+        "p50": 5198000.0,
+        "p65": 5276549.4,
+        "p75": 5338571.0,
+        "p90": 7884815.2,
+        "n": 9
+       },
+       "post_remodelacion": {
+        "p25": 4250324.0,
+        "p50": 5198000.0,
+        "p75": 5338571.0,
+        "n": 9,
+        "base_muestra": "todas las antigüedades (esta fotografía no tiene la antigüedad de los anuncios)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {},
+       "arriendo": {
+        "p10": 26476.0,
+        "p25": 29018.0,
+        "p50": 39413.5,
+        "p65": 51801.8,
+        "p75": 56188.0,
+        "p90": 71546.5,
+        "n": 16,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "celda_remodelada": null
+      }
+     }
+    },
+    "Casa": {
+     "general": {
+      "p10": 3973130.8,
+      "p25": 4965909.0,
+      "p50": 6115385.0,
+      "p65": 7039038.6,
+      "p75": 7763158.0,
+      "p90": 9433366.6,
+      "n": 85
+     },
+     "area": {
+      "p50": 269.0,
+      "p75": 383.0,
+      "p90": 494.8,
+      "n": 85
+     },
+     "bandas": {
+      "100-200": {
+       "venta": {
+        "p10": 3682184.6,
+        "p25": 5221005.8,
+        "p50": 5925040.0,
+        "p65": 6398214.2,
+        "p75": 6741278.8,
+        "p90": 8057017.5,
+        "n": 18
+       },
+       "post_remodelacion": {
+        "p25": 5221005.8,
+        "p50": 5925040.0,
+        "p75": 6741278.8,
+        "n": 18,
+        "base_muestra": "todas las antigüedades (esta fotografía no tiene la antigüedad de los anuncios)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {},
+       "arriendo": {
+        "p10": 27956.6,
+        "p25": 32158.5,
+        "p50": 39604.0,
+        "p65": 43377.1,
+        "p75": 45246.5,
+        "p90": 51881.6,
+        "n": 439,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "celda_remodelada": null
+      },
+      "200-400": {
+       "venta": {
+        "p10": 4255583.5,
+        "p25": 5138888.8,
+        "p50": 6802695.0,
+        "p65": 7822124.6,
+        "p75": 8839067.2,
+        "p90": 9632408.8,
+        "n": 48
+       },
+       "post_remodelacion": {
+        "p25": 5138888.8,
+        "p50": 6802695.0,
+        "p75": 8839067.2,
+        "n": 48,
+        "base_muestra": "todas las antigüedades (esta fotografía no tiene la antigüedad de los anuncios)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {},
+       "arriendo": {
+        "p10": 19667.0,
+        "p25": 25000.0,
+        "p50": 32877.0,
+        "p65": 37500.0,
+        "p75": 41667.0,
+        "p90": 54545.0,
+        "n": 61,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "celda_remodelada": null
+      },
+      ">400": {
+       "venta": {
+        "p10": 3921149.8,
+        "p25": 4636995.2,
+        "p50": 5105746.0,
+        "p65": 5481817.8,
+        "p75": 6434210.2,
+        "p90": 7584905.7,
+        "n": 18
+       },
+       "post_remodelacion": {
+        "p25": 4636995.2,
+        "p50": 5105746.0,
+        "p75": 6434210.2,
+        "n": 18,
+        "base_muestra": "todas las antigüedades (esta fotografía no tiene la antigüedad de los anuncios)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {},
+       "arriendo": {
+        "p10": 26476.0,
+        "p25": 29018.0,
+        "p50": 39413.5,
+        "p65": 51801.8,
+        "p75": 56188.0,
+        "p90": 71546.5,
+        "n": 16,
+        "base_muestra": "todas las antigüedades (muestra remodelada insuficiente)"
+       },
+       "celda_remodelada": null
+      }
+     }
+    }
+   }
+  },
+  "Centro Histórico": {
+   "ciudad": "Cartagena",
+   "moneda": "COP",
+   "fecha": "2026-09-13",
+   "texto_fecha": "13 de septiembre de 2026",
+   "con_antiguedad": false,
+   "fuente": "Metrocuadrado, corrida del 13 de septiembre de 2026 (venta y arriendo), dentro del polígono de la zona",
+   "tipos": {
+    "Apartamento": {
+     "general": {
+      "p10": 13514610.5,
+      "p25": 14054076.5,
+      "p50": 17851478.0,
+      "p65": 18478261.0,
+      "p75": 18604798.2,
+      "p90": 22232143.0,
+      "n": 16
+     },
+     "area": {
+      "p50": 91.0,
+      "p75": 124.5,
+      "p90": 261.3,
+      "n": 16
+     },
+     "bandas": {
+      "60-100": {
+       "venta": {
+        "p10": 16040935.4,
+        "p25": 17456741.0,
+        "p50": 17894737.0,
+        "p65": 18419908.6,
+        "p75": 18478261.0,
+        "p90": 18494364.2,
+        "n": 7
+       },
+       "post_remodelacion": {
+        "p25": 17456741.0,
+        "p50": 17894737.0,
+        "p75": 18478261.0,
+        "n": 7,
+        "base_muestra": "todas las antigüedades (esta fotografía no tiene la antigüedad de los anuncios)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {},
+       "arriendo": null,
+       "celda_remodelada": null
+      }
+     }
+    },
+    "Casa": {
+     "general": {
+      "p10": 14537624.0,
+      "p25": 15151300.5,
+      "p50": 19258586.0,
+      "p65": 21468128.5,
+      "p75": 24064655.2,
+      "p90": 26272790.0,
+      "n": 26
+     },
+     "area": {
+      "p50": 387.5,
+      "p75": 642.5,
+      "p90": 904.5,
+      "n": 26
+     },
+     "bandas": {
+      "100-200": {
+       "venta": {
+        "p10": 15197963.4,
+        "p25": 15384615.0,
+        "p50": 20886076.0,
+        "p65": 22825018.6,
+        "p75": 24117647.0,
+        "p90": 26313725.6,
+        "n": 5
+       },
+       "post_remodelacion": {
+        "p25": 15384615.0,
+        "p50": 20886076.0,
+        "p75": 24117647.0,
+        "n": 5,
+        "base_muestra": "todas las antigüedades (esta fotografía no tiene la antigüedad de los anuncios)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {},
+       "arriendo": null,
+       "celda_remodelada": null
+      },
+      "200-400": {
+       "venta": {
+        "p10": 14716177.6,
+        "p25": 14975165.5,
+        "p50": 19695378.5,
+        "p65": 23646428.7,
+        "p75": 24021551.8,
+        "p90": 24290685.5,
+        "n": 8
+       },
+       "post_remodelacion": {
+        "p25": 14975165.5,
+        "p50": 19695378.5,
+        "p75": 24021551.8,
+        "n": 8,
+        "base_muestra": "todas las antigüedades (esta fotografía no tiene la antigüedad de los anuncios)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {},
+       "arriendo": null,
+       "celda_remodelada": null
+      },
+      ">400": {
+       "venta": {
+        "p10": 14140702.8,
+        "p25": 17419355.0,
+        "p50": 19230769.0,
+        "p65": 19697280.6,
+        "p75": 20882779.0,
+        "p90": 27129375.0,
+        "n": 13
+       },
+       "post_remodelacion": {
+        "p25": 17419355.0,
+        "p50": 19230769.0,
+        "p75": 20882779.0,
+        "n": 13,
+        "base_muestra": "todas las antigüedades (esta fotografía no tiene la antigüedad de los anuncios)"
+       },
+       "nuevo_m2": null,
+       "por_edad": {},
+       "arriendo": null,
+       "celda_remodelada": null
+      }
+     }
+    }
+   }
+  },
+  "Getsemaní": {
+   "ciudad": "Cartagena",
+   "moneda": "COP",
+   "fecha": "2026-09-13",
+   "texto_fecha": "13 de septiembre de 2026",
+   "con_antiguedad": false,
+   "fuente": "Metrocuadrado, corrida del 13 de septiembre de 2026 (venta y arriendo), dentro del polígono de la zona",
+   "tipos": {
+    "Casa": {
+     "general": {
+      "p10": 13329464.4,
+      "p25": 14196004.5,
+      "p50": 20036764.5,
+      "p65": 26044303.7,
+      "p75": 27118495.0,
+      "p90": 28819444.6,
+      "n": 8
+     },
+     "area": {
+      "p50": 294.0,
+      "p75": 357.0,
+      "p90": 588.0,
+      "n": 8
+     },
+     "bandas": {}
+    }
+   }
+  }
+ }
+}

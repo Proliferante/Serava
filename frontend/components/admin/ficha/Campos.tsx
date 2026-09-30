@@ -5,6 +5,8 @@ import {
   lleno, type Bloque, type Campo, type Foto, type Valores,
 } from "@/components/admin/ficha/esquema";
 import { Btn, Card, IcoTrash, SecTitle } from "@/components/admin/ui";
+import { formatear, UNIDAD } from "@/lib/cifras";
+import type { Avisos } from "@/lib/revisar-ficha";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LOS CONTROLES DE LA FICHA — un bloque del esquema, dibujado.
@@ -124,7 +126,12 @@ function FilaRejilla({ fila, columnas, f, onSet, onQuitar }: {
   );
 }
 
-function Control({ c, v, onChange }: { c: Campo; v: unknown; onChange: (x: unknown) => void }) {
+function Control({ c, v, area, onChange }: {
+  c: Campo; v: unknown;
+  /** El área del predio: el termómetro la usa para pasar un precio total a $/m². */
+  area?: number;
+  onChange: (x: unknown) => void;
+}) {
   const id = `f-${c.k}`;
   const texto = typeof v === "string" || typeof v === "number" ? String(v) : "";
 
@@ -143,11 +150,29 @@ function Control({ c, v, onChange }: { c: Campo; v: unknown; onChange: (x: unkno
       </select>
     );
   }
+  if (c.tipo === "fechahora") {
+    return <input className="t" id={id} type="datetime-local" value={texto} onChange={(e) => onChange(e.target.value)} />;
+  }
+  /* Al salir de una cifra, queda con el formato de su campo: «16775000» en
+     la renta pasa a «$16,8M», «15» en la TIR a «15%». Sólo si es un número
+     desnudo —lo que ya trae letras se respeta—. Ver lib/cifras.ts. */
+  const alSalir = UNIDAD[c.k]
+    ? () => {
+      if (!texto.trim()) return;
+      const f = formatear(c.k, texto, area);
+      if (f === texto) return;
+      /* El termómetro es un <input type="number">: necesita el número con
+         punto decimal, no «6,5». */
+      onChange(c.tipo === "numero" ? String(Number(f.replace(/\./g, "").replace(",", "."))) : f);
+    }
+    : undefined;
+
   return (
     <input
       className="t" id={id} type={c.tipo === "numero" ? "number" : "text"}
       value={texto} placeholder={c.ej}
       onChange={(e) => onChange(e.target.value)}
+      onBlur={alSalir}
     />
   );
 }
@@ -181,8 +206,11 @@ export function comoPropuesta(c: Campo, sug: unknown): string {
 }
 
 /** Un campo con su etiqueta, su ayuda y —si la hay— la propuesta. */
-export function CampoCaja({ c, v, sugerido, aMano, onChange }: {
+export function CampoCaja({ c, v, sugerido, aMano, aviso, area, onChange }: {
   c: Campo; v: unknown; sugerido: unknown;
+  /** Lo que no cuadra en este campo (lib/revisar-ficha.ts). No bloquea. */
+  aviso?: string;
+  area?: number;
   /** Predio metido a mano: no hay anuncio del que "usar" nada. */
   aMano: boolean;
   onChange: (x: unknown) => void;
@@ -200,7 +228,8 @@ export function CampoCaja({ c, v, sugerido, aMano, onChange }: {
         {c.l}
         {c.req && <span className="fic-req" title="Hace falta para publicar"> ·  obligatorio</span>}
       </label>
-      <Control c={c} v={v} onChange={onChange} />
+      <Control c={c} v={v} area={area} onChange={onChange} />
+      {aviso && <p className="fic-aviso" role="status">{aviso}</p>}
       {c.ayuda && <p className="fic-ayuda">{c.ayuda}</p>}
       {ofrecer && (
         <button type="button" className="fic-sug" onClick={() => onChange(propuesta)}>
@@ -262,9 +291,10 @@ export function Ranura({ f, url, ocupado, listo, onElegir, onQuitar }: {
 /* ── Un bloque entero ────────────────────────────────────────────────────── */
 
 export function BloqueCaja({
-  b, valores, fotos, sugeridos, aMano, subiendo, almacenListo, onCampo, onSubir, onQuitar,
+  b, valores, fotos, sugeridos, aMano, subiendo, almacenListo, avisos, onCampo, onSubir, onQuitar,
 }: {
   b: Bloque;
+  avisos?: Avisos;
   valores: Valores;
   fotos: Record<string, string>;
   sugeridos: Record<string, unknown>;
@@ -275,6 +305,7 @@ export function BloqueCaja({
   onSubir: (ranura: string, archivo: File) => void;
   onQuitar: (ranura: string) => void;
 }): ReactNode {
+  const area = Number(String(valores.spec_area ?? "").replace(",", ".")) || undefined;
   return (
     <Card style={{ marginBottom: 14 }}>
       <SecTitle>{b.titulo}</SecTitle>
@@ -287,6 +318,8 @@ export function BloqueCaja({
               key={c.k} c={c} v={valores[c.k]}
               sugerido={c.sug ? sugeridos[c.sug] : undefined}
               aMano={aMano}
+              aviso={avisos?.[c.k]}
+              area={area}
               onChange={(v) => onCampo(c.k, v)}
             />
           ))}

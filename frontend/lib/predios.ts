@@ -1,4 +1,5 @@
 import type { Predio } from "@/components/predios/PredioCard";
+import { formatear } from "@/lib/cifras";
 import { firma } from "@/lib/firma";
 import { cookieInversor } from "@/lib/inversor";
 
@@ -67,7 +68,10 @@ async function pedir<T>(ruta: string): Promise<T | null> {
 }
 
 export async function listaPredios(): Promise<Listado> {
-  return (await pedir<Listado>("/api/predios")) ?? { predios: [], total: 0, actualizado: null };
+  const l = (await pedir<Listado>("/api/predios")) ?? { predios: [], total: 0, actualizado: null };
+  /* El precio de la tarjeta es la «Inversión total» de la ficha: con el
+     mismo formato que en la ficha, aunque se haya escrito sin él. */
+  return { ...l, predios: l.predios.map((p) => ({ ...p, price: formatear("inversion_total", p.price) })) };
 }
 
 export async function fichaPredio(slug: string): Promise<FichaPublicada | null> {

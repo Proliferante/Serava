@@ -38,6 +38,22 @@ const nextConfig = {
   // directo a `http://127.0.0.1:8000` desde el navegador para que todo salga
   // del mismo origen: así no hay preflight de CORS ni un dominio distinto
   // que configurar en el frontend.
+  /* Las rutas cambiaron de nombre el 29 de septiembre de 2026 para que la
+     dirección diga lo que dice el menú. Las viejas redirigen con un 308
+     permanente: un enlace guardado, compartido o indexado sigue llegando, y
+     Google pasa a la nueva sin perder lo que tenía de la vieja.
+
+     `/home` va a la raíz y no al revés: `www.zequara.com` a secas es la
+     dirección que se escribe, se imprime y se comparte, y es la que tiene que
+     abrir el inicio sin un salto de más. */
+  async redirects() {
+    return [
+      { source: "/modelo", destination: "/como-operamos", permanent: true },
+      { source: "/oportunidades", destination: "/proyectos", permanent: true },
+      { source: "/home", destination: "/", permanent: true },
+    ];
+  },
+
   async rewrites() {
     const backend = process.env.BACKEND_URL || "http://127.0.0.1:8000";
     return [{ source: "/api/:ruta*", destination: `${backend}/api/:ruta*` }];

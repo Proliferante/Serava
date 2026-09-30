@@ -1,0 +1,39 @@
+{
+  "_nota": "Notas de zona (1-10) que el predio hereda: bloques de Mercado y de Riesgo y salida de la nota técnica v9. Solo La Cabrera tiene notas oficiales (ejemplo documentado de la nota técnica). Las de Chicó y El Poblado son ESTIMADAS por David con las rúbricas v9 y la evidencia indicada; hay que validarlas con el agente de Score de Zonas. La unicidad no se hereda: se calcula por predio.",
+  "descuento_pais": {"Colombia": 0.03, "_fuente": "Nota v9, sección 5: Colombia BBB = 3 %"},
+  "zonas": {
+    "La Cabrera": {
+      "origen": "oficial",
+      "demanda": 9, "pipeline": 8, "liquidez": 8, "regulatorio": 8, "esg": 9,
+      "evidencia": {
+        "demanda": "Nota v9: diplomáticos, embajadas y ejecutivos internacionales; demanda inelástica.",
+        "pipeline": "Nota v9: zona consolidada, sin suelo para proyectos de escala. Obra nueva (0-5 años) = 7 % del segmento 200-400 m².",
+        "liquidez": "Nota v9: compradores extranjeros, salida < 90 días. Medido: 3,1 % de los anuncios del 13-sep ya no estaban el 27-sep.",
+        "regulatorio": "Colombia: canon con tope IPC, sin control de rentas ni restricción a extranjeros.",
+        "esg": "Sin regulación verde obligatoria en Colombia."
+      }
+    },
+    "Chicó": {
+      "origen": "estimado",
+      "demanda": 8, "pipeline": 7, "liquidez": 8, "regulatorio": 8, "esg": 9,
+      "evidencia": {
+        "demanda": "Estimado: ejecutivos y corporativo de la calle 93 y la 100; demanda profunda pero un poco más cíclica que La Cabrera.",
+        "pipeline": "Estimado: hay renovación de edificios. Obra nueva (0-5 años) = 9 % del segmento 100-200 m², algo más que La Cabrera.",
+        "liquidez": "Estimado: 576 anuncios comparables y la mayor tasa de salida medida (6,3 % en 14 días).",
+        "regulatorio": "Igual que el resto de Colombia.",
+        "esg": "Igual que el resto de Colombia."
+      }
+    },
+    "El Poblado": {
+      "origen": "estimado",
+      "demanda": 8, "pipeline": 5, "liquidez": 7, "regulatorio": 8, "esg": 9,
+      "evidencia": {
+        "demanda": "Estimado: extranjeros, nómadas digitales y compradores dolarizados; parte de la demanda es de renta corta.",
+        "pipeline": "Estimado: mucha obra nueva. 0-5 años y sobre planos = 17 % del segmento 100-200 m², el doble que La Cabrera.",
+        "liquidez": "Estimado: mercado grande (890 comparables) pero con salida medida más lenta (2,3-2,7 % en 14 días).",
+        "regulatorio": "Igual que el resto de Colombia (vigilar reglas de renta corta en Medellín).",
+        "esg": "Igual que el resto de Colombia."
+      }
+    }
+  }
+}

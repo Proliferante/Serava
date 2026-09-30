@@ -54,7 +54,7 @@ export const ESENCIAL = [
   { k: "fin_renta_mensual", kn: "fin_renta_nota", left: 405.9, top: 20, h: 112.4, t: "Renta mensual estimada", v: "$18,6M", vSize: 30.4, vLh: 31.92, vTop: 40.49, note: "arriendo remodelado de referencia", nTop: 75.41 },
   { k: "fin_rentabilidad", kn: "fin_rentabilidad_nota", left: 760.95, top: 20, h: 112.4, t: "Rentabilidad anual neta", v: "4,6%", vSize: 30.4, vLh: 31.92, vTop: 40.49, note: "yield neto sobre el All-in", nTop: 75.41 },
   { k: "fin_rango_inversion", kn: "", left: 405.9, top: 148.98, h: 113.22, t: "Rango de inversión", v: "$3.100M–$3.450M", vSize: 24, vLh: 25.2, vTop: 41.5, note: "monto de entrada", nTop: 69.5 },
-  { k: "fin_colocacion", kn: "", left: 760.95, top: 148.98, h: 112.41, t: "Colocación en arriendo", v: "~30 días", vSize: 30.4, vLh: 31.92, vTop: 40.5, note: "tiempo promedio en la zona", nTop: 75.42, reloj: true },
+  { k: "fin_colocacion", kn: "", left: 760.95, top: 148.98, h: 112.41, t: "Colocación en arriendo", v: "~30 días", vSize: 30.4, vLh: 31.92, vTop: 40.5, note: "supuesto de referencia", nTop: 75.42, reloj: true },
 ];
 
 /** Renta neta acumulada: barras verdes. `x`/`w` y alto salen del frame. */
@@ -155,14 +155,24 @@ export function cascada(d: Lector) {
 export const ESCENARIOS = [
   { k: "ft_tir_conservador", v: "9,0%", t: "Conservador", h: 106.39, from: "#c2b49b", to: "#a8967a" },
   { k: "ft_tir_base", v: "12,5%", t: "Base", h: 121.77, from: "#7d97a6", to: "#5e7a8a" },
-  { k: "ft_tir_optimo", v: "16,0%", t: "Óptimo", h: 121.77, from: "#8a9a5f", to: VERDE },
+  { k: "ft_tir_optimo", v: "16,0%", t: "Alto", h: 121.77, from: "#8a9a5f", to: VERDE },
 ];
 
+/* Paola (28-sep): el CDT no va como una fila más —«parece que estuviera en la
+   tabla»—. La tabla lleva los tres escenarios de este activo y el CDT va
+   debajo como referencia (`ft_cdt_referencia`). */
 export const ALTERNATIVAS: { k: string; t: string; v: string; verde?: boolean }[] = [
-  { k: "ft_tir_base", t: "ZEQUARA · TIR base", v: "~12,5%", verde: true },
-  { k: "ft_tir_optimo", t: "ZEQUARA · TIR óptimo", v: "~16,0%", verde: true },
-  { k: "ft_cdt_vigente", t: "CDT / renta fija vigente", v: "~10,5%" },
+  { k: "ft_tir_conservador", t: "Escenario conservador", v: "~9,0%" },
+  { k: "ft_tir_base", t: "Escenario base", v: "~12,5%", verde: true },
+  { k: "ft_tir_optimo", t: "Escenario alto", v: "~16,0%", verde: true },
 ];
+
+/** La nota bajo la tabla: primero la referencia del CDT, luego la aclaración. */
+export function notaAlternativas(d: Lector) {
+  const cdt = d.t("ft_cdt_referencia", d.real ? "" : "Referencia: CDT a 360 días, ~10,5% E.A.");
+  return [cdt, d.t("ft_alternativas_nota", "La TIR incluye renta y valorización; el CDT es renta fija sin activo subyacente.")]
+    .filter(Boolean).join(" ");
+}
 
 /** Proyección año a año. La última fila va resaltada, como en el frame. */
 export const TABLA = [
@@ -574,7 +584,8 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
         >
           {/* ── Rentabilidad detallada + Contexto de mercado ── */}
           <Band left={-1} width={1921} top={1405} height={510} bg={BROWN} corner="br" z={17}>
-            <FtTitle left={COL} top={128}>Rentabilidad detallada</FtTitle>
+            {/* Antes «Rentabilidad detallada». Paola (28-sep): solo mira el arriendo; la valorización va aparte. */}
+            <FtTitle left={COL} top={128}>Rentabilidad del arriendo</FtTitle>
             <Mini left={COL} top={173} width={262} height={140} t="Gastos estimados anuales" v={d.t("ft_gastos_anuales", "$14M")} pie={d.t("ft_gastos_nota", "admin., predial, seguros")} delay={0.06} />
             <Mini
               left={COL + 278} top={173} width={262} height={140}
@@ -585,7 +596,7 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
             <FtTitle left={COL + 560} top={128}>Contexto de mercado</FtTitle>
             <Reveal left={COL + 560} top={173} width={540} height={254} delay={0.1}>
               <div className="relative size-full" style={{ backgroundColor: VELO, border: VELO_BORDE, borderRadius: 16 }}>
-                <span className="absolute" style={{ left: 22, right: 22, top: 24, fontSize: 15, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>Rango de arriendo mensual (320 m²)</span>
+                <span className="absolute" style={{ left: 22, right: 22, top: 24, fontSize: 15, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>Rango de arriendo mensual ({d.t("spec_area", "320")} m²)</span>
                 {/* 70 y no 55: la marca del termómetro cuelga 26 px por encima
                     del carril y a 55 se comía el rótulo. */}
                 <div className="absolute" style={{ left: 22, top: 70 }}>
@@ -602,7 +613,7 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
                 <div className="absolute" style={{ left: 22, top: 122, width: 496, height: 118, backgroundColor: VELO, border: VELO_BORDE, borderRadius: 12 }}>
                   <span className="absolute" style={{ left: 20, right: 20, top: 17, fontSize: 15, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>Tasa de vacancia estimada</span>
                   <Cifra v={d.t("ft_vacancia", "~4%")} dur={1} className="absolute whitespace-nowrap font-semibold" style={{ left: 20, top: 34, fontSize: 30, lineHeight: "43.2px", color: ARENA }} />
-                  <span className="absolute" style={{ left: 20, top: 80, fontSize: 11.5, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>de la zona</span>
+                  <span className="absolute" style={{ left: 20, top: 80, fontSize: 11.5, lineHeight: "17.28px", color: "rgba(247,241,229,0.7)" }}>supuesto de referencia</span>
                 </div>
               </div>
             </Reveal>
@@ -623,7 +634,7 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
             <div className="absolute" style={{ left: COL + 638, top: 347, width: 469.57, height: 288.69 }}>
               {[
                 { t: "Costo total (All-in)", v: d.t("puente_allin", "$3.450M"), badge: d.t("puente_allin_m2", "$10,8M / m²"), vc: "#3d2c1e" },
-                { t: "Media mercado remodelado", v: d.t("ft_mercado_total", "$3.776M"), badge: d.t("puente_mercado_m2", "$11,8M / m²"), vc: "#3d2c1e" },
+                { t: "Mercado remodelado", v: d.t("ft_mercado_total", "$3.776M"), badge: d.t("puente_mercado_m2", "$11,8M / m²"), vc: "#3d2c1e" },
               ].map((c, i) => (
                 <Reveal key={c.t} left={i * 242.8} top={0} width={226.8} height={124.26} delay={0.08 + i * 0.07}>
                   <div className="relative size-full" style={{ backgroundColor: HUESO, border: `1px solid ${HAIRLINE}`, borderRadius: 12 }}>
@@ -677,11 +688,12 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
               </div>
             </Reveal>
 
-            <FtTitle left={COL + 560} top={132}>Comparación vs. alternativas</FtTitle>
-            <Reveal left={COL + 560} top={177} width={540} height={241.73} delay={0.1}>
+            <FtTitle left={COL + 560} top={132}>Comparación con el CDT</FtTitle>
+            {/* 272 y no 241: la nota lleva ahora la referencia del CDT y la aclaración, hasta tres líneas. */}
+            <Reveal left={COL + 560} top={177} width={540} height={272} delay={0.1}>
               <div className="relative size-full" style={{ backgroundColor: VELO, border: VELO_BORDE, borderRadius: 16 }}>
                 <div className="absolute" style={{ left: 23, top: 25.99, width: 494, height: 160 }}>
-                  <Fila cells={["Alternativa", "Retorno anual"]} cols={[304.05, 189.95]} top={0} alto={35.84} cabecera dark />
+                  <Fila cells={["Este activo", "TIR anual"]} cols={[304.05, 189.95]} top={0} alto={35.84} cabecera dark />
                   {ALTERNATIVAS.map((a, i) => (
                     <Fila key={a.t} cells={[a.t, d.t(a.k, a.v)]} cols={[304.05, 189.95]} top={35.84 + i * 41.39} alto={41.39} dark delay={0.1 + i * 0.07} />
                   ))}
@@ -689,7 +701,7 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
                 <div className="absolute flex gap-[10px]" style={{ left: 23, right: 23, top: 200 }}>
                   <span className="shrink-0" style={{ marginTop: 2, color: "#a57a4e" }}><IcInfo15 /></span>
                   <p className="font-light" style={{ fontSize: 12.5, lineHeight: "18.72px", color: "rgba(247,241,229,0.6)" }}>
-                    {d.t("ft_alternativas_nota", "La TIR incluye renta y valorización; el CDT es renta fija sin activo subyacente.")}
+                    {notaAlternativas(d)}
                   </p>
                 </div>
               </div>
@@ -732,6 +744,11 @@ export default function Finanzas({ abierta, onToggle }: { abierta: boolean; onTo
                 </div>
               </div>
             </Reveal>
+
+            {/* Paola (28-sep): ningún valor futuro sin decir su supuesto de IPC. */}
+            <p className="absolute font-light" style={{ left: COL, top: 484, width: 1100, fontSize: 12, lineHeight: "16px", color: SOMBRA }}>
+              {d.t("ft_supuestos", "Supuesto: valorización y renta crecen con el IPC más una prima real por escenario.")}
+            </p>
           </Band>
 
           {/* ── Liquidez + Costos de salida ── */}

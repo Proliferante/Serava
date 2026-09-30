@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
+import { formatearFicha } from "@/lib/cifras";
+
 /* ═══════════════════════════════════════════════════════════════════════════
    LOS DATOS DE LA FICHA — de la base a las tres pestañas.
 
@@ -51,7 +53,11 @@ const VACIO: FichaDatos = { valores: {}, fotos: {} };
 const C = createContext<FichaDatos>(VACIO);
 
 export function FichaProvider({ datos, children }: { datos: FichaDatos; children: ReactNode }) {
-  return <C.Provider value={datos}>{children}</C.Provider>;
+  /* Las cifras escritas sin formato («2775500000», «15») se pintan con el de
+     su campo («$2.776M», «15%»). Sólo al pintar: lo guardado no cambia. Ver
+     lib/cifras.ts. */
+  const valor = useMemo(() => ({ ...datos, valores: formatearFicha(datos.valores) }), [datos]);
+  return <C.Provider value={valor}>{children}</C.Provider>;
 }
 
 function limpio(v: unknown): string | null {
@@ -94,10 +100,19 @@ export function useFicha(): Lector {
         if (s == null) return respaldo;
         /* Las cifras se escriben como se imprimen —«~12,5%», «$3.450M»— porque
            así es como las revisa quien las escribe. Aquí se saca el número:
-           el punto es separador de miles y la coma, decimal. */
-        const m = /-?\d+(?:[.,]\d+)?/.exec(s.replace(/\.(?=\d{3}\b)/g, ""));
+           el punto es separador de miles y la coma, decimal.
+
+           El punto de miles se reconoce por los tres dígitos que lo siguen y
+           que no siguen más dígitos. Antes se exigía un límite de palabra
+           (`\b`) detrás, y en «$1.830M» la M pega con el 0: el punto se
+           quedaba, se leía 1,83 y la barra del precio del gráfico de costos
+           salía a cero. Pasaba con toda cifra de $1.000M en adelante.
+           El menos puede venir como «−» (U+2212), que es como lo escribe el
+           cálculo automático de la ficha, y delante del signo de pesos:
+           «−$120M». */
+        const m = /([-−])?[\s$]*(\d+(?:[.,]\d+)?)/.exec(s.replace(/\.(?=\d{3}(?!\d))/g, ""));
         if (!m) return respaldo;
-        const x = Number(m[0].replace(",", "."));
+        const x = (m[1] ? -1 : 1) * Number(m[2].replace(",", "."));
         return Number.isFinite(x) ? x : respaldo;
       },
       lista: (k, respaldo) => {

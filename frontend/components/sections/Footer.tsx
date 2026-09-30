@@ -26,8 +26,8 @@ export default function Footer() {
       <p className="[word-break:break-word] absolute font-extralight leading-[1.137] left-[1125px] not-italic text-[#cd9a64] text-[26px] top-[78px] tracking-[9.36px] whitespace-nowrap">NAVEGA</p>
       <div className="[word-break:break-word] absolute font-light leading-[0] left-[1125px] not-italic text-[20px] text-white top-[147px] w-[312px]">
         <p className="leading-[2.27] mb-0"><a href="/" className="hover:underline">Inicio</a></p>
-        <p className="leading-[2.27] mb-0"><a href="/modelo" className="hover:underline">¿Cómo operamos?</a></p>
-        <p className="leading-[2.27] mb-0"><a href="/oportunidades" className="hover:underline">Proyectos realizados</a></p>
+        <p className="leading-[2.27] mb-0"><a href="/como-operamos" className="hover:underline">¿Cómo operamos?</a></p>
+        <p className="leading-[2.27] mb-0"><a href="/proyectos" className="hover:underline">Proyectos realizados</a></p>
         <p className="leading-[2.27]"><a href="/hub" className="hover:underline">HUB</a></p>
       </div>
 

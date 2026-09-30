@@ -44,7 +44,9 @@ export type TipoCampo =
   /** Lista de líneas: las viñetas de la ficha. */
   | "lista"
   /** Rejilla de filas y columnas: la proyección año a año, el cronograma. */
-  | "tabla";
+  | "tabla"
+  /** Fecha y hora de Colombia («2026-10-05T18:00»): el cierre de la reserva. */
+  | "fechahora";
 
 export type Campo = {
   /** Clave en el JSON guardado. Ver «LAS CLAVES SON CONTRATO». */
@@ -145,8 +147,9 @@ const COMUN: Bloque[] = [
       { k: "prioridad", l: "Prioridad", tipo: "opcion", opciones: ["Prioridad alta", "Prioridad media", "Prioridad baja"], ej: "Prioridad alta" },
       { k: "inversion_total", l: "Inversión total", tipo: "cifra", req: true, ej: "$3.100M", ayuda: "Compra + remodelación. Es también el precio que sale en el listado de predios." },
       { k: "roi_estimado", l: "ROI estimado", tipo: "cifra", ej: "~22%" },
-      { k: "reserva_horas", l: "Horas de bloqueo de la reserva", tipo: "numero", ej: "3", ayuda: "De dónde sale la cuenta atrás." },
-      { k: "viendo_ahora", l: "Inversionistas viendo el predio", tipo: "numero", ej: "5" },
+      { k: "reserva_hasta", l: "La reserva cierra (hora de Colombia)", tipo: "fechahora", ayuda: "La cuenta atrás llega a cero en este momento, igual para todos. Vacío: no cuenta y dice cuánto dura la reserva." },
+      { k: "reserva_horas", l: "Horas de bloqueo de la reserva", tipo: "numero", ej: "48", ayuda: "Cuánto queda bloqueado el predio para quien reserva." },
+      { k: "viendo_ahora", l: "Inversionistas viendo el predio", tipo: "numero", ej: "2", ayuda: "Sólo si es real. Vacío: la frase no sale." },
     ],
   },
 ];
@@ -262,7 +265,7 @@ const FINANZAS: Bloque[] = [
       { k: "fin_retorno", l: "Retorno total acumulado", tipo: "cifra", req: true, ej: "54,4%", ayuda: "La cifra grande de la tarjeta verde." },
       { k: "fin_retorno_nota", l: "Pie de la cifra grande", tipo: "texto", ej: "a 5 años · sobre el capital invertido" },
       { k: "fin_tir", l: "TIR estimada", tipo: "cifra", req: true, ej: "~12,5%", ayuda: "La píldora de la tarjeta verde, junto al CDT." },
-      { k: "fin_cdt", l: "CDT con el que se compara", tipo: "cifra", ej: "10,5%" },
+      { k: "fin_cdt", l: "CDT con el que se compara", tipo: "cifra", ej: "12,0%", ayuda: "CDT a 360 días de la Superfinanciera. «Calcular finanzas» lo trae actualizado." },
       { k: "fin_renta_mensual", l: "Renta mensual estimada", tipo: "cifra", req: true, ej: "$18,6M" },
       { k: "fin_renta_nota", l: "Pie de la renta", tipo: "texto", ej: "arriendo remodelado de referencia" },
       { k: "fin_rentabilidad", l: "Rentabilidad anual neta", tipo: "cifra", req: true, ej: "4,6%" },
@@ -273,7 +276,8 @@ const FINANZAS: Bloque[] = [
   },
   {
     k: "rentabilidad",
-    titulo: "Ficha técnica · rentabilidad detallada",
+    /* Antes «rentabilidad detallada». Paola (28-sep): solo muestra el arriendo, le falta la valorización. */
+    titulo: "Ficha técnica · rentabilidad del arriendo",
     nota: "Primer bloque de lo que se despliega con «Ver ficha técnica completa».",
     campos: [
       { k: "ft_gastos_anuales", l: "Gastos estimados anuales", tipo: "cifra", ej: "$14M" },
@@ -304,14 +308,19 @@ const FINANZAS: Bloque[] = [
   },
   {
     k: "escenarios",
-    titulo: "Ficha técnica · escenarios de TIR y alternativas",
-    nota: "Las tres columnas de escenario y la tabla de comparación.",
+    titulo: "Ficha técnica · escenarios de TIR frente al CDT",
+    /* Paola (28-sep): el CDT no es una fila de la tabla —«parece que estuviera en
+       la tabla»—: la tabla lleva los tres escenarios del activo y el CDT va
+       debajo, como nota de referencia. `ft_cdt_vigente` se conserva (las claves
+       son contrato) pero ya no se pinta como fila. */
+    nota: "Las tres columnas de escenario, la tabla de los tres escenarios y, debajo, el CDT como referencia.",
     campos: [
-      { k: "ft_tir_conservador", l: "Escenario conservador", tipo: "cifra", ej: "9,0%" },
-      { k: "ft_tir_base", l: "Escenario base", tipo: "cifra", ej: "12,5%" },
-      { k: "ft_tir_optimo", l: "Escenario óptimo", tipo: "cifra", ej: "16,0%" },
-      { k: "ft_cdt_vigente", l: "CDT / renta fija vigente", tipo: "cifra", ej: "~10,5%" },
-      { k: "ft_alternativas_nota", l: "Nota de la comparación", tipo: "parrafo", ancho: "entero", ej: "La TIR incluye renta y valorización; el CDT es renta fija sin activo subyacente." },
+      { k: "ft_tir_conservador", l: "Escenario conservador", tipo: "cifra", ej: "10,1%" },
+      { k: "ft_tir_base", l: "Escenario base", tipo: "cifra", ej: "15,9%" },
+      { k: "ft_tir_optimo", l: "Escenario alto", tipo: "cifra", ej: "21,5%" },
+      { k: "ft_cdt_vigente", l: "CDT a 360 días", tipo: "cifra", ej: "12,0%", ayuda: "Ya no es una fila de la tabla: la cifra va en la referencia de abajo." },
+      { k: "ft_cdt_referencia", l: "Referencia del CDT (bajo la tabla)", tipo: "texto", ancho: "entero", ej: "Referencia: CDT a 360 días, 12,0% E.A. (promedio ponderado de 26 bancos, 21 al 25 de septiembre de 2026; Superintendencia Financiera)." },
+      { k: "ft_alternativas_nota", l: "Nota de la comparación", tipo: "parrafo", ancho: "entero", ej: "La TIR suma la renta y la venta del año 5, ya descontada la comisión. El CDT es renta fija sin riesgo." },
     ],
   },
   {
@@ -319,6 +328,8 @@ const FINANZAS: Bloque[] = [
     titulo: "Ficha técnica · proyección patrimonial detallada",
     nota: "Alimenta a la vez el gráfico y la tabla año a año. La última fila va resaltada en la ficha.",
     campos: [
+      /* Paola (28-sep): ningún valor futuro sin su supuesto de IPC. Va bajo el título de la proyección. */
+      { k: "ft_supuestos", l: "Supuestos de la proyección", tipo: "parrafo", ancho: "entero", ej: "Supuesto: IPC 6,2% constante (DANE, agosto de 2026) + prima real −2% / 0% / +2% → valorización de 4,1% / 6,2% / 8,4% al año. Arriendo y gastos crecen con el IPC." },
       {
         k: "ft_proyeccion", l: "Año a año", tipo: "tabla", ancho: "entero",
         columnas: ["Año", "Valor activo", "Renta acum.", "Patrimonio", "Yield"],
