@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { MARK } from "@/components/brand";
 import AvisoPantalla from "@/components/responsive/AvisoPantalla";
 import { ConsolaProvider } from "@/components/admin/ctx";
+import { useInstalar } from "@/components/admin/useInstalar";
 import { puedeVer, useSesion } from "@/components/admin/sesion";
 import { PREDIOS_SEED, type Predio, type VistaKey } from "@/components/admin/data";
 import ArmarFicha from "@/components/admin/views/ArmarFicha";
@@ -192,6 +193,8 @@ const ROL_ETIQUETA: Record<string, string> = {
 
 export default function AdminConsole() {
   const { usuario, salir } = useSesion();
+  const app = useInstalar();
+  const [ayudaIos, setAyudaIos] = useState(false);
   const [vista, setVista] = useState<VistaKey>(INICIAL);
   const [cajon, setCajon] = useState(false);
   const [predios, setPredios] = useState<Predio[]>(PREDIOS_SEED);
@@ -282,12 +285,41 @@ export default function AdminConsole() {
               </div>
             ))}
 
+            {/* Pie del menú. «Cerrar sesión» era un enlacito gris del mismo
+                tamaño que la nota de versión y nadie lo encontraba: ahora es
+                un botón de verdad, con icono y el color de lo que termina
+                algo, y arriba de él «Instalar app» cuando se puede. */}
             <div className="foot">
-              ZEQUARA · v0.1 interna<br />Acceso restringido al equipo.
-              <br />
-              <button type="button" className="pnl-link" style={{ marginTop: 6, color: "var(--sand)" }} onClick={() => void salir()}>
+              {app.modo === "navegador" && (
+                <button type="button" className="foot-btn instalar" onClick={() => void app.instalar()}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M12 3v12M7 10l5 5 5-5M4 19h16" />
+                  </svg>
+                  Instalar app
+                </button>
+              )}
+              {app.modo === "ios" && (
+                <>
+                  <button type="button" className="foot-btn instalar" aria-expanded={ayudaIos} onClick={() => setAyudaIos((v) => !v)}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M12 3v12M7 10l5 5 5-5M4 19h16" />
+                  </svg>
+                    Instalar app
+                  </button>
+                  {ayudaIos && (
+                    <p className="foot-ayuda">
+                      En Safari, toca <b>Compartir</b> (el cuadro con la flecha hacia arriba) y luego <b>Agregar a inicio</b>.
+                    </p>
+                  )}
+                </>
+              )}
+              <button type="button" className="foot-btn salir" onClick={() => void salir()}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4" />
+                </svg>
                 Cerrar sesión
               </button>
+              <p className="foot-nota">ZEQUARA · v0.1 interna<br />Acceso restringido al equipo.</p>
             </div>
           </aside>
 
