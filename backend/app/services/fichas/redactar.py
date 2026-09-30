@@ -168,7 +168,9 @@ def campos(r: dict, x: dict) -> dict:
          M(p["valor"] + p["renta_acum"]), P(p["yield_"]) if p["yield_"] is not None else "—"]
         for p in base["proyeccion"]
     ]
-    v["ft_payback_renta"] = f"~{num(re_['payback'])} años"
+    # Sin payback cuando la renta no cubre los gastos (ver `modelo.calcular`).
+    v["ft_payback_renta"] = (f"~{num(re_['payback'])} años" if re_["payback"] is not None
+                             else "No se recupera con la renta")
     pv = base["payback_valorizacion"]
     # «inmediato» = al entregar la obra, vender ya devuelve el All-in. Corto: la tarjeta no admite más.
     v["ft_payback_valorizacion"] = ("inmediato" if pv == 0 else f"~{pv} año{'s' if pv != 1 else ''}"

@@ -48,7 +48,7 @@ propuesta de transformación no se tocan.
 - **IPC:** DANE, vía la API del Banco de la República: **6,24 %** (agosto de 2026), constante 5 años.
 - **Escenarios:** valorización = (1 + IPC)(1 + prima real) − 1, con primas −2 / 0 / +2 %. Arriendo y gastos crecen con el IPC.
 - **Si no hay red:** CDT e IPC salen de la caché (12 h y 7 días) y, en último caso, de `macro_respaldo.json`. La consola dice de dónde salió cada dato.
-  - El servidor del BanRep no envía su certificado intermedio. El código descarga el oficial de DigiCert y verifica igual; **no desactiva la verificación TLS**.
+  - El servidor del BanRep no envía su certificado intermedio. El oficial de DigiCert («GeoTrust EV RSA CA G2») va en el repositorio (`backend/app/services/fichas/banrep_intermedio.pem`, válido hasta julio de 2030) y se verifica igual; **no desactiva la verificación TLS**. No se descarga al vuelo: se bajaba por http y quien interceptara esa descarga podía hacerse pasar por el BanRep (revisión del 30-sep).
   - Con `FICHAS_MACRO_EN_VIVO=0` no se sale a internet (así corren las pruebas).
 - **Score:** sin visita, las características arquitectónicas valen neutro y los gates quedan «Por validar».
   - Las notas de zona oficiales son solo las de La Cabrera; las de Chicó y El Poblado son estimadas. Para las demás zonas **no se calcula score** y la consola lo avisa.
@@ -58,5 +58,5 @@ propuesta de transformación no se tocan.
 ## Para desplegar
 
 - **No hay migración de base:** no se crean tablas ni columnas.
-- El backend necesita salida a internet hacia `www.datos.gov.co`, `suameca.banrep.gov.co` y `cacerts.digicert.com`. Sin ella funciona igual, con el respaldo.
+- El backend necesita salida a internet hacia `www.datos.gov.co` y `suameca.banrep.gov.co`. Sin ella funciona igual, con el respaldo; tras un fallo no reintenta en 10 minutos, así que «Calcular» no se queda esperando en cada clic.
 - Pruebas: `cd backend && python -m pytest tests -q` (pytest y httpx no están en `requirements.txt`).

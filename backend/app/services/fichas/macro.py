@@ -31,9 +31,22 @@ nunca muestra un dato viejo como si fuera de hoy.
 
 NOTA TLS (BanRep): su servidor no envía el certificado intermedio de la cadena,
 así que una verificación estricta falla («unable to get local issuer
-certificate»). No se desactiva la verificación: se descarga el intermedio
-oficial de DigiCert (la URL que declara el propio certificado en «CA Issuers»)
-y se agrega. Sigue siendo una conexión verificada.
+certificate»). No se desactiva la verificación: se agrega el intermedio
+oficial de DigiCert, «GeoTrust EV RSA CA G2», que va en el repositorio
+(`banrep_intermedio.pem`).
+
+Va en el repositorio y NO se descarga al vuelo. La versión anterior lo bajaba
+en cada consulta de `http://cacerts.digicert.com` —sin TLS, porque ese
+servidor sólo publica por http— y lo agregaba como autoridad de confianza.
+Quien pudiera interceptar esa descarga entregaba su propio certificado, pasaba
+a ser «autoridad», y desde ahí podía hacerse pasar por el BanRep y dictar el
+IPC de las fichas. El archivo del repositorio se comprobó una vez contra la
+raíz de DigiCert (DigiCert Global Root G2, en la lista de autoridades de
+Mozilla) el 30-sep-2026:
+    SHA-256 2D:14:0F:20:B8:A9:6E:2B:4D:2F:1C:C5:AC:A5:E5:A1:E7:DC:56:A7:49:1E:51:09:06:96:0F:38:D2:D2:1A:EF
+    válido hasta el 2 de julio de 2030. Antes de esa fecha hay que cambiarlo
+    (o antes, si el BanRep cambia de certificado): la consulta fallará y el
+    IPC saldrá del respaldo, avisándolo.
 
 Con `FICHAS_MACRO_EN_VIVO=0` en el entorno no se sale a internet (pruebas).
 """
@@ -56,16 +69,22 @@ CACHE_DISCO = Path(tempfile.gettempdir()) / "zequara_fichas_macro.json"
 API_CDT = "https://www.datos.gov.co/resource/axk9-g2nh.json"
 API_BANREP = "https://suameca.banrep.gov.co/estadisticas-economicas-back/rest/estadisticaEconomicaRestService/consultaMenuXId"
 REFERER_BANREP = "https://suameca.banrep.gov.co/estadisticas-economicas/"
-INTERMEDIO_BANREP = "http://cacerts.digicert.com/GeoTrustEVRSACAG2.crt"
+INTERMEDIO_BANREP = AQUI / "banrep_intermedio.pem"
 
 FRESCO_S = {"cdt": 12 * 3600, "ipc": 7 * 24 * 3600}
-TIEMPO_MAX_S = 12
+# Corto: esto corre mientras alguien espera con el botón pulsado.
+TIEMPO_MAX_S = 8
+# Tras un fallo no se vuelve a intentar en este rato. Sin esto, con la API
+# caída cada «Calcular» esperaba el tiempo máximo entero antes de caer al
+# respaldo, clic tras clic.
+REINTENTO_S = 10 * 60
 CORTES_CDT = 5
 EPOCA = datetime(1970, 1, 1, tzinfo=timezone.utc)
 MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
          "septiembre", "octubre", "noviembre", "diciembre"]
 
 _memoria: dict[str, tuple[float, dict]] = {}
+_fallos: dict[str, tuple[float, str]] = {}
 
 
 def en_vivo() -> bool:
@@ -111,8 +130,7 @@ def _serie_banrep(id_menu: int, ctx: ssl.SSLContext) -> dict[str, list[tuple[str
 
 def _consultar_ipc() -> dict:
     ctx = ssl.create_default_context()
-    der = urllib.request.urlopen(INTERMEDIO_BANREP, timeout=TIEMPO_MAX_S).read()
-    ctx.load_verify_locations(cadata=ssl.DER_cert_to_PEM_cert(der))
+    ctx.load_verify_locations(cafile=str(INTERMEDIO_BANREP))
     s = _serie_banrep(100001, ctx)
     total = next(v for k, v in s.items() if "total anual" in k.lower())
     meta = next(v for k, v in s.items() if "meta" in k.lower())
@@ -146,7 +164,10 @@ def _obtener(clave: str, consultar) -> dict:
     if disco and ahora - disco.get("_t", 0) < FRESCO_S[clave]:
         _memoria[clave] = (disco["_t"], disco)
         return disco
-    if en_vivo():
+    fallo = _fallos.get(clave)
+    if fallo and ahora - fallo[0] < REINTENTO_S:
+        error = fallo[1]
+    elif en_vivo():
         try:
             dato = consultar() | {"_t": ahora, "origen": "en vivo",
                                    "consultado": datetime.now().isoformat(timespec="seconds")}
@@ -155,6 +176,7 @@ def _obtener(clave: str, consultar) -> dict:
             return dato
         except Exception as e:  # red caída, API lenta, formato cambiado…
             error = str(e)
+            _fallos[clave] = (ahora, error)
     else:
         error = "consulta en vivo desactivada (FICHAS_MACRO_EN_VIVO=0)"
     if disco:  # vencido, pero es mejor que el respaldo fijo

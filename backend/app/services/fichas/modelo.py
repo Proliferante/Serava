@@ -146,7 +146,10 @@ def calcular(predio: dict, segmento: dict, ipc: float, cdt: float,
                    descuento_negociacion=1 - negociado / publicado),
         renta=dict(canon_m2=canon, bruta=renta_bruta, mensual=renta_bruta / 12, vacancia=vacancia,
                    cobrada=renta_cobrada, gastos=gastos, gastos_total=sum(gastos.values()), noi=noi1,
-                   yield_=noi1 / allin, carry=renta_bruta / allin, payback=allin / noi1),
+                   yield_=noi1 / allin, carry=renta_bruta / allin,
+                   # Con la renta sin cubrir los gastos no hay recuperación
+                   # por renta: None, y no una división por cero.
+                   payback=allin / noi1 if noi1 > 0 else None),
         escenarios=esc,
         supuestos=dict(ipc=ipc, cdt=cdt, prima_real=PRIMA_REAL, valorizacion=valorizacion,
                        vacancia_meses=VACANCIA_MESES, comision_venta=COMISION_VENTA),

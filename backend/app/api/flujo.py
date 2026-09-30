@@ -82,6 +82,7 @@ import io
 import json
 import re
 from datetime import datetime, timezone
+from typing import Annotated
 from urllib.parse import unquote
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
@@ -1094,6 +1095,15 @@ def quitar_foto(p: PeticionQuitarFoto, u: dict = Depends(usuario_actual)):
 # quien arma la ficha revisa, corrige y guarda o publica como siempre.
 
 
+# Techos holgados en pesos, muy por encima de cualquier predio real. No
+# validan el negocio —eso lo hacen los avisos del modelo—: impiden que un
+# número absurdo (un 1e300 escrito por error) lleve las cuentas a infinito, y
+# un infinito no se puede devolver en JSON: la petición acababa en un 500.
+TECHO_PRECIO = 1e13          # diez billones
+TECHO_M2 = 1e9               # mil millones por m²
+TECHO_MENSUAL = 1e10
+
+
 class PeticionCalculo(BaseModel):
     link: str = Field(max_length=LIMITE_LINK)
     # Todo opcional: lo que no venga se toma del anuncio (_calculo_base).
@@ -1101,13 +1111,13 @@ class PeticionCalculo(BaseModel):
     ciudad: str | None = Field(default=None, max_length=80)
     tipo: str | None = Field(default=None, max_length=40)
     area: float | None = Field(default=None, gt=0, lt=100_000)
-    publicado: float | None = Field(default=None, gt=0)
-    negociado: float | None = Field(default=None, gt=0)
-    remodelacion_m2: float | None = Field(default=None, gt=0)
-    administracion: float | None = Field(default=None, ge=0)
-    canon_m2: float | None = Field(default=None, gt=0)
-    valor_remodelado_m2: float | None = Field(default=None, gt=0)
-    rasgos: list[str] = Field(default_factory=list, max_length=6)
+    publicado: float | None = Field(default=None, gt=0, lt=TECHO_PRECIO)
+    negociado: float | None = Field(default=None, gt=0, lt=TECHO_PRECIO)
+    remodelacion_m2: float | None = Field(default=None, gt=0, lt=TECHO_M2)
+    administracion: float | None = Field(default=None, ge=0, lt=TECHO_MENSUAL)
+    canon_m2: float | None = Field(default=None, gt=0, lt=TECHO_M2)
+    valor_remodelado_m2: float | None = Field(default=None, gt=0, lt=TECHO_M2)
+    rasgos: list[Annotated[str, Field(max_length=120)]] = Field(default_factory=list, max_length=6)
 
 
 @router.post("/ficha/calcular")
