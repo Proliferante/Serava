@@ -180,9 +180,12 @@ function CTA({ x, y, tone, d = 0 }: { x: number; y: number; tone: "olive" | "cre
           boxShadow: olive ? "0px 16px 32px -16px rgba(47,55,30,0.6)" : "0px 16px 32px -16px rgba(0,0,0,0.4)",
         }}
       >
+        {/* Una sola línea: el texto mide ~228 y la caja de Figma era de 222,
+            así que partía «portafolio» abajo y se salía del botón por arriba y
+            por abajo. Cabe de sobra antes de la flecha, que está en 270. */}
         <T
-          x={32} cy={28.5} w={222}
-          className={`font-semibold ${olive ? "" : "text-center"}`}
+          x={32} cy={28.5} w={232}
+          className={`whitespace-nowrap font-semibold ${olive ? "" : "text-center"}`}
           style={{ fontSize: 16, lineHeight: "24.8px", color: olive ? LINEN : OIL }}
         >
           <p>{CTA_PORTAFOLIO}</p>
@@ -305,7 +308,9 @@ function Comparador({ active, setActive }: { active: number; setActive: (i: numb
           <p className="font-bold uppercase" style={{ fontSize: 10.6, lineHeight: "16.37px", letterSpacing: "1.478px", color: "rgba(247,241,229,0.9)" }}>Antes</p>
         </Pop>
         {/* Badge DESPUÉS (311:2083) */}
-        <Pop className="absolute backdrop-blur-[2px]" style={{ right: 16.42, top: 16, padding: "6px 14px 7.36px", background: "rgba(127,139,87,0.85)", borderRadius: 8 }} delay={0.6} from={0.7}>
+        {/* Mismo alto que el de ANTES (padding + borde de 1): con 2 px menos por
+            cada lado quedaba más bajo y descentrado respecto a su pareja. */}
+        <Pop className="absolute backdrop-blur-[2px]" style={{ right: 16.42, top: 16, padding: "7px 15px 8.36px", background: "rgba(127,139,87,0.85)", border: "1px solid rgba(0,0,0,0)", borderRadius: 8 }} delay={0.6} from={0.7}>
           <p className="font-bold uppercase" style={{ fontSize: 10.6, lineHeight: "16.37px", letterSpacing: "1.478px", color: LINEN }}>Después</p>
         </Pop>
 
@@ -333,14 +338,17 @@ function Comparador({ active, setActive }: { active: number; setActive: (i: numb
           </div>
           <p className="font-semibold" style={{ marginTop: 3, fontSize: 18.4, lineHeight: "28.52px", color: OIL }}>{p.title}</p>
         </L>
-        <L x={748} y={26.965} h={49.59} className="flex gap-[22px]">
+        {/* Anclado a la derecha con el mismo margen que el bloque de la
+            izquierda (25): fijo en x=748, «Intervención» acababa a 10 px del
+            borde de la barra. */}
+        <div className="absolute flex gap-[22px]" style={{ right: 25, top: 26.965, height: 49.59 }}>
           {([["Ciudad / Zona", `${p.city} · ${p.zone}`], ["Intervención", p.interv]] as const).map(([k, v]) => (
             <div key={k} style={{ paddingTop: 5 }}>
               <p className="font-normal uppercase" style={{ fontSize: 10.9, lineHeight: "16.86px", letterSpacing: "0.653px", color: MILLBROOK }}>{k}</p>
               <p className="font-semibold" style={{ marginTop: 1.79, fontSize: 16, lineHeight: "24.8px", color: BISTRE }}>{v}</p>
             </div>
           ))}
-        </L>
+        </div>
       </Rise>
 
       {/* Selectores de proyecto (311:2118) */}
@@ -565,8 +573,10 @@ export default function OportunidadesScreen() {
                 <Ico size={16.2} layers={IC_LOCK} />
               </Pop>
               <T x={48} cy={32.41} d={0.9} ry={12} className="whitespace-nowrap font-normal" style={{ fontSize: 13.2, lineHeight: "20.4px", color: LINEN80 }}>
-                <p>La información detallada se habilita dentro de la plataforma</p>
-                <p>después de la aprobación de acceso.</p>
+                {/* El corte de Figma dejaba la primera línea en ~395 px desde x=48:
+                    se comía el margen derecho y la tarjeta la recortaba. */}
+                <p>La información detallada se habilita dentro de la</p>
+                <p>plataforma después de la aprobación de acceso.</p>
               </T>
             </L>
           </motion.div>
@@ -628,14 +638,17 @@ export default function OportunidadesScreen() {
           <T x={417} cy={387.16} w={488} d={0.4} className="font-light" style={{ fontSize: 19.3, lineHeight: "29.9px", color: MILLBROOK }}>
             <p>Zequara acompaña cada operación desde la selección del activo hasta su remodelación y posterior administración.</p>
           </T>
-          <T x={417} cy={470.35} w={488} d={0.52} className="font-light" style={{ fontSize: 19.3, lineHeight: "29.9px", color: MILLBROOK }}>
+          {/* El primer párrafo ocupa tres líneas con la fuente real (en Figma
+              eran dos) y se montaba 6 px sobre el segundo. Éste y la nota de
+              abajo bajan 15 px para dejar el mismo aire que había en el diseño. */}
+          <T x={417} cy={485.35} w={488} d={0.52} className="font-light" style={{ fontSize: 19.3, lineHeight: "29.9px", color: MILLBROOK }}>
             <p>
               <span>El inversionista </span>
               <span className="font-semibold" style={{ color: BISTRE }}>conserva la propiedad</span>
               <span>, aprueba las decisiones clave y consulta el avance desde un solo lugar.</span>
             </p>
           </T>
-          <T x={417} cy={544.09} w={488} d={0.64} className="font-medium" style={{ fontSize: 14.5, lineHeight: "22.5px", color: VERDIGRIS }}>
+          <T x={417} cy={559.3} w={488} d={0.64} className="font-medium" style={{ fontSize: 14.5, lineHeight: "22.5px", color: VERDIGRIS }}>
             <p>Un solo equipo conecta análisis, diseño, obra y operación.</p>
           </T>
 
@@ -682,8 +695,12 @@ export default function OportunidadesScreen() {
 
         {/* ══════════ 5 · ACCESO (311:2313) ══════════ */}
         <L x={0} y={4706} w={1920} h={844} className="overflow-hidden" style={{ background: "rgba(73,33,0,0.85)", borderRadius: "150px 0 0 0" }}>
+          {/* En una línea: a 180 de ancho, con el tracking de 3,2, partía en
+              «PORTAFOLIO / PRIVADO» y dejaba la raya colgando a media altura.
+              En una línea, el conjunto raya + texto queda centrado sobre el
+              título tal como estaba colocado. */}
           <Rule x={845.445} y={146} w={34} color={LASER} delay={0.1} />
-          <T x={891.447} cy={145.58} w={180.155} d={0.24} ry={14} className="text-center font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.226px", color: LASER }}>
+          <T x={891.447} cy={145.58} w={200} d={0.24} ry={14} className="whitespace-nowrap font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "3.226px", color: LASER }}>
             <p>Portafolio privado</p>
           </T>
           <T x={650} cy={229.95} w={620} className="whitespace-nowrap text-center" style={{ fontSize: 51.2, lineHeight: "57.34px", letterSpacing: "-1.28px", color: LINEN }}>

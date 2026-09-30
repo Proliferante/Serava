@@ -38,12 +38,23 @@ const VERDIGRIS = "#5f6b3e";
 
 /* ── Piezas de sección, con los dos juegos de color del lienzo ───────────── */
 
-function Sec({ dark, bg, children, className }: { dark?: boolean; bg: string; children: ReactNode; className?: string }) {
+/**
+ * `fondo` va fuera de la columna a propósito: dentro, una textura con
+ * `inset-x-0` medía lo que la columna (720 como mucho) y en tablet quedaba como
+ * un recuadro con los bordes cortados en mitad de la franja.
+ */
+function Sec({ dark, bg, children, className, fondo }: { dark?: boolean; bg: string; children: ReactNode; className?: string; fondo?: ReactNode }) {
   return (
     <section className={`relative overflow-hidden ${className ?? ""}`} style={{ background: bg }}>
+      {fondo}
       <div className={`${WRAP} relative py-[56px]`}>{children}</div>
     </section>
   );
+}
+
+/** Plano de ciudad al 25 %, anclado abajo y a todo el ancho de la franja. */
+function Textura() {
+  return <img src={`${A}/como-ciudad.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-x-0 bottom-0 w-full opacity-25" />;
 }
 
 /** Antetítulo del paso: laser sobre oscuro, driftwood sobre crema. */
@@ -212,8 +223,7 @@ export default function ModeloCompact() {
         </Sec>
 
         {/* ══════════ 6 · PASO 04 · MODELO DE COBRO ══════════ */}
-        <Sec bg={CREAM} className="rounded-tl-[64px]">
-          <img src={`${A}/como-ciudad.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-x-0 bottom-0 w-full opacity-25" />
+        <Sec bg={CREAM} className="rounded-tl-[64px]" fondo={<Textura />}>
           <In><Paso>Paso 04 · Modelo de cobro</Paso></In>
           <In delay={0.05}>
             <Pregunta>¿Cómo cobra Zequara?</Pregunta>
@@ -315,8 +325,7 @@ export default function ModeloCompact() {
         </Sec>
 
         {/* ══════════ 10 · CAPACIDAD OPERATIVA ══════════ */}
-        <Sec bg={CREAM}>
-          <img src={`${A}/como-ciudad.webp`} alt="" loading="lazy" decoding="async" className="pointer-events-none absolute inset-x-0 bottom-0 w-full opacity-25" />
+        <Sec bg={CREAM} fondo={<Textura />}>
           <In><Paso>Capacidad operativa</Paso></In>
           <In delay={0.05}>
             <Pregunta>¿Qué experiencia respalda la operación?</Pregunta>

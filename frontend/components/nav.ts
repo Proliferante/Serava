@@ -11,7 +11,7 @@ export type Enlace = { href: string; label: string };
 
 export const ENLACES: Enlace[] = [
   { href: "/", label: "Inicio" },
-  { href: "/modelo", label: "¿Cómo operamos?" },
-  { href: "/oportunidades", label: "Proyectos realizados" },
+  { href: "/como-operamos", label: "¿Cómo operamos?" },
+  { href: "/proyectos", label: "Proyectos realizados" },
   { href: "/hub", label: "HUB" },
 ];

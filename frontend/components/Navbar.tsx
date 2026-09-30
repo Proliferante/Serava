@@ -38,10 +38,13 @@ export default function Navbar() {
           render del header de Cómo operamos (426:1129/1130/1131). */}
       {/* Los cuatro se recolocan porque «Proyectos realizados» es bastante
           más largo que «Oportunidades» y se comía al siguiente (OBS-48). */}
+      {/* Separación medida sobre el texto pintado: 100 px entre enlaces. Con
+          los huecos de antes (94, 65 y 142) «HUB» se veía descolgado del
+          resto. Todos en la misma línea base: «¿Cómo operamos?» iba 1 px alto. */}
       <NavLink href="/" left={470} top={64}>Inicio</NavLink>
-      <NavLink href="/modelo" left={640} top={63}>¿Cómo operamos?</NavLink>
-      <NavLink href="/oportunidades" left={990} top={64}>Proyectos realizados</NavLink>
-      <NavLink href="/hub" left={1440} top={64}>HUB</NavLink>
+      <NavLink href="/como-operamos" left={646} top={64}>¿Cómo operamos?</NavLink>
+      <NavLink href="/proyectos" left={1030} top={64}>Proyectos realizados</NavLink>
+      <NavLink href="/hub" left={1438} top={64}>HUB</NavLink>
 
       {/* Registro btn (426:1127) */}
       <a

@@ -58,8 +58,10 @@ export default async function HubPage() {
           <div className="absolute left-[436px] top-[944.335px] w-[1048px]"><HubCardsGrid cards={cards} /></div>
         </div>
 
-        {/* Featured article (painted on top, in the gap between hero and grid) */}
-        <RevealLayer left={446} top={1148} width={1048} height={447.52}><HubFeaturedArticle /></RevealLayer>
+        {/* Featured article (painted on top, in the gap between hero and grid).
+            En 436, como el boletín y la rejilla de abajo: en 446 quedaba 10 px
+            corrido a la derecha respecto de los dos bloques que tiene debajo. */}
+        <RevealLayer left={436} top={1148} width={1048} height={447.52}><HubFeaturedArticle /></RevealLayer>
 
         {/* Footer */}
         <Layer left={-2} top={3463} width={1922} height={364}><Footer /></Layer>

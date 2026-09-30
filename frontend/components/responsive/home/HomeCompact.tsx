@@ -410,7 +410,10 @@ export default function HomeCompact() {
                     ? { background: "#492100", borderColor: "rgba(201,168,119,0.4)" }
                     : { background: "rgba(255,255,255,0.45)", borderColor: "rgba(165,122,78,0.28)" }}
                 >
-                  <div className="flex items-center justify-between gap-[8px]">
+                  {/* En tres columnas (tablet) la etiqueta va debajo del título: al
+                      lado no le quedaban ni 60 px y partía en seis líneas de una
+                      o dos palabras, que además descentraban el título. */}
+                  <div className="flex items-center justify-between gap-[8px] sm:flex-col sm:items-start sm:gap-[6px]">
                     <p className="m-0 text-[16px] font-semibold" style={{ color: e.accent ? "#f7f1e5" : "#492100" }}>{e.title}</p>
                     <span className="rounded-full px-[9px] py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.6px]" style={e.accent ? { background: "rgba(201,168,119,0.22)", color: "#c9a877" } : { background: "rgba(165,122,78,0.16)", color: "#a57a4e" }}>{e.sub}</span>
                   </div>
