@@ -598,3 +598,13 @@
      mejor desplazándola que aplastada a treinta píxeles por celda. */
   .adm .fic-rejilla{overflow-x:auto;}
 }
+
+/* ── Calcular finanzas (components/admin/ficha/CalcularFinanzas.tsx) ─────── */
+.adm .fic-calc-cab{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.adm .fic-calc-res{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);}
+.adm .fic-calc-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;}
+.adm .fic-calc-kpis div{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;}
+.adm .fic-calc-kpis small{display:block;font-size:.72rem;color:var(--mocha);margin-bottom:3px;}
+.adm .fic-calc-kpis b{font-size:.95rem;color:var(--espresso2);}
+.adm .fic-calc-fuentes{margin-top:12px;font-size:.74rem;font-weight:300;color:var(--mocha);line-height:1.5;list-style:none;padding:0;}
+.adm .fic-calc-fuentes b{font-weight:600;}

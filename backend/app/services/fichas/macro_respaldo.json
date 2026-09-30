@@ -1,0 +1,16 @@
+{
+  "_nota": "Último recurso si no hay red ni caché: valores consultados el 29-sep-2026. Ver macro.py. La ficha dice que salen de aquí.",
+  "cdt": {
+    "valor": 0.1203,
+    "fecha_desde": "2026-09-21",
+    "fecha_hasta": "2026-09-25",
+    "bancos": 26,
+    "fuente": "Superintendencia Financiera, formato 441 (datos.gov.co)"
+  },
+  "ipc": {
+    "valor": 0.0624,
+    "fecha": "2026-08-31",
+    "meta": 0.03,
+    "fuente": "DANE, vía Banco de la República (SUAMECA)"
+  }
+}

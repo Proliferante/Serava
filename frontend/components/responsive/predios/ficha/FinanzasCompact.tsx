@@ -6,7 +6,7 @@ import { EASE, In, WRAP } from "@/components/responsive/kit";
 import { Cifra, posicionTermo, StrokeIcon, Termo } from "@/components/predios/ficha/kit";
 import { useFicha } from "@/components/predios/ficha/datos";
 import {
-  ALTERNATIVAS, Cascada, ESCENARIOS, ESENCIAL, LIQUIDEZ, Proyeccion, SALIDA, TABLA, TABLA_HEAD,
+  ALTERNATIVAS, Cascada, ESCENARIOS, ESENCIAL, LIQUIDEZ, notaAlternativas, Proyeccion, SALIDA, TABLA, TABLA_HEAD,
 } from "@/components/predios/ficha/Finanzas";
 import {
   Band, BROWN, Card, FichaShellCompact, H2, HAIRLINE, HeroCompact, HeroFoto,
@@ -165,10 +165,10 @@ export default function FinanzasCompact() {
               transition={{ duration: 0.5, ease: EASE }}
               style={{ overflow: "hidden" }}
             >
-              {/* ── Rentabilidad detallada + contexto de mercado ── */}
+              {/* ── Rentabilidad del arriendo + contexto de mercado ── */}
               <Band tone="brown" corner="br" className="pb-[42px] pt-[42px]">
                 <div className={WRAP}>
-                  <In><H2 dark>Rentabilidad detallada</H2></In>
+                  <In><H2 dark>Rentabilidad del arriendo</H2></In>
                   <div className="mt-[20px] grid grid-cols-1 gap-[10px] sm:grid-cols-2">
                     <Mini t="Gastos estimados anuales" v={d.t("ft_gastos_anuales", "$14M")} pie={d.t("ft_gastos_nota", "admin., predial, seguros")} />
                     <Mini t="TIR a 5 años" v={d.t("ft_tir_5", "~12,5%")} pie="efectivo anual" delay={0.06} bg="linear-gradient(151.696deg, rgba(127,139,87,0.4) 0%, rgba(95,107,62,0.3) 100%)" />
@@ -176,7 +176,7 @@ export default function FinanzasCompact() {
 
                   <In className="mt-[34px]"><H2 dark>Contexto de mercado</H2></In>
                   <In delay={0.06} className="mt-[20px] rounded-[16px] border border-solid px-[22px] pb-[22px] pt-[24px]" style={{ background: VELO, borderColor: VELO_BORDE }}>
-                    <span className="block text-[14.5px] leading-[1.3]" style={{ color: "rgba(247,241,229,0.7)" }}>Rango de arriendo mensual (320 m²)</span>
+                    <span className="block text-[14.5px] leading-[1.3]" style={{ color: "rgba(247,241,229,0.7)" }}>Rango de arriendo mensual ({d.t("spec_area", "320")} m²)</span>
                     <div className="mt-[26px]">
                       <Termo
                         width="100%"
@@ -189,7 +189,7 @@ export default function FinanzasCompact() {
                       />
                     </div>
                     <div className="mt-[22px]">
-                      <Mini t="Tasa de vacancia estimada" v={d.t("ft_vacancia", "~4%")} pie="de la zona" delay={0.12} />
+                      <Mini t="Tasa de vacancia estimada" v={d.t("ft_vacancia", "~4%")} pie="supuesto de referencia" delay={0.12} />
                     </div>
                   </In>
                 </div>
@@ -217,7 +217,7 @@ export default function FinanzasCompact() {
                 <div className={`${WRAP} mt-[14px]`}>
                   <div className="grid grid-cols-1 gap-[10px] sm:grid-cols-2">
                     <MiniClara t="Costo total (All-in)" v={d.t("puente_allin", "$3.450M")} badge={d.t("puente_allin_m2", "$10,8M / m²")} />
-                    <MiniClara t="Media mercado remodelado" v={d.t("ft_mercado_total", "$3.776M")} badge={d.t("puente_mercado_m2", "$11,8M / m²")} delay={0.06} />
+                    <MiniClara t="Mercado remodelado" v={d.t("ft_mercado_total", "$3.776M")} badge={d.t("puente_mercado_m2", "$11,8M / m²")} delay={0.06} />
                     <MiniClara t="Spread de valor" v={d.t("ft_spread", "+9%")} vc={VERD} delay={0.1} />
                     <MiniClara t="Valor creado hoy" v={d.t("valor_creado", "+$326M")} vc={VERD} delay={0.14} bg="linear-gradient(154.622deg, rgb(226,231,209) 0%, rgb(215,221,196) 100%)" />
                   </div>
@@ -249,10 +249,10 @@ export default function FinanzasCompact() {
                     </div>
                   </In>
 
-                  <In className="mt-[34px]"><H2 dark>Comparación vs. alternativas</H2></In>
+                  <In className="mt-[34px]"><H2 dark>Comparación con el CDT</H2></In>
                   <In delay={0.06} className="mt-[20px] rounded-[16px] border border-solid px-[22px] pb-[22px] pt-[20px]" style={{ background: VELO, borderColor: VELO_BORDE }}>
                     <div className="flex items-baseline justify-between border-b border-solid pb-[9px] text-[10.2px] font-semibold uppercase tracking-[0.41px]" style={{ borderColor: VELO_BORDE, color: "rgba(247,241,229,0.85)" }}>
-                      <span>Alternativa</span><span>Retorno anual</span>
+                      <span>Este activo</span><span>TIR anual</span>
                     </div>
                     {ALTERNATIVAS.map((a) => (
                       <div key={a.t} className="flex items-baseline justify-between gap-[12px] border-b border-solid py-[10px] last:border-b-0" style={{ borderColor: VELO_BORDE }}>
@@ -260,7 +260,7 @@ export default function FinanzasCompact() {
                         <span className="shrink-0 text-[13.6px] font-semibold" style={{ color: a.verde ? VERD : "rgba(247,241,229,0.85)" }}>{d.t(a.k, a.v)}</span>
                       </div>
                     ))}
-                    <Nota dark>{d.t("ft_alternativas_nota", "La TIR incluye renta y valorización; el CDT es renta fija sin activo subyacente.")}</Nota>
+                    <Nota dark>{notaAlternativas(d)}</Nota>
                   </In>
                 </div>
               </Band>
@@ -269,6 +269,10 @@ export default function FinanzasCompact() {
               <Band tone="cream" corner="bl" className="pb-[40px] pt-[42px]">
                 <div className={WRAP}>
                   <In><H2>Proyección patrimonial detallada</H2></In>
+                  {/* Paola (28-sep): ningún valor futuro sin decir su supuesto de IPC. */}
+                  <p className="m-0 mt-[10px] text-[12.5px] font-light leading-[1.45]" style={{ color: SOMBRA }}>
+                    {d.t("ft_supuestos", "Supuesto: valorización y renta crecen con el IPC más una prima real por escenario.")}
+                  </p>
                 </div>
 
                 <In delay={0.06} className="mt-[22px]">

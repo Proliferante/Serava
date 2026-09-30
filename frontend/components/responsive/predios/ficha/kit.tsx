@@ -7,6 +7,7 @@ import { PrediosNavCompact } from "@/components/responsive/predios/PrediosShell"
 import { EASE, In, WRAP } from "@/components/responsive/kit";
 import { IcArea, IcBath, IcBed, IcCar, posicionTermo, type TabKey, Termo } from "@/components/predios/ficha/kit";
 import { rutas, useFicha } from "@/components/predios/ficha/datos";
+import { useReserva, viendoAhora } from "@/components/predios/ficha/reserva";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FICHA DE PREDIO — piezas de la vista fluida (móvil y tablet).
@@ -229,19 +230,11 @@ export function HeroFoto() {
    El lateral del lienzo, entero. En columna cae justo después del hero, que
    es donde está en escritorio. */
 
-function useCuentaAtras(inicio: number) {
-  const [s, setS] = useState(inicio);
-  useEffect(() => {
-    const id = window.setInterval(() => setS((v) => (v > 0 ? v - 1 : 0)), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${p(Math.floor(s / 3600))}:${p(Math.floor((s % 3600) / 60))}:${p(s % 60)}`;
-}
-
 export function ReservaCompact() {
   const d = useFicha();
-  const tiempo = useCuentaAtras(d.n("reserva_horas", 2) * 3600 + 59 * 60 + 38);
+  /* La cuenta atrás y quién mira: ver predios/ficha/reserva.ts. */
+  const reserva = useReserva(d);
+  const viendo = viendoAhora(d);
   const BORDE = "rgba(90,67,50,0.16)";
 
   return (
@@ -271,22 +264,24 @@ export function ReservaCompact() {
           <span className="text-[18px] font-bold" style={{ color: VERD }}>{d.t("roi_estimado", "~22%")}</span>
         </div>
 
-        <div className="mt-[16px] flex items-center gap-[10px] rounded-[12px] border border-solid px-[14px] py-[12px]" style={{ background: "rgba(181,84,47,0.08)", borderColor: "rgba(181,84,47,0.25)" }}>
+        {reserva && <div className="mt-[16px] flex items-center gap-[10px] rounded-[12px] border border-solid px-[14px] py-[12px]" style={{ background: "rgba(181,84,47,0.08)", borderColor: "rgba(181,84,47,0.25)" }}>
           <svg width={18} height={18} viewBox="0 0 18 18" fill="none" stroke={TUSCANY} strokeWidth={1.425} aria-hidden><path d="M9 15.75C12.7279 15.75 15.75 12.7279 15.75 9C15.75 5.27208 12.7279 2.25 9 2.25C5.27208 2.25 2.25 5.27208 2.25 9C2.25 12.7279 5.27208 15.75 9 15.75ZM9 5.25V9L11.25 10.5" /></svg>
           <span>
-            <span className="block text-[11.5px] font-light" style={{ color: "#5b4332" }}>Reserva disponible por</span>
-            <span className="block text-[18px] font-bold tabular-nums" style={{ color: TUSCANY }}>{tiempo}</span>
+            <span className="block text-[11.5px] font-light" style={{ color: "#5b4332" }}>{reserva.etiqueta}</span>
+            <span className="block text-[18px] font-bold tabular-nums" style={{ color: TUSCANY }}>{reserva.valor}</span>
           </span>
-        </div>
+        </div>}
 
         <button type="button" className="ix-press mt-[16px] flex h-[56px] w-full items-center justify-center gap-[9px] rounded-[12px] text-[16.5px] font-semibold text-white" style={{ background: TUSCANY, boxShadow: "0 14px 28px -14px rgba(181,84,47,0.7)" }}>
           <svg width={17} height={17} viewBox="0 0 17 17" fill="none" stroke="#fff" strokeWidth={1.558} aria-hidden><path d="M9.20833 1.41667L2.125 9.91667H7.08333L6.375 15.5833L13.4583 7.08333H8.5L9.20833 1.41667Z" /></svg>
           Reservar ahora
         </button>
 
-        <p className="m-0 mt-[14px] text-center text-[12.5px] font-medium" style={{ color: TUSCANY }}>
-          <span className="motion-safe:animate-pulse">●</span> {d.t("viendo_ahora", "5")} inversionistas viendo este predio
-        </p>
+        {viendo && (
+          <p className="m-0 mt-[14px] text-center text-[12.5px] font-medium" style={{ color: TUSCANY }}>
+            <span className="motion-safe:animate-pulse">●</span> {viendo}
+          </p>
+        )}
         <p className="m-0 mt-[8px] text-center text-[12px] font-light leading-[1.5]" style={{ color: "#5b4332" }}>
           Al reservar, <span className="font-semibold" style={{ color: "#3d2c1e" }}>el predio se bloquea</span> y deja de estar disponible para otros mientras tu reserva esté vigente.
         </p>
