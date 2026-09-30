@@ -67,6 +67,25 @@ export default function AdminLogin() {
     }
   }, []);
 
+  /* Fuera de la consola, la dirección no dice nada de ella. Al cerrar sesión
+     desde /extraccion, la pantalla pasaba al acceso pero la barra seguía
+     diciendo /extraccion, y el «atrás» del navegador volvía a enseñar las
+     rutas de los módulos. Ahora el acceso deja la dirección en la raíz al
+     aparecer, y la vuelve a dejar ahí cada vez que el historial la mueve.
+     Va con el `replaceState` original del navegador, como en la consola (ver
+     `escribir` en AdminConsole): el de Next desmontaría la pantalla. */
+  useEffect(() => {
+    const raiz = window.location.hostname.startsWith("admin.") ? "/" : "/admin";
+    const limpiar = () => {
+      if (window.location.pathname + window.location.search !== raiz) {
+        History.prototype.replaceState.call(window.history, null, "", raiz);
+      }
+    };
+    limpiar();
+    window.addEventListener("popstate", limpiar);
+    return () => window.removeEventListener("popstate", limpiar);
+  }, []);
+
   const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!correo.trim() || !clave) {

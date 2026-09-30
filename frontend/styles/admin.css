@@ -43,7 +43,23 @@
 .adm .nav-item:hover{color:var(--ivory);background:rgba(247,241,229,.05);}
 .adm .nav-item.active{background:linear-gradient(90deg,rgba(165,122,78,.5),rgba(165,122,78,.12));color:var(--ivory);font-weight:500;}
 .adm .nav-item .badge{margin-left:auto;background:var(--terra);color:#fff;font-size:.6rem;font-weight:700;border-radius:999px;padding:1px 7px;}
-.adm .side .foot{margin-top:auto;padding:12px;font-size:.68rem;color:rgba(247,241,229,.4);font-weight:300;}
+.adm .side .foot{margin-top:auto;padding:12px 0 4px;font-size:.68rem;color:rgba(247,241,229,.4);font-weight:300;display:flex;flex-direction:column;gap:8px;
+  /* Pegado abajo: con los doce módulos el menú es más alto que la pantalla de
+     un portátil, y «Cerrar sesión» quedaba debajo, a un scroll de distancia.
+     El fondo tapa los módulos que pasan por detrás al bajar. */
+  position:sticky;bottom:-20px;margin-bottom:-20px;padding-bottom:20px;background:linear-gradient(180deg,rgba(34,24,18,0),var(--espresso) 18px);}
+/* Botones del pie del menú: del alto de un módulo, para que se lean como
+   acciones y no como letra pequeña. */
+.adm .side .foot-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:10px;font-family:inherit;font-size:.86rem;font-weight:500;cursor:pointer;text-align:left;transition:background .18s,border-color .18s;}
+.adm .side .foot-btn svg{width:18px;height:18px;flex-shrink:0;}
+.adm .side .foot-btn.salir{color:#F0C2AD;background:rgba(181,84,47,.14);border:1px solid rgba(181,84,47,.5);}
+.adm .side .foot-btn.salir:hover{background:rgba(181,84,47,.26);border-color:rgba(181,84,47,.75);}
+.adm .side .foot-btn.instalar{color:var(--sand);background:rgba(201,168,119,.1);border:1px solid rgba(201,168,119,.35);}
+.adm .side .foot-btn.instalar:hover{background:rgba(201,168,119,.18);}
+.adm .side .foot-btn:focus-visible{outline:2px solid var(--sand);outline-offset:2px;}
+.adm .side .foot-ayuda{margin:0;padding:0 4px;font-size:.74rem;line-height:1.5;color:rgba(247,241,229,.7);}
+.adm .side .foot-ayuda b{color:var(--ivory);font-weight:600;}
+.adm .side .foot-nota{margin:4px 0 0;padding:0 12px;line-height:1.5;}
 .adm .main{display:flex;flex-direction:column;min-width:0;}
 .adm .topbar{background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px clamp(16px,2.5vw,30px);position:sticky;top:0;z-index:30;}
 .adm .search{flex:1;max-width:420px;display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 14px;}
