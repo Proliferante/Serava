@@ -77,11 +77,19 @@ export default function MobileFooter() {
           {DISCLAIMER}
         </p>
 
-        <p className="mt-[18px] text-[13.5px] font-light">
-          <a href="/terminos" className="text-sand underline decoration-[rgba(223,197,159,0.35)] underline-offset-[3px]">Términos y condiciones</a>
-        </p>
+        {/* Legal: con su icono de documento y 44 px de alto para el pulgar,
+            pero en el tamaño del pie legal, que es lo que es. */}
+        <div className="mt-[16px] border-t border-solid border-[rgba(226,205,174,0.14)] pt-[8px]">
+          <a href="/terminos" className="group inline-flex h-[44px] items-center gap-[10px] text-[14px] font-light text-sand">
+            <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#cd9a64" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z" />
+              <path d="M14 3v5h5M9 13h6M9 17h4" />
+            </svg>
+            <span className="underline decoration-[rgba(205,154,100,0.45)] underline-offset-[4px] group-hover:decoration-sand">Términos y condiciones</span>
+          </a>
+        </div>
 
-        <p className="mt-[14px] text-[12.5px] font-light leading-[1.5] text-[rgba(226,205,174,0.5)]">
+        <p className="mt-[6px] text-[12.5px] font-light leading-[1.5] text-[rgba(226,205,174,0.5)]">
           © {new Date().getFullYear()} Zequara. Portafolio reservado para un grupo limitado de inversionistas. Acceso sujeto a evaluación.
         </p>
       </div>

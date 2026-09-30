@@ -496,3 +496,20 @@ body {
 .legal-indice summary::-webkit-details-marker { display: none; }
 .legal-flecha { transition: transform 0.2s ease; }
 .legal-indice[open] .legal-flecha { transform: rotate(180deg); }
+/* Sobre el marrón el foco café no se ve: va en arena. */
+.legal-enlace-claro:focus-visible { outline-color: #dfc59f; }
+
+/* Entradas del índice. Claro (el plegable de móvil) y oscuro (el fijo de
+   escritorio); la activa la marca `IndiceVivo` con `aria-current`. */
+.legal-item { color: #5b4332; }
+.legal-item .legal-item-num { color: #8b5e34; transition: color 0.2s ease; }
+.legal-item:hover { color: #492100; background: rgba(165, 122, 78, 0.1); }
+.legal-item[aria-current] { color: #492100; background: rgba(165, 122, 78, 0.14); font-weight: 500; }
+
+.legal-item-oscuro { color: rgba(247, 241, 229, 0.72); }
+.legal-item-oscuro .legal-item-num { color: #c59f72; }
+.legal-item-oscuro:hover { color: #f7f1e5; background: rgba(226, 205, 174, 0.07); }
+.legal-item-oscuro[aria-current] { color: #f7f1e5; background: rgba(197, 159, 114, 0.16); box-shadow: inset 2px 0 0 #c59f72; }
+
+/* La barra del índice fijo, fina y del color de la pieza. */
+.legal-caja { scrollbar-width: thin; scrollbar-color: rgba(226, 205, 174, 0.25) transparent; }
