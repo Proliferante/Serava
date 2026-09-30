@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import Cargando from "@/components/Cargando";
 import { MCuerpo, MPie, useConsola } from "@/components/admin/ctx";
 import { useSesion } from "@/components/admin/sesion";
 import { tituloDelEnlace } from "@/components/admin/data";
@@ -500,7 +501,7 @@ export default function FlujoInmuebles() {
 
   /** Cabecera de estado compartida por las seis pestañas. */
   const estado = () => {
-    if (cargando) return <Vacio>Cargando…</Vacio>;
+    if (cargando) return <Card><Cargando texto="Cargando inmuebles…" /></Card>;
     if (error) {
       return (
         <Card>

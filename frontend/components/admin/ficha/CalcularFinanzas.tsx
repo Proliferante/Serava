@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { lleno, type Valores } from "@/components/admin/ficha/esquema";
 import { Btn, Card, Hint, IcoCheck, SecTitle } from "@/components/admin/ui";
+import { conPuntos } from "@/lib/cifras";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    CALCULAR FINANZAS — las cifras de la ficha salen del modelo, no de la mano.
@@ -91,7 +92,12 @@ export function CalcularFinanzas({ link, base, zonas, valores, pedir, onAplicar 
     setError(null);
   }, [base, link]);
 
-  const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF((p) => ({ ...p, [k]: e.target.value }));
+  /* Las cifras llevan sus puntos de miles mientras se escriben («2.530.000»):
+     un precio de diez dígitos no se lee sin contar ceros. `numero()` los lee
+     igual. Ver `conPuntos` en lib/cifras.ts. */
+  const CIFRAS = new Set<keyof typeof f>(["area", "publicado", "negociado", "remodelacion", "administracion", "canon", "valorRemodelado"]);
+  const set = (k: keyof typeof f) => (e: { target: { value: string } }) =>
+    setF((p) => ({ ...p, [k]: CIFRAS.has(k) ? conPuntos(e.target.value) : e.target.value }));
   const tipos = useMemo(() => Object.keys(zonas[f.zona]?.tipos ?? {}), [zonas, f.zona]);
 
   const calcular = async () => {

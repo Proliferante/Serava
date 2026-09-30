@@ -134,3 +134,23 @@ export function formatearFicha(valores: Record<string, unknown>): Record<string,
   }
   return fuera;
 }
+
+/**
+ * Lo que se va escribiendo en un campo de cifra, con sus puntos de miles:
+ * «2530000» → «2.530.000», «1995,5» → «1.995,5». Es para que una cifra larga
+ * se lea mientras se teclea y no haya que contar ceros.
+ *
+ * El decimal es la coma. Un punto sólo se toma por decimal si es lo último
+ * que se acaba de teclear («3.» → «3,», y luego «3,1»): quien escribe «3.1»
+ * a mano lo teclea así. Cualquier otro punto es de miles, así que borrar el
+ * último dígito de «1.995» deja «199» y no «1,99».
+ */
+export function conPuntos(s: string): string {
+  let t = s.replace(/[^\d.,]/g, "");
+  if (!t.includes(",") && t.endsWith(".")) t = t.slice(0, -1) + ",";
+  const coma = t.indexOf(",");
+  const entero = (coma >= 0 ? t.slice(0, coma) : t).replace(/\./g, "").replace(/^0+(?=\d)/, "");
+  const decimal = coma >= 0 ? "," + t.slice(coma + 1).replace(/[.,]/g, "") : "";
+  const agrupado = entero.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return agrupado + decimal;
+}
