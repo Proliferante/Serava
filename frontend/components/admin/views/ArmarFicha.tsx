@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Cargando from "@/components/Cargando";
 import { useConsola } from "@/components/admin/ctx";
 import { useSesion } from "@/components/admin/sesion";
 import {
@@ -333,7 +334,7 @@ export default function ArmarFicha() {
         ))}
       </div>
 
-      {cargando && <Card><div className="empty">Cargando la ficha…</div></Card>}
+      {cargando && <Card><Cargando texto="Cargando la ficha…" /></Card>}
 
       {!cargando && error && (
         <Card>

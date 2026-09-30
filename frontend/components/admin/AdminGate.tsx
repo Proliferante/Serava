@@ -1,5 +1,6 @@
 "use client";
 
+import Cargando from "@/components/Cargando";
 import AdminConsole from "@/components/admin/AdminConsole";
 import AdminLogin from "@/components/admin/AdminLogin";
 import CambiarClave from "@/components/admin/CambiarClave";
@@ -27,7 +28,15 @@ import { SesionProvider, useSesion } from "@/components/admin/sesion";
 function Puerta() {
   const { usuario, listo } = useSesion();
 
-  if (!listo) return <div style={{ minHeight: "100vh", background: "#2a1e14" }} />;
+  /* Mientras se pregunta al servidor por la sesión. Antes era un fondo
+     vacío: con la red lenta parecía que la consola no cargaba. */
+  if (!listo) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#2a1e14" }}>
+        <Cargando pantalla tono="oscuro" texto="Comprobando la sesión…" />
+      </div>
+    );
+  }
   if (!usuario) return <AdminLogin />;
   if (usuario.debe_cambiar_clave) return <CambiarClave />;
   /* `Instalable` va sólo aquí, con la sesión dentro: en el login no se

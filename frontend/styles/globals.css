@@ -496,3 +496,36 @@ body {
 .legal-indice summary::-webkit-details-marker { display: none; }
 .legal-flecha { transition: transform 0.2s ease; }
 .legal-indice[open] .legal-flecha { transform: rotate(180deg); }
+
+/* ── Cargando (components/Cargando.tsx) ─────────────────────────────────── */
+.zq-cargando {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 36px 16px;
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+.zq-cargando-pantalla { min-height: 100vh; }
+.zq-cargando-marca { position: relative; width: 46px; height: 46px; display: block; }
+.zq-cargando-anillo {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 2px solid;
+  animation: zq-girar 0.9s linear infinite;
+}
+.zq-cargando-mono {
+  position: absolute;
+  inset: 12px 11px;
+  animation: zq-latir 1.4s ease-in-out infinite;
+}
+.zq-cargando-texto { opacity: 0.85; }
+@keyframes zq-girar { to { transform: rotate(360deg); } }
+@keyframes zq-latir { 0%, 100% { opacity: 0.45; transform: scale(0.92); } 50% { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .zq-cargando-anillo, .zq-cargando-mono { animation: none; }
+}
