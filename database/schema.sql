@@ -275,3 +275,47 @@ ALTER TABLE inmueble_detalle
 
 CREATE UNIQUE INDEX IF NOT EXISTS inmueble_detalle_slug_idx
     ON inmueble_detalle (slug) WHERE slug IS NOT NULL;
+
+
+-- ───────────────────────────────────────────────────────────────────────────
+-- 7. SOLICITUDES DE ACCESO — lo que deja el diagnóstico del inversionista
+-- ───────────────────────────────────────────────────────────────────────────
+--
+-- El diagnóstico de la portada y la solicitud de acceso eran dos formularios
+-- que no guardaban nada (checkpoint del 30-sep-2026). Ahora son un solo flujo:
+-- diez preguntas → resultado → registro. Cada envío es una fila.
+--
+-- `respuestas` son los índices de cada opción, con `version` del cuestionario
+-- (frontend/lib/diagnostico.ts): con las dos se recalcula cualquier resultado.
+-- `perfil`, `riesgo`, `compatibilidad` y `prioridad` se copian a columnas
+-- propias porque son lo que el equipo filtra y ordena; el resto, en el JSON.
+--
+-- Datos personales (Ley 1581 de 2012): no hay fila sin consentimiento, y se
+-- guarda cuándo y qué texto se aceptó. No se guarda la IP.
+
+CREATE TABLE IF NOT EXISTS solicitudes_acceso (
+    id                   BIGSERIAL PRIMARY KEY,
+    creado_en            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    version              TEXT NOT NULL,
+    respuestas           JSONB NOT NULL,
+    resultado            JSONB NOT NULL,
+    perfil               TEXT,
+    riesgo               TEXT,
+    compatibilidad       INTEGER,
+    prioridad            TEXT,
+    nombre               TEXT NOT NULL,
+    apellido             TEXT,
+    correo               TEXT NOT NULL,
+    whatsapp             TEXT NOT NULL,
+    ciudad               TEXT,
+    pais                 TEXT,
+    consentimiento_en    TIMESTAMPTZ NOT NULL,
+    consentimiento_texto TEXT NOT NULL,
+    origen               TEXT,
+    -- Para el seguimiento del equipo (se llena desde la consola, más adelante).
+    estado               TEXT NOT NULL DEFAULT 'nueva',
+    notas                TEXT
+);
+
+CREATE INDEX IF NOT EXISTS solicitudes_acceso_creado_idx ON solicitudes_acceso (creado_en DESC);
+CREATE INDEX IF NOT EXISTS solicitudes_acceso_correo_idx ON solicitudes_acceso (lower(correo));
