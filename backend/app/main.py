@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router, usuario_actual
+from app.api.diagnostico import router_admin as diagnostico_admin_router, router_publico as diagnostico_router
 from app.api.flujo import router as flujo_router
 from app.api.hub import router_admin as hub_admin_router, router_publico as hub_publico_router
 from app.api.inmuebles import router as inmuebles_router
@@ -219,6 +220,14 @@ app.include_router(admin_router, prefix="/api/admin", tags=["admin"],
 # ya son 700 líneas.
 app.include_router(flujo_router, prefix="/api/admin/flujo", tags=["flujo"],
                    dependencies=SESION)
+
+# Las solicitudes del diagnóstico del inversionista: el equipo las ve con sesión.
+app.include_router(diagnostico_admin_router, prefix="/api/admin/diagnostico", tags=["diagnostico"],
+                   dependencies=SESION)
+
+# El diagnóstico lo envía cualquiera desde la portada, sin sesión: es la entrada
+# de un inversionista nuevo. Exige consentimiento y lo frenan los topes por IP.
+app.include_router(diagnostico_router, prefix="/api/diagnostico", tags=["diagnostico"])
 
 # La sesión del área privada de la web. Va sin dependencia: es la puerta.
 app.include_router(inversor_router, prefix="/api/inversor", tags=["inversor"])

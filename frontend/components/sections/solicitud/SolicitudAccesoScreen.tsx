@@ -2,11 +2,11 @@
 
 import { MotionConfig, motion } from "framer-motion";
 import IrA, { Ancla } from "@/components/IrA";
-import { useState, type CSSProperties, type ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { EASE, MLine, POP, Pop, Rise, Rule } from "@/components/motion/Kinetics";
 import VolverAlInicio from "@/components/VolverAlInicio";
 import { WORDMARK, wordmarkH } from "@/components/brand";
-import ConfirmacionModal from "@/components/sections/solicitud/ConfirmacionModal";
+import DiagnosticoTrigger from "@/components/DiagnosticoTrigger";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SOLICITUD DE ACCESO — reproducción 1:1 del frame de Figma 311:4483
@@ -25,13 +25,11 @@ const I = "/figma/acc";
 const CREAM = "#e2cdae";
 const LINEN = "#f7f1e5";
 const BROWN = "#492100";
-const BISTRE = "#3d2c1e";
 const MILLBROOK = "#5b4332";
 const DRIFT = "#a57a4e";
 const LASER = "#c9a877";
 const AVOCADO = "#7f8b57";
 const OIL = "#2a1e14";
-const ATHS = "#efe6d5"; // fondo de los campos
 const DRIFT28 = "rgba(165,122,78,0.28)";
 const LINEN18 = "rgba(247,241,229,0.18)";
 
@@ -103,7 +101,6 @@ const IC_LOCK: [string, string, string][] = [
   ["41.67% 16.67% 16.67% 16.67%", "-9.5% -5.94%", "lock1.svg"],
   ["12.5% 33.33% 58.33% 33.33%", "-13.57% -11.88% 0 -11.87%", "lock2.svg"],
 ];
-const IC_CHEVRON: [string, string, string][] = [["37.5% 25% 37.5% 25%", "-11.79% -5.89% -23.57% -5.89%", "chevron.svg"]];
 const IC_CHIP_TICK: [string, string, string][] = [["29.17% 20.83%", "-10.61% -7.58% -21.21% -7.58%", "chip-tick.svg"]];
 const IC_CARD: [string, string, string][][] = [
   [["12.5%", "-5.8% 0 -4.72% 0", "c1a.svg"], ["62.5% 37.5% 12.5% 37.5%", "-14.17% -14.17% 0 -14.17%", "c1b.svg"]],
@@ -151,7 +148,7 @@ function CTA({ x, y, tone, label, d = 0, centered, destino = "formulario", ancho
 /* ── Contenido ───────────────────────────────────────────────────────────── */
 
 const PASOS = [
-  { n: "1", t: "Comparte tu perfil", lines: ["Completa un formulario breve con", "tus datos, capital disponible,", "objetivo y mercados de interés."] },
+  { n: "1", t: "Comparte tu perfil", lines: ["Haz el diagnóstico de 3 minutos:", "tus objetivos, tu horizonte y tu", "perfil de riesgo, en un solo paso."] },
   { n: "2", t: "Conversemos", lines: ["Después de revisar tu información,", "coordinamos una sesión virtual", "para conocer tu estrategia, resolver", "preguntas y alinear expectativas."] },
   { n: "3", t: "Confirmamos el acceso", lines: ["Al finalizar la sesión, ambas partes", "validan si existe afinidad para", "avanzar. Cuando el perfil es", "aprobado, habilitamos el acceso a", "la plataforma."] },
 ];
@@ -162,97 +159,11 @@ const ENCUENTRAS = [
   { t: "Lectura de la oportunidad", lines: ["Potencial de renta, valorización y", "alternativas de salida."] },
 ];
 
-const MERCADOS = [
-  { label: "Bogotá", x: 0, y: 0 },
-  { label: "Medellín", x: 114.63, y: 0 },
-  { label: "Cartagena", x: 236.77, y: 0 },
-  { label: "Ciudad de Panamá", x: 0, y: 51 },
-  { label: "Otros mercados", x: 199.66, y: 51 },
-  { label: "Abierto a recomendaciones", x: 0, y: 102 },
-];
-
-/* ── Campos del formulario ───────────────────────────────────────────────── */
-
-const LABEL_ST: CSSProperties = { fontSize: 12.8, lineHeight: "19.84px", color: BISTRE };
-const FIELD_ST: CSSProperties = {
-  background: ATHS,
-  border: `1px solid ${DRIFT28}`,
-  borderRadius: 12,
-  fontSize: 15.4,
-  width: "100%",
-  padding: "15px 17px",
-  outline: "none",
-  color: OIL,
-};
-
-function Field({ label, placeholder, type = "text", w }: { label: string; placeholder: string; type?: string; w: number }) {
-  return (
-    <div style={{ width: w }}>
-      <p className="font-medium" style={LABEL_ST}>{label}</p>
-      <input type={type} placeholder={placeholder} className="ix-field mt-[8px] block font-normal" style={FIELD_ST} />
-    </div>
-  );
-}
-
-/**
- * Desplegable del diseño (311:4623).
- *
- * Lo que se ve es un `<div>` y el `<select>` nativo va encima transparente. El
- * motivo es que en el frame el texto se parte en dos líneas cuando no cabe
- * —"Selecciona un / rango"—, y por eso esas dos cajas miden 60 y no 45: con
- * Poppins Regular 15.4 el hueco útil es de 157.25 px y «Selecciona un rango»
- * pide 158.8, «Selecciona una opción» 176. Un `<select>` nunca parte su texto,
- * así que antes lo recortaba a media palabra. Con el div el alto sale solo.
- *
- * El nativo sigue siendo quien recibe el clic y el teclado, así que se conserva
- * el desplegable del sistema y el comportamiento en móvil.
- */
-function Select({ label, placeholder, options, w }: { label: string; placeholder: string; options: string[]; w: number }) {
-  const [value, setValue] = useState("");
-  return (
-    <div style={{ width: w }}>
-      <p className="font-medium" style={LABEL_ST}>{label}</p>
-      <div className="ix-field-box relative mt-[8px]" style={{ borderRadius: 12 }}>
-        <div className="flex items-center" style={{ ...FIELD_ST, paddingRight: 43 }}>
-          <span className="font-normal" style={{ lineHeight: "15px" }}>{value || placeholder}</span>
-        </div>
-        <select
-          value={value} onChange={(e) => setValue(e.target.value)} aria-label={label}
-          className="absolute inset-0 cursor-pointer opacity-0"
-        >
-          <option value="" disabled>{placeholder}</option>
-          {options.map((o) => <option key={o} value={o}>{o}</option>)}
-        </select>
-        <span className="pointer-events-none absolute" style={{ right: 17, top: "calc(50% - 8px)" }}>
-          <Ico size={16} layers={IC_CHEVRON} />
-        </span>
-      </div>
-    </div>
-  );
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════
    Página
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export default function SolicitudAccesoScreen() {
-  const [mercados, setMercados] = useState<string[]>([]);
-  const [enviado, setEnviado] = useState(false);
-  const toggle = (m: string) => setMercados((s) => (s.includes(m) ? s.filter((x) => x !== m) : [...s, m]));
-
-  /**
-   * Todavía no hay endpoint al que enviar: por ahora sólo abre el modal de
-   * confirmación. Cuando exista el backend, el POST va aquí antes de abrirlo.
-   *
-   * Antes navegaba a /solicitud-acceso/confirmacion. Esa ruta sigue existiendo
-   * y sirve la pantalla completa; lo que cambia es que al enviar el formulario
-   * la confirmación sale encima, sin perder la página.
-   */
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setEnviado(true);
-  };
-
   return (
     <MotionConfig reducedMotion="user">
       <div className="relative size-full overflow-hidden" style={{ background: CREAM }} data-name="ACCESO">
@@ -467,7 +378,7 @@ export default function SolicitudAccesoScreen() {
             <p>contacto.</p>
           </T>
           {([
-            ["Toma unos 2 minutos.", IC_TICK],
+            ["Toma unos 3 minutos.", IC_TICK],
             ["Sin pagos por suscripción ni comisión para el inversionista.", IC_TICK],
             ["Tus datos se tratan de forma confidencial.", IC_LOCK],
           ] as const).map(([txt, ico], i) => (
@@ -486,84 +397,44 @@ export default function SolicitudAccesoScreen() {
             viewport={{ once: true, amount: 0.15 }}
             transition={{ duration: 0.9, ease: EASE }}
           >
-            <form className="flex flex-col" style={{ padding: 45, gap: 15.2 }} onSubmit={onSubmit}>
+            {/* Antes aquí había un formulario (contacto, capital en dólares, objetivo,
+                mercados, plazo) que no enviaba nada y repetía lo que pregunta el
+                diagnóstico. Paola (checkpoint del 30-sep): una sola puerta, sin
+                nada doble. Ahora la tarjeta abre el diagnóstico, que termina en
+                el registro y ES la solicitud de acceso. */}
+            <div className="flex flex-col" style={{ padding: 45, gap: 18 }}>
               <div className="flex items-center gap-[13px]">
-                <p className="whitespace-nowrap font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "2.074px", color: DRIFT }}>Tus datos</p>
+                <p className="whitespace-nowrap font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "2.074px", color: DRIFT }}>Tu solicitud en un solo paso</p>
                 <span className="h-px flex-1" style={{ background: DRIFT28 }} />
               </div>
-              <div className="flex gap-[16px]">
-                <Field label="Nombre completo" placeholder="Nombre y apellido" w={217.25} />
-                <Field label="Correo electrónico" placeholder="nombre@correo.com" type="email" w={217.25} />
+              <p className="font-light" style={{ fontSize: 26, lineHeight: "32px", letterSpacing: "-0.5px", color: MILLBROOK }}>
+                Haz el diagnóstico y tu solicitud de acceso queda enviada al final.
+              </p>
+              <div className="flex flex-col" style={{ gap: 12 }}>
+                {[
+                  "Diez preguntas sobre lo que buscas, tu horizonte y tu perfil de riesgo.",
+                  "Tu estrategia sugerida, tus zonas y tu compatibilidad con Zequara, al instante.",
+                  "Al final dejas tus datos una sola vez y te contactamos para la sesión.",
+                ].map((t) => (
+                  <div key={t} className="flex items-start gap-[11px]">
+                    <Ico size={7} layers={IC_CHIP_TICK} style={{ marginTop: 8 }} />
+                    <p className="font-light" style={{ fontSize: 14.4, lineHeight: "22.32px", color: MILLBROOK }}>{t}</p>
+                  </div>
+                ))}
               </div>
-              <div className="flex gap-[16px]">
-                <Field label="Teléfono / WhatsApp" placeholder="+57 300 000 0000" type="tel" w={217.25} />
-                <Select label="País de residencia" placeholder="Selecciona un país" w={217.25} options={["Colombia", "Panamá", "México", "Estados Unidos", "España", "Otro"]} />
-              </div>
-
-              <div className="flex items-center gap-[13px]" style={{ marginTop: 12.8 }}>
-                <p className="whitespace-nowrap font-semibold uppercase" style={{ fontSize: 11.5, lineHeight: "17.86px", letterSpacing: "2.074px", color: DRIFT }}>Tu perfil de inversión</p>
-                <span className="h-px flex-1" style={{ background: DRIFT28 }} />
-              </div>
-              <div className="flex gap-[16px]">
-                <Select label="Capital disponible para invertir" placeholder="Selecciona un rango" w={217.25} options={["Menos de USD 100.000", "USD 100.000 – 250.000", "USD 250.000 – 500.000", "Más de USD 500.000"]} />
-                <Select label="Objetivo principal" placeholder="Selecciona una opción" w={217.25} options={["Renta", "Valorización", "Ambos", "Diversificar patrimonio"]} />
-              </div>
-
-              <div>
-                <p className="font-medium" style={LABEL_ST}>Mercados de interés</p>
-                <div className="relative mt-[8px]" style={{ height: 144 }}>
-                  {MERCADOS.map((m) => {
-                    const on = mercados.includes(m.label);
-                    return (
-                      <button
-                        key={m.label}
-                        type="button"
-                        onClick={() => toggle(m.label)}
-                        aria-pressed={on}
-                        className="ix-chip absolute flex items-center gap-[11.5px]"
-                        style={{
-                          left: m.x, top: m.y,
-                          padding: "10px 17px 10px 20.5px",
-                          borderRadius: 999,
-                          background: on ? "rgba(127,139,87,0.16)" : ATHS,
-                          border: `1px solid ${on ? AVOCADO : DRIFT28}`,
-                        }}
-                      >
-                        <Ico size={7} layers={IC_CHIP_TICK} style={{ opacity: on ? 1 : 0 }} />
-                        <span className="whitespace-nowrap text-center font-normal" style={{ fontSize: 13.8, color: MILLBROOK }}>{m.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <Select label="¿Cuándo te gustaría invertir?" placeholder="Selecciona una opción" w={450.5} options={["En los próximos 3 meses", "En 3 – 6 meses", "En 6 – 12 meses", "Solo estoy explorando"]} />
-
-              <label className="flex cursor-pointer items-start gap-[11px]">
-                <input
-                  type="checkbox"
-                  className="shrink-0"
-                  style={{ width: 19, height: 19, marginTop: 2.79, borderRadius: 2.5, border: "1px solid #767676", background: "#ffffff", accentColor: AVOCADO }}
-                />
-                <span className="font-light" style={{ fontSize: 13.4, lineHeight: "20.83px", color: MILLBROOK }}>
-                  Autorizo el tratamiento de mis datos personales y el contacto por parte de Zequara para continuar el proceso de evaluación.
-                </span>
-              </label>
-
-              <button
-                type="submit"
+              <DiagnosticoTrigger
+                origen="solicitud-acceso"
                 className="ix-cta relative flex items-center justify-center gap-[11px] overflow-hidden"
                 style={{ width: "100%", padding: "18px 32px", borderRadius: 999, background: AVOCADO, boxShadow: "0px 16px 32px -16px rgba(47,55,30,0.6)" }}
               >
-                <span className="text-center font-semibold" style={{ fontSize: 16, color: LINEN }}>Enviar mi perfil</span>
+                <span className="text-center font-semibold" style={{ fontSize: 16, color: LINEN }}>Empezar mi diagnóstico</span>
                 <Ico size={18} layers={IC_ARROW_CREAM} className="ix-cta-arrow" />
                 <span className="ix-cta-shine" aria-hidden />
-              </button>
-
+              </DiagnosticoTrigger>
               <p className="text-center font-light" style={{ fontSize: 13.1, lineHeight: "20.34px", color: MILLBROOK }}>
-                Revisaremos tu información y te contactaremos para coordinar una sesión virtual de conocimiento mutuo.
+                Toma unos 3 minutos. Tus datos se tratan de forma confidencial.
               </p>
-            </form>
+            </div>
           </motion.div>
         </L>
 
@@ -620,7 +491,6 @@ export default function SolicitudAccesoScreen() {
             el hero. */}
         <VolverAlInicio x={63} y={92} />
 
-        <ConfirmacionModal open={enviado} onClose={() => setEnviado(false)} />
       </div>
     </MotionConfig>
   );

@@ -50,6 +50,7 @@ REVOKE ALL ON TABLE inmueble_detalle        FROM anon, authenticated;
 REVOKE ALL ON TABLE seguimiento_propiedades FROM anon, authenticated;
 REVOKE ALL ON TABLE clean_listings          FROM anon, authenticated;
 REVOKE ALL ON TABLE raw_listings            FROM anon, authenticated;
+REVOKE ALL ON TABLE solicitudes_acceso      FROM anon, authenticated;  -- datos personales del diagnóstico
 
 -- La secuencia del id de usuarios: sin esto, un rol con INSERT recuperado
 -- podría seguir pidiéndole números.
@@ -81,6 +82,7 @@ ALTER TABLE inmueble_detalle        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE seguimiento_propiedades ENABLE ROW LEVEL SECURITY;
 ALTER TABLE clean_listings          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE raw_listings            ENABLE ROW LEVEL SECURITY;
+ALTER TABLE solicitudes_acceso      ENABLE ROW LEVEL SECURITY;
 
 
 -- ───────────────────────────────────────────────────────────────────────────

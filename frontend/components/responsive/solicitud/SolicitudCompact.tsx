@@ -1,10 +1,9 @@
 "use client";
 
 import { MotionConfig } from "framer-motion";
-import { useState } from "react";
 import IrA, { Ancla } from "@/components/IrA";
 import MobileNav from "@/components/responsive/MobileNav";
-import ConfirmacionModal from "@/components/sections/solicitud/ConfirmacionModal";
+import DiagnosticoTrigger from "@/components/DiagnosticoTrigger";
 import { BROWN, Card, CheckList, CTA, Eyebrow, H2, In, LASER, MILLBROOK, Note, P, Reveal, Step, Timeline, Volver, WRAP } from "@/components/responsive/kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -23,15 +22,10 @@ import { BROWN, Card, CheckList, CTA, Eyebrow, H2, In, LASER, MILLBROOK, Note, P
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const A = "/figma";
-const ATHS = "#efe6d5";
 const DRIFT28 = "rgba(165,122,78,0.28)";
 
-const CAMPO = "h-[56px] w-full rounded-[12px] border border-solid px-[16px] text-[16px] outline-none";
-const CAMPO_ST = { background: ATHS, borderColor: DRIFT28, color: "#2a1e14" } as const;
-const ETIQUETA = "mb-[8px] block text-[13px] font-medium";
-
 const PASOS = [
-  { n: "01", t: "Comparte tu perfil", d: "Completa un formulario breve con tus datos, capital disponible, objetivo y mercados de interés." },
+  { n: "01", t: "Comparte tu perfil", d: "Haz el diagnóstico de 3 minutos: tus objetivos, tu horizonte y tu perfil de riesgo, en un solo paso." },
   { n: "02", t: "Conversemos", d: "Después de revisar tu información, coordinamos una sesión virtual para conocer tu estrategia, resolver preguntas y alinear expectativas." },
   { n: "03", t: "Confirmamos el acceso", d: "Al finalizar la sesión, ambas partes validan si existe afinidad para avanzar. Cuando el perfil es aprobado, habilitamos el acceso a la plataforma." },
 ];
@@ -42,42 +36,7 @@ const ENCUENTRAS = [
   { t: "Lectura de la oportunidad", d: "Potencial de renta, valorización y alternativas de salida." },
 ];
 
-const MERCADOS = ["Bogotá", "Medellín", "Cartagena", "Ciudad de Panamá", "Otros mercados", "Abierto a recomendaciones"];
-
-const PAISES = ["Colombia", "Panamá", "México", "Estados Unidos", "España", "Otro"];
-const CAPITAL = ["Menos de USD 100.000", "USD 100.000 – 250.000", "USD 250.000 – 500.000", "Más de USD 500.000"];
-const OBJETIVO = ["Renta", "Valorización", "Ambos", "Diversificar patrimonio"];
-const CUANDO = ["En los próximos 3 meses", "En 3 – 6 meses", "En 6 – 12 meses", "Solo estoy explorando"];
-
-function Campo({ label, placeholder, type = "text", autoComplete }: { label: string; placeholder: string; type?: string; autoComplete?: string }) {
-  return (
-    <div>
-      <label className={ETIQUETA} style={{ color: BROWN }}>{label}</label>
-      <input type={type} placeholder={placeholder} autoComplete={autoComplete} className={`ix-field ${CAMPO}`} style={CAMPO_ST} />
-    </div>
-  );
-}
-
-function Selector({ label, placeholder, options }: { label: string; placeholder: string; options: string[] }) {
-  return (
-    <div>
-      <label className={ETIQUETA} style={{ color: BROWN }}>{label}</label>
-      <div className="ix-field-box relative" style={{ borderRadius: 12 }}>
-        <select defaultValue="" aria-label={label} className={`ix-field ${CAMPO} cursor-pointer appearance-none pr-[44px]`} style={CAMPO_ST}>
-          <option value="" disabled>{placeholder}</option>
-          {options.map((o) => <option key={o} value={o}>{o}</option>)}
-        </select>
-        <svg className="pointer-events-none absolute right-[16px] top-1/2 -translate-y-1/2" width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#5b4332" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m6 9 6 6 6-6" /></svg>
-      </div>
-    </div>
-  );
-}
-
 export default function SolicitudCompact() {
-  const [mercados, setMercados] = useState<string[]>([]);
-  const [enviado, setEnviado] = useState(false);
-  const toggle = (m: string) => setMercados((s) => (s.includes(m) ? s.filter((x) => x !== m) : [...s, m]));
-
   return (
     <MotionConfig reducedMotion="user">
       <div className="bg-cream">
@@ -108,7 +67,7 @@ export default function SolicitudCompact() {
               <IrA destino="espacio-privado" margen={84} className="ix-press mt-[10px] flex h-[56px] w-full max-w-[340px] items-center justify-center rounded-full border border-solid text-[16px] font-semibold" style={{ borderColor: "rgba(226,205,174,0.45)", color: "#e2cdae" }}>
                 ¿Qué beneficios obtengo?
               </IrA>
-              <p className="mt-[16px] text-[15px] font-medium" style={{ color: "#e2cdae" }}>El formulario toma aproximadamente 2 minutos.</p>
+              <p className="mt-[16px] text-[15px] font-medium" style={{ color: "#e2cdae" }}>El diagnóstico toma unos 3 minutos.</p>
               {/* Se entra aquí desde un correo o un enlace suelto, sin el menú
                   a mano: la vuelta al home tiene que verse (OBS-20). */}
               <div className="mt-[20px]"><Volver tono="oscuro" /></div>
@@ -141,63 +100,37 @@ export default function SolicitudCompact() {
               <H2>Cuéntanos cómo <span className="font-semibold">quieres invertir.</span></H2>
               <P>Tus respuestas nos ayudan a preparar una conversación más útil desde el primer contacto.</P>
             </In>
-            <CheckList items={["Toma unos 2 minutos.", "Sin pagos por suscripción ni comisión para el inversionista.", "Tus datos se tratan de forma confidencial."]} />
+            <CheckList items={["Toma unos 3 minutos.", "Sin pagos por suscripción ni comisión para el inversionista.", "Tus datos se tratan de forma confidencial."]} />
 
             <In delay={0.14} className="mt-[28px] rounded-[20px] p-[20px]" style={{ background: "#f7f1e5" }}>
-              <form className="flex flex-col gap-[16px]" onSubmit={(e) => { e.preventDefault(); setEnviado(true); }}>
+              {/* Antes, un formulario que no enviaba nada y repetía el diagnóstico
+                  (ver la cabecera de DiagnosticoModal). Ahora abre el diagnóstico,
+                  que termina en el registro: una sola puerta, nada doble. */}
+              <div className="flex flex-col gap-[16px]">
                 <div className="flex items-center gap-[12px]">
-                  <p className="m-0 whitespace-nowrap text-[11.5px] font-semibold uppercase tracking-[2px]" style={{ color: "#a57a4e" }}>Tus datos</p>
+                  <p className="m-0 whitespace-nowrap text-[11.5px] font-semibold uppercase tracking-[2px]" style={{ color: "#a57a4e" }}>Tu solicitud en un solo paso</p>
                   <span className="h-px flex-1" style={{ background: DRIFT28 }} />
                 </div>
-                <Campo label="Nombre completo" placeholder="Nombre y apellido" autoComplete="name" />
-                <Campo label="Correo electrónico" placeholder="nombre@correo.com" type="email" autoComplete="email" />
-                <Campo label="Teléfono / WhatsApp" placeholder="+57 300 000 0000" type="tel" autoComplete="tel" />
-                <Selector label="País de residencia" placeholder="Selecciona un país" options={PAISES} />
-
-                <div className="mt-[6px] flex items-center gap-[12px]">
-                  <p className="m-0 whitespace-nowrap text-[11.5px] font-semibold uppercase tracking-[2px]" style={{ color: "#a57a4e" }}>Tu perfil de inversión</p>
-                  <span className="h-px flex-1" style={{ background: DRIFT28 }} />
-                </div>
-                <Selector label="Capital disponible para invertir" placeholder="Selecciona un rango" options={CAPITAL} />
-                <Selector label="Objetivo principal" placeholder="Selecciona una opción" options={OBJETIVO} />
-
-                <div>
-                  <p className={ETIQUETA} style={{ color: BROWN }}>Mercados de interés</p>
-                  <div className="flex flex-wrap gap-[8px]">
-                    {MERCADOS.map((m) => {
-                      const on = mercados.includes(m);
-                      return (
-                        <button
-                          key={m} type="button" onClick={() => toggle(m)} aria-pressed={on}
-                          className="ix-chip flex min-h-[44px] items-center gap-[8px] rounded-full border border-solid px-[16px] text-[14px]"
-                          style={{ background: on ? "rgba(127,139,87,0.16)" : ATHS, borderColor: on ? "#7f8b57" : DRIFT28, color: MILLBROOK }}
-                        >
-                          <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="#7f8b57" strokeWidth={3.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ opacity: on ? 1 : 0 }}><path d="M20 6 9 17l-5-5" /></svg>
-                          {m}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <Selector label="¿Cuándo te gustaría invertir?" placeholder="Selecciona una opción" options={CUANDO} />
-
-                <label className="flex cursor-pointer items-start gap-[11px]">
-                  <input type="checkbox" required className="mt-[3px] size-[20px] shrink-0" style={{ accentColor: "#7f8b57" }} />
-                  <span className="text-[13.5px] font-light leading-[1.5]" style={{ color: MILLBROOK }}>
-                    Autorizo el tratamiento de mis datos personales y el contacto por parte de Zequara para continuar el proceso de evaluación.
-                  </span>
-                </label>
-
-                <button type="submit" className="ix-press flex h-[58px] w-full items-center justify-center gap-[10px] rounded-full text-[16px] font-semibold" style={{ background: "#7f8b57", color: "#f7f1e5" }}>
-                  Enviar mi perfil
-                  <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                </button>
-
-                <p className="m-0 text-center text-[13px] font-light leading-[1.5]" style={{ color: MILLBROOK }}>
-                  Revisaremos tu información y te contactaremos para coordinar una sesión virtual de conocimiento mutuo.
+                <p className="m-0 text-[21px] font-light leading-[1.3]" style={{ color: MILLBROOK }}>
+                  Haz el diagnóstico y tu solicitud de acceso queda enviada al final.
                 </p>
-              </form>
+                <ul className="m-0 flex list-none flex-col gap-[10px] p-0 text-[14.5px] font-light leading-[1.5]" style={{ color: MILLBROOK }}>
+                  <li>· Diez preguntas sobre lo que buscas, tu horizonte y tu perfil de riesgo.</li>
+                  <li>· Tu estrategia sugerida, tus zonas y tu compatibilidad con Zequara, al instante.</li>
+                  <li>· Al final dejas tus datos una sola vez y te contactamos para la sesión.</li>
+                </ul>
+                <DiagnosticoTrigger
+                  origen="solicitud-acceso"
+                  className="ix-press flex h-[58px] w-full items-center justify-center gap-[10px] rounded-full text-[16px] font-semibold"
+                  style={{ background: "#7f8b57", color: "#f7f1e5" }}
+                >
+                  Empezar mi diagnóstico
+                  <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </DiagnosticoTrigger>
+                <p className="m-0 text-center text-[13px] font-light leading-[1.5]" style={{ color: MILLBROOK }}>
+                  Toma unos 3 minutos. Tus datos se tratan de forma confidencial.
+                </p>
+              </div>
             </In>
           </div>
         </section>
@@ -241,7 +174,6 @@ export default function SolicitudCompact() {
 
         {/* Sin pie, como el lienzo: es una página de conversión y el pie sólo
             ofrece salidas justo donde se quiere que el usuario envíe. */}
-        <ConfirmacionModal open={enviado} onClose={() => setEnviado(false)} />
       </div>
     </MotionConfig>
   );

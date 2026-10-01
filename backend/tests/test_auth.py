@@ -391,10 +391,17 @@ def test_crear_rechaza_correo_sin_arroba(base):
 # Y el HUB, que es de la web pública y lo lee cualquiera:
 #   /api/hub              los artículos, videos y noticias publicados.
 #
+# Y el diagnóstico del inversionista, que lo envía quien todavía no tiene
+# cuenta (es justo como se pide una):
+#   /api/diagnostico      guarda la solicitud. Exige consentimiento, valida
+#                         cada campo y la frenan los topes por IP. Su listado
+#                         (/api/admin/diagnostico) sí exige sesión.
+#
 # /api/predios YA NO está aquí: desde el 29 de septiembre de 2026 exige
 # sesión de inversionista (ver app/api/inversor.py).
 ABIERTAS = {"/api/salud", "/api/auth/login", "/api/auth/politica",
-            "/api/inversor/login", "/api/inversor/salir", "/api/hub"}
+            "/api/inversor/login", "/api/inversor/salir", "/api/hub",
+            "/api/diagnostico"}
 
 
 def _rutas_de(aplicacion):
