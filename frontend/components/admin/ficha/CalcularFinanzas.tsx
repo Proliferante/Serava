@@ -60,6 +60,39 @@ const millones = (n: number | null | undefined) =>
   n == null ? "" : (n / 1e6).toLocaleString("es-CO", { maximumFractionDigits: 1 });
 const pct = (x: number) => `${(x * 100).toLocaleString("es-CO", { maximumFractionDigits: 1 })}%`;
 const mm = (x: number) => `$${Math.round(x / 1e6).toLocaleString("es-CO")}M`;
+const m2 = (x: number) => `$${(x / 1e6).toLocaleString("es-CO", { maximumFractionDigits: 1 })}M/m²`;
+
+/* ── Millones o pesos ─────────────────────────────────────────────────────
+   Los precios se piden en millones («1.830»), pero lo natural es escribir el
+   precio entero («1.830.000.000»), y con los puntos automáticos los dos se ven
+   igual de bien. Antes eso se multiplicaba por un millón otra vez y el backend
+   lo rechazaba con un «Input should be less than 10000000000000» en inglés
+   (Paola, checkpoint del 30-sep).
+
+   Un número así solo puede ser pesos: un predio de un millón de millones no
+   existe, ni una obra de diez mil millones por m². Por encima del umbral se lee
+   como pesos; por debajo, como millones. Bajo el campo se dice cómo se leyó. */
+const UMBRAL_PRECIO = 1e6;   // «1.000.000» en un campo de millones = un billón: es pesos
+const UMBRAL_M2 = 1e4;       // «10.000» millones por m²: es pesos
+function aPesos(s: string, umbral: number): number | null {
+  const n = numero(s);
+  if (n == null) return null;
+  return n >= umbral ? n : n * 1e6;
+}
+function lectura(s: string, umbral: number, porM2 = false): string | null {
+  const n = numero(s);
+  if (n == null || n <= 0) return null;
+  const pesos = aPesos(s, umbral)!;
+  return `Se lee como ${porM2 ? m2(pesos) : mm(pesos)}${n >= umbral ? " (escrito en pesos)" : ""}.`;
+}
+
+/* El backend valida con pydantic y sus mensajes salen en inglés. */
+function enEspanol(msg: string): string {
+  if (/^(Input should|Value error|Field required|value is not)/i.test(msg)) {
+    return "Alguna cifra está fuera de rango. Revisa los precios: van en millones (1.830) o en pesos completos (1.830.000.000).";
+  }
+  return msg;
+}
 
 export function CalcularFinanzas({ link, base, zonas, valores, pedir, onAplicar }: {
   link: string;
@@ -104,18 +137,19 @@ export function CalcularFinanzas({ link, base, zonas, valores, pedir, onAplicar 
     setCalculando(true);
     setError(null);
     try {
-      const m = (s: string) => { const n = numero(s); return n == null ? null : n * 1e6; };
       const cuerpo = {
         link,
         zona: f.zona || null, tipo: f.tipo || null, area: numero(f.area),
-        publicado: m(f.publicado), negociado: m(f.negociado), remodelacion_m2: m(f.remodelacion),
-        administracion: numero(f.administracion), canon_m2: numero(f.canon), valor_remodelado_m2: m(f.valorRemodelado),
+        publicado: aPesos(f.publicado, UMBRAL_PRECIO), negociado: aPesos(f.negociado, UMBRAL_PRECIO),
+        remodelacion_m2: aPesos(f.remodelacion, UMBRAL_M2),
+        administracion: numero(f.administracion), canon_m2: numero(f.canon),
+        valor_remodelado_m2: aPesos(f.valorRemodelado, UMBRAL_M2),
         rasgos: f.rasgos.split(",").map((x) => x.trim()).filter(Boolean).slice(0, 6),
       };
       setRes(await pedir<Resultado>("/api/admin/flujo/ficha/calcular", { method: "POST", body: JSON.stringify(cuerpo) }));
     } catch (e) {
       setRes(null);
-      setError((e as Error).message);
+      setError(enEspanol((e as Error).message));
     } finally {
       setCalculando(false);
     }
@@ -175,15 +209,17 @@ export function CalcularFinanzas({ link, base, zonas, valores, pedir, onAplicar 
             <div className="fic-campo">
               <label htmlFor="calc-pub">Precio publicado (millones)</label>
               <input className="t" id="calc-pub" inputMode="decimal" value={f.publicado} onChange={set("publicado")} placeholder="1.995" />
+              {lectura(f.publicado, UMBRAL_PRECIO) && <p className="fic-ayuda">{lectura(f.publicado, UMBRAL_PRECIO)}</p>}
             </div>
             <div className="fic-campo">
               <label htmlFor="calc-neg">Precio negociado (millones)</label>
               <input className="t" id="calc-neg" inputMode="decimal" value={f.negociado} onChange={set("negociado")} placeholder="vacío = publicado − 10 %" />
+              {lectura(f.negociado, UMBRAL_PRECIO) && <p className="fic-ayuda">{lectura(f.negociado, UMBRAL_PRECIO)}</p>}
             </div>
             <div className="fic-campo">
               <label htmlFor="calc-rem">Remodelación por m² (millones)</label>
               <input className="t" id="calc-rem" inputMode="decimal" value={f.remodelacion} onChange={set("remodelacion")} placeholder="vacío = 3,1 (Bogotá)" />
-              <p className="fic-ayuda">Medellín sigue pendiente de arquitectura: si no se escribe, se usa el de Bogotá y se avisa.</p>
+              <p className="fic-ayuda">{lectura(f.remodelacion, UMBRAL_M2, true) ?? "Medellín sigue pendiente de arquitectura: si no se escribe, se usa el de Bogotá y se avisa."}</p>
             </div>
             <div className="fic-campo">
               <label htmlFor="calc-adm">Administración mensual ($)</label>
@@ -201,6 +237,7 @@ export function CalcularFinanzas({ link, base, zonas, valores, pedir, onAplicar 
             <div className="fic-campo">
               <label htmlFor="calc-vr">Valor remodelado por m² (millones) · opcional</label>
               <input className="t" id="calc-vr" inputMode="decimal" value={f.valorRemodelado} onChange={set("valorRemodelado")} placeholder="vacío = percentiles del segmento" />
+              {lectura(f.valorRemodelado, UMBRAL_M2, true) && <p className="fic-ayuda">{lectura(f.valorRemodelado, UMBRAL_M2, true)}</p>}
             </div>
           </div>
 

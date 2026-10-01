@@ -96,3 +96,12 @@ def test_cdt_ponderado_por_monto_y_ultimos_cortes():
 def test_sin_red_usa_el_respaldo_y_lo_avisa():
     r = fichas.calcular_ficha(CASOS["SN001"]["entradas"])
     assert any(a.startswith("CDT: no se pudo consultar en vivo (respaldo fijo)") for a in r["avisos"])
+
+
+def test_negociado_que_no_cuadra_con_el_publicado_se_avisa():
+    # 1,8 M frente a 1.995 M publicados: una cifra mal escrita, no una ganga.
+    r = fichas.calcular_ficha(dict(CASOS["SN001"]["entradas"], negociado=1_800_000))
+    assert any(a.startswith("Revisa el precio negociado") for a in r["avisos"])
+    # El negociado real de SN001 (Excel de Paola) no avisa.
+    r = fichas.calcular_ficha(CASOS["SN001"]["entradas"])
+    assert not any(a.startswith("Revisa el precio negociado") for a in r["avisos"])
