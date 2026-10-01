@@ -5,7 +5,7 @@ import IndiceVivo from "@/components/legal/IndiceVivo";
 import MobileFooter from "@/components/responsive/MobileFooter";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   PÁGINA LEGAL — Términos, y la Política de Privacidad cuando llegue.
+   PÁGINA LEGAL — Términos y Política de Tratamiento de Datos.
 
    No va en el lienzo de 1920 como el resto del sitio, y es a propósito: el
    lienzo escala un diseño de Figma de medidas fijas, y aquí no hay diseño
@@ -23,15 +23,20 @@ import MobileFooter from "@/components/responsive/MobileFooter";
    ficha de predio. El texto largo, en cambio, va sobre el crema y en una
    columna de lectura: la marca está en el marco, no en el párrafo.
 
-   El documento es un dato (`components/legal/terminos.ts`), y esta página
-   sólo lo pinta: la de privacidad será otro archivo de datos con esta misma
-   página.
+   El documento es un dato (`components/legal/terminos.ts`,
+   `components/legal/privacidad.ts`), y esta página sólo lo pinta.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export type SeccionLegal = {
   titulo: string;
   parrafos?: string[];
   lista?: string[];
+  /** Párrafos que van después de la lista. */
+  cierre?: string[];
+  /** Dos columnas: lo que es y lo que abarca (el marco normativo). */
+  tabla?: { k: string; v: string }[];
+  /** Un recuadro aparte, fuera del texto legal: lo que pasa hoy en el sitio. */
+  nota?: { titulo: string; lista: string[] };
   contacto?: { k: string; v: string; href?: string }[];
 };
 
@@ -287,6 +292,35 @@ export default function LegalPage({ doc }: { doc: DocumentoLegal }) {
                         </li>
                       ))}
                     </ul>
+                  )}
+
+                  {s.tabla && (
+                    <dl className="m-0 mt-[18px] max-w-[68ch] overflow-hidden rounded-[16px] border border-solid border-[rgba(165,122,78,0.25)]">
+                      {s.tabla.map((f) => (
+                        <div key={f.k} className="border-t border-solid border-[rgba(165,122,78,0.18)] px-[18px] py-[14px] first:border-t-0 sm:grid sm:grid-cols-[190px_minmax(0,1fr)] sm:gap-[20px] sm:px-[22px]">
+                          <dt className="text-[15px] font-semibold leading-[1.5] text-brown-dark">{f.k}</dt>
+                          <dd className="m-0 mt-[4px] text-[15.5px] leading-[1.65] sm:mt-0" style={{ color: TEXTO }}>{f.v}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
+
+                  {s.cierre?.map((p, j) => (
+                    <p key={j} className="m-0 mt-[16px] max-w-[68ch] text-[16px] leading-[1.8] sm:text-[16.5px]" style={{ color: TEXTO }}>{p}</p>
+                  ))}
+
+                  {s.nota && (
+                    <aside className="mt-[22px] max-w-[68ch] rounded-[16px] p-[18px] sm:p-[22px]" style={{ background: "rgba(127,139,87,0.12)" }}>
+                      <p className="m-0 text-[12px] font-semibold uppercase tracking-[3px]" style={{ color: VERDIGRIS }}>{s.nota.titulo}</p>
+                      <ul className="m-0 mt-[12px] flex list-none flex-col gap-[10px] p-0">
+                        {s.nota.lista.map((item, j) => (
+                          <li key={j} className="flex gap-[12px] text-[15px] leading-[1.7] text-brown-dark">
+                            <span aria-hidden className="mt-[10px] size-[6px] shrink-0 rounded-full" style={{ background: VERDIGRIS }} />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </aside>
                   )}
 
                   {s.contacto && (

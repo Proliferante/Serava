@@ -3,16 +3,22 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
+import { AUTORIZACION, EnlacePolitica } from "@/components/legal/consentimiento";
+
 /** PAGINA HUB · Newsletter (1048 × 243) — funcional */
 export default function HubNewsletter() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [autoriza, setAutoriza] = useState(false);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
+    // Sin endpoint todavía. El POST, cuando exista, lleva
+    // `consentimiento: evidencia("boletin")` (ver `legal/consentimiento`).
     setSent(true);
     setEmail("");
+    setAutoriza(false);
     window.setTimeout(() => setSent(false), 3500);
   };
 
@@ -29,7 +35,8 @@ export default function HubNewsletter() {
         </div>
       </div>
 
-      <form onSubmit={submit} className="flex gap-[10px] items-start relative shrink-0 w-[446.63px]">
+      <form onSubmit={submit} className="flex flex-col gap-[12px] relative shrink-0 w-[446.63px]">
+        <div className="flex gap-[10px] items-start">
         <div className="bg-[rgba(247,241,229,0.1)] border border-[rgba(247,241,229,0.4)] border-solid flex flex-col justify-center min-w-[230px] grow overflow-clip px-[23px] py-[16px] rounded-[999px] self-stretch">
           <input
             type="email"
@@ -47,6 +54,17 @@ export default function HubNewsletter() {
             {sent ? "¡Listo!" : "Suscribirme"}
           </span>
         </button>
+        </div>
+        {/* Autorización aparte para lo comercial: sin marcar y obligatoria. */}
+        <label className="flex cursor-pointer items-start gap-[9px] px-[6px]">
+          <input
+            type="checkbox" name="autorizacion_datos" required checked={autoriza} onChange={(e) => setAutoriza(e.target.checked)}
+            className="mt-[2px] size-[16px] shrink-0" style={{ accentColor: "#f7f1e5" }}
+          />
+          <span className="font-light text-[12px] leading-[1.45]" style={{ color: "rgba(247,241,229,0.85)" }}>
+            {AUTORIZACION.boletin} <EnlacePolitica className="text-cream-93" />. Puedes darte de baja cuando quieras.
+          </span>
+        </label>
       </form>
 
       <AnimatePresence>

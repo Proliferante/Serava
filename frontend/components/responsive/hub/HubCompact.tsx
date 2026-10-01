@@ -4,6 +4,7 @@ import { motion, MotionConfig } from "framer-motion";
 import { useMemo, useState } from "react";
 import MobileNav from "@/components/responsive/MobileNav";
 import MobileFooter from "@/components/responsive/MobileFooter";
+import { AUTORIZACION, EnlacePolitica } from "@/components/legal/consentimiento";
 import { CARDS } from "@/components/sections/hub/HubCardsGrid";
 import type { CardData } from "@/components/sections/hub/HubCard";
 import { BROWN, CREAM, In, LASER, MILLBROOK, Parallax, Reveal, WRAP } from "@/components/responsive/kit";
@@ -118,7 +119,8 @@ export default function HubCompact({ cards = CARDS }: { cards?: CardData[] }) {
             <p className="m-0 mt-[9px] text-[14.5px] font-light leading-[1.55]" style={{ color: "rgba(247,241,229,0.85)" }}>
               Análisis de mercado, casos reales y aprendizajes del método Zequara. Sin ruido.
             </p>
-            <form className="mt-[16px] flex flex-col gap-[10px] sm:flex-row" onSubmit={(e) => e.preventDefault()}>
+            <form className="mt-[16px]" onSubmit={(e) => e.preventDefault()}>
+              <div className="flex flex-col gap-[10px] sm:flex-row">
               <input
                 type="email" required placeholder="nombre@correo.com" aria-label="Correo electrónico"
                 /* `sm:flex-1` y no `flex-1`: en columna, `flex-basis: 0` cae
@@ -129,6 +131,15 @@ export default function HubCompact({ cards = CARDS }: { cards?: CardData[] }) {
               <button type="submit" className="ix-press h-[52px] shrink-0 rounded-full px-[26px] text-[15px] font-semibold" style={{ background: "#f7f1e5", color: BROWN }}>
                 Suscribirme
               </button>
+              </div>
+              {/* Autorización aparte para lo comercial: sin marcar y
+                  obligatoria. Textos en `legal/consentimiento`. */}
+              <label className="mt-[14px] flex cursor-pointer items-start gap-[10px]">
+                <input type="checkbox" name="autorizacion_datos" required className="mt-[2px] size-[20px] shrink-0" style={{ accentColor: "#f7f1e5" }} />
+                <span className="text-[13px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.85)" }}>
+                  {AUTORIZACION.boletin} <EnlacePolitica className="text-cream-93" />. Puedes darte de baja cuando quieras.
+                </span>
+              </label>
             </form>
             <p className="m-0 mt-[12px] text-[13px] font-light" style={{ color: "rgba(247,241,229,0.7)" }}>Te avisaremos cada mes. Sin ruido.</p>
           </In>
