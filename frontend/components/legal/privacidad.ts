@@ -14,10 +14,10 @@ import type { DocumentoLegal } from "@/components/legal/LegalPage";
    cookies con su gestión de preferencias, que hoy no hace falta).
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/** Los dos datos que el Word dejó en blanco. Hasta que no estén, la página no
-    debería salir a producción. */
-export const DIRECCION = "[COMPLETAR DIRECCIÓN]";
-export const CORREO_PRIVACIDAD = "[COMPLETAR CORREO DE PRIVACIDAD]";
+/** Los dos datos que el Word dejó en blanco, confirmados aparte (octubre de
+    2026). Si cambian, cambian aquí y en el Word. */
+export const DIRECCION = "Carrera 56 # 152 - 77, Bogotá";
+export const CORREO_PRIVACIDAD = "servicioalcliente@savvybridge.com.co";
 
 const correo = { v: CORREO_PRIVACIDAD, href: CORREO_PRIVACIDAD.includes("@") ? `mailto:${CORREO_PRIVACIDAD}` : undefined };
 
