@@ -7,10 +7,11 @@ import { EASE, MLine, POP, Pop, Rise, Rule } from "@/components/motion/Kinetics"
 import VolverAlInicio from "@/components/VolverAlInicio";
 import { WORDMARK, wordmarkH } from "@/components/brand";
 import ConfirmacionModal from "@/components/sections/solicitud/ConfirmacionModal";
+import { AUTORIZACION, AVISO_SOLICITUD, EnlacePolitica } from "@/components/legal/consentimiento";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SOLICITUD DE ACCESO — reproducción 1:1 del frame de Figma 311:4483
-   (ACCESO, 1920 × 4470): hero, los tres pasos, el formulario, qué encuentras
+   (ACCESO, 1920 × 4470 en Figma; 4570 aquí, por el aviso de privacidad del formulario): hero, los tres pasos, el formulario, qué encuentras
    al ingresar y el cierre.
 
    Orden de pintado del diseño: hero → sección 2 → sección 4 → sección 3 →
@@ -242,7 +243,8 @@ export default function SolicitudAccesoScreen() {
 
   /**
    * Todavía no hay endpoint al que enviar: por ahora sólo abre el modal de
-   * confirmación. Cuando exista el backend, el POST va aquí antes de abrirlo.
+   * confirmación. Cuando exista el backend, el POST va aquí antes de abrirlo,
+   * con `consentimiento: evidencia("solicitud")` (ver `legal/consentimiento`).
    *
    * Antes navegaba a /solicitud-acceso/confirmacion. Esa ruta sigue existiendo
    * y sirve la pantalla completa; lo que cambia es que al enviar el formulario
@@ -374,8 +376,10 @@ export default function SolicitudAccesoScreen() {
           </T>
         </L>
 
-        {/* ══════════ 4 · QUÉ ENCUENTRAS AL INGRESAR (311:4713) ══════════ */}
-        <L x={0} y={2668} w={1920} h={1158} className="overflow-hidden" style={{ background: CREAM }}>
+        {/* ══════════ 4 · QUÉ ENCUENTRAS AL INGRESAR (311:4713) ══════════
+            100 px más abajo que en Figma (2668), igual que el cierre: la
+            tarjeta del formulario creció con el aviso de privacidad. */}
+        <L x={0} y={2768} w={1920} h={1158} className="overflow-hidden" style={{ background: CREAM }}>
           {/* Destino del botón «¿Qué beneficios obtengo?» (OBS-45). */}
           <Ancla nombre="espacio-privado" className="absolute left-0 top-0" />
           <T x={460} cy={321.16} w={760} d={0} ry={16} className="font-normal" style={{ fontSize: 14.4, lineHeight: "22.32px", color: BROWN }}>
@@ -432,12 +436,12 @@ export default function SolicitudAccesoScreen() {
         </L>
 
         {/* ══════════ 3 · FORMULARIO (311:4564) — se pinta sobre la sección 4 ══════════ */}
-        <L x={0} y={1667} w={1920} h={1202.17} className="overflow-hidden" style={{ background: BROWN, borderRadius: "150px 0 0 0" }}>
+        <L x={0} y={1667} w={1920} h={1302.17} className="overflow-hidden" style={{ background: BROWN, borderRadius: "150px 0 0 0" }}>
           {/* Trama de cubos (358:1107): el `cuadro 1` del diseño, pasado a webp
               sin pérdida (580 kB de PNG → 219, y las líneas son de un píxel).
 
               Va a su tamaño nativo, 1920 × 1688, que es más alto que la sección
-              —1202— y arranca 465 px por encima de ella, así que la sección le
+              —1302— y arranca 465 px por encima de ella, así que la sección le
               recorta lo que sobra por arriba y por abajo. Ese desbordamiento es
               justo lo que coloca los cubos donde el diseño los pone: densos a la
               derecha, detrás de la tarjeta, y sueltos en el borde izquierdo.
@@ -539,14 +543,21 @@ export default function SolicitudAccesoScreen() {
 
               <Select label="¿Cuándo te gustaría invertir?" placeholder="Selecciona una opción" w={450.5} options={["En los próximos 3 meses", "En 3 – 6 meses", "En 6 – 12 meses", "Solo estoy explorando"]} />
 
+              {/* Aviso breve y autorización (Ley 1581): la casilla va sin
+                  marcar y es obligatoria. Textos en `legal/consentimiento`. */}
+              <p className="font-light" style={{ fontSize: 12.4, lineHeight: "19px", color: MILLBROOK, paddingTop: 13, borderTop: `1px solid ${DRIFT28}` }}>
+                {AVISO_SOLICITUD}
+              </p>
               <label className="flex cursor-pointer items-start gap-[11px]">
                 <input
                   type="checkbox"
+                  name="autorizacion_datos"
+                  required
                   className="shrink-0"
                   style={{ width: 19, height: 19, marginTop: 2.79, borderRadius: 2.5, border: "1px solid #767676", background: "#ffffff", accentColor: AVOCADO }}
                 />
                 <span className="font-light" style={{ fontSize: 13.4, lineHeight: "20.83px", color: MILLBROOK }}>
-                  Autorizo el tratamiento de mis datos personales y el contacto por parte de Zequara para continuar el proceso de evaluación.
+                  {AUTORIZACION.solicitud} <EnlacePolitica className="font-medium" />.
                 </span>
               </label>
 
@@ -568,7 +579,7 @@ export default function SolicitudAccesoScreen() {
         </L>
 
         {/* ══════════ 5 · CIERRE (311:4752) ══════════ */}
-        <L x={0} y={3647} w={1920} h={823} className="overflow-hidden" style={{ background: BROWN, borderRadius: "150px 0 0 0" }}>
+        <L x={0} y={3747} w={1920} h={823} className="overflow-hidden" style={{ background: BROWN, borderRadius: "150px 0 0 0" }}>
           {/* Dibujo de torres (312:1175). La ventana va en (0, 4) de la sección:
               antes estaba en (-580, -116), que son las coordenadas del rectángulo
               relativas a su contenedor en Figma, no a la sección — y por eso el

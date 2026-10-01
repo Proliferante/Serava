@@ -5,6 +5,7 @@ import { useState } from "react";
 import IrA, { Ancla } from "@/components/IrA";
 import MobileNav from "@/components/responsive/MobileNav";
 import ConfirmacionModal from "@/components/sections/solicitud/ConfirmacionModal";
+import { AUTORIZACION, AVISO_SOLICITUD, EnlacePolitica } from "@/components/legal/consentimiento";
 import { BROWN, Card, CheckList, CTA, Eyebrow, H2, In, LASER, MILLBROOK, Note, P, Reveal, Step, Timeline, Volver, WRAP } from "@/components/responsive/kit";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -182,10 +183,15 @@ export default function SolicitudCompact() {
 
                 <Selector label="¿Cuándo te gustaría invertir?" placeholder="Selecciona una opción" options={CUANDO} />
 
+                {/* Aviso breve y autorización: la casilla, sin marcar y
+                    obligatoria. Textos en `legal/consentimiento`. */}
+                <p className="m-0 border-t border-solid pt-[14px] text-[12.5px] font-light leading-[1.5]" style={{ color: MILLBROOK, borderColor: DRIFT28 }}>
+                  {AVISO_SOLICITUD}
+                </p>
                 <label className="flex cursor-pointer items-start gap-[11px]">
-                  <input type="checkbox" required className="mt-[3px] size-[20px] shrink-0" style={{ accentColor: "#7f8b57" }} />
+                  <input type="checkbox" name="autorizacion_datos" required className="mt-[3px] size-[20px] shrink-0" style={{ accentColor: "#7f8b57" }} />
                   <span className="text-[13.5px] font-light leading-[1.5]" style={{ color: MILLBROOK }}>
-                    Autorizo el tratamiento de mis datos personales y el contacto por parte de Zequara para continuar el proceso de evaluación.
+                    {AUTORIZACION.solicitud} <EnlacePolitica className="font-medium" />.
                   </span>
                 </label>
 

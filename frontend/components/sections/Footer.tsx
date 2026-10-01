@@ -32,10 +32,10 @@ export default function Footer() {
       </div>
 
       {/* Legal, bajo CUENTA: es la única columna con hueco debajo (NAVEGA
-          llega hasta abajo con sus cuatro enlaces). Cuando esté la Política de
-          Privacidad, va en la línea de abajo. Un filete corto en el cobre de
+          llega hasta abajo con sus cuatro enlaces). Un filete corto en el cobre de
           los antetítulos lo separa de los dos enlaces de cuenta, y el icono
-          de documento dice qué es sin tener que subirle el tamaño. */}
+          de documento dice qué es sin tener que subirle el tamaño. La
+          política de datos va en la línea de abajo. */}
       <span aria-hidden className="absolute h-px left-[1460px] top-[256px] w-[36px] bg-[#cd9a64] opacity-60" />
       <p className="absolute leading-[1.5] left-[1460px] top-[272px] whitespace-nowrap">
         <a href="/terminos" className="group inline-flex items-center gap-[10px] font-light text-[16px] text-[rgba(226,205,174,0.82)] transition-colors hover:text-cream">
@@ -44,6 +44,15 @@ export default function Footer() {
             <path d="M14 3v5h5M9 13h6M9 17h4" />
           </svg>
           <span className="underline decoration-[rgba(205,154,100,0.45)] decoration-1 underline-offset-[5px] group-hover:decoration-cream">Términos y condiciones</span>
+        </a>
+      </p>
+      <p className="absolute leading-[1.5] left-[1460px] top-[306px] whitespace-nowrap">
+        <a href="/privacidad" className="group inline-flex items-center gap-[10px] font-light text-[16px] text-[rgba(226,205,174,0.82)] transition-colors hover:text-cream">
+          <svg width={17} height={17} viewBox="0 0 24 24" fill="none" stroke="#cd9a64" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M12 3l7 3v5c0 4.4-3 8.3-7 9.5C8 19.3 5 15.4 5 11V6l7-3z" />
+            <path d="M9.5 12l2 2 3.5-4" />
+          </svg>
+          <span className="underline decoration-[rgba(205,154,100,0.45)] decoration-1 underline-offset-[5px] group-hover:decoration-cream">Política de datos</span>
         </a>
       </p>
 
