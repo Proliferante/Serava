@@ -1,7 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { MARK } from "@/components/brand";
 import { AUTORIZACION, AVISO_SOLICITUD, EnlacePolitica, evidencia } from "@/components/legal/consentimiento";
@@ -63,21 +63,114 @@ const BG = `radial-gradient(120% 120% at 0% 100%, rgba(127,139,87,0.16) 0%, rgba
 type Step = "intro" | "q" | "partial" | "capture" | "result";
 type Envio = { estado: "no" | "enviando" | "ok" | "error"; error?: string };
 
-/* ── Barra de progreso ───────────────────────────────────── */
-function Progress({ pct, label }: { pct: number; label: string }) {
+/* ── Barra de progreso ───────────────────────────────────────────────────────
+   Cada pregunta monta su propia barra (va dentro del paso que se desliza),
+   así que por sí sola saltaría al valor nuevo. Por eso recibe `desde`: el
+   porcentaje que tenía la anterior, y avanza desde ahí.
+
+   Lo que se mueve:
+   · el relleno, con un muelle suave hasta el valor nuevo;
+   · un brillo que lo recorre cada pocos segundos, para que se sienta vivo;
+   · la cabeza, que late, y deja una onda al llegar;
+   · una muesca por pregunta, que se enciende con un pequeño salto al pasarla;
+   · el porcentaje, que cuenta en vez de cambiar de golpe;
+   · al 100 %, un destello y la cabeza se vuelve un check.
+   Con «reducir movimiento» activado en el sistema, sólo queda el relleno. */
+function Progress({ pct, label, desde = pct, pasos = N }: { pct: number; label: string; desde?: number; pasos?: number }) {
+  const quieto = useReducedMotion();
+  const listo = pct >= 100;
+  const valor = useMotionValue(desde);
+  const texto = useTransform(valor, (v) => `${Math.round(v)}%`);
+  useEffect(() => {
+    const c = animate(valor, pct, { duration: quieto ? 0 : 0.9, ease: EASE });
+    return () => c.stop();
+  }, [pct, quieto, valor]);
+
   return (
-    <div className="w-full">
-      <div className="mb-[10px] flex items-baseline justify-between">
+    <div className="w-full" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} aria-label={label}>
+      <div className="mb-[12px] flex items-baseline justify-between">
         <p className="text-[12.5px] font-light" style={{ color: "rgba(247,241,229,0.7)" }}>{label}</p>
-        <p className="text-[12.5px] font-light" style={{ color: "rgba(247,241,229,0.7)" }}>{Math.round(pct)}%</p>
+        <motion.p className="text-[12.5px] font-medium tabular-nums" style={{ color: listo ? "#cde0a0" : "rgba(247,241,229,0.7)" }}>{texto}</motion.p>
       </div>
-      <div className="relative h-[5px] w-full overflow-visible rounded-full" style={{ background: "rgba(247,241,229,0.12)" }}>
+      <div className="relative h-[6px] w-full rounded-full" style={{ background: "rgba(247,241,229,0.1)" }}>
+        {/* Muescas: una por pregunta. */}
+        {Array.from({ length: pasos - 1 }, (_, i) => {
+          const en = ((i + 1) / pasos) * 100;
+          const pasada = pct >= en;
+          // Sólo salta la que se acaba de pasar; las de antes nacen encendidas.
+          const recien = pasada && desde < en;
+          // La que queda bajo la cabeza no se pinta: asomaría por encima de ella.
+          if (Math.abs(en - pct) < 0.5) return null;
+          return (
+            <motion.span
+              key={i} aria-hidden
+              className="absolute top-1/2 z-[1] size-[4px] rounded-full"
+              // El centrado va por framer y no con -translate de Tailwind: al
+              // animar `scale`, framer reescribe el transform entero.
+              style={{ left: `${en}%`, x: "-50%", y: "-50%" }}
+              initial={recien ? { scale: 1, backgroundColor: "rgba(247,241,229,0.22)" } : false}
+              animate={pasada
+                ? { scale: recien && !quieto ? [1, 2.2, 1] : 1, backgroundColor: "rgba(247,241,229,0.85)" }
+                : { scale: 1, backgroundColor: "rgba(247,241,229,0.22)" }}
+              transition={{ duration: 0.5, delay: recien && !quieto ? 0.5 : 0 }}
+            />
+          );
+        })}
+
+        {/* El relleno. */}
         <motion.div
-          className="absolute left-0 top-0 h-[5px] rounded-full"
-          style={{ background: "linear-gradient(90deg, #7f8b57 0%, #9aa66f 100%)", boxShadow: "0 0 12px rgba(154,166,111,0.7)" }}
-          initial={false} animate={{ width: `${pct}%` }} transition={{ duration: 0.7, ease: EASE }}
+          className="absolute inset-y-0 left-0 rounded-full"
+          style={{ background: "linear-gradient(90deg, #6d7849 0%, #8f9b62 60%, #a9b67a 100%)", boxShadow: "0 0 14px rgba(154,166,111,0.55)" }}
+          initial={{ width: `${desde}%` }}
+          animate={{ width: `${pct}%` }}
+          transition={quieto ? { duration: 0 } : { type: "spring", stiffness: 90, damping: 18, mass: 0.9 }}
         >
-          <span className="absolute right-0 top-1/2 h-[11px] w-[11px] -translate-y-1/2 rounded-full" style={{ background: "#cde0a0", boxShadow: "0 0 10px 2px rgba(205,224,160,0.9)" }} />
+          {/* Brillo que recorre el relleno. */}
+          {!quieto && (
+            <span className="absolute inset-0 overflow-hidden rounded-full" aria-hidden>
+              <motion.span
+                className="absolute inset-y-0 w-[45%]"
+                style={{ background: "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0) 100%)" }}
+                initial={{ left: "-50%" }}
+                animate={{ left: "120%" }}
+                transition={{ duration: 1.4, ease: "easeInOut", repeat: Infinity, repeatDelay: 1.8, delay: 0.9 }}
+              />
+            </span>
+          )}
+
+          {/* La cabeza: late mientras avanza, y al 100 % es un check. */}
+          <span className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2" aria-hidden>
+            {!quieto && (
+              <motion.span
+                key={Math.round(pct)}
+                className="absolute left-1/2 top-1/2 size-[14px] rounded-full"
+                style={{ border: "2px solid rgba(205,224,160,0.8)", x: "-50%", y: "-50%" }}
+                initial={{ scale: 0.6, opacity: 0.9 }}
+                animate={{ scale: listo ? 3.4 : 2.4, opacity: 0 }}
+                transition={{ duration: listo ? 1.1 : 0.8, delay: 0.5, ease: "easeOut" }}
+              />
+            )}
+            <motion.span
+              className="relative flex items-center justify-center rounded-full"
+              style={{ background: "#cde0a0", boxShadow: "0 0 12px 3px rgba(205,224,160,0.75)" }}
+              initial={false}
+              animate={listo
+                ? { width: 18, height: 18, scale: 1 }
+                : { width: 12, height: 12, scale: quieto ? 1 : [1, 1.25, 1] }}
+              transition={listo
+                ? { type: "spring", stiffness: 320, damping: 16 }
+                : { scale: { duration: 1.6, repeat: Infinity, ease: "easeInOut" }, default: { duration: 0.3 } }}
+            >
+              <AnimatePresence>
+                {listo && (
+                  <motion.svg key="ok" width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="#2a1e14" strokeWidth={3.4} strokeLinecap="round" strokeLinejoin="round"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <motion.path d="M20 6L9 17l-5-5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: quieto ? 0 : 0.45, delay: quieto ? 0 : 0.35 }} />
+                  </motion.svg>
+                )}
+              </AnimatePresence>
+            </motion.span>
+          </span>
         </motion.div>
       </div>
     </div>
@@ -153,6 +246,13 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
   const [envio, setEnvio] = useState<Envio>({ estado: "no" });
 
   useEffect(() => setMounted(true), []);
+
+  // El porcentaje de la barra anterior: la siguiente avanza desde ahí. Al
+  // volver a la portada del diagnóstico se pone a cero.
+  const pctAnterior = useRef(0);
+  useEffect(() => {
+    pctAnterior.current = step === "intro" ? 0 : step === "q" ? ((qIndex + 1) / N) * 100 : 100;
+  }, [step, qIndex]);
 
   useEffect(() => {
     if (!open) return;
@@ -232,6 +332,7 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
   const p = PREGUNTAS[qIndex];
   const stepKey = step === "q" ? `q${qIndex}` : step;
   const pct = step === "q" ? ((qIndex + 1) / N) * 100 : 100;
+  const desde = pctAnterior.current;
   const slide = { initial: { opacity: 0, x: dir * 44 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: dir * -44 } };
   const per = resultado ? PERFILES[resultado.perfil] : null;
   const sec = resultado ? PERFILES[resultado.secundario] : null;
@@ -278,7 +379,7 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
                   {/* ── PREGUNTAS ── */}
                   {step === "q" && (
                     <motion.div key={stepKey} {...slide} transition={{ duration: 0.42, ease: EASE }}>
-                      <Progress pct={pct} label={`Pregunta ${qIndex + 1} de ${N}`} />
+                      <Progress pct={pct} desde={desde} label={`Pregunta ${qIndex + 1} de ${N}`} />
                       <p className="mt-[40px] text-[11.84px] font-bold uppercase tracking-[2.368px] text-[#c9a877]">Pregunta {String(qIndex + 1).padStart(2, "0")}</p>
                       <h3 className="mt-[16px] max-w-[520px] text-[28.6px] font-light leading-[1.35] tracking-[-0.704px] text-[#f7f1e5]">{p.q}</h3>
                       {p.ayuda && <p className="mt-[10px] max-w-[520px] text-[13.5px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.55)" }}>{p.ayuda}</p>}
@@ -313,7 +414,7 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
                   {/* ── LECTURA PARCIAL (ya con el resultado real) ── */}
                   {step === "partial" && resultado && per && (
                     <motion.div key="partial" {...slide} transition={{ duration: 0.5, ease: EASE }} className="flex flex-col items-center text-center">
-                      <div className="w-full"><Progress pct={100} label="Diagnóstico completado" /></div>
+                      <div className="w-full"><Progress pct={100} desde={desde} label="Diagnóstico completado" /></div>
                       <motion.p initial={{ scale: 0.55 }} animate={{ scale: 1 }} transition={{ delay: 0.15, duration: 0.55, ease: [0.34, 1.56, 0.64, 1] }}
                         className="mt-[40px] text-[38px] font-extrabold leading-none text-[#c9a877]">{resultado.compatibilidad}</motion.p>
                       <p className="mt-[6px] text-[10.5px] uppercase tracking-[0.25em]" style={{ color: "rgba(247,241,229,0.55)" }}>Compatibilidad con Zequara</p>
@@ -340,7 +441,7 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
                   {/* ── REGISTRO (es la solicitud de acceso) ── */}
                   {step === "capture" && (
                     <motion.div key="capture" {...slide} transition={{ duration: 0.5, ease: EASE }} className="w-full">
-                      <Progress pct={100} label="Último paso" />
+                      <Progress pct={100} desde={desde} label="Último paso" />
                       <form className="mt-[26px] rounded-[18px] border border-solid p-[clamp(20px,4vw,40px)]" style={{ background: "rgba(247,241,229,0.03)", borderColor: "rgba(247,241,229,0.14)" }}
                         onSubmit={(e) => { e.preventDefault(); enviar(); }} noValidate>
                         <h3 className="text-[clamp(24px,3.5vw,30px)] font-light tracking-[-0.02em] text-[#f7f1e5]">Ya casi. Un último paso.</h3>
