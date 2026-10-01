@@ -6,7 +6,11 @@ Los predios publicados, para la web del inversionista. Montado en /api/predios.
     GET /api/predios          el portafolio publicado, en forma de tarjeta
     GET /api/predios/{slug}   la ficha completa de uno
 
-ESTO NO EXIGE SESIÓN, Y ES A PROPÓSITO
+ESTO EXIGE SESIÓN DE INVERSIONISTA (desde el 29 de septiembre de 2026)
+    La dependencia se pone en el `include_router` de main.py. Lo de abajo es
+    la historia de por qué estuvo abierto.
+
+ESTUVO SIN SESIÓN, Y FUE A PROPÓSITO
     La página `/predios` del sitio hoy la ve cualquiera con la URL: no hay
     middleware delante ni autenticación de inversionista construida. Este
     router refleja eso y no inventa una protección que la página no tiene
@@ -35,11 +39,12 @@ from app.services import inmueble_service as svc
 
 router = APIRouter()
 
-# La web pide esto en cada visita y cambia cuando alguien publica, o sea
-# rara vez. Un minuto de caché en el CDN y diez de "sirve lo viejo mientras
-# revalidas" es lo que separa una página que responde al instante de una que
-# espera a Supabase en cada carga.
-CACHE = "public, s-maxage=60, stale-while-revalidate=600"
+# Sin caché compartida. Hubo un minuto de caché en el CDN
+# (`public, s-maxage=60`), que tenía sentido mientras esto era público.
+# Desde que exige sesión, con `public` el CDN de Vercel guardaría la
+# respuesta de un inversionista con sesión y se la serviría al siguiente que
+# llegara sin ella, saltándose el login entero.
+CACHE = "private, no-store"
 
 
 @router.get("")

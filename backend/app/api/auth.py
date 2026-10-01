@@ -49,7 +49,14 @@ router = APIRouter()
 # DEPENDENCIAS DE SESIÓN
 # ---------------------------------------------------------------------------
 
-def usuario_actual(zq_sesion: str | None = Cookie(default=None)) -> dict:
+# Lo único que puede hacer quien entra con una contraseña temporal: saber
+# quién es, cambiarla y salir. Antes la bandera sólo la miraba la pantalla, y
+# con la temporal se podía usar toda la API sin cambiarla nunca.
+CON_CLAVE_TEMPORAL = ("/api/auth/yo", "/api/auth/cambiar-clave", "/api/auth/salir",
+                      "/api/auth/politica")
+
+
+def usuario_actual(peticion: Request, zq_sesion: str | None = Cookie(default=None)) -> dict:
     """Valida la cookie de sesión y devuelve el usuario.
 
     Se comprueba contra la base que el usuario siga existiendo y activo, no
@@ -73,6 +80,8 @@ def usuario_actual(zq_sesion: str | None = Cookie(default=None)) -> dict:
         raise sin_sesion
     if not u["activo"]:
         raise HTTPException(403, "Esta cuenta está desactivada.")
+    if u.get("debe_cambiar_clave") and peticion.url.path not in CON_CLAVE_TEMPORAL:
+        raise HTTPException(403, "Cambia tu contraseña temporal para seguir.")
 
     # El id de la sesión viaja con el usuario para poder revocar "todas menos
     # esta" sin volver a leer la cookie más abajo.
@@ -225,7 +234,7 @@ def _frena_clave(u: dict, ip: str | None) -> None:
     """El mismo freno del login para los endpoints que piden la contraseña
     actual. Cuenta en la misma cubeta —por correo—, así que cinco fallos entre
     el login y aquí bloquean la cuenta igual."""
-    motivo = intentos.bloqueado(u["correo"], None)
+    motivo = intentos.bloqueado(u["correo"], ip)
     if motivo:
         raise HTTPException(429, motivo)
 

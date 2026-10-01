@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 
 import psycopg2
 from fastapi import Depends, FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.admin import router as admin_router
@@ -11,6 +10,7 @@ from app.api.auth import router as auth_router, usuario_actual
 from app.api.flujo import router as flujo_router
 from app.api.hub import router_admin as hub_admin_router, router_publico as hub_publico_router
 from app.api.inmuebles import router as inmuebles_router
+from app.api.inversor import inversor_actual, router as inversor_router
 from app.core import config, sesiones
 from app.core.limites import Frenos
 from app.services import manual_service
@@ -36,6 +36,14 @@ async def _ciclo_de_vida(_: FastAPI):
     # que un predio de portal saca de `clean_listings`). Aquí y no en cada
     # petición: el listado público las lee y no tiene por qué poder alterar
     # tablas. `ADD COLUMN IF NOT EXISTS` hace que repetirlo no cueste nada.
+    # La columna que separa las sesiones de la consola de las del portafolio.
+    # Sin ella, `validar` falla en todas las peticiones con sesión: se avisa
+    # alto en el registro.
+    try:
+        sesiones.asegurar_ambito()
+    except Exception as e:
+        log.error("No se pudo asegurar la columna `ambito` de sesiones: %s", e)
+
     try:
         manual_service.asegurar_columnas()
     except Exception as e:
@@ -88,18 +96,17 @@ def _mal_configurado(_: Request, exc: RuntimeError):
                            "falta la variable DATABASE_URL."},
     )
 
-# CORS: la lista de dominios permitidos sale del entorno (CORS_ORIGINS), y
-# por defecto es sólo el localhost del frontend. Antes estaba en ["*"], que
-# con `allow_credentials` es justo lo que no se debe hacer: cualquier página
-# de cualquier dominio podía llamar a la API con la sesión del usuario.
-# Al desplegar: CORS_ORIGINS=https://el-dominio-real
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=config.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# SIN CORS, A PROPÓSITO.
+# Todo lo que el navegador pide a esta API va por el mismo origen: Next lo
+# reescribe (`/api/*` → backend) desde www o desde admin, así que ninguna
+# llamada legítima necesita cabeceras CORS. Hubo un CORSMiddleware con
+# `allow_credentials` y la lista CORS_ORIGINS, que tenía a la vez
+# www.zequara.com y admin.zequara.com: con eso, un script que corriera en la
+# web pública podía llamar a admin.zequara.com/api/admin con la cookie de la
+# consola (los dos subdominios son «el mismo sitio» y SameSite=Strict no los
+# separa) y LEER la respuesta, porque el backend le daba permiso CORS.
+# Sin la cabecera, el navegador no le deja leer nada. CORS_ORIGINS se sigue
+# usando, pero sólo para la comprobación de origen de abajo.
 
 @app.middleware("http")
 async def _cabeceras_y_origen(peticion: Request, siguiente):
@@ -128,15 +135,40 @@ async def _cabeceras_y_origen(peticion: Request, siguiente):
         localhost dejaría el dominio marcado como "sólo HTTPS" en el navegador
         del equipo, y a partir de ahí `http://localhost` deja de funcionar.
     """
+    ruta = peticion.url.path
+    prohibido = JSONResponse(status_code=403, content={"detail": "Origen no permitido."})
+
+    # SEC-FETCH-SITE: lo pone el navegador en cada petición y dice de dónde
+    # nace. A la API sólo se llama desde su propia página («same-origin») o
+    # escribiendo la dirección («none»); una petición que viene de otro
+    # subdominio («same-site») o de otro sitio («cross-site») se corta aquí,
+    # lecturas incluidas. Es lo que separa www de admin, que para SameSite
+    # son el mismo sitio. Sin la cabecera (servidor a servidor, navegadores
+    # viejos) quedan las comprobaciones de Origin de abajo.
+    sitio = peticion.headers.get("sec-fetch-site")
+    if ruta.startswith("/api/") and sitio and sitio not in ("same-origin", "none"):
+        return prohibido
+
     if peticion.method in ("POST", "PUT", "PATCH", "DELETE"):
         origen = peticion.headers.get("origin")
         if origen and origen not in config.CORS_ORIGINS:
-            return JSONResponse(
-                status_code=403,
-                content={"detail": "Origen no permitido."},
-            )
+            return prohibido
+        # Y cada API desde su subdominio: la consola sólo desde admin, el
+        # portafolio sólo desde www. Si no hay subdominio de consola (local,
+        # vistas previas), no se separa.
+        admin = [o for o in config.CORS_ORIGINS if "://admin." in o]
+        if origen and admin:
+            es_consola = ruta.startswith(("/api/admin", "/api/auth"))
+            if es_consola and origen not in admin:
+                return prohibido
+            if ruta.startswith("/api/inversor") and origen in admin:
+                return prohibido
 
     r = await siguiente(peticion)
+    # Nada de la API se guarda en una caché compartida salvo que el endpoint
+    # lo pida (el HUB público lo hace). Las respuestas con sesión nunca.
+    if ruta.startswith("/api/") and "cache-control" not in r.headers:
+        r.headers["Cache-Control"] = "no-store"
     r.headers["X-Frame-Options"] = "DENY"
     r.headers["X-Content-Type-Options"] = "nosniff"
     r.headers["Referrer-Policy"] = "same-origin"
@@ -188,22 +220,22 @@ app.include_router(admin_router, prefix="/api/admin", tags=["admin"],
 app.include_router(flujo_router, prefix="/api/admin/flujo", tags=["flujo"],
                    dependencies=SESION)
 
-# Los predios publicados, para la web del inversionista.
+# La sesión del área privada de la web. Va sin dependencia: es la puerta.
+app.include_router(inversor_router, prefix="/api/inversor", tags=["inversor"])
+
+# Los predios publicados, para el área privada del inversionista.
 #
-# VA SIN `SESION`, Y ESO ES UNA DECISIÓN, NO UN OLVIDO.
-# La página `/predios` del sitio hoy no tiene nada delante: no hay
-# middleware, y la autenticación de inversionista no existe todavía (la de
-# `usuarios` es la del equipo). Cerrar la API mientras la página sigue
-# abierta no protegería el portafolio y sólo dejaría la página en blanco.
+# Exige sesión de inversionista (api/inversor.py). Antes iba abierta porque
+# la página `/predios` no tenía nada delante y cerrar la API sólo la habría
+# dejado en blanco; desde que existe el login del portafolio, la página
+# exige sesión y la API también. La web los pide desde el servidor de Next
+# reenviando la cookie del visitante (frontend/lib/predios.ts).
 #
-# Lo que este router expone es únicamente lo publicado y sólo sus campos de
-# portafolio — nunca el anuncio original, el contacto del vendedor ni lo que
-# está a medio camino. Ver app/api/inmuebles.py.
-#
-# El día que haya acceso de inversionista, se cierra AQUÍ: se le añade
-# `dependencies=` con la dependencia que toque y ni el router ni el servicio
-# cambian.
-app.include_router(inmuebles_router, prefix="/api/predios", tags=["predios"])
+# Aun así sólo expone lo publicado y sólo sus campos de portafolio — nunca el
+# anuncio original, el contacto del vendedor ni lo que está a medio camino.
+# Ver app/api/inmuebles.py.
+app.include_router(inmuebles_router, prefix="/api/predios", tags=["predios"],
+                   dependencies=[Depends(inversor_actual)])
 
 # El HUB va en dos mitades. La de escritura exige sesión Y rol —la dependencia
 # vive dentro del router, en `exige_editor`, porque no es "hay sesión" sino

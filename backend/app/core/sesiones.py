@@ -46,6 +46,18 @@ log = logging.getLogger("zequara.sesiones")
 
 COOKIE = "zq_sesion"
 
+# DOS ÁMBITOS, DOS COOKIES
+#   `consola`   la del equipo, en admin.zequara.com (cookie `zq_sesion`).
+#   `inversor`  la del área privada de la web, en www (cookie `zq_inversor`).
+# La sesión guarda para qué se abrió, y `validar` sólo la acepta en ese
+# ámbito: una sesión de inversionista no abre la consola aunque alguien copie
+# su identificador a la otra cookie, y al revés. Hoy las dos se abren con las
+# mismas cuentas (ver api/inversor.py), y es justo por eso que hace falta que
+# no se puedan intercambiar.
+CONSOLA = "consola"
+INVERSOR = "inversor"
+COOKIES = {CONSOLA: COOKIE, INVERSOR: "zq_inversor"}
+
 # Tope absoluto y cierre por inactividad.
 DURACION = timedelta(hours=config.SESION_HORAS)
 INACTIVIDAD = timedelta(hours=2)
@@ -71,7 +83,17 @@ def disponible() -> bool:
     return tabla_existe("sesiones")
 
 
-def crear(usuario_id: int, ip: str | None, agente: str | None) -> str:
+def asegurar_ambito() -> None:
+    """Añade la columna `ambito` a `sesiones` si no la tiene. Se llama al
+    arrancar; `IF NOT EXISTS` hace que repetirlo no cueste nada. Las sesiones
+    que ya había quedan como de consola, que es lo que eran."""
+    with escribir() as con:
+        con.execute(
+            "ALTER TABLE sesiones ADD COLUMN IF NOT EXISTS ambito TEXT NOT NULL DEFAULT 'consola'"
+        )
+
+
+def crear(usuario_id: int, ip: str | None, agente: str | None, ambito: str = CONSOLA) -> str:
     """Abre una sesión y devuelve su identificador, que es lo que va en la cookie.
 
     32 bytes de `secrets.token_urlsafe` — no es adivinable, y de la cookie no
@@ -80,8 +102,8 @@ def crear(usuario_id: int, ip: str | None, agente: str | None) -> str:
     sid = secrets.token_urlsafe(32)
     with escribir() as con:
         con.execute(
-            "INSERT INTO sesiones (id, usuario_id, expira, ip, agente) VALUES (?, ?, ?, ?, ?)",
-            (sid, usuario_id, _ahora() + DURACION, ip, (agente or "")[:200] or None),
+            "INSERT INTO sesiones (id, usuario_id, expira, ip, agente, ambito) VALUES (?, ?, ?, ?, ?, ?)",
+            (sid, usuario_id, _ahora() + DURACION, ip, (agente or "")[:200] or None, ambito),
         )
     return sid
 
@@ -92,7 +114,7 @@ _CAMPOS_USUARIO = ("u.id, u.nombre, u.correo, u.rol, u.activo, "
                    "u.debe_cambiar_clave, u.creado_en, u.ultimo_acceso")
 
 
-def validar(sid: str | None) -> dict | None:
+def validar(sid: str | None, ambito: str = CONSOLA) -> dict | None:
     """Devuelve el usuario si la sesión sirve, o None.
 
     UNA sola consulta, no dos. Antes se leía la sesión aquí y el usuario
@@ -109,8 +131,9 @@ def validar(sid: str | None) -> dict | None:
     with cursor() as con:
         fila = con.execute(
             f"SELECT s.expira, s.ultima_actividad, s.revocada, {_CAMPOS_USUARIO} "
-            "FROM sesiones s JOIN usuarios u ON u.id = s.usuario_id WHERE s.id = ?",
-            (sid,),
+            "FROM sesiones s JOIN usuarios u ON u.id = s.usuario_id "
+            "WHERE s.id = ? AND s.ambito = ?",
+            (sid, ambito),
         ).fetchone()
 
     if not fila or fila["revocada"] is not None:
@@ -160,7 +183,7 @@ def activas(usuario_id: int) -> list[dict]:
     ahora = _ahora()
     with cursor() as con:
         filas = con.execute(
-            "SELECT id, creada, ultima_actividad, ip, agente FROM sesiones "
+            "SELECT id, creada, ultima_actividad, ip, agente, ambito FROM sesiones "
             "WHERE usuario_id = ? AND revocada IS NULL AND expira > ? "
             "AND ultima_actividad > ? ORDER BY ultima_actividad DESC",
             (usuario_id, ahora, ahora - INACTIVIDAD),
@@ -186,9 +209,9 @@ def limpiar() -> int:
 # LA COOKIE
 # ---------------------------------------------------------------------------
 
-def poner_cookie(respuesta, sid: str) -> None:
+def poner_cookie(respuesta, sid: str, ambito: str = CONSOLA) -> None:
     respuesta.set_cookie(
-        key=COOKIE,
+        key=COOKIES[ambito],
         value=sid,
         max_age=int(DURACION.total_seconds()),
         httponly=True,               # JavaScript no la ve
@@ -198,8 +221,8 @@ def poner_cookie(respuesta, sid: str) -> None:
     )
 
 
-def quitar_cookie(respuesta) -> None:
+def quitar_cookie(respuesta, ambito: str = CONSOLA) -> None:
     respuesta.delete_cookie(
-        key=COOKIE, httponly=True, samesite="strict",
+        key=COOKIES[ambito], httponly=True, samesite="strict",
         secure=config.COOKIE_SEGURA, path="/",
     )

@@ -121,7 +121,7 @@ export default function AccountMenu({
             })}
 
             <a
-              href="/login"
+              href="/salir"
               role="menuitem"
               className="ix-menuitem block px-[14px] py-[9px] text-[13.5px] font-medium"
               style={{ color: DANGER_FG, borderTop: "1px solid rgba(247,241,229,0.1)" }}

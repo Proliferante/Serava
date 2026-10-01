@@ -44,7 +44,15 @@ log = logging.getLogger("zequara.intentos")
 
 # Ventana en la que se cuentan los fallos, y los topes de cada vía.
 VENTANA = timedelta(minutes=15)
+# El bloqueo fino es por correo DESDE UNA IP: cinco fallos de la misma
+# conexión contra la misma cuenta. Antes eran cinco fallos contra la cuenta
+# desde cualquier sitio, y eso dejaba a cualquiera bloquear al equipo: con
+# conocer los correos, cinco intentos cada quince minutos los mantenían
+# fuera de la consola sin haber acertado nada.
 TOPE_CORREO = 5
+# El techo por cuenta sigue, pero alto: frena un ataque repartido entre
+# muchas IPs contra una cuenta sin que una sola IP pueda cerrarla.
+TOPE_CORREO_TOTAL = 50
 TOPE_IP = 20
 
 _avisado = False
@@ -101,12 +109,19 @@ def bloqueado(correo: str | None, ip: str | None) -> str | None:
     try:
         with cursor() as con:
             if correo:
+                c = (correo or "").strip().lower()
                 n = con.execute(
                     "SELECT count(*) AS n FROM intentos_acceso "
-                    "WHERE lower(correo) = ? AND exito = FALSE AND momento > ?",
-                    ((correo or "").strip().lower(), desde),
+                    "WHERE lower(correo) = ? AND exito = FALSE AND momento > ? "
+                    "AND (ip = ? OR ? IS NULL)",
+                    (c, desde, ip, ip),
                 ).fetchone()["n"]
-                if n >= TOPE_CORREO:
+                total = con.execute(
+                    "SELECT count(*) AS n FROM intentos_acceso "
+                    "WHERE lower(correo) = ? AND exito = FALSE AND momento > ?",
+                    (c, desde),
+                ).fetchone()["n"]
+                if n >= TOPE_CORREO or total >= TOPE_CORREO_TOTAL:
                     return (f"Demasiados intentos fallidos con este correo. "
                             f"Espera {VENTANA.seconds // 60} minutos y vuelve a probar.")
             if ip:

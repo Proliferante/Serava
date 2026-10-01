@@ -105,26 +105,28 @@ def base(monkeypatch):
 
     # Sesiones en memoria: {id: usuario_id}. Reproduce lo que hace la tabla
     # sin necesitar Postgres.
-    abiertas: dict[str, int] = {}
+    # Cada sesión guarda su ámbito, como la columna de la tabla: es lo que
+    # impide que una del portafolio abra la consola.
+    abiertas: dict[str, tuple[int, str]] = {}
     contador = {"n": 0}
 
-    def crear(usuario_id, ip=None, agente=None):
+    def crear(usuario_id, ip=None, agente=None, ambito=sesiones.CONSOLA):
         contador["n"] += 1
         sid = f"sesion-{contador['n']}"
-        abiertas[sid] = usuario_id
+        abiertas[sid] = (usuario_id, ambito)
         return sid
 
-    def validar(sid):
+    def validar(sid, ambito=sesiones.CONSOLA):
         """Devuelve el usuario, no su id: `validar` trae los dos en un JOIN
         para no gastar dos viajes a la base por petición."""
-        uid = abiertas.get(sid) if sid else None
-        return por_id(uid) if uid else None
+        uid, suyo = abiertas.get(sid, (None, None)) if sid else (None, None)
+        return por_id(uid) if uid and suyo == ambito else None
 
     def revocar(sid):
         abiertas.pop(sid, None)
 
     def revocar_todas(usuario_id, excepto=None):
-        fuera = [k for k, v in abiertas.items() if v == usuario_id and k != excepto]
+        fuera = [k for k, (v, _) in abiertas.items() if v == usuario_id and k != excepto]
         for k in fuera:
             abiertas.pop(k)
         return len(fuera)
@@ -381,14 +383,18 @@ def test_crear_rechaza_correo_sin_arroba(base):
 #                         contraseña para no aceptar lo que el servidor
 #                         rechaza, y eso pasa antes de entrar.
 #
-# Y las tres de la web pública, que son el producto y las lee cualquiera:
-#   /api/predios          las tarjetas del portafolio.
-#   /api/predios/{slug}   la ficha de un predio publicado.
-#   /api/hub              los artículos, videos y noticias del HUB.
-# Sólo devuelven lo que alguien marcó como publicado; escribir en ellas sigue
-# estando bajo /api/admin, que exige sesión en el `include_router`.
+# La puerta del portafolio, que es su propio login:
+#   /api/inversor/login   donde se consigue la sesión de inversionista.
+#   /api/inversor/salir   salir tiene que funcionar aunque la sesión ya no
+#                         valga, así que no la exige.
+#
+# Y el HUB, que es de la web pública y lo lee cualquiera:
+#   /api/hub              los artículos, videos y noticias publicados.
+#
+# /api/predios YA NO está aquí: desde el 29 de septiembre de 2026 exige
+# sesión de inversionista (ver app/api/inversor.py).
 ABIERTAS = {"/api/salud", "/api/auth/login", "/api/auth/politica",
-            "/api/predios", "/api/predios/{slug}", "/api/hub"}
+            "/api/inversor/login", "/api/inversor/salir", "/api/hub"}
 
 
 def _rutas_de(aplicacion):
@@ -406,7 +412,7 @@ def _rutas_de(aplicacion):
                 yield metodo.upper(), ruta
 
 
-def test_ninguna_ruta_nueva_queda_abierta_por_descuido():
+def test_ninguna_ruta_nueva_queda_abierta_por_descuido(monkeypatch):
     """Sin cookie, toda ruta responde 401 salvo las tres de `ABIERTAS`.
 
     Esta prueba existe por un fallo real: los siete endpoints de
@@ -422,6 +428,12 @@ def test_ninguna_ruta_nueva_queda_abierta_por_descuido():
     (ver la nota de los imports en `app/api/admin.py`).
     """
     from app.main import app as aplicacion
+
+    # Que haya tabla de sesiones se da por hecho: sin esto, comprobarlo va a
+    # la base, y donde no hay base (GitHub Actions) todas las rutas con sesión
+    # contestarían 503 en vez de 401 y la prueba no diría nada útil. Sin
+    # cookie, `validar` responde None sin consultar nada.
+    monkeypatch.setattr(sesiones, "disponible", lambda: True)
 
     sin_sesion = TestClient(aplicacion)
     sin_sesion.cookies.clear()
