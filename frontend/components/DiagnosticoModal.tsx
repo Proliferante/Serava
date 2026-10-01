@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { MARK } from "@/components/brand";
+import { AUTORIZACION, AVISO_SOLICITUD, EnlacePolitica, evidencia } from "@/components/legal/consentimiento";
 import {
   calcular, completa, PERFILES, PREGUNTAS, vacias, VERSION,
   type Respuestas, type Resultado,
@@ -47,8 +48,10 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const N = PREGUNTAS.length;
 const PAISES = ["Colombia", "Panamá", "Estados Unidos", "México", "España", "Otro"];
 /* El texto exacto que acepta la persona: se guarda con la solicitud. */
-const CONSENTIMIENTO =
-  "Autorizo a Zequara a tratar mis datos personales para evaluar mi solicitud de acceso y contactarme por correo o WhatsApp, conforme a su política de tratamiento de datos.";
+/** El texto que se guarda como evidencia es el mismo que se ve: la
+    autorización compartida de `legal/consentimiento` y el nombre de la
+    política a la que enlaza. */
+const CONSENTIMIENTO = evidencia("solicitud").texto;
 const RIESGO_TXT = {
   Conservador: "Priorizas cuidar el capital: prefieres certeza a un retorno más alto.",
   Moderado: "Aceptas variaciones razonables si hay una tesis clara de valorización.",
@@ -361,10 +364,11 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
                             {ver("pais") && <span className="text-[12px]" style={{ color: "#e39a7a" }}>{ver("pais")}</span>}
                           </label>
                         </div>
-                        <label className="mt-[18px] flex cursor-pointer items-start gap-[11px]">
+                        <p className="mt-[18px] text-[12px] leading-[1.5]" style={{ color: "rgba(247,241,229,0.5)" }}>{AVISO_SOLICITUD}</p>
+                        <label className="mt-[12px] flex cursor-pointer items-start gap-[11px]">
                           <input type="checkbox" checked={acepta} onChange={(e) => setAcepta(e.target.checked)} className="mt-[3px] size-[18px] shrink-0" style={{ accentColor: "#7f8b57" }} />
                           <span className="text-[12.5px] leading-[1.5]" style={{ color: intentoEnvio && !acepta ? "#e39a7a" : "rgba(247,241,229,0.65)" }}>
-                            {CONSENTIMIENTO} Ver <a href="/terminos" target="_blank" rel="noopener" className="underline">términos y condiciones</a>.
+                            {AUTORIZACION.solicitud} <EnlacePolitica className="text-[#f7f1e5]" />.
                           </span>
                         </label>
                         <OliveBtn type="submit" disabled={envio.estado === "enviando"} className="mt-[22px] w-full">
