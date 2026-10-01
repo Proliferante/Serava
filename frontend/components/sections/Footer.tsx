@@ -1,4 +1,5 @@
 import { WORDMARK } from "@/components/brand";
+import { PreferenciasCookies } from "@/components/cookies/AvisoCookies";
 import { CTA_PORTAFOLIO_CORTO, DISCLAIMER } from "@/components/copy";
 const A = "/figma";
 
@@ -54,6 +55,10 @@ export default function Footer() {
           </svg>
           <span className="underline decoration-[rgba(205,154,100,0.45)] decoration-1 underline-offset-[5px] group-hover:decoration-cream">Política de datos</span>
         </a>
+      </p>
+      {/* Sólo existe con la analítica activa (ver lib/cookies). */}
+      <p className="absolute leading-[1.5] left-[1672px] top-[306px] whitespace-nowrap">
+        <PreferenciasCookies className="font-light text-[16px] text-[rgba(226,205,174,0.82)] underline decoration-[rgba(205,154,100,0.45)] decoration-1 underline-offset-[5px] transition-colors hover:text-cream hover:decoration-cream" />
       </p>
 
       {/* Cuenta column */}
