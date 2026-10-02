@@ -39,7 +39,7 @@ Además hay una etiqueta de **diversificación internacional**, que se suma a cu
    - Con menos de 2 años de horizonte, o si vendería ante la caída, el riesgo es conservador.
    - Sin el «compraría más» ante la caída, nunca sale agresivo.
 3. **Reglas que pesan más que los puntos.** A un conservador no se le propone «Oportunidad». Con poco horizonte baja «Transformación y valor». Quien eligió renta corta la ve al menos como estrategia secundaria.
-4. **Compatibilidad con Zequara (0 a 100), solo para el equipo.** Desde el 2-oct **no se le muestra a la persona**: se guarda con la solicitud (columna `compatibilidad`) para priorizar y analizar. La persona ve solo la afinidad en palabras («se alinea», «tiene puntos en común», «no encaja del todo») y sus motivos. Suma:
+4. **Compatibilidad con Zequara (0 a 100), solo para el equipo.** Desde el 2-oct **no se le muestra a la persona**, y tampoco la afinidad ni sus motivos: un «no encaja del todo» desanima a quien todavía puede llegar a invertir. Todo se guarda con la solicitud (columna `compatibilidad`; afinidad y motivos dentro de `resultado`) para priorizar y analizar. En su lugar, la persona ve la **propuesta de su perfil** (`PERFILES[...].propuesta`, «Con tu perfil, podríamos…»). Suma:
    - capital: 35 puntos;
    - horizonte: 20;
    - involucramiento (Zequara opera, así que suma más quien quiere delegar): 20;
@@ -48,7 +48,7 @@ Además hay una etiqueta de **diversificación internacional**, que se suma a cu
 5. **Capital mínimo: 500 millones** (`CAPITAL_MINIMO`).
    - El proyecto más barato posible cuesta ~$555M todo incluido: 60 m² en Laureles, compra en el p25 con 10 % de descuento y obra de $3,1M/m² (`mercado_referencia.json`).
    - Zequara no es crowdfunding: el inversionista compra el inmueble completo.
-   - Por debajo de 500 millones la compatibilidad queda en 40 como máximo (afinidad baja) y se le explica por qué, sin mostrarle el número.
+   - Por debajo de 500 millones la compatibilidad queda en 40 como máximo (afinidad baja, prioridad baja). A la persona no se le dice: el tema del capital se conversa en la cita.
 6. **Moneda.** Una sola lista en pesos, con el equivalente en dólares en cada opción, a la TRM del 1-oct ($3.312,84). Todo se calcula en pesos, la misma unidad de las fichas.
 7. **Para el equipo y la plataforma.** Se calcula una `prioridad` interna (alta / media / baja, según capital, momento y horizonte) y unas `etiquetas` (estrategia, riesgo, ticket, ciudades, renta corta) para personalizar los proyectos que se le muestran.
 
@@ -87,7 +87,7 @@ Además hay una etiqueta de **diversificación internacional**, que se suma a cu
 
 Después de revisar el diagnóstico con Paola, se hicieron tres cambios (rama `fix/diagnostico-ajustes`):
 
-1. **La compatibilidad ya no se le muestra a la persona.** Se quitó el número de la lectura parcial y del resultado; la tarjeta final dice «Tu encaje con Zequara» con la afinidad en palabras. El número se sigue calculando y se guarda en `solicitudes_acceso.compatibilidad` para uso interno.
+1. **Ni la compatibilidad ni el «encaje» se le muestran a la persona.** Se quitó el número de la lectura parcial y del resultado, y también la tarjeta de afinidad («se alinea / no encaja del todo») con sus motivos, para no desanimar a nadie. La tarjeta final ahora se llama «Lo que podemos hacer contigo» y muestra la propuesta del perfil (por ejemplo, para «Transformación y valor»: «Con tu perfil, podríamos buscar contigo un inmueble por debajo del precio de su zona, transformarlo con un proyecto de arquitectura y capturar su valorización en 3 a 5 años…»), seguida de «En tu cita la revisamos contigo con proyectos concretos». El número, la afinidad y los motivos se siguen calculando y se guardan con la solicitud para uso interno. Una prueba nueva verifica que las cinco propuestas existan y no digan «encaja», «compatibilidad» ni «no alcanza».
 2. **Los botones invitan a agendar una cita**, en vez de «ver el diagnóstico»:
    - lectura parcial: «Quiero agendar mi cita»;
    - registro: el título es «Agenda tu cita con Zequara» y el botón «Enviar mis datos y agendar mi cita»;

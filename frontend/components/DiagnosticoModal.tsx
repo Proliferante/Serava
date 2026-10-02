@@ -472,18 +472,16 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
                         </div>
                       </div>
 
-                      <div className="mt-[16px] w-full overflow-hidden rounded-[20px] p-[32px]" style={{ background: resultado.afinidad === "Baja" ? "rgba(247,241,229,0.06)" : "linear-gradient(160deg, #7f8b57 0%, #5f6b3e 100%)" }}>
-                        <p className="text-[11px] uppercase tracking-[0.2em]" style={{ color: "rgba(247,241,229,0.75)" }}>Tu encaje con Zequara</p>
-                        <h3 className="mt-[10px] text-[clamp(22px,3.6vw,28px)] font-light text-[#f7f1e5]">
-                          {resultado.afinidad === "Alta" ? "Tu perfil se alinea con el modelo Zequara."
-                            : resultado.afinidad === "Media" ? "Tu perfil tiene puntos en común con el modelo Zequara."
-                              : "Por ahora tu perfil no encaja del todo con el modelo Zequara."}
-                        </h3>
-                        {resultado.motivos.length > 0 && (
-                          <ul className="mx-auto mt-[12px] max-w-[480px] list-none space-y-[6px] p-0 text-[13.5px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.85)" }}>
-                            {resultado.motivos.map((m) => <li key={m}>{m}</li>)}
-                          </ul>
-                        )}
+                      {/* Ni el número ni la afinidad («encaja / no encaja») se le muestran: un
+                          «no encaja del todo» espanta a quien todavía puede llegar a invertir.
+                          Se cierra con lo que Zequara podría hacer con su perfil; afinidad y
+                          motivos quedan para el equipo, guardados con la solicitud (2-oct-2026). */}
+                      <div className="mt-[16px] w-full overflow-hidden rounded-[20px] p-[32px]" style={{ background: "linear-gradient(160deg, #7f8b57 0%, #5f6b3e 100%)" }}>
+                        <p className="text-[11px] uppercase tracking-[0.2em]" style={{ color: "rgba(247,241,229,0.75)" }}>Lo que podemos hacer contigo</p>
+                        <h3 className="mx-auto mt-[10px] max-w-[560px] text-[clamp(18px,3vw,22px)] font-light leading-[1.45] text-[#f7f1e5]">{per.propuesta}</h3>
+                        <p className="mx-auto mt-[12px] max-w-[480px] text-[13.5px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.85)" }}>
+                          En tu cita la revisamos contigo con proyectos concretos.
+                        </p>
                         <motion.button type="button" onClick={onClose} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                           className="mt-[22px] inline-flex items-center justify-center gap-[10px] rounded-full bg-[#f7f1e5] px-[30px] py-[15px] text-[15px] font-bold text-[#2a1e14] shadow-[0px_10px_24px_-10px_rgba(0,0,0,0.5)]">
                           Volver a Zequara <ArrowR />
