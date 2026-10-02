@@ -39,7 +39,7 @@ Además hay una etiqueta de **diversificación internacional**, que se suma a cu
    - Con menos de 2 años de horizonte, o si vendería ante la caída, el riesgo es conservador.
    - Sin el «compraría más» ante la caída, nunca sale agresivo.
 3. **Reglas que pesan más que los puntos.** A un conservador no se le propone «Oportunidad». Con poco horizonte baja «Transformación y valor». Quien eligió renta corta la ve al menos como estrategia secundaria.
-4. **Compatibilidad con Zequara (0 a 100), explicada a la persona.** Suma:
+4. **Compatibilidad con Zequara (0 a 100), solo para el equipo.** Desde el 2-oct **no se le muestra a la persona**: se guarda con la solicitud (columna `compatibilidad`) para priorizar y analizar. La persona ve solo la afinidad en palabras («se alinea», «tiene puntos en común», «no encaja del todo») y sus motivos. Suma:
    - capital: 35 puntos;
    - horizonte: 20;
    - involucramiento (Zequara opera, así que suma más quien quiere delegar): 20;
@@ -48,7 +48,7 @@ Además hay una etiqueta de **diversificación internacional**, que se suma a cu
 5. **Capital mínimo: 500 millones** (`CAPITAL_MINIMO`).
    - El proyecto más barato posible cuesta ~$555M todo incluido: 60 m² en Laureles, compra en el p25 con 10 % de descuento y obra de $3,1M/m² (`mercado_referencia.json`).
    - Zequara no es crowdfunding: el inversionista compra el inmueble completo.
-   - Por debajo de 500 millones la compatibilidad queda en 40 como máximo y se le explica por qué.
+   - Por debajo de 500 millones la compatibilidad queda en 40 como máximo (afinidad baja) y se le explica por qué, sin mostrarle el número.
 6. **Moneda.** Una sola lista en pesos, con el equivalente en dólares en cada opción, a la TRM del 1-oct ($3.312,84). Todo se calcula en pesos, la misma unidad de las fichas.
 7. **Para el equipo y la plataforma.** Se calcula una `prioridad` interna (alta / media / baja, según capital, momento y horizonte) y unas `etiquetas` (estrategia, riesgo, ticket, ciudades, renta corta) para personalizar los proyectos que se le muestran.
 
@@ -82,3 +82,19 @@ Además hay una etiqueta de **diversificación internacional**, que se suma a cu
 - Lógica: 11 pruebas.
 - Frontend: `tsc` sin errores.
 - Recorrido completo en Chrome, en escritorio y celular, contra un backend de prueba local: un perfil value-add y uno de renta turística. Se probaron «Anterior», la validación del registro y que la solicitud llegue al backend con el perfil, el riesgo, la compatibilidad y el contacto.
+
+## Ajustes del 2 de octubre
+
+Después de revisar el diagnóstico con Paola, se hicieron tres cambios (rama `fix/diagnostico-ajustes`):
+
+1. **La compatibilidad ya no se le muestra a la persona.** Se quitó el número de la lectura parcial y del resultado; la tarjeta final dice «Tu encaje con Zequara» con la afinidad en palabras. El número se sigue calculando y se guarda en `solicitudes_acceso.compatibilidad` para uso interno.
+2. **Los botones invitan a agendar una cita**, en vez de «ver el diagnóstico»:
+   - lectura parcial: «Quiero agendar mi cita»;
+   - registro: el título es «Agenda tu cita con Zequara» y el botón «Enviar mis datos y agendar mi cita»;
+   - confirmación: «Recibimos tus datos. Te escribiremos… para agendar tu cita».
+3. **Pantalla vacía al terminar (error corregido).** Un doble toque, o un toque mientras la pantalla pasaba a la siguiente pregunta, hacía avanzar dos veces: se saltaba una pregunta, quedaba sin respuesta y al final la lectura parcial salía vacía (solo el fondo, el logo y «Salir»). El segundo caso además podía guardar la respuesta en la pregunta equivocada. Se corrigió así:
+   - los toques se ignoran mientras hay un avance en curso;
+   - cada toque se guarda en la pregunta que estaba en pantalla;
+   - si al final faltara alguna respuesta, se vuelve a esa pregunta en vez de mostrar una pantalla vacía.
+
+   Se reprodujo en Chrome antes de corregirlo y se volvió a probar después: con el doble toque (80 ms) y con el toque durante la animación (350 ms), ahora pasa de la pregunta 1 a la 2 y el final tiene contenido.

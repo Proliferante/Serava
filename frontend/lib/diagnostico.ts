@@ -276,7 +276,9 @@ export type Resultado = {
   riesgo: Riesgo;
   /** Diversificación internacional: se suma a cualquier perfil. */
   internacional: boolean;
+  /** Para el equipo: NO se le muestra a la persona (decisión del 2-oct-2026); se guarda con la solicitud. */
   compatibilidad: number;
+  /** Lo que sí ve la persona, en palabras: «se alinea», «tiene puntos en común», «no encaja del todo». */
   afinidad: "Alta" | "Media" | "Baja";
   /** Por qué sale esa compatibilidad, en frases cortas: se le muestra a la persona. */
   motivos: string[];
