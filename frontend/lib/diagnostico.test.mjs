@@ -142,3 +142,10 @@ test("las opciones de capital llevan su equivalente en dólares con la TRM de re
   assert.equal(enDolares(500e6), "USD 151 mil");
   assert.match(PREGUNTAS.find((p) => p.id === "capital").opciones[4].sub, /millones/);
 });
+
+test("cada perfil cierra con una propuesta en positivo, sin decir si encaja o no", () => {
+  for (const per of Object.values(PERFILES)) {
+    assert.ok(per.propuesta.startsWith("Con tu perfil, podríamos"), per.id);
+    assert.ok(!/encaja|compatib|no alcanza/i.test(per.propuesta), per.id);
+  }
+});
