@@ -105,6 +105,13 @@ def calcular_ficha(e: dict) -> dict:
     if not e.get("negociado"):
         avisos.append(f"Precio negociado supuesto: publicado − 10 % ({redactar.M(r['costo']['negociado'])}). "
                       "Escribe el real si ya se negoció.")
+    # Un negociado muy lejos del publicado casi siempre es una cifra mal escrita
+    # (millones por pesos, un cero de menos): con 1,8 M de negociado sobre 1.995 M
+    # publicados la TIR salía de 50 % sin que nada lo señalara (checkpoint 30-sep).
+    rel = r["costo"]["negociado"] / r["costo"]["publicado"]
+    if e.get("negociado") and not 0.6 <= rel <= 1.1:
+        avisos.append(f"Revisa el precio negociado: es el {redactar.num(rel * 100)} % del publicado "
+                      f"({redactar.M(r['costo']['negociado'])} frente a {redactar.M(r['costo']['publicado'])}).")
     if not e.get("remodelacion_m2"):
         pendiente = " (PENDIENTE: arquitectura no ha dado el costo de obra de esta ciudad)" \
             if ciudad in modelo.REMODELACION_PENDIENTE else ""
