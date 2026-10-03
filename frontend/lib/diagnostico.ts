@@ -213,6 +213,9 @@ export type Perfil = {
   /** Zonas activas de Zequara que le encajan, por ciudad. */
   zonas: Record<string, string[]>;
   ruta: string[];
+  /** Lo que Zequara podría hacer con esa persona. Es lo que cierra el resultado:
+   *  en positivo, sin decirle si «encaja» o no (decisión del 2-oct-2026). */
+  propuesta: string;
 };
 
 export const PERFILES: Record<PerfilId, Perfil> = {
@@ -224,6 +227,7 @@ export const PERFILES: Record<PerfilId, Perfil> = {
     zonas: { "Bogotá": ["La Cabrera", "El Retiro", "Chicó"], "Medellín": ["El Poblado"], "Ciudad de Panamá": ["Bella Vista / Obarrio"] },
     ruta: ["Definir cuánto de tu patrimonio quieres en finca raíz.", "Elegir zonas consolidadas con historial de valorización.",
       "Comprar por debajo del precio de mercado.", "Mantener a largo plazo con arriendo estable."],
+    propuesta: "Con tu perfil, podríamos buscar contigo un inmueble en una zona consolidada, comprarlo por debajo de su precio de mercado y darle una remodelación puntual, para proteger tu capital y arrendarlo a largo plazo.",
   },
   renta: {
     id: "renta", nombre: "Renta estable", equivale: "Core-plus",
@@ -233,6 +237,7 @@ export const PERFILES: Record<PerfilId, Perfil> = {
     zonas: { "Bogotá": ["Chicó", "La Cabrera"], "Medellín": ["El Poblado", "Laureles"], "Ciudad de Panamá": ["El Cangrejo"] },
     ruta: ["Definir la renta mensual que esperas.", "Validar el arriendo real de la zona para ese tamaño.",
       "Remodelar para arrendar más y con menos vacancia.", "Delegar la administración del arriendo."],
+    propuesta: "Con tu perfil, podríamos buscar contigo un inmueble bien ubicado y remodelarlo pensando en el arriendo, para que te genere una renta mensual estable sin que tengas que encargarte de la administración.",
   },
   turistica: {
     id: "turistica", nombre: "Renta turística", equivale: "Core-plus con operación",
@@ -242,6 +247,7 @@ export const PERFILES: Record<PerfilId, Perfil> = {
     zonas: { "Cartagena": ["Centro Histórico", "Getsemaní"], "Medellín": ["El Poblado", "Laureles"], "Ciudad de Panamá": ["Casco Viejo"] },
     ruta: ["Confirmar que el reglamento del edificio permite la renta corta.", "Registrar el inmueble en el Registro Nacional de Turismo y asegurarlo.",
       "Remodelar y amoblar para huéspedes.", "Definir quién opera las reservas y la limpieza."],
+    propuesta: "Con tu perfil, podríamos buscar contigo un inmueble en una zona turística cuyo reglamento permita la renta corta, remodelarlo y amoblarlo para huéspedes, y dejar la operación de las reservas en manos expertas.",
   },
   valor: {
     id: "valor", nombre: "Transformación y valor", equivale: "Value-add · el modelo Zequara",
@@ -251,6 +257,7 @@ export const PERFILES: Record<PerfilId, Perfil> = {
     zonas: { "Bogotá": ["La Cabrera", "Chicó"], "Medellín": ["El Poblado"], "Ciudad de Panamá": ["Bella Vista / Obarrio"] },
     ruta: ["Encontrar un inmueble bajo el precio de su zona.", "Validar con arquitectura el alcance y el costo de la obra.",
       "Remodelar y decidir si arrendar o vender.", "Fijar el horizonte de salida con la valorización esperada."],
+    propuesta: "Con tu perfil, podríamos buscar contigo un inmueble por debajo del precio de su zona, transformarlo con un proyecto de arquitectura y capturar su valorización en 3 a 5 años, para venderlo o arrendarlo.",
   },
   oportunidad: {
     id: "oportunidad", nombre: "Oportunidad", equivale: "Oportunista",
@@ -260,6 +267,7 @@ export const PERFILES: Record<PerfilId, Perfil> = {
     zonas: { "Bogotá": ["Chicó"], "Medellín": ["Laureles"], "Cartagena": ["Getsemaní"], "Ciudad de Panamá": ["Casco Viejo"] },
     ruta: ["Definir cuánto riesgo puedes asumir sin afectar tu patrimonio.", "Identificar zonas con una tesis clara de transformación.",
       "Negociar fuerte la compra para tener margen de seguridad.", "Tener una salida alterna si la zona tarda en valorizarse."],
+    propuesta: "Con tu perfil, podríamos buscar contigo un inmueble en una zona en transformación, negociarlo con margen de seguridad y transformarlo para buscar un mayor retorno, con un plan de salida claro.",
   },
 };
 
@@ -276,9 +284,12 @@ export type Resultado = {
   riesgo: Riesgo;
   /** Diversificación internacional: se suma a cualquier perfil. */
   internacional: boolean;
+  /** Para el equipo: NO se le muestra a la persona (decisión del 2-oct-2026); se guarda con la solicitud. */
   compatibilidad: number;
+  /** Para el equipo, igual que la compatibilidad: desde el 2-oct-2026 a la persona no se le
+   *  dice si «encaja» o no, para no desanimarla; ve en cambio la propuesta de su perfil. */
   afinidad: "Alta" | "Media" | "Baja";
-  /** Por qué sale esa compatibilidad, en frases cortas: se le muestra a la persona. */
+  /** Para el equipo: por qué sale esa compatibilidad, en frases cortas. No se le muestran. */
   motivos: string[];
   capitalSuficiente: boolean;
   ciudades: string[];
