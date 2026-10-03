@@ -15,6 +15,8 @@ nombre anterior del proyecto. La marca, los textos y los logotipos son Zequara.
 | `database/` | **Postgres en Supabase.** Cinco tablas: `raw_listings` y `clean_listings` (las reconstruye el pipeline), `usuarios`, `seguimiento_propiedades` e `inmueble_detalle` (las escriben las personas). El esquema está en `database/schema.sql`. |
 | `docker-compose.yml` | Vacío. |
 
+**Antes de tocar nada: [COMO-TRABAJAMOS.md](COMO-TRABAJAMOS.md).** `main` es lo que está en línea en www.zequara.com, y los cambios entran por ramas y Pull Requests.
+
 Para arrancar el backend y crear los usuarios del equipo:
 **[backend/LEEME.md](backend/LEEME.md)**.
 

@@ -52,6 +52,8 @@ def _app() -> FastAPI:
 @pytest.fixture
 def cliente(monkeypatch):
     monkeypatch.setattr(config, "PROXY_SECRETO", "")
+    # Reloj parado a mitad de minuto: ver `limites._ahora`.
+    monkeypatch.setattr(limites, "_ahora", lambda: 1_000_020.0)
     limites.contador.vaciar()
     yield TestClient(_app())
     limites.contador.vaciar()
@@ -60,6 +62,8 @@ def cliente(monkeypatch):
 @pytest.fixture
 def firmado(monkeypatch):
     monkeypatch.setattr(config, "PROXY_SECRETO", SECRETO)
+    # Reloj parado a mitad de minuto: ver `limites._ahora`.
+    monkeypatch.setattr(limites, "_ahora", lambda: 1_000_020.0)
     limites.contador.vaciar()
     yield TestClient(_app())
     limites.contador.vaciar()
