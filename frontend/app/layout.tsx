@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Poppins } from "next/font/google";
 import "@/styles/globals.css";
 import PageTransition from "@/components/PageTransition";
+import AvisoCookies from "@/components/cookies/AvisoCookies";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -48,6 +49,8 @@ export default function RootLayout({
     <html lang="es" className={`${poppins.variable} ${cormorant.variable}`}>
       <body className="font-sans antialiased">
         <PageTransition>{children}</PageTransition>
+        {/* Fuera de la transición: no debe animarse con cada cambio de página. */}
+        <AvisoCookies />
       </body>
     </html>
   );

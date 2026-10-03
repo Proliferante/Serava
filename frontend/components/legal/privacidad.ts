@@ -1,4 +1,5 @@
 import type { DocumentoLegal } from "@/components/legal/LegalPage";
+import { ANALITICA } from "@/lib/cookies";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    POLÍTICA DE TRATAMIENTO DE DATOS PERSONALES — el texto, tal cual el Word.
@@ -144,7 +145,15 @@ export const PRIVACIDAD: DocumentoLegal = {
         lista: [
           "Una cookie de sesión (zq_sesion), sólo si inicias sesión en la plataforma. Es esencial: sin ella no se puede mantener la sesión abierta. No la puede leer ningún script de la página, viaja sólo a nuestro servidor y caduca a las 12 horas, o antes si sales o pasan dos horas sin actividad.",
           "Una marca en el almacenamiento de la pestaña (sessionStorage) para no repetirte el aviso de tamaño de pantalla. No contiene datos personales y se borra al cerrar la pestaña.",
-          "No usamos cookies de analítica, de publicidad ni píxeles de terceros. Si eso cambia, lo diremos aquí y te pediremos permiso antes de activarlas.",
+          // Cambia sola con NEXT_PUBLIC_GA_ID (ver lib/cookies): el mismo
+          // despliegue que enciende la analítica actualiza este texto.
+          ...(ANALITICA
+            ? [
+                "Google Analytics, sólo si nos das permiso en el aviso de cookies: las cookies _ga y _ga_… (hasta 2 años) para medir las visitas de forma agregada. No lo usamos para publicidad ni le enviamos tu nombre, correo o teléfono. Google puede procesar estos datos fuera de Colombia (sección 11).",
+                "Una cookie zq_cookies que guarda tu decisión durante 6 meses. Puedes cambiarla cuando quieras en «Preferencias de cookies», al pie de cada página; si retiras el permiso, apagamos Google Analytics y borramos sus cookies.",
+                "No usamos cookies de publicidad ni píxeles de terceros.",
+              ]
+            : ["No usamos cookies de analítica, de publicidad ni píxeles de terceros. Si eso cambia, lo diremos aquí y te pediremos permiso antes de activarlas."]),
         ],
       },
     },

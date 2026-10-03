@@ -1,5 +1,6 @@
 import { WORDMARK, wordmarkH } from "@/components/brand";
 import { CTA_PORTAFOLIO_CORTO, DISCLAIMER } from "@/components/copy";
+import { PreferenciasCookies } from "@/components/cookies/AvisoCookies";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PIE DE MÓVIL Y TABLET.
@@ -94,6 +95,7 @@ export default function MobileFooter() {
             </svg>
             <span className="underline decoration-[rgba(205,154,100,0.45)] underline-offset-[4px] group-hover:decoration-sand">Política de datos</span>
           </a>
+          <PreferenciasCookies className="inline-flex h-[44px] items-center text-[14px] font-light text-sand underline decoration-[rgba(205,154,100,0.45)] underline-offset-[4px]" />
         </div>
 
         <p className="mt-[6px] text-[12.5px] font-light leading-[1.5] text-[rgba(226,205,174,0.5)]">
