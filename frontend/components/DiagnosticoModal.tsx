@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { MARK } from "@/components/brand";
 import { AUTORIZACION, AVISO_SOLICITUD, EnlacePolitica, evidencia } from "@/components/legal/consentimiento";
@@ -177,23 +177,46 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
   const resultado: Resultado | null = useMemo(() => (listo ? calcular(answers) : null), [answers, listo]);
   const errores = erroresDe(form);
 
-  const avanzar = () => {
+  /* LA PANTALLA VACÍA (prueba del 2-oct-2026)
+     Al tocar una opción se espera 260 ms antes de pasar a la siguiente, para
+     que se vea marcada. Un segundo toque en ese rato —un doble toque, o
+     cambiar de opción rápido— programaba OTRO avance: se saltaba una pregunta,
+     quedaba sin responder, y al final la lectura parcial no tenía qué pintar
+     (fondo, logo y «Salir»). Peor aún: un toque sobre la pregunta que se
+     estaba yendo guardaba la respuesta en la pregunta siguiente.
+     Tres cosas lo cierran:
+       · `avanzando`: mientras hay un avance en curso, los toques se ignoran;
+       · cada toque lleva el número de SU pregunta y se descarta si ya no es la
+         que está en pantalla;
+       · al llegar al final, si faltara alguna respuesta (no debería), se vuelve
+         a esa pregunta en vez de mostrar una pantalla vacía. */
+  const avanzando = useRef(false);
+  /* Las respuestas al día, para el avance que corre 260 ms después del toque:
+     el `answers` de ese momento ya es viejo. */
+  const respuestas = useRef<Respuestas>(answers);
+  respuestas.current = answers;
+  const primeraSinResponder = (r: Respuestas) => r.findIndex((_, i) => !completa(r, i));
+
+  const avanzar = (desde: number) => {
     setDir(1);
-    if (qIndex < N - 1) setQIndex((q) => q + 1);
-    else setStep("partial");
+    if (desde < N - 1) { setQIndex(desde + 1); return; }
+    const falta = primeraSinResponder(respuestas.current);
+    if (falta >= 0) { setQIndex(falta); setStep("q"); } else setStep("partial");
   };
-  const elegir = (i: number) => {
-    const p = PREGUNTAS[qIndex];
+  const elegir = (pregunta: number, i: number) => {
+    if (avanzando.current || pregunta !== qIndex) return;
+    const p = PREGUNTAS[pregunta];
     if (p.multiple) {
       setAnswers((a) => {
-        const n = [...a]; const v = (n[qIndex] as number[]) ?? [];
-        n[qIndex] = v.includes(i) ? v.filter((x) => x !== i) : [...v, i];
+        const n = [...a]; const v = (n[pregunta] as number[]) ?? [];
+        n[pregunta] = v.includes(i) ? v.filter((x) => x !== i) : [...v, i];
         return n;
       });
       return; // las múltiples avanzan con «Continuar»
     }
-    setAnswers((a) => { const n = [...a]; n[qIndex] = i; return n; });
-    window.setTimeout(avanzar, 260);
+    setAnswers((a) => { const n = [...a]; n[pregunta] = i; return n; });
+    avanzando.current = true;
+    window.setTimeout(() => { avanzar(pregunta); avanzando.current = false; }, 260);
   };
   const atras = () => {
     setDir(-1);
@@ -287,7 +310,7 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
                           const v = answers[qIndex];
                           const active = Array.isArray(v) ? v.includes(i) : v === i;
                           return (
-                            <motion.button key={opt.t} type="button" onClick={() => elegir(i)} aria-pressed={active}
+                            <motion.button key={opt.t} type="button" onClick={() => elegir(qIndex, i)} aria-pressed={active}
                               whileHover={{ x: 4 }} whileTap={{ scale: 0.99 }}
                               className="flex min-h-[70px] items-center gap-[16px] rounded-[15px] border border-solid px-[22px] py-[12px] text-left transition-colors"
                               style={{ background: active ? "rgba(127,139,87,0.22)" : "rgba(247,241,229,0.04)", borderColor: active ? "#7f8b57" : "rgba(247,241,229,0.18)" }}>
@@ -304,9 +327,23 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
                         })}
                       </div>
                       {p.multiple && (
-                        <OliveBtn onClick={avanzar} disabled={!completa(answers, qIndex)} className="mt-[22px]">Continuar <ArrowR /></OliveBtn>
+                        <OliveBtn onClick={() => avanzar(qIndex)} disabled={!completa(answers, qIndex)} className="mt-[22px]">Continuar <ArrowR /></OliveBtn>
                       )}
                       <Atras onClick={atras} />
+                    </motion.div>
+                  )}
+
+                  {/* Nunca una pantalla vacía: si en un paso posterior faltara una
+                      respuesta, se ofrece volver a ella. */}
+                  {step !== "intro" && step !== "q" && !resultado && (
+                    <motion.div key="falta" {...slide} transition={{ duration: 0.4, ease: EASE }} className="flex flex-col items-center text-center">
+                      <h3 className="text-[clamp(24px,3.6vw,30px)] font-light text-[#f7f1e5]">Falta una respuesta.</h3>
+                      <p className="mt-[12px] text-[15px] font-light" style={{ color: "rgba(247,241,229,0.7)" }}>
+                        Para darte tu resultado necesitamos que respondas la pregunta {primeraSinResponder(answers) + 1}.
+                      </p>
+                      <OliveBtn onClick={() => { setDir(-1); setQIndex(Math.max(0, primeraSinResponder(answers))); setStep("q"); }} className="mt-[24px]">
+                        Ir a la pregunta <ArrowR />
+                      </OliveBtn>
                     </motion.div>
                   )}
 
@@ -314,10 +351,10 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
                   {step === "partial" && resultado && per && (
                     <motion.div key="partial" {...slide} transition={{ duration: 0.5, ease: EASE }} className="flex flex-col items-center text-center">
                       <div className="w-full"><Progress pct={100} label="Diagnóstico completado" /></div>
-                      <motion.p initial={{ scale: 0.55 }} animate={{ scale: 1 }} transition={{ delay: 0.15, duration: 0.55, ease: [0.34, 1.56, 0.64, 1] }}
-                        className="mt-[40px] text-[38px] font-extrabold leading-none text-[#c9a877]">{resultado.compatibilidad}</motion.p>
-                      <p className="mt-[6px] text-[10.5px] uppercase tracking-[0.25em]" style={{ color: "rgba(247,241,229,0.55)" }}>Compatibilidad con Zequara</p>
-                      <h3 className="mt-[26px] text-[clamp(26px,4vw,34px)] font-light tracking-[-0.02em] text-[#f7f1e5]">Ya tenemos una lectura inicial de tu perfil.</h3>
+                      {/* La compatibilidad (0–100) NO se muestra: es un dato interno del equipo
+                          para priorizar y analizar (decisión del 2-oct-2026). Se sigue calculando y
+                          se guarda con la solicitud (columna `compatibilidad`). */}
+                      <h3 className="mt-[44px] text-[clamp(26px,4vw,34px)] font-light tracking-[-0.02em] text-[#f7f1e5]">Ya tenemos una lectura inicial de tu perfil.</h3>
                       <div className="mt-[34px] w-full max-w-[560px] rounded-[18px] border border-solid p-[8px]" style={{ background: "rgba(247,241,229,0.03)", borderColor: "rgba(247,241,229,0.14)" }}>
                         {([
                           ["Estrategia sugerida", per.nombre, false],
@@ -330,9 +367,9 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
                             <span className="text-right text-[14px] font-semibold text-[#c9a877]" style={{ filter: blur ? "blur(4px)" : "none" }}>{v}</span>
                           </div>
                         ))}
-                        <p className="px-[22px] py-[12px] text-[12.5px]" style={{ color: "rgba(247,241,229,0.5)" }}>Déjanos tus datos para ver tu diagnóstico completo y enviar tu solicitud de acceso.</p>
+                        <p className="px-[22px] py-[12px] text-[12.5px]" style={{ color: "rgba(247,241,229,0.5)" }}>Escribe tus datos y agenda una cita con nuestro equipo: en ella revisamos contigo tu diagnóstico completo y las oportunidades que encajan con tu perfil.</p>
                       </div>
-                      <OliveBtn onClick={() => { setDir(1); setStep("capture"); }} className="mt-[28px] w-full max-w-[560px]">Ver mi diagnóstico completo <ArrowR /></OliveBtn>
+                      <OliveBtn onClick={() => { setDir(1); setStep("capture"); }} className="mt-[28px] w-full max-w-[560px]">Quiero agendar mi cita <ArrowR /></OliveBtn>
                       <Atras onClick={atras}>Cambiar mis respuestas</Atras>
                     </motion.div>
                   )}
@@ -343,9 +380,10 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
                       <Progress pct={100} label="Último paso" />
                       <form className="mt-[26px] rounded-[18px] border border-solid p-[clamp(20px,4vw,40px)]" style={{ background: "rgba(247,241,229,0.03)", borderColor: "rgba(247,241,229,0.14)" }}
                         onSubmit={(e) => { e.preventDefault(); enviar(); }} noValidate>
-                        <h3 className="text-[clamp(24px,3.5vw,30px)] font-light tracking-[-0.02em] text-[#f7f1e5]">Ya casi. Un último paso.</h3>
+                        <h3 className="text-[clamp(24px,3.5vw,30px)] font-light tracking-[-0.02em] text-[#f7f1e5]">Agenda tu cita con Zequara.</h3>
                         <p className="mt-[10px] text-[14px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.7)" }}>
-                          Con tus datos ves tu diagnóstico completo y queda enviada tu solicitud de acceso. Te contactaremos para coordinar una sesión.
+                          Escribe tus datos y te contactamos para agendar una cita virtual en la que conoces más sobre Zequara, revisamos tu perfil
+                          y te mostramos las oportunidades que encajan contigo. Al enviarlos verás tu diagnóstico completo.
                         </p>
                         <div className="mt-[22px] grid grid-cols-1 gap-[16px] sm:grid-cols-2">
                           <Field label="Nombre" placeholder="Tu nombre" value={form.nombre} onChange={(v) => setForm({ ...form, nombre: v })} error={ver("nombre")} autoComplete="given-name" />
@@ -372,7 +410,7 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
                           </span>
                         </label>
                         <OliveBtn type="submit" disabled={envio.estado === "enviando"} className="mt-[22px] w-full">
-                          {envio.estado === "enviando" ? "Enviando…" : <>Ver mi diagnóstico y enviar mi solicitud <ArrowR /></>}
+                          {envio.estado === "enviando" ? "Enviando…" : <>Enviar mis datos y agendar mi cita <ArrowR /></>}
                         </OliveBtn>
                       </form>
                       <Atras onClick={atras} />
@@ -384,7 +422,7 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
                     <motion.div key="result" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: EASE }} className="flex flex-col items-center pt-[20px] text-center">
                       {envio.estado === "ok" ? (
                         <p className="mb-[22px] w-full rounded-[12px] px-[16px] py-[12px] text-[13.5px]" style={{ background: "rgba(127,139,87,0.2)", color: "#e6ecd2" }}>
-                          ✓ Recibimos tu solicitud. Te escribiremos al correo o al WhatsApp que dejaste para coordinar una sesión.
+                          ✓ Recibimos tus datos. Te escribiremos al correo o al WhatsApp que dejaste para agendar tu cita.
                         </p>
                       ) : (
                         <p className="mb-[22px] w-full rounded-[12px] px-[16px] py-[12px] text-[13.5px]" style={{ background: "rgba(227,154,122,0.15)", color: "#f2c9b6" }}>
@@ -434,18 +472,16 @@ export default function DiagnosticoModal({ open, onClose, origen = "portada" }: 
                         </div>
                       </div>
 
-                      <div className="mt-[16px] w-full overflow-hidden rounded-[20px] p-[32px]" style={{ background: resultado.afinidad === "Baja" ? "rgba(247,241,229,0.06)" : "linear-gradient(160deg, #7f8b57 0%, #5f6b3e 100%)" }}>
-                        <p className="text-[11px] uppercase tracking-[0.2em]" style={{ color: "rgba(247,241,229,0.75)" }}>Compatibilidad con Zequara · {resultado.compatibilidad}/100</p>
-                        <h3 className="mt-[10px] text-[clamp(22px,3.6vw,28px)] font-light text-[#f7f1e5]">
-                          {resultado.afinidad === "Alta" ? "Tu perfil se alinea con el modelo Zequara."
-                            : resultado.afinidad === "Media" ? "Tu perfil tiene puntos en común con el modelo Zequara."
-                              : "Por ahora tu perfil no encaja del todo con el modelo Zequara."}
-                        </h3>
-                        {resultado.motivos.length > 0 && (
-                          <ul className="mx-auto mt-[12px] max-w-[480px] list-none space-y-[6px] p-0 text-[13.5px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.85)" }}>
-                            {resultado.motivos.map((m) => <li key={m}>{m}</li>)}
-                          </ul>
-                        )}
+                      {/* Ni el número ni la afinidad («encaja / no encaja») se le muestran: un
+                          «no encaja del todo» espanta a quien todavía puede llegar a invertir.
+                          Se cierra con lo que Zequara podría hacer con su perfil; afinidad y
+                          motivos quedan para el equipo, guardados con la solicitud (2-oct-2026). */}
+                      <div className="mt-[16px] w-full overflow-hidden rounded-[20px] p-[32px]" style={{ background: "linear-gradient(160deg, #7f8b57 0%, #5f6b3e 100%)" }}>
+                        <p className="text-[11px] uppercase tracking-[0.2em]" style={{ color: "rgba(247,241,229,0.75)" }}>Lo que podemos hacer contigo</p>
+                        <h3 className="mx-auto mt-[10px] max-w-[560px] text-[clamp(18px,3vw,22px)] font-light leading-[1.45] text-[#f7f1e5]">{per.propuesta}</h3>
+                        <p className="mx-auto mt-[12px] max-w-[480px] text-[13.5px] font-light leading-[1.5]" style={{ color: "rgba(247,241,229,0.85)" }}>
+                          En tu cita la revisamos contigo con proyectos concretos.
+                        </p>
                         <motion.button type="button" onClick={onClose} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                           className="mt-[22px] inline-flex items-center justify-center gap-[10px] rounded-full bg-[#f7f1e5] px-[30px] py-[15px] text-[15px] font-bold text-[#2a1e14] shadow-[0px_10px_24px_-10px_rgba(0,0,0,0.5)]">
                           Volver a Zequara <ArrowR />
